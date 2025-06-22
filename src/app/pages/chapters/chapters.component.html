@@ -1,0 +1,8 @@
+<h1>{{ chapter.title }}</h1>
+<div class="pages">
+  @for (page of chapter.pages; track $index) {
+  <img [src]="page.path" alt="Page Image" />
+  }@empty {
+  <p>No pages available for this chapter.</p>
+  }
+</div>

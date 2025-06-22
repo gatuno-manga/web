@@ -1,0 +1,11 @@
+<div id="books">
+  @for (book of books; track book.id) {
+  <a [routerLink]="[book.id]" class="book">
+    <h2>{{ book.title }}</h2>
+  </a>
+  }@empty {
+  <div class="no-books">
+    <p>No books available.</p>
+  </div>
+  }
+</div>

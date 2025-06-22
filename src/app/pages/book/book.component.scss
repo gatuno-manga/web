@@ -1,0 +1,28 @@
+h1 {
+  text-align: center;
+}
+
+.chapters {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+  padding: 1rem;
+  justify-content: center;
+  align-items: center;
+
+  .chapter {
+    padding: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    width: 100%;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+    flex: none;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+}
