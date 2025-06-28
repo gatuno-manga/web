@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { BookService } from '../../service/book.service';
 import { BookList } from '../../models/booke.models';
 import { RouterModule } from '@angular/router';
+import { Page } from '../../models/miscellaneous.models';
 
 @Component({
   selector: 'app-books',
@@ -12,8 +13,8 @@ import { RouterModule } from '@angular/router';
 export class BooksComponent {
   books: BookList[] = [];
   constructor(private booksService: BookService) {
-    this.booksService.getBooks().subscribe((books: BookList[]) => {
-      this.books = books;
+    this.booksService.getBooks().subscribe((bookPage: Page<BookList>) => {
+      this.books = bookPage.data;
     });
   }
 }
