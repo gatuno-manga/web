@@ -1,16 +1,24 @@
 import { HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 export const HttpClientInterceptor: HttpInterceptorFn = (req, next) => {
   let clonedRequest = req;
+  if (!/^https?:\/\//i.test(req.url) && !req.url.startsWith('/assets/') && !req.url.startsWith('/favicon.ico')) {
+    let baseUrl = environment.apiURL;
 
-  if (!req.url.includes('https://')) {
-    const url = (environment.apiURL ?? `${window.location.origin}/api`) + `/${req.url}`;
+    if (!baseUrl) {
+      const platformId = inject(PLATFORM_ID);
+      if (isPlatformBrowser(platformId)) {
+        baseUrl = window.location.origin + '/api';
+      } else {
+        baseUrl = '/api';
+      }
+    }
 
-    clonedRequest = req.clone({
-      url,
-    });
+    const url = `${baseUrl.replace(/\/+$/, '')}/${req.url.replace(/^\/+/, '')}`;
+    clonedRequest = req.clone({ url });
   }
 
   return next(clonedRequest);
