@@ -49,7 +49,11 @@ app.get('**', (req, res, next) => {
       publicPath: browserDistFolder,
       providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
     })
-    .then((html) => res.send(html))
+    .then((html) => {
+      const theme = req.cookies['theme'] === 'dark' ? 'dark' : 'light';
+      const themedHtml = html.replace('<html lang="pt-BR">', `<html lang="pt-BR" data-theme="${theme}">`);
+      res.send(themedHtml);
+    })
     .catch((err) => next(err));
 });
 

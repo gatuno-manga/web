@@ -1,13 +1,47 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Front</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-</head>
-<body>
-  <app-root></app-root>
-</body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+	<head>
+		<script>
+			(function () {
+				function applyTheme(theme) {
+					document.documentElement.setAttribute('data-theme', theme);
+				}
+
+				function getInitialTheme() {
+					try {
+						const storedTheme =
+							window.localStorage.getItem('@gatuno/theme');
+						if (storedTheme === 'dark' || storedTheme === 'light')
+							return storedTheme;
+					} catch (e) {
+						console.error('Erro ao acessar localStorage:', e);
+					}
+
+					try {
+						if (
+							window.matchMedia('(prefers-color-scheme: dark)')
+								.matches
+						) {
+							return 'dark';
+						}
+					} catch (e) {
+						console.error('Erro ao acessar matchMedia:', e);
+					}
+
+					return 'light';
+				}
+
+				applyTheme(getInitialTheme());
+			})();
+		</script>
+
+		<meta charset="utf-8" />
+		<title>Front</title>
+		<base href="/" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/x-icon" href="favicon.ico" />
+	</head>
+	<body>
+		<app-root></app-root>
+	</body>
 </html>

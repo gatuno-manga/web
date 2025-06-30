@@ -1,0 +1,12 @@
+<div (click)="toggleTheme()">
+	<app-icons
+		*ngIf="themeService.currentTheme() === 'dark'"
+		name="moon"
+		size="32"
+	/>
+	<app-icons
+		*ngIf="themeService.currentTheme() === 'light'"
+		name="sun"
+		size="32"
+	/>
+</div>
