@@ -6,3 +6,8 @@ export interface Page<T> {
     lastPage: number;
   };
 }
+
+export interface PageRequest {
+  page?: number;
+  limit?: number;
+}

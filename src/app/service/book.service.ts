@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Book, BookList, Chapter } from "../models/booke.models";
+import { Book, BookList, BookPageOptions, Chapter } from "../models/book.models";
 import { Page } from "../models/miscellaneous.models";
 
 @Injectable({
@@ -9,8 +9,12 @@ import { Page } from "../models/miscellaneous.models";
 export class BookService {
   constructor(private http: HttpClient) {}
 
-  getBooks() {
-    return this.http.get<Page<BookList>>('books');
+  getBooks(opitions?: BookPageOptions) {
+    return this.http.get<Page<BookList>>('books', {
+      params: {
+        ...opitions,
+      }
+    });
   }
 
   getBook(id: string) {

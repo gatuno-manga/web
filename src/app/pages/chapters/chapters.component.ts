@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Chapter } from '../../models/booke.models';
+import { Chapter } from '../../models/book.models';
 import { BookService } from '../../service/book.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
@@ -13,7 +13,7 @@ import { NgIf } from '@angular/common';
   styleUrl: './chapters.component.scss'
 })
 export class ChaptersComponent {
-  chapter!: Chapter
+  chapter!: Chapter;
 
   constructor(
     private bookService: BookService,

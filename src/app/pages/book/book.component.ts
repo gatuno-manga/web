@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Book, ScrapingStatus } from '../../models/booke.models';
+import { Book, ScrapingStatus } from '../../models/book.models';
 import { BookService } from '../../service/book.service';
 import { NgClass } from '@angular/common';
 
@@ -31,7 +31,7 @@ export class BookComponent {
         console.error('Erro ao buscar livro:', err);
         this.router.navigate(['../'], { relativeTo: this.activatedRoute });
       }
-    })
+    });
   }
 
   getScrapingStatusClass(status: ScrapingStatus): string {

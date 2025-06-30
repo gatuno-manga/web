@@ -12,3 +12,14 @@
 	</div>
 	}
 </div>
+<div class="pages">
+	@for(page of pagesToShow; track page) {
+	<div
+		class="page"
+		[class.active]="page === currentPage"
+		(click)="goToPage(page)"
+	>
+		{{ page }}
+	</div>
+	}
+</div>
