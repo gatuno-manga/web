@@ -2,33 +2,48 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Book, ScrapingStatus } from '../../models/booke.models';
 import { BookService } from '../../service/book.service';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-book',
-  imports: [RouterModule],
+  imports: [RouterModule, NgClass],
   templateUrl: './book.component.html',
   styleUrl: './book.component.scss'
 })
 export class BookComponent {
-  book: Book = {
-    id: '',
-    title: '',
-    chapters: [],
-    scrapingStatus: ScrapingStatus.PROCESSING,
-  };
+  ScrapingStatus = ScrapingStatus;
+  book!: Book;
   constructor(
     private bookService: BookService,
     private activatedRoute: ActivatedRoute,
     private router: Router
   ) {
-    // TODO: Quando o id não for encontrado figa bugado
     const id = this.activatedRoute.snapshot.paramMap.get('id');
     if (!id) {
       this.router.navigate(['../'], { relativeTo: this.activatedRoute });
-    } else {
-      this.bookService.getBook(id).subscribe((book: Book) => {
+      return;
+    }
+    this.bookService.getBook(id).subscribe({
+      next: (book) => {
         this.book = book;
-      });
+      },
+      error: (err) => {
+        console.error('Erro ao buscar livro:', err);
+        this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+      }
+    })
+  }
+
+  getScrapingStatusClass(status: ScrapingStatus): string {
+    switch (status) {
+      case ScrapingStatus.READY:
+        return 'Pronto';
+      case ScrapingStatus.PROCESSING:
+        return 'Processando';
+      case ScrapingStatus.ERROR:
+        return 'error';
+      default:
+        return '';
     }
   }
 }

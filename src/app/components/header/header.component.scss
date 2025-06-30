@@ -1,23 +1,27 @@
 :host {
-  position: sticky;
-  top: 0;
-  left: 0;
-  z-index: 1000;
+	position: sticky;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+}
+:host[static] {
+	position: static;
 }
 
 header {
-  width: 100%;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 20px 0;
-  border-bottom: 2px solid black;
-  background-color: white;
-  margin-bottom: 20px;
+	width: 100%;
+	height: 70px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 40px;
+	border-bottom: 2px solid black;
+	background-image: var(--degrader);
+	margin-bottom: 20px;
 
-  nav {
-    display: flex;
-    gap: 20px;
-  }
+	nav {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+	}
 }

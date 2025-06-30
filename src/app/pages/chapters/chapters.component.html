@@ -1,8 +1,23 @@
-<h1>{{ chapter.title }}</h1>
+<app-header static />
+<div class="header">
+	<h1>#{{ chapter.index }} capitulo</h1>
+	<h2>{{ chapter.title }}</h2>
+	<div class="controler">
+		<a class="arrow" *ngIf="chapter.previous" (click)="previousPage()"
+			><app-icons name="arrow-left" size="42"
+		/></a>
+		<a class="index" (click)="backPage()"
+			>{{ chapter.index }}/{{ chapter.totalChapters }}</a
+		>
+		<a class="arrow" *ngIf="chapter.next" (click)="nextPage()"
+			><app-icons name="arrow-right" size="42"
+		/></a>
+	</div>
+</div>
 <div class="pages">
-  @for (page of chapter.pages; track $index) {
-  <img [src]="page.path" alt="Page Image" />
-  }@empty {
-  <p>No pages available for this chapter.</p>
-  }
+	@for (page of chapter.pages; track $index) {
+	<img [src]="page.path" alt="Page Image" />
+	}@empty {
+	<p>No pages available for this chapter.</p>
+	}
 </div>

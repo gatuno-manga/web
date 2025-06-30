@@ -1,10 +1,46 @@
-<div class="book-info">
-  <h1>{{ this.book.title }}</h1>
+<div class="book">
+	<div class="book-header">
+		<div class="book-cover">
+			<img [src]="book.cover" alt="" />
+		</div>
+		<div class="book-info">
+			<div class="top">
+				<h1>{{ book.title }}</h1>
+				<div>{{ book.chapters.length }} Capitulos</div>
+				<div>Ano de lançamento: {{ book.publication }}</div>
+			</div>
+		</div>
+	</div>
+	<div>
+		<p>{{ book.description }}</p>
+	</div>
 </div>
 <div class="chapters">
-  @for(chapter of this.book.chapters; track chapter.id) {
-  <a [routerLink]="[chapter.id]" class="chapter">
-    <h2>Capitulo #{{ chapter.index }}</h2>
-  </a>
-  }
+	@for(chapter of book.chapters; track chapter.id) {
+	<a [routerLink]="[chapter.id]" class="chapter">
+		<div>
+			<h2>
+				{{
+					chapter.title
+						? '#' + chapter.index + ' - ' + chapter.title
+						: 'Capitulo #' + chapter.index
+				}}
+			</h2>
+		</div>
+		<div>
+			<div
+				[ngClass]="{
+					scrapingStatusReady:
+						chapter.scrapingStatus === ScrapingStatus.READY,
+					scrapingStatusProcessing:
+						chapter.scrapingStatus === ScrapingStatus.PROCESSING,
+					scrapingStatusError:
+						chapter.scrapingStatus === ScrapingStatus.ERROR
+				}"
+			>
+				{{ getScrapingStatusClass(chapter.scrapingStatus) }}
+			</div>
+		</div>
+	</a>
+	}
 </div>

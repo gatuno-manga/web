@@ -36,20 +36,20 @@ export const routes: Routes = [
             }
           }
         },
-      },
-      {
-        path: 'books/:id/:chapter',
-        component: ChaptersComponent,
-        data: {
-          ssr: {
-            renderMode: RenderMode.Server,
-            cache: {
-              key: 'chapter',
-              ttl: 60 * 60
-            }
-          }
-        },
       }
     ]
+  },
+  {
+    path: 'books/:id/:chapter',
+    component: ChaptersComponent,
+    data: {
+      ssr: {
+        renderMode: RenderMode.Server,
+        cache: {
+          key: 'chapter',
+          ttl: 60 * 60
+        }
+      }
+    },
   }
 ];

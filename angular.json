@@ -32,8 +32,13 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "public/assets/scss/global.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "public/assets/scss"
+              ]
+            },
             "scripts": [],
             "server": "src/main.server.ts",
             "prerender": true,

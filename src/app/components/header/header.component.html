@@ -1,10 +1,11 @@
 <header>
-  <nav>
-    <a (click)="backPage()">Voltar</a>
-  </nav>
-  <nav>
-    <a [routerLink]="['/']">Home</a>
-    <a [routerLink]="['/books']">Mangas</a>
-  </nav>
-  <nav></nav>
+	<nav>
+		<a [routerLink]="['/']">
+			<app-icons name="logo" size="72" />
+		</a>
+	</nav>
+	<nav>
+		<a [routerLink]="['/books']">Mangas</a>
+		<app-theme-toggle />
+	</nav>
 </header>
