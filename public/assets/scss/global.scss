@@ -1,0 +1,36 @@
+@use 'color';
+@use 'color-definitions';
+
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	list-style: none;
+	text-decoration: none;
+	color: inherit;
+	position: relative;
+	z-index: 1;
+}
+
+:root {
+	@include color-definitions.light-definitions();
+	@include color.colors();
+}
+[data-theme='dark'] {
+	@include color-definitions.dark-definitions();
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme]) {
+		@include color-definitions.dark-definitions();
+	}
+}
+
+html {
+	color-scheme: light dark;
+	background-color: var(--app-background-color);
+	color: var(--app-text-color);
+}
+
+body {
+	min-height: 100vh;
+}

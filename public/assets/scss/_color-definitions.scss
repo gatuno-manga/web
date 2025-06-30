@@ -1,0 +1,29 @@
+@use 'color';
+
+@mixin dark-definitions() {
+	--app-background-color: var(--black);
+	--app-text-color: var(--beige);
+	--primary-color: var(--orange);
+	--scrollbar-color: var(--dark-gray);
+	--scrollbar-thumb-color: var(--dark-lilac);
+	--erro-message-color: var(--orange);
+	--degrader: linear-gradient(
+		88deg,
+		var(--black) 55%,
+		var(--dark-purple) 194%
+	);
+}
+@mixin light-definitions() {
+	--app-background-color: var(--white);
+	--app-text-color: var(--dark-purple);
+	--primary-color: var(--lilac);
+	--scrollbar-color: var(--beige);
+	--scrollbar-thumb-color: var(--dark-purple);
+	--erro-message-color: var(--orange);
+	--degrader: linear-gradient(
+		88deg,
+		var(--white) 0%,
+		var(--white) 50%,
+		var(--beige) 100%
+	);
+}
