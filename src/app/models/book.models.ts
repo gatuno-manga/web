@@ -31,6 +31,12 @@ export interface Book {
   chapters: Chapterlist[];
   tags: tag[];
   sensitiveContent: SensitiveContent[];
+  authors: Author[];
+}
+
+export interface Author {
+  id: string;
+  name: string;
 }
 
 export interface tag {

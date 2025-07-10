@@ -7,7 +7,9 @@
 		<div class="book-info">
 			<div class="top">
 				<h1>{{ book.title }}</h1>
-				<h6>{{ book.title }}</h6>
+				<h6>
+					{{ getAuthorNames() }}
+				</h6>
 			</div>
 			<div class="bottom">
 				<div>{{ book.chapters.length }} Capitulos</div>

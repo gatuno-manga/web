@@ -46,4 +46,8 @@ export class BookComponent {
         return '';
     }
   }
+
+  getAuthorNames(): string {
+    return this.book.authors.map(author => author.name).join(', ');
+  }
 }
