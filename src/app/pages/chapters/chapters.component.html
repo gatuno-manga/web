@@ -1,17 +1,21 @@
 <app-header static />
-<div class="header">
-	<h1>#{{ chapter.index }} capitulo</h1>
-	<h2>{{ chapter.title }}</h2>
+<div id="header" class="header">
+	<div class="title">
+		<h1>Capitulo {{ chapter.index }}</h1>
+		@if(chapter.title){
+		<h2>{{ chapter.title }}</h2>
+		}
+	</div>
 	<div class="controler">
-		<a class="arrow" *ngIf="chapter.previous" (click)="previousPage()"
-			><app-icons name="arrow-left" size="42"
-		/></a>
-		<a class="index" (click)="backPage()"
-			>{{ chapter.index }}/{{ chapter.totalChapters }}</a
-		>
-		<a class="arrow" *ngIf="chapter.next" (click)="nextPage()"
-			><app-icons name="arrow-right" size="42"
-		/></a>
+		<a class="arrow" *ngIf="chapter.previous" (click)="previousPage()">
+			<app-icons name="arrow-left" size="42" />
+		</a>
+		<a class="index" (click)="backPage()">
+			{{ chapter.index }}/{{ chapter.totalChapters }}
+		</a>
+		<a class="arrow" *ngIf="chapter.next" (click)="nextPage()">
+			<app-icons name="arrow-right" size="42" />
+		</a>
 	</div>
 </div>
 <div class="pages">
@@ -19,5 +23,24 @@
 	<img [src]="page.path" alt="Page Image" />
 	}@empty {
 	<p>No pages available for this chapter.</p>
+	}
+	<div
+		class="btn-top"
+		[ngClass]="{
+			show: showBtnTop
+		}"
+		(click)="scrollToTop()"
+	>
+		<app-icons name="arrow-up" size="42" />
+	</div>
+</div>
+<div class="footer">
+	@if(this.chapter.next) {
+	<a class="next" (click)="nextPage()">
+		Proximo capitulo
+		<app-icons name="arrow-right" size="42" />
+	</a>
+	} @else {
+	<a class="next" (click)="backPage()">Voltar a pagina inicial</a>
 	}
 </div>

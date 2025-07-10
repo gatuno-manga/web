@@ -36,19 +36,20 @@
 			}
 		</div>
 		<div class="metadata">
-			<div class="scraping-status scrapingStatusReady">
+			<div
+				class="scraping-status"
+				[ngClass]="{
+					scrapingStatusReady:
+						chapter.scrapingStatus === ScrapingStatus.READY,
+					scrapingStatusProcessing:
+						chapter.scrapingStatus === ScrapingStatus.PROCESSING,
+					scrapingStatusError:
+						chapter.scrapingStatus === ScrapingStatus.ERROR
+				}"
+			>
 				{{ getScrapingStatusClass(chapter.scrapingStatus) }}
 			</div>
 		</div>
 	</a>
 	}
 </div>
-
-<!-- [ngClass]="{
-	scrapingStatusReady:
-		chapter.scrapingStatus === ScrapingStatus.READY,
-	scrapingStatusProcessing:
-		chapter.scrapingStatus === ScrapingStatus.PROCESSING,
-	scrapingStatusError:
-		chapter.scrapingStatus === ScrapingStatus.ERROR
-}" -->
