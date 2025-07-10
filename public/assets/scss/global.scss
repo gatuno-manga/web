@@ -35,3 +35,9 @@ html {
 body {
 	min-height: 100vh;
 }
+
+@media (max-width: 768px) {
+	html {
+		font-size: 12px;
+	}
+}
