@@ -1,25 +1,35 @@
+$page-size: 900px;
+
 .book {
-	max-width: 1200px;
+	position: relative;
+	max-width: $page-size;
 	margin: 0 auto;
 	padding: 0 50px;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
 
 	.book-header {
 		display: flex;
-		gap: 1rem;
-		padding: 1rem;
+		width: 100%;
+		padding: 0 5%;
+		gap: 1.6rem;
+		height: 350px;
+		margin-bottom: 2rem;
 
 		.book-cover {
-			flex: none;
-			width: 200px;
+			flex: 0 0 200px;
+			height: inherit;
 			img {
-				width: 100%;
-				height: auto;
+				height: 350px;
 				border-radius: 12px;
 				object-fit: contain;
 			}
 		}
 
 		.book-info {
+			flex: 1 1 0;
+			min-width: 0;
 			height: 100%;
 			display: flex;
 			flex-direction: column;
@@ -28,8 +38,65 @@
 			.top {
 				display: flex;
 				flex-direction: column;
-				gap: 1rem;
+
+				h1 {
+					font-size: 2.5rem;
+					line-height: 3rem;
+					margin-bottom: 0.5rem;
+					font-weight: lighter;
+				}
 			}
+
+			.bottom {
+			}
+		}
+	}
+
+	.book-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 100vw;
+		max-width: 500px;
+		transform: rotate(90deg) translateY(-95%);
+		transform-origin: top left;
+		filter: blur(200px);
+		z-index: -1;
+		opacity: 0.6;
+		pointer-events: none;
+	}
+
+	.book-info-plus {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+
+		.tags {
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			span {
+				padding: 4px 8px;
+				border-radius: 12px;
+				margin-right: 0.5rem;
+				font-size: 0.8rem;
+				color: var(--app-text-color);
+				text-transform: capitalize;
+			}
+			.tag {
+				background-color: var(--primary-color);
+			}
+			.sensitive {
+				background-color: var(--red);
+			}
+		}
+
+		.book-description {
+			font-size: 1rem;
+			line-height: 1.5;
+			text-align: center;
 		}
 	}
 }
@@ -41,15 +108,15 @@
 	padding: 1rem;
 	justify-content: center;
 	align-items: center;
-	max-width: 1200px;
+	max-width: $page-size;
 	margin: 0 auto;
 
 	.chapter {
-		padding: 1rem;
-		border: 2px solid var(--app-text-color);
+		padding: 0.6rem 1rem;
 		border-radius: 12px;
 		width: 100%;
 		transition: background-color 0.3s;
+		background-color: var(--secondary-color);
 		flex: none;
 		display: flex;
 		align-items: center;
@@ -58,7 +125,44 @@
 		&:hover {
 			background-color: var(--primary-color);
 			border-color: var(--primary-color);
-			// background-color: #e0e0e0;
+		}
+
+		.title {
+			line-height: 2rem;
+			text-transform: capitalize;
+			h2 {
+				font-size: 1.8rem;
+				font-weight: lighter;
+				margin: 0;
+			}
+			h3 {
+				font-size: 0.8rem;
+				margin: 0;
+			}
+		}
+
+		.scraping-status {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 5px;
+			background-color: var(--secondary-color);
+			color: var(--app-text-color);
+			font-size: 0.8rem;
+			font-weight: bold;
+			padding: 0.3rem 0.8rem;
+
+			&.scrapingStatusReady {
+				background-color: var(--scraping-status-ready-color);
+			}
+
+			&.scrapingStatusProcessing {
+				background-color: var(--scraping-status-processing-color);
+			}
+
+			&.scrapingStatusError {
+				background-color: var(scraping-status-error-color);
+			}
 		}
 	}
 }

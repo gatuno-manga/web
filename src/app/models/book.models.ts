@@ -14,6 +14,13 @@ export enum ScrapingStatus {
   ERROR = 'error',
 }
 
+export enum SensitiveContent {
+  GORE = 'gore',
+  SUGGESTIVE = 'suggestive',
+  EROTIC = 'erotic',
+  PORNOGRAFIC = 'pornografic',
+}
+
 export interface Book {
   id: string;
   title: string;
@@ -22,6 +29,12 @@ export interface Book {
   publication: number;
   scrapingStatus: ScrapingStatus;
   chapters: Chapterlist[];
+  tags: tag[];
+  sensitiveContent: SensitiveContent[];
+}
+
+export interface tag {
+  name: string;
 }
 
 export interface Chapterlist {

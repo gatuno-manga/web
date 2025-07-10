@@ -1,46 +1,54 @@
 <div class="book">
+	<img [src]="book.cover" class="book-background" />
 	<div class="book-header">
 		<div class="book-cover">
-			<img [src]="book.cover" alt="" />
+			<img [src]="book.cover" />
 		</div>
 		<div class="book-info">
 			<div class="top">
 				<h1>{{ book.title }}</h1>
+				<h6>{{ book.title }}</h6>
+			</div>
+			<div class="bottom">
 				<div>{{ book.chapters.length }} Capitulos</div>
-				<div>Ano de lançamento: {{ book.publication }}</div>
+				<div>Lançamento {{ book.publication }}</div>
 			</div>
 		</div>
 	</div>
-	<div>
-		<p>{{ book.description }}</p>
+	<div class="book-info-plus">
+		<div class="tags">
+			@for(tag of book.sensitiveContent; track tag) {
+			<span class="sensitive">{{ tag }}</span>
+			} @for(tag of book.tags; track tag.name) {
+			<span class="tag">{{ tag.name }}</span>
+			}
+		</div>
+		<p class="book-description">{{ book.description }}</p>
 	</div>
 </div>
 <div class="chapters">
 	@for(chapter of book.chapters; track chapter.id) {
 	<a [routerLink]="[chapter.id]" class="chapter">
-		<div>
-			<h2>
-				{{
-					chapter.title
-						? '#' + chapter.index + ' - ' + chapter.title
-						: 'Capitulo #' + chapter.index
-				}}
-			</h2>
+		<div class="title">
+			<h2>capitulo {{ chapter.index }}</h2>
+			@if(chapter.title){
+			<h3>{{ chapter.title }}</h3>
+			}
 		</div>
-		<div>
-			<div
-				[ngClass]="{
-					scrapingStatusReady:
-						chapter.scrapingStatus === ScrapingStatus.READY,
-					scrapingStatusProcessing:
-						chapter.scrapingStatus === ScrapingStatus.PROCESSING,
-					scrapingStatusError:
-						chapter.scrapingStatus === ScrapingStatus.ERROR
-				}"
-			>
+		<div class="metadata">
+			<div class="scraping-status scrapingStatusReady">
 				{{ getScrapingStatusClass(chapter.scrapingStatus) }}
 			</div>
 		</div>
 	</a>
 	}
 </div>
+
+<!-- [ngClass]="{
+	scrapingStatusReady:
+		chapter.scrapingStatus === ScrapingStatus.READY,
+	scrapingStatusProcessing:
+		chapter.scrapingStatus === ScrapingStatus.PROCESSING,
+	scrapingStatusError:
+		chapter.scrapingStatus === ScrapingStatus.ERROR
+}" -->

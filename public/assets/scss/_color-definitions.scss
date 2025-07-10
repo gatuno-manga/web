@@ -4,9 +4,13 @@
 	--app-background-color: var(--black);
 	--app-text-color: var(--beige);
 	--primary-color: var(--orange);
+	--secondary-color: var(--dark-purple);
 	--scrollbar-color: var(--dark-gray);
 	--scrollbar-thumb-color: var(--dark-lilac);
 	--erro-message-color: var(--orange);
+	--scraping-status-ready-color: var(--dark-green);
+	--scraping-status-processing-color: var(--orange);
+	--scraping-status-error-color: var(--dark-red);
 	--degrader: linear-gradient(
 		88deg,
 		var(--black) 55%,
@@ -17,9 +21,13 @@
 	--app-background-color: var(--white);
 	--app-text-color: var(--dark-purple);
 	--primary-color: var(--lilac);
+	--secondary-color: var(--beige);
 	--scrollbar-color: var(--beige);
 	--scrollbar-thumb-color: var(--dark-purple);
 	--erro-message-color: var(--orange);
+	--scraping-status-ready-color: var(--green);
+	--scraping-status-processing-color: var(--orange);
+	--scraping-status-error-color: var(--red);
 	--degrader: linear-gradient(
 		88deg,
 		var(--white) 0%,
