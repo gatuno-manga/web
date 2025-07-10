@@ -21,6 +21,7 @@ export class IconsComponent {
   @Input() color: string = 'currentColor';
   @Input() background: string = 'none';
   @Input() stroke: string = '2';
+  @Input() modifier: boolean = true;
 
   svgContent: SafeHtml = '';
 
@@ -60,11 +61,15 @@ export class IconsComponent {
   }
 
   private applySvgAttributes(svg: string): string {
-    return svg
+    svg = svg
       .replace(/width=".*?"/, `width="${this.size}"`)
       .replace(/height=".*?"/, `height="${this.size}"`)
-      .replace(/stroke=".*?"/, `stroke="${this.color}"`)
-      .replace(/fill=".*?"/, `fill="${this.background}"`)
-      .replace(/stroke-width=".*?"/, `stroke-width="${this.stroke}"`);
+    if (this.modifier) {
+      svg = svg
+        .replace(/stroke=".*?"/, `stroke="${this.color}"`)
+        .replace(/fill=".*?"/, `fill="${this.background}"`)
+        .replace(/stroke-width=".*?"/, `stroke-width="${this.stroke}"`);
+    }
+    return svg;
   }
 }

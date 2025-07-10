@@ -9,7 +9,7 @@ import { NgIf } from '@angular/common';
   templateUrl: './theme-toggle.component.html',
   styleUrl: './theme-toggle.component.scss'
 })
-export class ThemetToggleComponent {
+export class ThemeToggleComponent {
   public themeService = inject(ThemeService);
 
   toggleTheme(): void {

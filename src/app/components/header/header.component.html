@@ -1,7 +1,11 @@
 <header>
 	<nav>
-		<a [routerLink]="['/']">
-			<app-icons name="logo" size="72" />
+		<a
+			id="logo"
+			[routerLink]="['/']"
+			[ngClass]="{ 'dark-theme': isDarkTheme() }"
+		>
+			<app-icons name="logo" size="72" [modifier]="false" />
 		</a>
 	</nav>
 	<nav>

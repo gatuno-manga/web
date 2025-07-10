@@ -1,24 +1,28 @@
-import { Location } from '@angular/common';
+import { Location, NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
-import { ThemetToggleComponent } from '../theme-toggle/theme-toggle.component';
+import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { IconsComponent } from '../icons/icons.component';
+import { ThemeService } from '../../service/theme.service';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterModule, IconsComponent, ThemetToggleComponent],
+  imports: [RouterModule, IconsComponent, ThemeToggleComponent, NgClass],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private location: Location
+    private location: Location,
+    private themeService: ThemeService,
   ) {}
 
   backPage() {
     this.location.back();
+  }
+
+  isDarkTheme(): boolean {
+    return this.themeService.currentTheme() === 'dark';
   }
 
 }
