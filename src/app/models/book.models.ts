@@ -10,7 +10,7 @@ export interface BookList {
 
 export enum ScrapingStatus {
   READY = 'ready',
-  PROCESSING = 'processing',
+  PROCESSING = 'process',
   ERROR = 'error',
 }
 
