@@ -15,6 +15,7 @@ export enum ScrapingStatus {
 }
 
 export enum SensitiveContent {
+  SAFE = 'safe',
   GORE = 'gore',
   SUGGESTIVE = 'suggestive',
   EROTIC = 'erotic',
