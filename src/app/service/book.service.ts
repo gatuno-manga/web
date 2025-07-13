@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Book, BookList, BookPageOptions, Chapter } from "../models/book.models";
+import { Book, BookList, BookPageOptions, Chapter, SensitiveContent } from "../models/book.models";
 import { Page } from "../models/miscellaneous.models";
 
 @Injectable({
@@ -19,9 +19,5 @@ export class BookService {
 
   getBook(id: string) {
     return this.http.get<Book>(`books/${id}`);
-  }
-
-  getChapter(id: string, chapter: string) {
-    return this.http.get<Chapter>(`books/${id}/chapters/${chapter}`);
   }
 }

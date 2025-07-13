@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
 import { HeaderComponent } from '../../components/header/header.component';
 import { NgClass, NgIf } from '@angular/common';
+import { ChapterService } from '../../service/chapter.service';
 
 @Component({
   selector: 'app-chapters',
@@ -19,7 +20,7 @@ export class ChaptersComponent {
   private scrollThreshold = 1500;
 
   constructor(
-    private bookService: BookService,
+    private chapterService: ChapterService,
     private activatedRoute: ActivatedRoute,
     private router: Router
   ) {}
@@ -32,7 +33,7 @@ export class ChaptersComponent {
         this.router.navigate(['../'], { relativeTo: this.activatedRoute });
         return;
       }
-      this.bookService.getChapter(id, chapter).subscribe((chapter: Chapter) => {
+      this.chapterService.getChapter(chapter).subscribe((chapter: Chapter) => {
         this.chapter = chapter;
       });
     });
