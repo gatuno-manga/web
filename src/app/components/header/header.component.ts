@@ -1,20 +1,28 @@
-import { Location, NgClass } from '@angular/common';
+import { Location, NgClass, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { IconsComponent } from '../icons/icons.component';
 import { ThemeService } from '../../service/theme.service';
+import { UserTokenService } from '../../service/user-token.service';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterModule, IconsComponent, ThemeToggleComponent, NgClass],
+  imports: [
+    RouterModule,
+    IconsComponent,
+    ThemeToggleComponent,
+    NgClass,
+    NgIf
+  ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
   constructor(
-    private location: Location,
-    private themeService: ThemeService,
+    private readonly location: Location,
+    private readonly themeService: ThemeService,
+    private readonly userTokenService: UserTokenService,
   ) {}
 
   backPage() {
@@ -23,6 +31,11 @@ export class HeaderComponent {
 
   isDarkTheme(): boolean {
     return this.themeService.currentTheme() === 'dark';
+  }
+
+  isloggedIn(): boolean {
+    console.log('isloggedIn', this.userTokenService.hasToken);
+    return this.userTokenService.hasToken;
   }
 
 }

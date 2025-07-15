@@ -10,6 +10,12 @@
 	</nav>
 	<nav>
 		<a [routerLink]="['/books']">Mangas</a>
-		<app-theme-toggle />
+		<a [routerLink]="['/auth/login']" *ngIf="!isloggedIn()">Login</a>
+		<div class="icons">
+			<app-theme-toggle />
+			<a [routerLink]="['/user']" class="user" *ngIf="isloggedIn()">
+				<app-icons name="user" size="32" />
+			</a>
+		</div>
 	</nav>
 </header>
