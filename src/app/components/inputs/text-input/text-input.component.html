@@ -1,0 +1,38 @@
+<div class="input-container">
+	<div
+		class="input"
+		[ngClass]="{
+			label: isFocused || touched || value,
+			focused: isFocused
+		}"
+	>
+		<app-icons
+			[name]="leftIcon"
+			(click)="onLeftIconClick($event)"
+			*ngIf="leftIcon"
+			[ngClass]="{ clickable: !!leftIconClick }"
+		/>
+		<input
+			#input
+			[id]="id"
+			[type]="type"
+			[value]="value"
+			(input)="onInput($event)"
+			(blur)="onBlur(value); isFocused = false"
+			(focus)="isFocused = true"
+		/>
+		<label
+			[for]="id"
+			[ngClass]="{ ative: touched || value, icons: leftIcon }"
+		>
+			{{ placeholder }}
+		</label>
+		<app-icons
+			[ngClass]="{ 'right-icon': rightIcon, clickable: !!rightIconClick }"
+			[name]="rightIcon"
+			(click)="onRightIconClick($event)"
+			*ngIf="rightIcon"
+		/>
+	</div>
+	<div class="error-messages"></div>
+</div>

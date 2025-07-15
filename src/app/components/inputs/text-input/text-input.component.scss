@@ -1,0 +1,49 @@
+.input {
+	position: relative;
+	padding: 0 0.5rem;
+	min-height: 50px;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	background-color: var(--secondary-color);
+	border-radius: 4px;
+	transition: all 0.3s ease-in-out;
+
+	&.label {
+		margin-top: 1.5rem;
+	}
+	&.focused {
+		border: 1px solid var(--primary-color);
+		box-shadow: 0 0 1rem var(--secondary-color);
+	}
+}
+input {
+	width: 100%;
+	padding: 8px;
+	background-color: transparent;
+	outline: none;
+	border: none;
+}
+label {
+	display: block;
+	position: absolute;
+	font-weight: 500;
+	z-index: 2;
+	transition: all 0.3s ease-in-out;
+	top: 0.3rem;
+	left: 10px;
+	pointer-events: none;
+
+	&.icons {
+		left: 2.5rem;
+	}
+}
+label.ative,
+input:focus + label {
+	top: -2.5rem;
+	left: 0;
+}
+
+app-icons.clickable {
+	cursor: pointer;
+}
