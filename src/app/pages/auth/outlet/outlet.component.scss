@@ -1,0 +1,32 @@
+:host {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+
+header {
+	position: sticky;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 2rem;
+
+	a {
+		display: flex;
+	}
+}
+
+main {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	.forms {
+		border: solid 4px var(--primary-color);
+		border-radius: 0.5rem;
+		padding: 2rem;
+		width: 100%;
+		max-width: 700px;
+	}
+}

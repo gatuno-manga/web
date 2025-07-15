@@ -5,6 +5,7 @@ import { BookComponent } from './pages/book/book.component';
 import { BooksComponent } from './pages/books/books.component';
 import { ChaptersComponent } from './pages/chapters/chapters.component';
 import { HomeComponent } from './pages/home/home.component';
+import { OutletComponent as OutletAuht } from './pages/auth/outlet/outlet.component';
 
 export const routes: Routes = [
   {
@@ -51,5 +52,13 @@ export const routes: Routes = [
         }
       }
     },
-  }
+  },
+  {
+    path: 'auth',
+    component: OutletAuht,
+    loadChildren: () =>
+      import('./pages/auth/auth.routes').then(
+        (module_) => module_.routes,
+      ),
+  },
 ];

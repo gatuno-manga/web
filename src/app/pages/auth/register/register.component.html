@@ -1,0 +1,31 @@
+<h1>Crie uma conta</h1>
+<form [formGroup]="form" (ngSubmit)="submit()">
+	<app-input
+		formControlName="email"
+		placeholder="Email"
+		id="email"
+		type="email"
+		leftIcon="email"
+		[errors]="this.form.get('email')?.errors"
+		[touched]="this.form.get('email')?.touched ?? false"
+	/>
+	<app-input
+		formControlName="password"
+		placeholder="Senha"
+		id="password"
+		type="password"
+		leftIcon="lock"
+		[errors]="this.form.get('password')?.errors"
+		[touched]="this.form.get('password')?.touched ?? false"
+	/>
+	<app-input
+		formControlName="confirmPassword"
+		placeholder="Confirme a sua senha"
+		id="confirmPassword"
+		type="password"
+		leftIcon="lock"
+		[errors]="this.form.get('confirmPassword')?.errors"
+		[touched]="this.form.get('confirmPassword')?.touched ?? false"
+	/>
+	<app-button type="submit">Criar conta</app-button>
+</form>
