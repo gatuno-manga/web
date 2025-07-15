@@ -9,6 +9,7 @@ button {
 	outline: none;
 	justify-content: center;
 	transition: 0.3s;
+	cursor: pointer;
 
 	&:hover {
 		background-color: var(--secondary-color);

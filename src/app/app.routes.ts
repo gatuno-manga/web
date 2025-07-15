@@ -6,6 +6,7 @@ import { BooksComponent } from './pages/books/books.component';
 import { ChaptersComponent } from './pages/chapters/chapters.component';
 import { HomeComponent } from './pages/home/home.component';
 import { OutletComponent as OutletAuht } from './pages/auth/outlet/outlet.component';
+import { OutletComponent as OutletUser } from './pages/user/outlet/outlet.component';
 
 export const routes: Routes = [
   {
@@ -37,6 +38,14 @@ export const routes: Routes = [
             }
           }
         },
+      },
+      {
+        path: 'user',
+        component: OutletUser,
+        loadChildren: () =>
+          import('./pages/user/user.routes').then(
+            (module_) => module_.routes,
+          ),
       }
     ]
   },
@@ -60,5 +69,5 @@ export const routes: Routes = [
       import('./pages/auth/auth.routes').then(
         (module_) => module_.routes,
       ),
-  },
+  }
 ];

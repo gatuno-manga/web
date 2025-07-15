@@ -8,7 +8,7 @@ import { UserTokenService } from "./user-token.service";
 @Injectable({
     providedIn: 'root',
 })
-export class authService {
+export class AuthService {
     constructor(
         private readonly http: HttpClient,
         private readonly userTokenService: UserTokenService
@@ -29,7 +29,7 @@ export class authService {
     }
 
     logout() {
-        return this.http.get('/auth/logout', { withCredentials: true })
+        return this.http.get('/auth/logout')
             .pipe(
                 tap(() => {
                     this.userTokenService.removeTokens();

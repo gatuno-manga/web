@@ -71,4 +71,6 @@ export interface Page {
   path: string;
 }
 
-export interface BookPageOptions extends PageRequest {}
+export interface BookPageOptions extends PageRequest {
+  sensitiveContent?: SensitiveContent[];
+}

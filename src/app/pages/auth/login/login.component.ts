@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { authService } from '../../../service/auth.service';
+import { AuthService } from '../../../service/auth.service';
 import { PasswordInputComponent, TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent } from '../../../components/inputs/button/button.component';
@@ -20,7 +20,7 @@ export class LoginComponent {
   form: FormGroup;
   constructor(
     private fb: FormBuilder,
-    private readonly authService: authService,
+    private readonly authService: AuthService,
     private readonly router: Router
   ) {
     this.form = this.fb.group({

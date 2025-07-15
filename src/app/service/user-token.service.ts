@@ -43,7 +43,6 @@ export class UserTokenService {
     isTokenValid(token: string): boolean {
         try {
             const { exp, iss } = jwtDecode<payloadToken>(token);
-            console.log('isTokenValid', exp, iss);
             if (!exp) return false;
 
             const currentTime = Math.floor(Date.now() / 1000);

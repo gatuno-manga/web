@@ -1,0 +1,17 @@
+<h1>Configurações</h1>
+<div class="options">
+	<div>
+		<h2>Filtro de conteudo</h2>
+		<div class="options">
+			@for (content of sensitiveContentList; track content) {
+			<app-checkbox
+				[value]="allowContent.includes(content)"
+				(change)="toggleContentAllow(content)"
+			>
+				{{ getSensitiveContentLabel(content) }}
+			</app-checkbox>
+			}
+		</div>
+	</div>
+	<app-button (click)="logout()">Sair da sua conta</app-button>
+</div>

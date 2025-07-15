@@ -34,7 +34,6 @@ export class HeaderComponent {
   }
 
   isloggedIn(): boolean {
-    console.log('isloggedIn', this.userTokenService.hasToken);
     return this.userTokenService.hasToken;
   }
 

@@ -26,6 +26,7 @@ export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
       url,
       setHeaders: {
         Authorization: `Bearer ${token}`,
+        cookie: `accessToken=${token}`,
       },
     });
   }

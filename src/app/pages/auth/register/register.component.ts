@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { PasswordInputComponent, TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
-import { authService } from '../../../service/auth.service';
+import { AuthService } from '../../../service/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent } from '../../../components/inputs/button/button.component';
 
@@ -20,7 +20,7 @@ export class RegisterComponent {
   form: FormGroup;
   constructor(
     private readonly fb: FormBuilder,
-    private readonly authService: authService,
+    private readonly authService: AuthService,
     private readonly router: Router
   ) {
     this.form = this.fb.nonNullable.group(
