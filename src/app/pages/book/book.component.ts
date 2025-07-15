@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Book, ScrapingStatus } from '../../models/book.models';
 import { BookService } from '../../service/book.service';
 import { NgClass } from '@angular/common';
+import { IconsComponent } from '../../components/icons/icons.component';
 
 @Component({
   selector: 'app-book',
-  imports: [RouterModule, NgClass],
+  imports: [RouterModule, IconsComponent, NgClass],
   templateUrl: './book.component.html',
   styleUrl: './book.component.scss'
 })
@@ -49,5 +50,9 @@ export class BookComponent {
 
   getAuthorNames(): string {
     return this.book.authors.map(author => author.name).join(', ');
+  }
+
+  getMaxChapterIndex(): number {
+    return this.book.chapters.reduce((max, chapter) => Math.max(max, chapter.index), 0);
   }
 }

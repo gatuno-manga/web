@@ -38,6 +38,12 @@
 			}
 		</div>
 		<div class="metadata">
+			<div class="read">
+				<app-icons
+					[name]="chapter.read ? 'eye' : 'eye-close'"
+					[ngClass]="{ read: chapter.read }"
+				/>
+			</div>
 			<div
 				class="scraping-status"
 				[ngClass]="{

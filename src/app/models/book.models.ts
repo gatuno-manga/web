@@ -50,6 +50,7 @@ export interface Chapterlist {
   originalUrl: string;
   scrapingStatus: ScrapingStatus;
   index: number;
+  read: boolean;
 }
 
 export interface Chapter {
