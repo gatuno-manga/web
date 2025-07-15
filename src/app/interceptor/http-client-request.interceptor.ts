@@ -2,8 +2,12 @@ import { HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angul
 import { environment } from '../../environments/environment';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { UserTokenService } from '../service/user-token.service';
 
-export const HttpClientInterceptor: HttpInterceptorFn = (req, next) => {
+export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
+  const userTokenService = inject(UserTokenService);
+  const token = userTokenService.AccessToken;
+
   let clonedRequest = req;
   if (!/^https?:\/\//i.test(req.url) && !req.url.startsWith('/assets/') && !req.url.startsWith('/favicon.ico')) {
     let baseUrl = environment.apiURL;
@@ -18,7 +22,12 @@ export const HttpClientInterceptor: HttpInterceptorFn = (req, next) => {
     }
 
     const url = `${baseUrl.replace(/\/+$/, '')}/${req.url.replace(/^\/+/, '')}`;
-    clonedRequest = req.clone({ url });
+    clonedRequest = req.clone({
+      url,
+      setHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 
   return next(clonedRequest);
