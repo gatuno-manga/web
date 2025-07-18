@@ -27,6 +27,7 @@ export class BookComponent {
     this.bookService.getBook(id).subscribe({
       next: (book) => {
         this.book = book;
+        console.log('Livro carregado:', this.book);
       },
       error: (err) => {
         console.error('Erro ao buscar livro:', err);

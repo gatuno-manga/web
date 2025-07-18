@@ -19,8 +19,8 @@
 	</div>
 	<div class="book-info-plus">
 		<div class="tags">
-			@for(tag of book.sensitiveContent; track tag) {
-			<span class="sensitive">{{ tag }}</span>
+			@for(content of book.sensitiveContent; track content) {
+			<span class="sensitive">{{ content.name }}</span>
 			} @for(tag of book.tags; track tag.name) {
 			<span class="tag">{{ tag.name }}</span>
 			}

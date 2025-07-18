@@ -13,15 +13,6 @@ export enum ScrapingStatus {
   PROCESSING = 'process',
   ERROR = 'error',
 }
-
-export enum SensitiveContent {
-  SAFE = 'safe',
-  GORE = 'gore',
-  SUGGESTIVE = 'suggestive',
-  EROTIC = 'erotic',
-  PORNOGRAFIC = 'pornografic',
-}
-
 export interface Book {
   id: string;
   title: string;
@@ -31,7 +22,7 @@ export interface Book {
   scrapingStatus: ScrapingStatus;
   chapters: Chapterlist[];
   tags: tag[];
-  sensitiveContent: SensitiveContent[];
+  sensitiveContent: SensitiveContentResponse[];
   authors: Author[];
 }
 
@@ -66,11 +57,20 @@ export interface Chapter {
   totalChapters: number;
 }
 
+export interface SensitiveContentResponse {
+  id: string;
+  name: string;
+}
+export interface TagResponse {
+  id: string;
+  name: string;
+}
+
 export interface Page {
   index: string;
   path: string;
 }
 
 export interface BookPageOptions extends PageRequest {
-  sensitiveContent?: SensitiveContent[];
+  sensitiveContent?: string[];
 }

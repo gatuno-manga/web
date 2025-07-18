@@ -5,10 +5,10 @@
 		<div class="options">
 			@for (content of sensitiveContentList; track content) {
 			<app-checkbox
-				[value]="allowContent.includes(content)"
+				[value]="allowContent.includes(content.name)"
 				(change)="toggleContentAllow(content)"
 			>
-				{{ getSensitiveContentLabel(content) }}
+				{{ content.name }}
 			</app-checkbox>
 			}
 		</div>
