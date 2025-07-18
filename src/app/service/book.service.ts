@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Book, BookList, BookPageOptions, Chapter, SensitiveContent } from "../models/book.models";
+import { Book, BookList, BookPageOptions, Chapter, SensitiveContentResponse, TagResponse } from "../models/book.models";
 import { Page } from "../models/miscellaneous.models";
 import { SensitiveContentService } from "./sensitive-content.service";
 
@@ -27,4 +27,9 @@ export class BookService {
   getBook(id: string) {
     return this.http.get<Book>(`books/${id}`);
   }
+
+  getTags() {
+    return this.http.get<TagResponse[]>('books/tags');
+  }
+
 }

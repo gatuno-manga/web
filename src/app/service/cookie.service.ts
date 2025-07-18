@@ -16,16 +16,25 @@ export class CookieService {
         };
     }
 
-    set(key: string, value: string, options?: { path?: string; expires?: Date; secure?: boolean }) {
+    set(key: string, value: string, usePrefix: boolean = true, options?: { path?: string; expires?: Date; secure?: boolean }) {
         const cookieOptions = { ...this.cookieConfig, ...options };
-        this.cookieService.set(`${this.KEY}/${key}`, value, cookieOptions);
+        if (usePrefix) {
+            key = `${this.KEY}/${key}`;
+        }
+        this.cookieService.set(key, value, cookieOptions);
     }
 
-    get(key: string) {
-        return this.cookieService.get(`${this.KEY}/${key}`);
+    get(key: string, usePrefix: boolean = true): string | null {
+        if (usePrefix) {
+            key = `${this.KEY}/${key}`;
+        }
+        return this.cookieService.get(key);
     }
 
-    delete(key: string) {
-        this.cookieService.delete(`${this.KEY}/${key}`, this.cookieConfig.path);
+    delete(key: string, usePrefix: boolean = true): void {
+        if (usePrefix) {
+            key = `${this.KEY}/${key}`;
+        }
+        this.cookieService.delete(key, this.cookieConfig.path);
     }
 }

@@ -3,6 +3,8 @@ import { CookieService } from "./cookie.service";
 import { HttpClient } from "@angular/common/http";
 import { jwtDecode } from 'jwt-decode';
 import { payloadToken, Role } from "../models/user.models";
+import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
@@ -10,22 +12,24 @@ import { payloadToken, Role } from "../models/user.models";
 export class UserTokenService {
     ACCESSKEY = 'accessToken';
     REFRESHKEY = 'refreshToken';
+    private refreshObservable: Observable<{ accessToken: string, refreshToken: string }> | null = null;
+
     constructor(
         private readonly http: HttpClient,
         private cookieService: CookieService
     ) {}
 
     setTokens(accessToken: string, refreshToken: string) {
-        this.cookieService.set(this.ACCESSKEY, accessToken);
-        this.cookieService.set(this.REFRESHKEY, refreshToken);
+        this.cookieService.set(this.ACCESSKEY, accessToken, false);
+        this.cookieService.set(this.REFRESHKEY, refreshToken, false);
     }
 
     removeAccessToken(): void {
-        this.cookieService.delete(this.ACCESSKEY);
+        this.cookieService.delete(this.ACCESSKEY, false);
     }
 
     removeRefreshToken(): void {
-        this.cookieService.delete(this.REFRESHKEY);
+        this.cookieService.delete(this.REFRESHKEY, false);
     }
 
     removeTokens(): void {
@@ -34,10 +38,10 @@ export class UserTokenService {
     }
 
     get AccessToken(): string | null {
-        return this.cookieService.get(this.ACCESSKEY)
+        return this.cookieService.get(this.ACCESSKEY, false)
     }
     get RefreshToken(): string | null {
-        return this.cookieService.get(this.REFRESHKEY);
+        return this.cookieService.get(this.REFRESHKEY, false);
     }
 
     isTokenValid(token: string): boolean {
@@ -57,7 +61,15 @@ export class UserTokenService {
         if (!token) return false;
 
         if (!this.isTokenValid(token)) {
-            this.removeAccessToken();
+            console.warn('Token inválido ou expirado');
+            this.refreshTokens().subscribe({
+                next: ({ accessToken, refreshToken }) => {
+                    this.setTokens(accessToken, refreshToken);
+                },
+                error: () => {
+                    this.removeAccessToken();
+                }
+            });
             return false;
         }
         return true;
@@ -95,11 +107,16 @@ export class UserTokenService {
     }
 
     refreshTokens() {
-        const refreshToken = this.RefreshToken;
-        if (!refreshToken) {
-            return this.http.post<{ accessToken: string, refreshToken: string }>('/auth/refresh', {});
+        if (!this.refreshObservable) {
+            this.refreshObservable = this.http.get<{ accessToken: string, refreshToken: string }>('/auth/refresh', { withCredentials: true })
+                .pipe(
+                    shareReplay(1)
+                );
+            this.refreshObservable.subscribe({
+                complete: () => this.refreshObservable = null,
+                error: () => this.refreshObservable = null
+            });
         }
-
-        return this.http.post<{ accessToken: string, refreshToken: string }>('/auth/refresh', { refreshToken });
+        return this.refreshObservable;
     }
 }
