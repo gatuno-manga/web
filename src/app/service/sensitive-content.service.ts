@@ -29,6 +29,6 @@ export class SensitiveContentService {
     }
 
     getSensitiveContent() {
-        return this.http.get<SensitiveContentResponse[]>('books/sensitive-content');
+        return this.http.get<SensitiveContentResponse[]>('sensitive-content');
     }
 }
