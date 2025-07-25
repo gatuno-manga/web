@@ -13,7 +13,12 @@ import { SensitiveContentResponse } from '../../../models/book.models';
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent {
-  sensitiveContentList: SensitiveContentResponse[] = []
+  sensitiveContentList: SensitiveContentResponse[] = [
+    {
+      id: '1',
+      name: 'safe',
+    }
+  ]
   allowContent: string[] = [];
 
   constructor(
@@ -22,7 +27,7 @@ export class ProfileComponent {
     private readonly router: Router
   ) {
     this.sensitiveContentService.getSensitiveContent().subscribe((list) => {
-      this.sensitiveContentList = list;
+      this.sensitiveContentList = [...this.sensitiveContentList, ...list];
     });
     this.allowContent = this.sensitiveContentService.getContentAllow();
   }
