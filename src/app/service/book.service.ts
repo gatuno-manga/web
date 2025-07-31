@@ -11,13 +11,16 @@ export class BookService {
   constructor(
     private readonly http: HttpClient,
     private readonly sensitiveContentService: SensitiveContentService,
+    private readonly userTokenService: UserTokenService
   ) {}
   getBooks(options?: BookPageOptions) {
     const opts = { ...options };
 
-    if (!opts.sensitiveContent) {
+    if (!opts.sensitiveContent)
       opts.sensitiveContent = this.sensitiveContentService.getContentAllow();
-    }
+
+    if (!this.userTokenService.hasToken)
+      opts.sensitiveContent = [];
 
     return this.http.get<Page<BookList>>('books', {
       params: { ...opts }
