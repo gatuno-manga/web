@@ -15,4 +15,8 @@ export class ChapterService {
     resetChapter(idChapter: string) {
         return this.http.patch(`chapters/${idChapter}/reset`, {});
     }
+
+    resetChapters(idChapters: string[]) {
+        return this.http.patch(`chapters/reset`, idChapters);
+    }
 }

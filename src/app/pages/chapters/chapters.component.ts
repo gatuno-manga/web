@@ -6,6 +6,8 @@ import { IconsComponent } from '../../components/icons/icons.component';
 import { HeaderComponent } from '../../components/header/header.component';
 import { NgClass, NgIf } from '@angular/common';
 import { ChapterService } from '../../service/chapter.service';
+import { UserTokenService } from '../../service/user-token.service';
+import { ModalNotificationService } from '../../service/modal-notification.service';
 
 @Component({
   selector: 'app-chapters',
@@ -18,12 +20,17 @@ export class ChaptersComponent {
   showBtnTop = false;
   private lastScrollTop = 0;
   private scrollThreshold = 1500;
+  admin = false;
 
   constructor(
     private chapterService: ChapterService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
-  ) {}
+    private router: Router,
+    private userTokenService: UserTokenService,
+    private modalService: ModalNotificationService
+  ) {
+    this.admin = this.userTokenService.isAdmin();
+  }
 
   ngOnInit() {
     this.activatedRoute.paramMap.subscribe(params => {
@@ -81,5 +88,35 @@ export class ChaptersComponent {
 
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  resetChapter() {
+    if (this.chapter) {
+      this.modalService.show(
+        'Redefinir Capítulo',
+        `Tem certeza que deseja redefinir o capítulo\n"${this.chapter.bookTitle} (${this.chapter.index})"?\nEsta ação não pode ser desfeita.`,
+        [
+          {
+            label: 'Cancelar',
+            type: 'primary',
+          },
+          {
+            label: 'Redefinir',
+            type: 'danger',
+            callback: () => {
+              this.confirmResetChapter();
+            }
+          }
+        ],
+        'warning'
+      );
+    }
+  }
+  confirmResetChapter() {
+    if (this.chapter) {
+      this.chapterService.resetChapter(this.chapter.id).subscribe(() => {
+        this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+      });
+    }
   }
 }

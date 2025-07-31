@@ -17,6 +17,9 @@
 			<app-icons name="arrow-right" size="42" />
 		</a>
 	</div>
+	<div class="admin-controls" *ngIf="admin">
+		<button (click)="resetChapter()">Resetar capitulo</button>
+	</div>
 </div>
 <div class="pages">
 	@for (page of chapter.pages; track $index) {
