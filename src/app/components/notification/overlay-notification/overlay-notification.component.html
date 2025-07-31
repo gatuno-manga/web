@@ -1,0 +1,45 @@
+@if(modal){
+<div id="overlay-modal">
+	<div id="modal-content" #modalContent tabindex="-1">
+		<h1>{{ modal.title }}</h1>
+		<p>{{ modal.description }}</p>
+		<div class="button-container">
+			@for (button of modal.buttons; track $index) {
+			<button
+				(click)="button.callback?.(); modal = null"
+				[ngClass]="{
+					primary: button.type === 'primary',
+					secondary: button.type === 'secondary',
+					danger: button.type === 'danger'
+				}"
+			>
+				{{ button.label }}
+			</button>
+			}
+		</div>
+	</div>
+</div>
+} @if(toast$) {
+<div id="overlay-toast">
+	<div id="toast-container">
+		@for (toast of toast$ | async; track $index) {
+		<div
+			class="toast"
+			[ngClass]="{ error: toast.type === 'error' }"
+			[style.--animation-duration]="toast.timeout + 'ms'"
+		>
+			<div class="message">{{ toast.message }}</div>
+		</div>
+		}
+	</div>
+</div>
+}@if(notification) {
+<div id="overlay-notification">
+	<div
+		class="notification"
+		[ngClass]="{ error: notification.type === 'error' }"
+	>
+		<div class="message">{{ notification.message }}</div>
+	</div>
+</div>
+}
