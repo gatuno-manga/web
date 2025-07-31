@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractContro
 import { AuthService } from '../../../service/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent } from '../../../components/inputs/button/button.component';
+import { minUppercaseValidator } from '../../../validators/min-uppercase.validator';
+import { minNumberValidator } from '../../../validators/min-number.validator';
+import { minSymbolValidator } from '../../../validators/min-symbol.validator';
 
 @Component({
   selector: 'app-register',
@@ -26,7 +29,13 @@ export class RegisterComponent {
     this.form = this.fb.nonNullable.group(
       {
         email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
+        password: ['', [
+          Validators.required,
+          Validators.minLength(8),
+          minUppercaseValidator(1),
+          minNumberValidator(1),
+          minSymbolValidator(1),
+        ]],
         confirmPassword: ['', [Validators.required]],
       },
       { validators: [this.passwordsMatch] }
@@ -52,11 +61,11 @@ export class RegisterComponent {
     }
     this.authService.register(data).subscribe({
       next: (response) => {
-        console.log('Registration successful', response);
         this.router.navigate(['/login']);
       },
       error: (error) => {
-        console.error('Registration failed', error);
+        this.form.setErrors({ registrationFailed: 'Falha ao registrar. Tente novamente.' });
+        console.error('Registration error:', this.form.errors);
       }
     });
   }

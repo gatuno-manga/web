@@ -27,5 +27,13 @@
 		[errors]="this.form.get('confirmPassword')?.errors"
 		[touched]="this.form.get('confirmPassword')?.touched ?? false"
 	/>
+	@if(form.errors?.['registrationFailed']){
+	<div class="error">
+		{{ form.errors?.['registrationFailed'] }}
+	</div>
+	}
 	<app-button type="submit">Criar conta</app-button>
+	<div class="link">
+		<a [routerLink]="['../', 'login']">Já tem uma conta? Faça login</a>
+	</div>
 </form>

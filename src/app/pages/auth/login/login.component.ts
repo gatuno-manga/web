@@ -38,6 +38,7 @@ export class LoginComponent {
       },
       error: (error) => {
         console.error('Login failed', error);
+        this.form.setErrors({ loginFailed: 'Email ou senha inválidos' });
       }
     });
   }
