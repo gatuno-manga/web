@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Book, ScrapingStatus } from '../../models/book.models';
 import { BookService } from '../../service/book.service';
-import { NgClass } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { IconsComponent } from '../../components/icons/icons.component';
 
 @Component({
   selector: 'app-book',
-  imports: [RouterModule, IconsComponent, NgClass],
+  imports: [RouterModule, IconsComponent, NgClass, DecimalPipe],
   templateUrl: './book.component.html',
   styleUrl: './book.component.scss'
 })

@@ -1,7 +1,7 @@
 <app-header static />
 <div id="header" class="header">
 	<div class="title">
-		<h1>Capitulo {{ chapter.index }}</h1>
+		<h1>Capitulo {{ chapter.index | number }}</h1>
 		@if(chapter.title){
 		<h2>{{ chapter.title }}</h2>
 		}
@@ -11,7 +11,7 @@
 			<app-icons name="arrow-left" size="42" />
 		</a>
 		<a class="index" (click)="backPage()">
-			{{ chapter.index }}/{{ chapter.totalChapters }}
+			{{ chapter.index | number }}/{{ chapter.totalChapters }}
 		</a>
 		<a class="arrow" *ngIf="chapter.next" (click)="nextPage()">
 			<app-icons name="arrow-right" size="42" />

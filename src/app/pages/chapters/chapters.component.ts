@@ -4,14 +4,14 @@ import { BookService } from '../../service/book.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
 import { HeaderComponent } from '../../components/header/header.component';
-import { NgClass, NgIf } from '@angular/common';
+import { DecimalPipe, NgClass, NgIf } from '@angular/common';
 import { ChapterService } from '../../service/chapter.service';
 import { UserTokenService } from '../../service/user-token.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 
 @Component({
   selector: 'app-chapters',
-  imports: [IconsComponent, HeaderComponent, NgIf, RouterModule, NgClass],
+  imports: [IconsComponent, HeaderComponent, NgIf, RouterModule, NgClass, DecimalPipe],
   templateUrl: './chapters.component.html',
   styleUrl: './chapters.component.scss'
 })

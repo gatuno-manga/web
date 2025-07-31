@@ -32,7 +32,7 @@
 	@for(chapter of book.chapters; track chapter.id) {
 	<a [routerLink]="[chapter.id]" class="chapter">
 		<div class="title">
-			<h2>capitulo {{ chapter.index }}</h2>
+			<h2>capitulo {{ chapter.index | number }}</h2>
 			@if(chapter.title){
 			<h3>{{ chapter.title }}</h3>
 			}
