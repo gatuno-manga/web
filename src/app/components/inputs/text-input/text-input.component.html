@@ -12,21 +12,23 @@
 			*ngIf="leftIcon"
 			[ngClass]="{ clickable: !!leftIconClick }"
 		/>
-		<input
-			#input
-			[id]="id"
-			[type]="type"
-			[value]="value"
-			(input)="onInput($event)"
-			(blur)="onBlur(value); isFocused = false"
-			(focus)="isFocused = true"
-		/>
-		<label
-			[for]="id"
-			[ngClass]="{ ative: touched || value, icons: leftIcon }"
-		>
-			{{ placeholder }}
-		</label>
+		<div class="input-wrapper">
+			<input
+				#input
+				[id]="id"
+				[type]="type"
+				[value]="value"
+				(input)="onInput($event)"
+				(blur)="onBlur(value); isFocused = false"
+				(focus)="isFocused = true"
+			/>
+			<label
+				[for]="id"
+				[ngClass]="{ ative: touched || value, icons: leftIcon }"
+			>
+				{{ placeholder }}
+			</label>
+		</div>
 		<app-icons
 			[ngClass]="{ 'right-icon': rightIcon, clickable: !!rightIconClick }"
 			[name]="rightIcon"
@@ -34,5 +36,9 @@
 			*ngIf="rightIcon"
 		/>
 	</div>
-	<div class="error-messages"></div>
+	<div class="error-messages" [style.--error-count]="errorMessages().length">
+		@for (item of errorMessages(); track $index) {
+		<span class="error-message">{{ item }}</span>
+		}
+	</div>
 </div>

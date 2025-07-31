@@ -17,6 +17,11 @@
 		box-shadow: 0 0 1rem var(--secondary-color);
 	}
 }
+.input-wrapper {
+	display: flex;
+	position: relative;
+	width: 100%;
+}
 input {
 	width: 100%;
 	padding: 8px;
@@ -30,20 +35,40 @@ label {
 	font-weight: 500;
 	z-index: 2;
 	transition: all 0.3s ease-in-out;
-	top: 0.3rem;
-	left: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	left: 0rem;
 	pointer-events: none;
-
-	&.icons {
-		left: 2.5rem;
-	}
 }
 label.ative,
 input:focus + label {
 	top: -2.5rem;
-	left: 0;
+	left: -40px;
+	transform: translateY(0);
 }
 
 app-icons.clickable {
 	cursor: pointer;
+}
+
+.error-messages {
+	--error-count: 0;
+	$line-height: 1.6rem;
+
+	height: calc(var(--error-count) * #{$line-height});
+	transition: 0.3s;
+	display: flex;
+	flex-direction: column;
+	margin-top: 10px;
+
+	// Remove margin-top when error-count is 0
+	&[style*='--error-count: 0'] {
+		margin-top: 0;
+	}
+
+	.error-message {
+		line-height: $line-height;
+		font-size: 0.9rem;
+		margin-left: 0.5rem;
+	}
 }
