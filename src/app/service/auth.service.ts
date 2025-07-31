@@ -29,7 +29,11 @@ export class AuthService {
     }
 
     logout() {
-        return this.http.get('/auth/logout')
+        return this.http.get('/auth/logout',
+            {
+                withCredentials: true
+            }
+        )
             .pipe(
                 tap(() => {
                     this.userTokenService.removeTokens();
@@ -40,7 +44,9 @@ export class AuthService {
     register(data: registerRequest) {
         return this.http
             .post('/auth/signup', data,
-                { observe: 'response' }
+                {
+                    observe: 'response',
+                }
             )
     }
 }
