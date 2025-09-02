@@ -44,7 +44,7 @@ export class UserTokenService {
         return this.cookieService.get(this.REFRESHKEY, false);
     }
 
-    isTokenValid(token: string): boolean {
+    private isTokenValid(token: string): boolean {
         try {
             const { exp, iss } = jwtDecode<payloadToken>(token);
             if (!exp) return false;
@@ -104,6 +104,10 @@ export class UserTokenService {
         if (!roles) return false;
 
         return Array.isArray(roles) && roles.includes(role);
+    }
+
+    isAdmin(): boolean {
+        return this.hasRole(Role.ADMIN);
     }
 
     refreshTokens() {

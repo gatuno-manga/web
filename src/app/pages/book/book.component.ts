@@ -1,23 +1,32 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Book, ScrapingStatus } from '../../models/book.models';
 import { BookService } from '../../service/book.service';
-import { DecimalPipe, NgClass } from '@angular/common';
+import { DecimalPipe, NgClass, NgIf } from '@angular/common';
 import { IconsComponent } from '../../components/icons/icons.component';
+import { MetaDataService } from '../../service/meta-data.service';
+import { UserTokenService } from '../../service/user-token.service';
+import { ModalNotificationService } from '../../service/modal-notification.service';
 
 @Component({
   selector: 'app-book',
-  imports: [RouterModule, IconsComponent, NgClass, DecimalPipe],
+  imports: [RouterModule, IconsComponent, NgClass, NgIf, DecimalPipe],
   templateUrl: './book.component.html',
-  styleUrl: './book.component.scss'
+  styleUrl: './book.component.scss',
 })
 export class BookComponent {
   ScrapingStatus = ScrapingStatus;
   book!: Book;
+  admin = false;
+  isLoading = signal(true);
+
   constructor(
     private bookService: BookService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private metaService: MetaDataService,
+    private modalService: ModalNotificationService,
+    private userTokenService: UserTokenService
   ) {
     const id = this.activatedRoute.snapshot.paramMap.get('id');
     if (!id) {
@@ -26,13 +35,27 @@ export class BookComponent {
     }
     this.bookService.getBook(id).subscribe({
       next: (book) => {
+        if (!book) {
+          this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+          return;
+        }
         this.book = book;
-        console.log('Livro carregado:', this.book);
+        this.setMetaData();
+        this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error('Erro ao buscar livro:', err);
+      error: () => {
         this.router.navigate(['../'], { relativeTo: this.activatedRoute });
       }
+    });
+    this.admin = this.userTokenService.isAdmin();
+  }
+
+  setMetaData() {
+    this.metaService.setMetaData({
+      title: this.book.title,
+      description: this.book.description,
+      image: this.book.cover,
+      url: `https://example.com/books/${this.book.id}`,
     });
   }
 
@@ -55,5 +78,66 @@ export class BookComponent {
 
   getMaxChapterIndex(): number {
     return this.book.chapters.reduce((max, chapter) => Math.max(max, chapter.index), 0);
+  }
+
+  fixBook() {
+    if (this.book) {
+      this.modalService.show(
+        'Consertar Livro',
+        `Você tem certeza que deseja consertar o livro "${this.book.title}"?`,
+        [
+          {
+            label: 'Cancelar',
+            type: 'primary',
+          },
+          {
+            label: 'Consertar',
+            type: 'danger',
+            callback: () => {
+              this.confirmFixBook();
+            }
+          }
+        ],
+        'warning'
+      )
+    }
+  }
+
+  confirmFixBook() {
+    if (this.book) {
+      this.bookService.fixBook(this.book.id).subscribe(() => {
+        this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+      });
+    }
+  }
+
+  resetBook() {
+    if (this.book) {
+      this.modalService.show(
+        'Redefinir Livro',
+        `Você tem certeza que deseja redefinir o livro "${this.book.title}"? Esta ação não pode ser desfeita.`,
+        [
+          {
+            label: 'Cancelar',
+            type: 'primary',
+          },
+          {
+            label: 'Redefinir',
+            type: 'danger',
+            callback: () => {
+              this.confirmResetBook();
+            }
+          }
+        ],
+        'warning'
+      );
+    }
+  }
+  confirmResetBook() {
+    if (this.book) {
+      this.bookService.resetBook(this.book.id).subscribe(() => {
+        this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+      });
+    }
   }
 }

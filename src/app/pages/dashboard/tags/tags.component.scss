@@ -1,0 +1,41 @@
+#tags-list {
+	max-height: 100%;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 0 20px;
+	margin: 0 10px;
+	margin-bottom: 30px;
+
+	.tag-item {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 8px;
+		border-radius: 4px;
+		background-color: var(--secondary-color);
+	}
+}
+
+#merge {
+	position: relative;
+	.cancel-button {
+		position: absolute;
+		top: 0;
+		right: 0;
+		background-color: transparent;
+		border: none;
+		cursor: pointer;
+		color: var(--app-text-color);
+		font-size: 16px;
+		padding: 8px;
+
+		&:hover {
+			color: var(--primary-color);
+		}
+	}
+	.title {
+		text-align: center;
+	}
+}

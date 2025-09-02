@@ -1,0 +1,78 @@
+.item {
+	background-color: color-mix(
+		in srgb,
+		#ffffff,
+		var(--app-background-color) 70%
+	);
+	padding: 15px;
+	border-radius: 8px;
+}
+
+#infos {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	display: flex;
+	justify-content: center;
+
+	.info-item {
+		display: flex;
+		flex-direction: column;
+		justify-content: start;
+		width: 200px;
+		cursor: pointer;
+	}
+}
+
+#book {
+	display: flex;
+	padding: 20px;
+	gap: 20px;
+	.title {
+		border-bottom: 1px solid;
+	}
+
+	#process-books {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+
+		$book-size: 100px;
+		.content {
+			display: flex;
+			gap: 5px;
+			flex-wrap: wrap;
+			max-height: $book-size * 3;
+			justify-content: space-around;
+			overflow: auto;
+		}
+
+		.book {
+			display: flex;
+			height: 80px;
+			background-color: rgba(255, 255, 255, 0.103);
+			gap: 10px;
+
+			.book-title {
+				width: 200px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.book-image {
+				height: 100%;
+				aspect-ratio: 1.5/2;
+				overflow: hidden;
+				border-radius: 8px;
+
+				img {
+					height: 100%;
+					width: 100%;
+					object-fit: cover;
+				}
+			}
+		}
+	}
+}

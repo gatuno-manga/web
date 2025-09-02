@@ -1,0 +1,21 @@
+@for (item of items; track $index) {
+<div class="custom-checkbox-wrapper">
+	<label class="custom-checkbox-label">
+		{{ item.label }}
+
+		<input
+			type="checkbox"
+			[checked]="item.checked"
+			(change)="OnItemChange(item)"
+			[attr.id]="'checkbox-' + $index"
+			[attr.name]="'checkbox-' + $index"
+			[attr.value]="item.id"
+			[attr.aria-label]="item.label"
+			[attr.aria-checked]="item.checked"
+		/>
+		<span class="custom-checkbox"></span>
+	</label>
+</div>
+}@empty{
+<p>No items available</p>
+}
