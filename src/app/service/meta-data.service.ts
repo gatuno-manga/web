@@ -20,7 +20,7 @@ export class MetaDataService {
     private managedTags: HTMLMetaElement[] = [];
     private defaultMeta: MetaDataOptions = {
         title: 'Gatuno',
-        description: 'Seu aservo local de livros',
+        description: 'Seu acervo local de livros',
         robots: 'noindex, nofollow',
         keywords: 'livros, leitura, biblioteca',
     }
