@@ -1,3 +1,4 @@
+@defer (when !isLoading()){
 <div id="books">
 	@for (book of books; track book.id) {
 	<app-item-book [book]="book" />
@@ -7,14 +8,37 @@
 	</div>
 	}
 </div>
-<div class="pages">
-	@for(page of pagesToShow; track page) {
-	<div
-		class="page"
-		[class.active]="page === currentPage"
-		(click)="goToPage(page)"
-	>
-		{{ page }}
+<div class="controller">
+	<div class="pages">
+		@for(page of pagesToShow; track page) {
+		<div
+			class="page"
+			[class.active]="page === currentPage"
+			(click)="goToPage(page)"
+		>
+			{{ page }}
+		</div>
+		}
 	</div>
+</div>
+} @placeholder {
+<div class="controller">
+	<div class="pages">
+		@for (i of [].constructor(5); track i) {
+		<div class="placeholder"></div>
+		}
+	</div>
+</div>
+<div id="books">
+	@for (i of [].constructor(10); track i) {
+	<div class="placeholder"></div>
 	}
 </div>
+<div class="controller">
+	<div class="pages">
+		@for (i of [].constructor(5); track i) {
+		<div class="placeholder"></div>
+		}
+	</div>
+</div>
+}

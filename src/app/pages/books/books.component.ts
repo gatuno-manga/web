@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, signal } from '@angular/core';
 import { BookService } from '../../service/book.service';
 import { BookList } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
@@ -16,7 +16,7 @@ export class BooksComponent {
   currentPage = 1;
   lastPage = 1;
   pagesToShow: number[] = [];
-
+  isLoading = signal(true);
   constructor(private booksService: BookService) {
     this.loadBooks(this.currentPage);
   }
@@ -27,6 +27,7 @@ export class BooksComponent {
       this.currentPage = bookPage.metadata.page;
       this.lastPage = bookPage.metadata.lastPage;
       this.pagesToShow = this.getPagesToShow();
+      this.isLoading.set(false);
     });
   }
 
