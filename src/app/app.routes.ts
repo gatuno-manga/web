@@ -20,7 +20,16 @@ export const routes: Routes = [
       },
       {
         path: 'home',
-        component: HomeComponent
+        component: HomeComponent,
+        data: {
+          ssr: {
+            renderMode: RenderMode.Prerender,
+            cache: {
+              key: 'home',
+              ttl: 60 * 60 * 24 // 24 hours cache
+            }
+          }
+        }
       },
       {
         path: 'books',
@@ -42,6 +51,11 @@ export const routes: Routes = [
       {
         path: 'user',
         component: OutletUser,
+        data: {
+          ssr: {
+            renderMode: RenderMode.Client,
+          }
+        },
         loadChildren: () =>
           import('./pages/user/user.routes').then(
             (module_) => module_.routes,
@@ -67,6 +81,14 @@ export const routes: Routes = [
     component: OutletAuht,
     loadChildren: () =>
       import('./pages/auth/auth.routes').then(
+        (module_) => module_.routes,
+      ),
+  },
+  {
+    path: 'dashboard',
+    component: DefaltOutletComponent,
+    loadChildren: () =>
+      import('./pages/dashboard/dashboard.routes').then(
         (module_) => module_.routes,
       ),
   }
