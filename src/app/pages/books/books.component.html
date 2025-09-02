@@ -1,14 +1,6 @@
 @defer (when !isLoading()){
-<div id="books">
-	@for (book of books; track book.id) {
-	<app-item-book [book]="book" />
-	}@empty {
-	<div class="no-books">
-		<p>No books available.</p>
-	</div>
-	}
-</div>
 <div class="controller">
+	<div></div>
 	<div class="pages">
 		@for(page of pagesToShow; track page) {
 		<div
@@ -20,6 +12,18 @@
 		</div>
 		}
 	</div>
+	<div>
+		<app-select [items]="selectList" />
+	</div>
+</div>
+<div id="books">
+	@for (book of books; track book.id) {
+	<app-item-book [book]="book" [type]="bookOptions" />
+	}@empty {
+	<div class="no-books">
+		<p>No books available.</p>
+	</div>
+	}
 </div>
 } @placeholder {
 <div class="controller">

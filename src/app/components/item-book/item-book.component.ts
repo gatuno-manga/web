@@ -12,4 +12,6 @@ import { BookList } from '../../models/book.models';
 })
 export class ItemBookComponent {
   @Input() book!: BookList;
+  @Input() type: 'grid' | 'list' = 'grid';
+
 }
