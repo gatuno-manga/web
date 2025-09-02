@@ -1,3 +1,4 @@
+@defer (when !isLoading()){
 <img [src]="book.cover" class="book-background" />
 <div class="book">
 	<div class="book-header">
@@ -12,6 +13,10 @@
 				</h6>
 			</div>
 			<div class="bottom">
+				<div *ngIf="admin" class="admin-actions">
+					<button (click)="resetBook()">Resetar</button>
+					<button (click)="fixBook()">Corrigir</button>
+				</div>
 				<div>{{ getMaxChapterIndex() }} Capitulos</div>
 				<div>Lançamento {{ book.publication }}</div>
 			</div>
@@ -61,3 +66,8 @@
 	</a>
 	}
 </div>
+} @placeholder {
+<h1>Esqueleto da pagina</h1>
+} @loading (after 100ms; minimum 1s){
+<h1>carregando...</h1>
+}
