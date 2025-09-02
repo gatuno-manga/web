@@ -12,6 +12,9 @@ import { SensitiveContentService } from './service/sensitive-content.service';
 export class AppComponent {
   public themeService = inject(ThemeService);
   public sensitiveContentService = inject(SensitiveContentService);
+  public metadata = inject(MetaDataService);
 
-  title = 'front';
+  ngOnInit() {
+    this.metadata.initDefaultMeta();
+  }
 }
