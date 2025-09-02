@@ -1,12 +1,15 @@
-import { Component, Inject } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { LocalStorageService } from '../../service/local-storage.service';
 import { BookService } from '../../service/book.service';
 import { BookList } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
+import { ItemBookComponent } from '../../components/item-book/item-book.component';
 import { Page } from '../../models/miscellaneous.models';
+import { SelectComponent } from '../../components/select/select.component';
 
 @Component({
   selector: 'app-books',
-  imports: [RouterModule],
+  imports: [RouterModule, ItemBookComponent, SelectComponent],
   templateUrl: './books.component.html',
   styleUrl: './books.component.scss'
 })
@@ -15,9 +18,33 @@ export class BooksComponent {
   currentPage = 1;
   lastPage = 1;
   pagesToShow: number[] = [];
+  isLoading = signal(true);
+  bookOptions: 'grid' | 'list' = 'grid';
+  selectList = [
+    {
+      icon: 'grid',
+      checked: () => this.setBookOptions('grid')
+    },
+    {
+      icon: 'list',
+      checked: () => this.setBookOptions('list')
+    }
+  ];
 
-  constructor(private booksService: BookService) {
+  constructor(
+    private booksService: BookService,
+    private localStorage: LocalStorageService
+  ) {
+    const savedLayout = this.localStorage.get('books-layout');
+    if (savedLayout === 'grid' || savedLayout === 'list') {
+      this.bookOptions = savedLayout;
+    }
     this.loadBooks(this.currentPage);
+  }
+
+  setBookOptions(option: 'grid' | 'list') {
+    this.bookOptions = option;
+    this.localStorage.set('books-layout', option);
   }
 
   loadBooks(page: number) {
@@ -26,6 +53,7 @@ export class BooksComponent {
       this.currentPage = bookPage.metadata.page;
       this.lastPage = bookPage.metadata.lastPage;
       this.pagesToShow = this.getPagesToShow();
+      this.isLoading.set(false);
     });
   }
 

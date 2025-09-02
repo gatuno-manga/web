@@ -6,12 +6,16 @@ $page-size: 1200px;
 	left: 50%;
 	height: 90vw;
 	max-width: 500px;
-	transform: rotate(90deg) translateY(-50%);
+	transform: rotate(90deg) translate(-50%, -50%);
 	transform-origin: top left;
 	filter: blur(200px);
 	z-index: -1;
 	opacity: 0.6;
 	pointer-events: none;
+}
+.placeholder-background {
+	width: 100vw;
+	background-color: var(--primary-color);
 }
 
 .book {
@@ -64,6 +68,16 @@ $page-size: 1200px;
 					line-height: 3rem;
 					margin-bottom: 0.5rem;
 					font-weight: lighter;
+
+					&.placeholder {
+						height: 4rem;
+					}
+				}
+
+				h6 {
+					&.placeholder {
+						height: 2rem;
+					}
 				}
 			}
 
@@ -71,6 +85,19 @@ $page-size: 1200px;
 				.admin-actions {
 					display: flex;
 					gap: 1rem;
+				}
+
+				.caps {
+					&.placeholder {
+						height: 2rem;
+						margin-bottom: 0.5rem;
+					}
+				}
+
+				.release {
+					&.placeholder {
+						height: 2rem;
+					}
 				}
 			}
 		}
@@ -101,6 +128,14 @@ $page-size: 1200px;
 			.sensitive {
 				background-color: var(--red);
 			}
+
+			.placeholder {
+				width: 4rem;
+				height: 2rem;
+				&::after {
+					filter: blur(1rem);
+				}
+			}
 		}
 
 		.book-description {
@@ -108,6 +143,10 @@ $page-size: 1200px;
 			line-height: 1.5;
 			text-align: center;
 			white-space: pre-wrap;
+
+			&.placeholder {
+				height: 6rem;
+			}
 		}
 	}
 }
@@ -121,6 +160,12 @@ $page-size: 1200px;
 	align-items: center;
 	max-width: $page-size;
 	margin: 0 auto;
+
+	.placeholder {
+		height: 4rem;
+		width: 100%;
+		border-radius: 12px;
+	}
 
 	.chapter {
 		padding: 0.6rem 1rem;

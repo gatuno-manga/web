@@ -1,25 +1,48 @@
+@defer (when !isLoading()){
+<div class="controller">
+	<div></div>
+	<div class="pages">
+		@for(page of pagesToShow; track page) {
+		<div
+			class="page"
+			[class.active]="page === currentPage"
+			(click)="goToPage(page)"
+		>
+			{{ page }}
+		</div>
+		}
+	</div>
+	<div>
+		<app-select [items]="selectList" />
+	</div>
+</div>
 <div id="books">
 	@for (book of books; track book.id) {
-	<a [routerLink]="[book.id]" class="book-card">
-		<img [src]="book.cover" alt="" />
-		<div class="info">
-			<span>{{ book.title }}</span>
-		</div>
-	</a>
+	<app-item-book [book]="book" [type]="bookOptions" />
 	}@empty {
 	<div class="no-books">
 		<p>No books available.</p>
 	</div>
 	}
 </div>
-<div class="pages">
-	@for(page of pagesToShow; track page) {
-	<div
-		class="page"
-		[class.active]="page === currentPage"
-		(click)="goToPage(page)"
-	>
-		{{ page }}
+} @placeholder {
+<div class="controller">
+	<div class="pages">
+		@for (i of [].constructor(5); track i) {
+		<div class="placeholder"></div>
+		}
 	</div>
+</div>
+<div id="books">
+	@for (i of [].constructor(10); track i) {
+	<div class="placeholder"></div>
 	}
 </div>
+<div class="controller">
+	<div class="pages">
+		@for (i of [].constructor(5); track i) {
+		<div class="placeholder"></div>
+		}
+	</div>
+</div>
+}

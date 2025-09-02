@@ -1,0 +1,7 @@
+<div class="container" (click)="onSelect()">
+	@for (item of items; track $index) {
+	<div class="icon" [ngClass]="{ select: $index == select }">
+		<app-icons [name]="item.icon" />
+	</div>
+	}
+</div>

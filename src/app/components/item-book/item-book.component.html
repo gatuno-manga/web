@@ -1,0 +1,19 @@
+@if(type == 'grid'){
+<a [routerLink]="[book.id]" class="book-card grid">
+	<img [src]="book.cover" alt="" />
+	<div class="info">
+		<span>{{ book.title }}</span>
+	</div>
+</a>
+} @else {
+<a [routerLink]="[book.id]" class="book-card list">
+	<img [src]="book.cover" alt="" />
+	<div class="info">
+		<div>
+			<span class="title">{{ book.title }}</span>
+		</div>
+		<span class="description">{{ book.description }}</span>
+	</div>
+</a>
+
+}

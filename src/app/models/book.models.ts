@@ -5,6 +5,7 @@ export interface BookList {
   id: string;
   title: string;
   cover: string;
+  description: string;
   scrapingStatus: ScrapingStatus;
 }
 

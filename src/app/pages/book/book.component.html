@@ -17,8 +17,8 @@
 					<button (click)="resetBook()">Resetar</button>
 					<button (click)="fixBook()">Corrigir</button>
 				</div>
-				<div>{{ getMaxChapterIndex() }} Capitulos</div>
-				<div>Lançamento {{ book.publication }}</div>
+				<div class="caps">{{ getMaxChapterIndex() }} Capitulos</div>
+				<div class="release">Lançamento {{ book.publication }}</div>
 			</div>
 		</div>
 	</div>
@@ -67,7 +67,33 @@
 	}
 </div>
 } @placeholder {
-<h1>Esqueleto da pagina</h1>
-} @loading (after 100ms; minimum 1s){
-<h1>carregando...</h1>
+<div class="book-background placeholder-background"></div>
+<div class="book">
+	<div class="book-header">
+		<div class="book-cover placeholder"></div>
+		<div class="book-info">
+			<div class="top">
+				<h1 class="placeholder"></h1>
+				<h6 class="placeholder"></h6>
+			</div>
+			<div class="bottom">
+				<div class="caps placeholder"></div>
+				<div class="release placeholder"></div>
+			</div>
+		</div>
+	</div>
+	<div class="book-info-plus">
+		<div class="tags">
+			@for (i of [].constructor(5); track i) {
+			<span class="placeholder"></span>
+			}
+		</div>
+		<p class="book-description placeholder"></p>
+	</div>
+</div>
+<div class="chapters">
+	@for (i of [].constructor(4); track i) {
+	<div class="placeholder"></div>
+	}
+</div>
 }
