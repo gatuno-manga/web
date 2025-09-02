@@ -1,11 +1,6 @@
 <div id="books">
 	@for (book of books; track book.id) {
-	<a [routerLink]="[book.id]" class="book-card">
-		<img [src]="book.cover" alt="" />
-		<div class="info">
-			<span>{{ book.title }}</span>
-		</div>
-	</a>
+	<app-item-book [book]="book" />
 	}@empty {
 	<div class="no-books">
 		<p>No books available.</p>

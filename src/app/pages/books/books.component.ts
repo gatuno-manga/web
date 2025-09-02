@@ -2,11 +2,12 @@ import { Component, Inject } from '@angular/core';
 import { BookService } from '../../service/book.service';
 import { BookList } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
+import { ItemBookComponent } from '../../components/item-book/item-book.component';
 import { Page } from '../../models/miscellaneous.models';
 
 @Component({
   selector: 'app-books',
-  imports: [RouterModule],
+  imports: [RouterModule, ItemBookComponent],
   templateUrl: './books.component.html',
   styleUrl: './books.component.scss'
 })
