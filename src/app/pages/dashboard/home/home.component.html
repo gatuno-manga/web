@@ -1,0 +1,51 @@
+<div id="infos" class="mural">
+	<a id="all-books" class="info-item item">
+		<app-icons name="sun" />
+		<span class="label">Total de livros</span>
+		<span class="value">{{ overview.books }}</span>
+	</a>
+	<a id="all-chapters" class="info-item item">
+		<app-icons name="sun" />
+		<span class="label">Total de capítulos</span>
+		<span class="value">{{ overview.chapters }}</span>
+	</a>
+	<a id="all-users" class="info-item item">
+		<app-icons name="sun" />
+		<span class="label">Total de autores</span>
+		<span class="value">{{ overview.authors }}</span>
+	</a>
+	<a id="all-pages" class="info-item item">
+		<app-icons name="sun" />
+		<span class="label">Total de páginas</span>
+		<span class="value">{{ overview.pages }}</span>
+	</a>
+	<a id="all-tags" class="info-item item" routerLink="/dashboard/tags">
+		<app-icons name="sun" />
+		<span class="label">Total de tags</span>
+		<span class="value">{{ overview.tags }}</span>
+	</a>
+</div>
+<div id="book">
+	<div id="process-books" class="book-item item">
+		<div class="title">
+			<h4>Livros em processamento</h4>
+		</div>
+		<div class="content">
+			@for (item of progressBooks.books; track $index) {
+			<div [routerLink]="['/books', item.id]" class="book">
+				<div class="book-image">
+					<img [src]="item.cover" [alt]="item.title" />
+				</div>
+				<div class="book-title">{{ item.title }}</div>
+			</div>
+			}
+		</div>
+	</div>
+	<!--
+	<div id="sensitive-books" class="book-item item">
+		<div class="title">
+			<h4>Livros por conteudo sensivel</h4>
+		</div>
+		<div class="content"></div>
+	</div> -->
+</div>

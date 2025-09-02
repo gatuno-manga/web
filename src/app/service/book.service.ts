@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Book, BookList, BookPageOptions, Chapter, SensitiveContentResponse, TagResponse } from "../models/book.models";
 import { Page } from "../models/miscellaneous.models";
 import { SensitiveContentService } from "./sensitive-content.service";
+import { UserTokenService } from "./user-token.service";
 
 @Injectable({
   providedIn: 'root'
@@ -35,4 +36,11 @@ export class BookService {
     return this.http.get<TagResponse[]>('books/tags');
   }
 
+  fixBook(id: string) {
+    return this.http.patch<Book>(`books/${id}/fix`, {});
+  }
+
+  resetBook(id: string) {
+    return this.http.patch<Book>(`books/${id}/reset`, {});
+  }
 }

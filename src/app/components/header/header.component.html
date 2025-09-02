@@ -9,6 +9,7 @@
 		</a>
 	</nav>
 	<nav>
+		<a [routerLink]="['/dashboard']" *ngIf="isAdmin()">Dashboard</a>
 		<a [routerLink]="['/books']">Mangas</a>
 		<a [routerLink]="['/auth/login']" *ngIf="!isloggedIn()">Login</a>
 		<div class="icons">

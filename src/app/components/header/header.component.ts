@@ -37,4 +37,8 @@ export class HeaderComponent {
     return this.userTokenService.hasToken;
   }
 
+  isAdmin(): boolean {
+    return this.userTokenService.isAdmin();
+  }
+
 }

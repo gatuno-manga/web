@@ -1,0 +1,34 @@
+<!-- @if (isLoading()) {
+<div class="loading">Carregando...</div>
+} -->
+@if (mergingSelection) {
+<div id="merge">
+	<div class="title">
+		<h2>Mesclar Tags</h2>
+		<h3>
+			Selesione as tags que você deseja mesclar com "{{
+				mergingSelection.name
+			}}":
+		</h3>
+		<button class="cancel-button" (click)="mergingSelection = null">
+			Cancelar
+		</button>
+	</div>
+	<div class="body">
+		<app-list-checkbox [items]="mergingTags" />
+	</div>
+	<button (click)="mergeTags()">Mesclar</button>
+</div>
+} @else{
+<div id="tags-list">
+	@for (item of tags; track $index) {
+	<div class="tag-item">
+		<div>{{ item.name }}</div>
+		<div>
+			<button (click)="mergeSelect(item)">Mesclar</button>
+			<!-- <button>Editar</button> não implementado -->
+		</div>
+	</div>
+	}
+</div>
+}
