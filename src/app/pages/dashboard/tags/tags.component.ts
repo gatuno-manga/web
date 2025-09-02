@@ -1,13 +1,14 @@
 import { Component, signal } from '@angular/core';
 import { TagsService } from '../../../service/tags.service';
 import { Tag } from '../../../models/tags.models';
-import { IconsComponent } from '../../../components/icons/icons.component';
 import { ListCheckboxComponent } from '../../../components/inputs/list-checkbox/list-checkbox.component';
 import { ListCheckboxItem } from '../../../components/inputs/list-checkbox/list-checkbox.type';
+import { ButtonComponent } from '../../../components/inputs/button/button.component';
+import { IconsComponent } from '../../../components/icons/icons.component';
 
 @Component({
   selector: 'app-tags',
-  imports: [IconsComponent, ListCheckboxComponent],
+  imports: [ButtonComponent, ListCheckboxComponent, IconsComponent],
   templateUrl: './tags.component.html',
   styleUrl: './tags.component.scss'
 })

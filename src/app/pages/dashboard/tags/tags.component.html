@@ -11,13 +11,13 @@
 			}}":
 		</h3>
 		<button class="cancel-button" (click)="mergingSelection = null">
-			Cancelar
+			<app-icons name="close" />
 		</button>
 	</div>
 	<div class="body">
 		<app-list-checkbox [items]="mergingTags" />
 	</div>
-	<button (click)="mergeTags()">Mesclar</button>
+	<app-button (click)="mergeTags()">Mesclar</app-button>
 </div>
 } @else{
 <div id="tags-list">
@@ -25,8 +25,8 @@
 	<div class="tag-item">
 		<div>{{ item.name }}</div>
 		<div>
-			<button (click)="mergeSelect(item)">Mesclar</button>
-			<!-- <button>Editar</button> não implementado -->
+			<app-button (click)="mergeSelect(item)">Mesclar</app-button>
+			<!-- <app-button>Editar</app-button> não implementado -->
 		</div>
 	</div>
 	}
