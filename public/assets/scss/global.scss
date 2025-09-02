@@ -16,6 +16,14 @@
 :root {
 	@include color-definitions.light-definitions();
 	@include color.colors();
+
+	::-webkit-scrollbar {
+		width: 7px;
+		background-color: var(--scrollbar-color);
+	}
+	::-webkit-scrollbar-thumb {
+		background-color: var(--scrollbar-thumb-color);
+	}
 }
 [data-theme='dark'] {
 	@include color-definitions.dark-definitions();
