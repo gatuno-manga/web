@@ -5,7 +5,7 @@ import { UserTokenService } from '../service/user-token.service';
 
 export const httpClientResponseInterceptor: HttpInterceptorFn = (req, next) => {
 	const userTokenService = inject(UserTokenService);
-	const token = userTokenService.AccessToken;
+	const token = userTokenService.accessToken;
 
 	let clonedRequest = req.clone({
 		setHeaders: {
@@ -13,7 +13,7 @@ export const httpClientResponseInterceptor: HttpInterceptorFn = (req, next) => {
 		},
 	});
 
-	const requestExclude = ['/auth/signup'];
+	const requestExclude = ['/auth/signup', '/auth/refresh', '/data/', '/assets/'];
 	return next(clonedRequest).pipe(
 		catchError((error) => {
 			if (
@@ -26,7 +26,7 @@ export const httpClientResponseInterceptor: HttpInterceptorFn = (req, next) => {
 						userTokenService.setTokens(newToken.accessToken, newToken.refreshToken);
 						const retryRequest = req.clone({
 							setHeaders: {
-								Authorization: `Bearer ${newToken}`,
+								Authorization: `Bearer ${newToken.accessToken}`,
 							},
 						});
 						return next(retryRequest);

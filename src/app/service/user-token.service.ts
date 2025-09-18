@@ -3,8 +3,8 @@ import { CookieService } from "./cookie.service";
 import { HttpClient } from "@angular/common/http";
 import { jwtDecode } from 'jwt-decode';
 import { payloadToken, Role } from "../models/user.models";
-import { Observable } from 'rxjs';
-import { shareReplay } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { shareReplay, switchMap, tap } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
@@ -37,10 +37,10 @@ export class UserTokenService {
         this.removeRefreshToken();
     }
 
-    get AccessToken(): string | null {
+    get accessToken(): string | null {
         return this.cookieService.get(this.ACCESSKEY, false)
     }
-    get RefreshToken(): string | null {
+    get refreshToken(): string | null {
         return this.cookieService.get(this.REFRESHKEY, false);
     }
 
@@ -57,26 +57,36 @@ export class UserTokenService {
     }
 
     get hasToken() {
-        const token = this.AccessToken;
+        const token = this.accessToken;
         if (!token) return false;
 
         if (!this.isTokenValid(token)) {
             console.warn('Token inválido ou expirado');
-            this.refreshTokens().subscribe({
-                next: ({ accessToken, refreshToken }) => {
+            this.refreshTokens().pipe(
+                switchMap(({ accessToken, refreshToken }) => {
                     this.setTokens(accessToken, refreshToken);
-                },
-                error: () => {
-                    this.removeAccessToken();
-                }
-            });
+                    return of(true);
+                })
+            );
             return false;
         }
         return true;
     }
 
+    get hasValidAccessToken() {
+        const token = this.accessToken;
+        if (!token) return false;
+        return this.isTokenValid(token);
+    }
+
+    get hasValidRefreshToken() {
+        const token = this.refreshToken;
+        if (!token) return false;
+        return this.isTokenValid(token);
+    }
+
     get timeToExpire() {
-        const token = this.AccessToken;
+        const token = this.accessToken;
         if (!token) return 0;
         const { exp } = jwtDecode<payloadToken>(token);
         if (!exp) return 0;
@@ -84,7 +94,7 @@ export class UserTokenService {
     }
 
     get userId() {
-        const token = this.AccessToken;
+        const token = this.accessToken;
         if (!token) return 0;
         const { sub } = jwtDecode<payloadToken>(token);
         if (!sub) return 0;
@@ -92,7 +102,7 @@ export class UserTokenService {
     }
 
     private hasRole(role: Role): boolean {
-        const token = this.AccessToken;
+        const token = this.accessToken;
         if (!token) return false;
 
         if (!this.isTokenValid(token)) {
@@ -114,6 +124,10 @@ export class UserTokenService {
         if (!this.refreshObservable) {
             this.refreshObservable = this.http.get<{ accessToken: string, refreshToken: string }>('/auth/refresh', { withCredentials: true })
                 .pipe(
+                    tap(({ accessToken, refreshToken }) => {
+                        console.log('Tokens refreshed successfully');
+                        this.setTokens(accessToken, refreshToken);
+                    }),
                     shareReplay(1)
                 );
             this.refreshObservable.subscribe({
