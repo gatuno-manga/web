@@ -20,7 +20,7 @@ export class BookService {
     if (!opts.sensitiveContent)
       opts.sensitiveContent = this.sensitiveContentService.getContentAllow();
 
-    if (!this.userTokenService.hasToken)
+    if (!this.userTokenService.hasToken && !this.userTokenService.hasValidRefreshToken)
       opts.sensitiveContent = [];
 
     return this.http.get<Page<BookList>>('books', {
