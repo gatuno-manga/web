@@ -1,0 +1,52 @@
+:host {
+	display: flex;
+	height: 100vh;
+}
+
+aside {
+	border-right: 2px solid var(--app-text-color);
+	width: 250px;
+
+	#header {
+		display: flex;
+		padding: 1rem;
+		font-size: 1.5rem;
+		font-weight: bold;
+		text-align: center;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+
+		.user-image {
+			width: 80px;
+			height: 80px;
+			border-radius: 50%;
+			object-fit: cover;
+			margin-bottom: 0.5rem;
+			border: 2px solid var(--app-text-color);
+		}
+		h1 {
+			margin: 0;
+			font-size: 1.2rem;
+		}
+	}
+
+	a {
+		display: block;
+		padding: 0.5rem 1rem;
+		text-decoration: none;
+		color: var(--app-text-color);
+		border-left: 4px solid transparent;
+		border-bottom: 1px solid var(--app-text-color);
+		transition: all 0.3s ease;
+
+		&.active {
+			border-color: var(--primary-color);
+			color: var(--primary-color);
+		}
+	}
+}
+
+router-outlet {
+	padding: 1rem;
+}

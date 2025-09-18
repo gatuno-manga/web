@@ -1,0 +1,10 @@
+<div class="filters">
+	<div id="content-filter">
+		<h2>Conteudo sensivel</h2>
+		<app-list-switch
+			[items]="sensitiveContentList"
+			[selectedItems]="allowContent"
+			(toggleItem)="toggleContentAllow($event)"
+		/>
+	</div>
+</div>
