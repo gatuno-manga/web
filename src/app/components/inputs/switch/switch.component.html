@@ -1,0 +1,12 @@
+<label class="switch-container">
+	<input
+		type="checkbox"
+		[checked]="value"
+		[disabled]="disabled"
+		(change)="onSwitchChange($event)"
+	/>
+	<ng-content></ng-content>
+	<div class="checkmark" [class.checked]="value" [class.disabled]="disabled">
+		<div class="button"></div>
+	</div>
+</label>
