@@ -15,9 +15,8 @@ header {
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 40px;
-	border-bottom: 2px solid black;
+	border-bottom: 2px solid var(--app-text-color);
 	background-image: var(--degrader);
-	margin-bottom: 20px;
 
 	#logo {
 		display: flex;

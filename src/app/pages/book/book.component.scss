@@ -1,5 +1,10 @@
 $page-size: 1200px;
 
+:host {
+	display: block;
+	padding: 30px 0;
+}
+
 .book-background {
 	position: absolute;
 	top: 0;
