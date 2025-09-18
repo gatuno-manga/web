@@ -22,7 +22,7 @@ export class SwitchComponent extends CheckboxControlValueAccessor {
   onSwitchChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.value = input.checked;
-    this.valueChange.emit(false);
+    this.valueChange.emit(this.value);
     if (this.onChange) {
       this.onChange(this.value);
     }
