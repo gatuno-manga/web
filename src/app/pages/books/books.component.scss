@@ -16,7 +16,9 @@
 }
 
 .controller {
+	position: relative;
 	max-width: calc(255px * 5);
+	height: 100px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -27,9 +29,11 @@
 
 .pages {
 	display: flex;
-	justify-content: center;
 	gap: 8px;
-	margin: 20px 0;
+	position: absolute;
+	margin: 20px auto;
+	left: 50%;
+	transform: translateX(-50%);
 
 	.placeholder {
 		width: 60px;
@@ -61,6 +65,20 @@
 			border-color: var(--primary-color);
 			color: var(--app-text-color);
 			font-weight: bold;
+		}
+	}
+}
+
+@media (max-width: 600px) {
+	.controller {
+		flex-direction: column;
+		height: auto;
+		gap: 10px;
+
+		.pages {
+			position: static;
+			transform: none;
+			margin: 10px 0 0 0;
 		}
 	}
 }
