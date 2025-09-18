@@ -41,19 +41,19 @@
 } @placeholder {
 <div class="controller">
 	<div class="pages">
-		@for (i of [].constructor(5); track i) {
+		@for (i of [].constructor(5); track $index) {
 		<div class="placeholder"></div>
 		}
 	</div>
 </div>
 <div id="books">
-	@for (i of [].constructor(10); track i) {
+	@for (i of [].constructor(10); track $index) {
 	<div class="placeholder"></div>
 	}
 </div>
 <div class="controller">
 	<div class="pages">
-		@for (i of [].constructor(5); track i) {
+		@for (i of [].constructor(5); track $index) {
 		<div class="placeholder"></div>
 		}
 	</div>
