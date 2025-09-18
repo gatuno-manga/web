@@ -25,6 +25,19 @@
 	</div>
 	}
 </div>
+<div class="controller">
+	<div class="pages">
+		@for(page of pagesToShow; track page) {
+		<div
+			class="page"
+			[class.active]="page === currentPage"
+			(click)="goToPage(page)"
+		>
+			{{ page }}
+		</div>
+		}
+	</div>
+</div>
 } @placeholder {
 <div class="controller">
 	<div class="pages">
