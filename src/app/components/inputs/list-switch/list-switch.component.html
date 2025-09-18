@@ -1,0 +1,10 @@
+@for(item of items; track item.id) {
+<div class="itens">
+	<app-switch
+		[value]="isItemSelected(item)"
+		(valueChange)="onItemToggle(item)"
+	>
+		{{ item.name }}
+	</app-switch>
+</div>
+}

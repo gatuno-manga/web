@@ -23,11 +23,11 @@ export class BooksComponent {
   selectList = [
     {
       icon: 'grid',
-      checked: () => this.setBookOptions('grid')
+      checked: () => this.setBookOptions('grid'),
     },
     {
       icon: 'list',
-      checked: () => this.setBookOptions('list')
+      checked: () => this.setBookOptions('list'),
     }
   ];
 
@@ -75,5 +75,9 @@ export class BooksComponent {
     if (page !== this.currentPage && page >= 1 && page <= this.lastPage) {
       this.loadBooks(page);
     }
+  }
+
+  selectListItem(): number {
+    return this.selectList.findIndex(item => item.icon === this.bookOptions);
   }
 }

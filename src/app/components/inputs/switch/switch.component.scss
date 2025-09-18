@@ -1,0 +1,35 @@
+.switch-container {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	text-transform: capitalize;
+}
+
+.checkmark {
+	width: 34px;
+	height: 15px;
+	background-color: #ccc;
+	border-radius: 34px;
+	transition: 0.4s;
+	overflow: hidden;
+	display: flex;
+
+	&.checked .button {
+		left: 20px;
+	}
+
+	.button {
+		transition: 0.4s;
+		left: 0;
+		display: block;
+		background-color: white;
+		height: 100%;
+		aspect-ratio: 1/1;
+		border-radius: 50%;
+		box-shadow: 0 0 2px rgba(0, 0, 0, 0.5),
+			-20px 0px 0px 10px var(--primary-color);
+	}
+}
+input {
+	display: none;
+}

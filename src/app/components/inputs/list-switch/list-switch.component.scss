@@ -1,0 +1,11 @@
+:host {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	width: 100%;
+}
+.itens {
+	background-color: var(--secondary-color);
+	border-radius: 4px;
+	padding: 0.5rem 1rem;
+}

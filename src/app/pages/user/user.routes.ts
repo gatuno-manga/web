@@ -1,12 +1,16 @@
 import { Routes } from "@angular/router";
-import { profile } from "console";
 import { ProfileComponent } from "./profile/profile.component";
+import { FilterComponent } from "./filter/filter.component";
 
 export const routes: Routes = [
     {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'profile',
+        redirectTo: 'filter',
+    },
+    {
+        path: 'filter',
+        component: FilterComponent,
     },
     {
         path: 'profile',

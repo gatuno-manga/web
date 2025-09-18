@@ -13,7 +13,7 @@
 		}
 	</div>
 	<div>
-		<app-select [items]="selectList" />
+		<app-select [items]="selectList" [select]="selectListItem()" />
 	</div>
 </div>
 <div id="books">
@@ -24,6 +24,19 @@
 		<p>No books available.</p>
 	</div>
 	}
+</div>
+<div class="controller">
+	<div class="pages">
+		@for(page of pagesToShow; track page) {
+		<div
+			class="page"
+			[class.active]="page === currentPage"
+			(click)="goToPage(page)"
+		>
+			{{ page }}
+		</div>
+		}
+	</div>
 </div>
 } @placeholder {
 <div class="controller">

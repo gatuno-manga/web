@@ -7,7 +7,8 @@ import { ButtonComponent } from '../../../components/inputs/button/button.compon
 
 @Component({
   selector: 'app-login',
-  imports: [TextInputComponent,
+  imports: [
+    TextInputComponent,
     ButtonComponent,
     ReactiveFormsModule,
     RouterModule,
