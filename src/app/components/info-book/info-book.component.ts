@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
 import { ModalNotificationService } from '../../service/modal-notification.service';
-import { Router } from 'express';
+import { Router } from '@angular/router';
 
 enum tab {
   chapters = 0,
