@@ -4,6 +4,7 @@ import { PageRequest } from "./miscellaneous.models";
 export interface BookList {
   id: string;
   title: string;
+  tags: tag[];
   cover: string;
   description: string;
   scrapingStatus: ScrapingStatus;
@@ -14,6 +15,37 @@ export enum ScrapingStatus {
   PROCESSING = 'process',
   ERROR = 'error',
 }
+
+export enum TypeBook {
+  MANGA = 'manga',
+  MANHWA = 'manhwa',
+  MANHUA = 'manhua',
+  COMIC = 'comic',
+  NOVEL = 'novel',
+  OTHER = 'other',
+}
+
+export interface BookBasic {
+  id: string;
+  title: string;
+  cover: string;
+  description: string;
+  publication: number;
+  scrapingStatus: ScrapingStatus;
+  tags: tag[];
+  sensitiveContent: SensitiveContentResponse[];
+  totalChapters: number;
+  authors: Author[];
+}
+
+export interface BookDetail {
+  alternativeTitle: string[];
+  originalUrl: string[];
+  scrapingStatus: ScrapingStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Book {
   id: string;
   title: string;
@@ -56,6 +88,13 @@ export interface Chapter {
   bookId: string;
   bookTitle: string;
   totalChapters: number;
+}
+
+export interface Cover {
+  id: string;
+  url: string;
+  selected: boolean;
+  title: string;
 }
 
 export interface SensitiveContentResponse {

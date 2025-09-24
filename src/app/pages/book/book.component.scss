@@ -156,87 +156,9 @@ $page-size: 1200px;
 	}
 }
 
-.chapters {
-	display: flex;
-	gap: 1rem;
-	flex-direction: column;
-	padding: 1rem;
-	justify-content: center;
-	align-items: center;
+app-info-book {
+	display: block;
+	width: 100%;
 	max-width: $page-size;
 	margin: 0 auto;
-
-	.placeholder {
-		height: 4rem;
-		width: 100%;
-		border-radius: 12px;
-	}
-
-	.chapter {
-		padding: 0.6rem 1rem;
-		border-radius: 12px;
-		width: 100%;
-		transition: background-color 0.3s;
-		background-color: var(--secondary-color);
-		flex: none;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-
-		&:hover {
-			background-color: var(--primary-color);
-			border-color: var(--primary-color);
-		}
-
-		.title {
-			line-height: 2rem;
-			text-transform: capitalize;
-			h2 {
-				font-size: 1.8rem;
-				font-weight: lighter;
-				margin: 0;
-			}
-			h3 {
-				font-size: 0.8rem;
-				margin: 0;
-			}
-		}
-
-		.metadata {
-			display: flex;
-			gap: 1rem;
-			align-items: center;
-
-			.read {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
-			}
-
-			.scraping-status {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				border-radius: 5px;
-				background-color: var(--secondary-color);
-				color: var(--app-text-color);
-				font-size: 0.8rem;
-				font-weight: bold;
-				padding: 0.3rem 0.8rem;
-
-				&.scrapingStatusReady {
-					background-color: var(--scraping-status-ready-color);
-				}
-
-				&.scrapingStatusProcessing {
-					background-color: var(--scraping-status-processing-color);
-				}
-
-				&.scrapingStatusError {
-					background-color: var(scraping-status-error-color);
-				}
-			}
-		}
-	}
 }

@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Book, BookList, BookPageOptions, Chapter, SensitiveContentResponse, TagResponse } from "../models/book.models";
+import { Book, BookBasic, BookDetail, BookList, BookPageOptions, Chapterlist, Cover, TagResponse } from "../models/book.models";
 import { Page } from "../models/miscellaneous.models";
 import { SensitiveContentService } from "./sensitive-content.service";
 import { UserTokenService } from "./user-token.service";
@@ -14,6 +14,7 @@ export class BookService {
     private readonly sensitiveContentService: SensitiveContentService,
     private readonly userTokenService: UserTokenService
   ) {}
+
   getBooks(options?: BookPageOptions) {
     const opts = { ...options };
 
@@ -29,7 +30,23 @@ export class BookService {
   }
 
   getBook(id: string) {
-    return this.http.get<Book>(`books/${id}`);
+    return this.http.get<BookBasic>(`books/${id}`);
+  }
+
+  getChapters(bookId: string) {
+    return this.http.get<Chapterlist[]>(`books/${bookId}/chapters`);
+  }
+
+  getCovers(bookId: string) {
+    return this.http.get<Cover[]>(`books/${bookId}/covers`);
+  }
+
+  selectCover(bookId: string, coverId: string) {
+    return this.http.patch<Book>(`books/${bookId}/covers/${coverId}/selected`, {});
+  }
+
+  getInfo(bookId: string) {
+    return this.http.get<BookDetail>(`books/${bookId}/infos`);
   }
 
   getTags() {
