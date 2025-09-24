@@ -17,7 +17,7 @@
 					<button (click)="resetBook()">Resetar</button>
 					<button (click)="fixBook()">Corrigir</button>
 				</div>
-				<div class="caps">{{ getMaxChapterIndex() }} Capitulos</div>
+				<div class="caps">{{ book.totalChapters }} Capitulos</div>
 				<div class="release">Lançamento {{ book.publication }}</div>
 			</div>
 		</div>
@@ -33,39 +33,7 @@
 		<p class="book-description">{{ book.description }}</p>
 	</div>
 </div>
-<div class="chapters">
-	@for(chapter of book.chapters; track chapter.id) {
-	<a [routerLink]="[chapter.id]" class="chapter">
-		<div class="title">
-			<h2>capitulo {{ chapter.index | number }}</h2>
-			@if(chapter.title){
-			<h3>{{ chapter.title }}</h3>
-			}
-		</div>
-		<div class="metadata">
-			<div class="read">
-				<app-icons
-					[name]="chapter.read ? 'eye' : 'eye-close'"
-					[ngClass]="{ read: chapter.read }"
-				/>
-			</div>
-			<div
-				class="scraping-status"
-				[ngClass]="{
-					scrapingStatusReady:
-						chapter.scrapingStatus === ScrapingStatus.READY,
-					scrapingStatusProcessing:
-						chapter.scrapingStatus === ScrapingStatus.PROCESSING,
-					scrapingStatusError:
-						chapter.scrapingStatus === ScrapingStatus.ERROR
-				}"
-			>
-				{{ getScrapingStatusClass(chapter.scrapingStatus) }}
-			</div>
-		</div>
-	</a>
-	}
-</div>
+<app-info-book [id]="book.id" />
 } @placeholder {
 <div class="book-background placeholder-background"></div>
 <div class="book">
@@ -84,7 +52,7 @@
 	</div>
 	<div class="book-info-plus">
 		<div class="tags">
-			@for (i of [].constructor(5); track i) {
+			@for (i of [].constructor(5); track $index) {
 			<span class="placeholder"></span>
 			}
 		</div>
@@ -92,7 +60,7 @@
 	</div>
 </div>
 <div class="chapters">
-	@for (i of [].constructor(4); track i) {
+	@for (i of [].constructor(4); track $index) {
 	<div class="placeholder"></div>
 	}
 </div>

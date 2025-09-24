@@ -1,22 +1,23 @@
 import { Component, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Book, ScrapingStatus } from '../../models/book.models';
+import { Book, BookBasic, ScrapingStatus } from '../../models/book.models';
 import { BookService } from '../../service/book.service';
 import { DecimalPipe, NgClass, NgIf } from '@angular/common';
 import { IconsComponent } from '../../components/icons/icons.component';
 import { MetaDataService } from '../../service/meta-data.service';
 import { UserTokenService } from '../../service/user-token.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
+import { InfoBookComponent } from '../../components/info-book/info-book.component';
 
 @Component({
   selector: 'app-book',
-  imports: [RouterModule, IconsComponent, NgClass, NgIf, DecimalPipe],
+  imports: [RouterModule, NgIf, InfoBookComponent],
   templateUrl: './book.component.html',
   styleUrl: './book.component.scss',
 })
 export class BookComponent {
   ScrapingStatus = ScrapingStatus;
-  book!: Book;
+  book!: BookBasic;
   admin = false;
   isLoading = signal(true);
 
@@ -76,9 +77,9 @@ export class BookComponent {
     return this.book.authors.map(author => author.name).join(', ');
   }
 
-  getMaxChapterIndex(): number {
-    return this.book.chapters.reduce((max, chapter) => Math.max(max, chapter.index), 0);
-  }
+  // getMaxChapterIndex(): number {
+  //   return this.book.chapters.reduce((max, chapter) => Math.max(max, chapter.index), 0);
+  // }
 
   fixBook() {
     if (this.book) {

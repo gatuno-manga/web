@@ -1,0 +1,92 @@
+<div id="header">
+	<div class="selector" #selector></div>
+	<span #firstTab (click)="selectTab(tab.chapters, $event)">Capitulos</span>
+	<span (click)="selectTab(tab.covers, $event)">Capas</span>
+	<span (click)="selectTab(tab.extraInfo, $event)">Informações extras</span>
+</div>
+<div id="container" [style.--current-tab-index]="selectedTab">
+	<div
+		id="chapters"
+		[class.selected]="selectedTab === tab.chapters"
+		class="container"
+	>
+		<div class="scrollable">
+			@for(chapter of chapters; track chapter.id) {
+			<a [routerLink]="[chapter.id]" class="chapter">
+				<div class="title">
+					<h2>capitulo {{ chapter.index | number }}</h2>
+					@if(chapter.title){
+					<h3>{{ chapter.title }}</h3>
+					}
+				</div>
+				<div class="metadata">
+					<div class="read">
+						<app-icons
+							[name]="chapter.read ? 'eye' : 'eye-close'"
+							[class.read]="chapter.read"
+						/>
+					</div>
+					<div
+						class="scraping-status"
+						[class.scrapingStatusReady]="
+							chapter.scrapingStatus === ScrapingStatus.READY
+						"
+						[class.scrapingStatusProcessing]="
+							chapter.scrapingStatus === ScrapingStatus.PROCESSING
+						"
+						[class.scrapingStatusError]="
+							chapter.scrapingStatus === ScrapingStatus.ERROR
+						"
+					>
+						{{ getScrapingStatusClass(chapter.scrapingStatus) }}
+					</div>
+				</div>
+			</a>
+			}
+		</div>
+	</div>
+	<div
+		id="covers"
+		[class.selected]="selectedTab === tab.covers"
+		class="container"
+	>
+		<div class="container-cover scrollable">
+			@for(cover of covers; track cover.id) {
+			<div class="cover" [class.selected]="cover.selected">
+				<img [src]="cover.url" [alt]="'Cover ' + cover.id" />
+				<div class="metadata">{{ cover.title }}</div>
+			</div>
+			}
+		</div>
+	</div>
+	<div
+		id="extra-info"
+		[class.selected]="selectedTab === tab.extraInfo"
+		class="container"
+	>
+		<div class="scrollable">
+			<div class="titles">
+				<h1>Titulos alternativos</h1>
+				<div>
+					@for(title of extraInfo.alternativeTitle; track title) {
+					<p class="item">{{ title }}</p>
+					}@empty {
+					<p>Nenhum titulo alternativo disponível</p>
+					}
+				</div>
+			</div>
+			<div class="sources">
+				<h1>Fontes</h1>
+				<div>
+					@for(source of extraInfo.originalUrl; track source) {
+					<a class="item" [href]="source" target="_blank">{{
+						this.urlTransform(source)
+					}}</a>
+					}@empty {
+					<p>Nenhuma fonte disponível</p>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
