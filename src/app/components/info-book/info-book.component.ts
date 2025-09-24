@@ -4,6 +4,8 @@ import { BookDetail, Chapterlist, Cover, ScrapingStatus } from '../../models/boo
 import { RouterModule } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
+import { ModalNotificationService } from '../../service/modal-notification.service';
+import { Router } from 'express';
 
 enum tab {
   chapters = 0,
@@ -58,6 +60,7 @@ export class InfoBookComponent implements AfterViewInit {
 
   constructor(
     private bookService: BookService,
+    private modalService: ModalNotificationService,
   ) {}
 
   ngAfterViewInit() {
@@ -143,5 +146,29 @@ export class InfoBookComponent implements AfterViewInit {
 
   urlTransform(url: string): string {
     return new URL(url).hostname;
+  }
+
+  selectCover(cover: Cover) {
+    this.modalService.show(
+      'Confirmar troca de capa',
+      'Tem certeza que deseja trocar a capa do livro?',
+      [
+        {
+          label: 'Cancelar',
+          type: 'primary',
+        },
+        {
+          label: 'Sim',
+          type: 'danger',
+          callback: () => {
+            this.bookService.selectCover(this.id, cover.id).subscribe({
+              next: (book) => {
+                window.location.reload();
+              }
+            });
+          }
+        }
+      ]
+    );
   }
 }

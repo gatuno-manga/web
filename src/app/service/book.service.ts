@@ -41,6 +41,10 @@ export class BookService {
     return this.http.get<Cover[]>(`books/${bookId}/covers`);
   }
 
+  selectCover(bookId: string, coverId: string) {
+    return this.http.patch<Book>(`books/${bookId}/covers/${coverId}/selected`, {});
+  }
+
   getInfo(bookId: string) {
     return this.http.get<BookDetail>(`books/${bookId}/infos`);
   }
