@@ -45,7 +45,13 @@ export class InfoBookComponent implements AfterViewInit {
   ];
   chapters: Chapterlist[] = [];
   covers: Cover[] = [];
-  extraInfo!: BookDetail;
+  extraInfo: BookDetail = {
+    alternativeTitle: [],
+    originalUrl: [],
+    scrapingStatus: ScrapingStatus.PROCESSING,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
 
   @ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
   @ViewChild('firstTab') firstTab!: ElementRef<HTMLSpanElement>;
