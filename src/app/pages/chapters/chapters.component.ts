@@ -81,6 +81,60 @@ export class ChaptersComponent {
     this.lastScrollTop = st <= 0 ? 0 : st;
   }
 
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+
+    // Ctrl + Alt + Seta para cima/baixo: pula de página em página
+    if (event.ctrlKey && event.altKey) {
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.scrollToTop();
+        return;
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        return;
+      }
+    }
+
+    // Ctrl + Seta para cima/baixo: pula de página em página (imagens do capítulo)
+    if (event.ctrlKey) {
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.scrollToPreviousImage();
+        return;
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        this.scrollToNextImage();
+        return;
+      }
+    }
+
+    // Verifica se está no final da página
+    const isAtBottom = (window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 100;
+
+    if (isAtBottom && event.key === 'ArrowRight') {
+      event.preventDefault();
+      this.nextPage();
+    } else if (window.pageYOffset <= 100 && event.key === 'ArrowLeft') {
+      event.preventDefault();
+      this.previousPage();
+    }
+  }
+
+  scrollToNextImage() {
+    const delta = Math.floor(window.innerHeight * 0.7);
+    const maxScroll = Math.max(document.body.scrollHeight - window.innerHeight, 0);
+    const target = Math.min(window.pageYOffset + delta, maxScroll);
+    window.scrollTo({ top: target, behavior: 'smooth' });
+  }
+
+  scrollToPreviousImage() {
+    const delta = Math.floor(window.innerHeight * 0.7);
+    const target = Math.max(window.pageYOffset - delta, 0);
+    window.scrollTo({ top: target, behavior: 'smooth' });
+  }
+
   clearScrolledUpAmount() {
     this.scrolledUpAmount = 0;
     this.showBtnTop = false;

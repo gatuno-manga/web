@@ -28,6 +28,15 @@
 	<p>No pages available for this chapter.</p>
 	}
 	<div
+		class="last-chapter shortcuts-mobile-pages"
+		(dblclick)="previousPage()"
+	>
+		<div class="extension"></div>
+	</div>
+	<div class="next-chapter shortcuts-mobile-pages" (dblclick)="nextPage()">
+		<div class="extension"></div>
+	</div>
+	<div
 		class="btn-top"
 		[ngClass]="{
 			show: showBtnTop
