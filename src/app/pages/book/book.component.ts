@@ -76,11 +76,9 @@ export class BookComponent {
   getAuthorNames(): string {
     return this.book.authors.map(author => author.name).join(', ');
   }
-
-  // getMaxChapterIndex(): number {
-  //   return this.book.chapters.reduce((max, chapter) => Math.max(max, chapter.index), 0);
-  // }
-
+  filterByTag(tagId: string) {
+    this.router.navigate(['/books'], { queryParams: { tags: tagId } });
+  }
   fixBook() {
     if (this.book) {
       this.modalService.show(

@@ -26,8 +26,10 @@
 		<div class="tags">
 			@for(content of book.sensitiveContent; track content) {
 			<span class="sensitive">{{ content.name }}</span>
-			} @for(tag of book.tags; track tag.name) {
-			<span class="tag">{{ tag.name }}</span>
+			} @for(tag of book.tags; track tag.id) {
+			<span class="tag" (click)="filterByTag(tag.id)">{{
+				tag.name
+			}}</span>
 			}
 		</div>
 		<p class="book-description">{{ book.description }}</p>
