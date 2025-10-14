@@ -12,11 +12,11 @@ import { CommonModule } from '@angular/common';
 export class AsideComponent implements OnInit, OnDestroy {
   @Input() position: 'left' | 'right' = 'right';
   @Input() topOffset: number = 80;
+  @Input() readonly SWIPE_THRESHOLD = 300;
+  @Input() readonly EDGE_THRESHOLD = 150;
   isOpen = false;
   private touchStartX = 0;
   private touchStartY = 0;
-  private readonly SWIPE_THRESHOLD = 300;
-  private readonly EDGE_THRESHOLD = 150;
   private isDragging = false;
   public dragOffset = 0;
   private isBrowser: boolean;
@@ -84,21 +84,15 @@ export class AsideComponent implements OnInit, OnDestroy {
     const deltaX = currentX - this.touchStartX;
 
     if (!this.isOpen) {
-      // Quando fechado, permite arrastar para abrir
       if (this.position === 'right') {
-        // Arrasta da direita para esquerda (valores negativos)
         this.dragOffset = Math.max(-300, Math.min(0, deltaX));
       } else {
-        // Arrasta da esquerda para direita (valores positivos)
         this.dragOffset = Math.max(0, Math.min(300, deltaX));
       }
     } else {
-      // Quando aberto, permite arrastar para fechar
       if (this.position === 'right') {
-        // Arrasta para direita (valores positivos)
         this.dragOffset = Math.max(0, Math.min(300, deltaX));
       } else {
-        // Arrasta para esquerda (valores negativos)
         this.dragOffset = Math.max(-300, Math.min(0, deltaX));
       }
     }
@@ -117,7 +111,6 @@ export class AsideComponent implements OnInit, OnDestroy {
     this.dragOffset = 0;
 
     if (this.position === 'right') {
-      // Lógica para aside à direita
       if (
         !this.isOpen &&
         this.touchStartX > (screenWidth - this.EDGE_THRESHOLD) &&
@@ -137,7 +130,6 @@ export class AsideComponent implements OnInit, OnDestroy {
         return;
       }
     } else {
-      // Lógica para aside à esquerda
       if (
         !this.isOpen &&
         this.touchStartX < this.EDGE_THRESHOLD &&
@@ -174,14 +166,12 @@ export class AsideComponent implements OnInit, OnDestroy {
   getDragTransform(): string {
     if (this.isDragging) {
       if (this.position === 'right') {
-        // Aside à direita
         if (!this.isOpen) {
           return `translateX(calc(100% + ${this.dragOffset}px))`;
         } else {
           return `translateX(${this.dragOffset}px)`;
         }
       } else {
-        // Aside à esquerda
         if (!this.isOpen) {
           return `translateX(calc(-100% + ${this.dragOffset}px))`;
         } else {
