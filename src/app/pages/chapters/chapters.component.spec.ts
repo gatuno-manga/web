@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SharedTestingModule } from '@testing/shared-testing.module';
 
 import { ChaptersComponent } from './chapters.component';
 
@@ -8,9 +9,9 @@ describe('ChaptersComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChaptersComponent]
+      imports: [ChaptersComponent, SharedTestingModule]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ChaptersComponent);
     component = fixture.componentInstance;

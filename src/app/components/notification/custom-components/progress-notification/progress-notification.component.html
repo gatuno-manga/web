@@ -1,0 +1,18 @@
+<div class="progress-content">
+	<div class="header">
+		<h3>{{ title }}</h3>
+		<span class="percentage">{{ progress }}%</span>
+	</div>
+
+	<div class="progress-bar">
+		<div class="progress-fill" [style.width.%]="progress"></div>
+	</div>
+
+	<p class="status">{{ statusMessage }}</p>
+
+	@if(currentItem) {
+	<div class="current-item">
+		Processando: <strong>{{ currentItem }}</strong>
+	</div>
+	}
+</div>

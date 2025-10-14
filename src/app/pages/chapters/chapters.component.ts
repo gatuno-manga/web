@@ -60,10 +60,12 @@ export class ChaptersComponent {
   }
 
   setMetaData() {
+    const defaultImage = this.chapter?.pages?.[0]?.path || '';
+
     this.metaService.setMetaData({
       title: this.chapter ? `Capitulo ${this.formatNumber(this.chapter.index)} | ${this.chapter.bookTitle}` : 'Capítulo',
       description: this.chapter ? `Ler online o capítulo ${this.formatNumber(this.chapter.index)} do livro ${this.chapter.bookTitle}.` : 'Capítulo',
-      image: this.chapter ? this.chapter.pages[0].path : '',
+      image: defaultImage,
     })
   }
 

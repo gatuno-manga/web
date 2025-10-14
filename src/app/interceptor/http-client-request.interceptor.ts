@@ -8,14 +8,17 @@ import { of } from 'rxjs';
 
 export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
   const userTokenService = inject(UserTokenService);
+  const platformId = inject(PLATFORM_ID);
   const requestExclude = ['/favicon.ico', '/data/', '/assets/'];
 
   let clonedRequest = req;
   if (!/^https?:\/\//i.test(req.url) && !requestExclude.some(url => req.url.includes(url))) {
-    let baseUrl = environment.apiURL;
+    // Usar URL do servidor em SSR, URL do cliente no browser
+    let baseUrl = isPlatformBrowser(platformId)
+      ? environment.apiURL
+      : environment.apiURLServer || environment.apiURL;
 
     if (!baseUrl) {
-      const platformId = inject(PLATFORM_ID);
       if (isPlatformBrowser(platformId)) {
         baseUrl = window.location.origin + '/api';
       } else {

@@ -3,6 +3,24 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@testing/*": [
+        "testing/*"
+      ],
+      "@components/*": [
+        "app/components/*"
+      ],
+      "@guards/*": [
+        "app/guards/*"
+      ],
+      "@interceptor/*": [
+        "app/interceptor/*"
+      ],
+      "@models/*": [
+        "app/models/*"
+      ]
+    },
     "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,

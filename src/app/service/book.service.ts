@@ -4,6 +4,7 @@ import { Book, BookBasic, BookDetail, BookList, BookPageOptions, Chapterlist, Co
 import { Page } from "../models/miscellaneous.models";
 import { SensitiveContentService } from "./sensitive-content.service";
 import { UserTokenService } from "./user-token.service";
+import { BookWebsocketService } from "./book-websocket.service";
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +13,22 @@ export class BookService {
   constructor(
     private readonly http: HttpClient,
     private readonly sensitiveContentService: SensitiveContentService,
-    private readonly userTokenService: UserTokenService
-  ) {}
+    private readonly userTokenService: UserTokenService,
+    private readonly websocketService: BookWebsocketService
+  ) {
+    // Conecta ao WebSocket após um pequeno delay para garantir que o backend está pronto
+    // Apenas no browser (não no SSR)
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        try {
+          this.websocketService.connect();
+        } catch (error) {
+          console.warn('Falha ao conectar WebSocket:', error);
+          // WebSocket é opcional, não deve quebrar a aplicação
+        }
+      }, 2000);
+    }
+  }
 
   getBooks(options?: BookPageOptions) {
     const opts = { ...options };
@@ -59,5 +74,19 @@ export class BookService {
 
   resetBook(id: string) {
     return this.http.patch<Book>(`books/${id}/reset`, {});
+  }
+
+  /**
+   * Retorna os observables do WebSocket para eventos em tempo real
+   */
+  getWebsocketService() {
+    return this.websocketService;
+  }
+
+  /**
+   * Observa eventos de um livro específico
+   */
+  watchBook(bookId: string) {
+    return this.websocketService.watchBook(bookId);
   }
 }

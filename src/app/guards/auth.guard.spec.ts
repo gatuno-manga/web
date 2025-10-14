@@ -1,17 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
+import { SharedTestingModule } from '../../testing/shared-testing.module';
+import { AuthenticateGuard } from './auth.guard';
 
-import { authGuard } from './auth.guard';
-
-describe('authGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => 
-      TestBed.runInInjectionContext(() => authGuard(...guardParameters));
+describe('AuthenticateGuard', () => {
+  let guard: AuthenticateGuard;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({ imports: [SharedTestingModule] });
+    guard = TestBed.inject(AuthenticateGuard);
   });
 
   it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+    expect(guard).toBeTruthy();
   });
 });

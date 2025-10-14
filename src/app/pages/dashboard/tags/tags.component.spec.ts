@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SharedTestingModule } from '@testing/shared-testing.module';
 
 import { TagsComponent } from './tags.component';
 
@@ -8,9 +9,9 @@ describe('TagsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TagsComponent]
+      imports: [TagsComponent, SharedTestingModule]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(TagsComponent);
     component = fixture.componentInstance;

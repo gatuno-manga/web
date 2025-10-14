@@ -1,11 +1,11 @@
-import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal, OnDestroy } from '@angular/core';
 import { BookService } from '../../service/book.service';
 import { BookDetail, Chapterlist, Cover, ScrapingStatus } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
 import { ModalNotificationService } from '../../service/modal-notification.service';
-import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 enum tab {
   chapters = 0,
@@ -24,12 +24,14 @@ interface ModulesLoad {
   templateUrl: './info-book.component.html',
   styleUrl: './info-book.component.scss'
 })
-export class InfoBookComponent implements AfterViewInit {
+export class InfoBookComponent implements AfterViewInit, OnDestroy {
   tab = tab;
   ScrapingStatus = ScrapingStatus;
 
   @Input() id!: string;
   selectedTab: tab = tab.chapters;
+
+  private websocketSubscription?: Subscription;
 
   modulesLoad: ModulesLoad[] = [
     {
@@ -67,6 +69,54 @@ export class InfoBookComponent implements AfterViewInit {
     if (this.firstTab) {
       this.firstTab.nativeElement.click();
     }
+
+    this.subscribeToWebSocketEvents();
+  }
+
+  ngOnDestroy() {
+    if (this.websocketSubscription) {
+      this.websocketSubscription.unsubscribe();
+    }
+  }
+
+  private subscribeToWebSocketEvents() {
+    if (!this.id) return;
+
+    this.websocketSubscription = this.bookService.watchBook(this.id).subscribe({
+      next: (event) => {
+        console.log('📡 Evento WebSocket recebido:', event);
+
+        switch (event.type) {
+          case 'chapters.updated':
+            if (this.selectedTab === tab.chapters && this.modulesLoad[tab.chapters].load()) {
+              this.loadChapters();
+            } else {
+              this.modulesLoad[tab.chapters].load.set(false);
+            }
+            break;
+
+          case 'cover.processed':
+          case 'cover.selected':
+            if (this.selectedTab === tab.covers && this.modulesLoad[tab.covers].load()) {
+              this.loadCovers();
+            } else {
+              this.modulesLoad[tab.covers].load.set(false);
+            }
+            break;
+
+          case 'book.updated':
+            if (this.selectedTab === tab.extraInfo && this.modulesLoad[tab.extraInfo].load()) {
+              this.loadExtraInfo();
+            } else {
+              this.modulesLoad[tab.extraInfo].load.set(false);
+            }
+            break;
+        }
+      },
+      error: (error) => {
+        console.error('❌ Erro no WebSocket:', error);
+      }
+    });
   }
 
   selectTab(tabName: tab, event?: Event) {
