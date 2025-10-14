@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { UserTokenService } from "../service/user-token.service";
-import { Router } from "@angular/router";
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from "@angular/router";
 
 @Injectable({
   providedIn: 'root',
@@ -11,14 +11,15 @@ export class AuthenticateGuard {
     private router: Router,
   ) {}
 
-  isLogged(): boolean {
+  isLogged(route?: ActivatedRouteSnapshot, state?: RouterStateSnapshot): boolean {
     if (!this.tokenService.hasToken) {
       this.tokenService.refreshTokens().subscribe({
         next: () => {
           this.router.navigate(['']);
         },
         error: () => {
-          this.router.navigate(['/login']);
+          const returnUrl = state?.url || '/';
+          this.router.navigate(['/login'], { queryParams: { returnUrl } });
         }
       });
       return false;

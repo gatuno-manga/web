@@ -1,4 +1,3 @@
-import e from "express";
 import { PageRequest } from "./miscellaneous.models";
 
 export interface BookList {
@@ -65,6 +64,7 @@ export interface Author {
 }
 
 export interface tag {
+  id: string;
   name: string;
 }
 
@@ -112,5 +112,17 @@ export interface Page {
 }
 
 export interface BookPageOptions extends PageRequest {
+  type?: TypeBook[];
   sensitiveContent?: string[];
+  search?: string;
+  tags?: string[];
+  tagsLogic?: 'and' | 'or';
+  excludeTags?: string[];
+  excludeTagsLogic?: 'and' | 'or';
+  publication?: number;
+  publicationOperator?: 'eq' | 'gt' | 'lt' | 'gte' | 'lte';
+  authors?: string[];
+  authorsLogic?: 'and' | 'or';
+  orderBy?: 'title' | 'createdAt' | 'updatedAt' | 'publication';
+  order?: 'ASC' | 'DESC';
 }

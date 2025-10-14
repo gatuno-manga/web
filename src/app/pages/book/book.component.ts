@@ -1,17 +1,18 @@
 import { Component, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Book, BookBasic, ScrapingStatus } from '../../models/book.models';
+import { BookBasic, ScrapingStatus } from '../../models/book.models';
 import { BookService } from '../../service/book.service';
-import { DecimalPipe, NgClass, NgIf } from '@angular/common';
 import { IconsComponent } from '../../components/icons/icons.component';
 import { MetaDataService } from '../../service/meta-data.service';
 import { UserTokenService } from '../../service/user-token.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { InfoBookComponent } from '../../components/info-book/info-book.component';
+import { AsideComponent } from '../../components/aside/aside.component';
+import { ButtonComponent } from '../../components/inputs/button/button.component';
 
 @Component({
   selector: 'app-book',
-  imports: [RouterModule, NgIf, InfoBookComponent],
+  imports: [RouterModule, IconsComponent, InfoBookComponent, AsideComponent, ButtonComponent],
   templateUrl: './book.component.html',
   styleUrl: './book.component.scss',
 })
@@ -76,11 +77,9 @@ export class BookComponent {
   getAuthorNames(): string {
     return this.book.authors.map(author => author.name).join(', ');
   }
-
-  // getMaxChapterIndex(): number {
-  //   return this.book.chapters.reduce((max, chapter) => Math.max(max, chapter.index), 0);
-  // }
-
+  filterByTag(tagId: string) {
+    this.router.navigate(['/books'], { queryParams: { tags: tagId } });
+  }
   fixBook() {
     if (this.book) {
       this.modalService.show(

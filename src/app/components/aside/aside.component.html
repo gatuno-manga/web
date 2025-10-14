@@ -1,0 +1,17 @@
+<div class="aside-container" [class.open]="isOpen">
+	<div class="aside-overlay" *ngIf="isOpen" (click)="close()"></div>
+	<div
+		class="aside-content"
+		[style.transform]="getDragTransform()"
+		[ngStyle]="{
+			'top.px': topOffset,
+			'right.px': position === 'right' ? 0 : 'auto',
+			'left.px': position === 'left' ? 0 : 'auto'
+		}"
+	>
+		<div class="aside-header">
+			<app-icons name="close" class="close-icon" (click)="close()" />
+		</div>
+		<ng-content></ng-content>
+	</div>
+</div>

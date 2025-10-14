@@ -1,12 +1,13 @@
 #tags-list {
 	max-height: 100%;
+	width: 100%;
+	max-width: 720px;
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 	padding: 0 20px;
-	margin: 0 10px;
-	margin-bottom: 30px;
+	margin: 30px auto;
 
 	.tag-item {
 		display: flex;
@@ -20,6 +21,9 @@
 
 #merge {
 	position: relative;
+	width: 100%;
+	max-width: 720px;
+	margin: 30px auto;
 	.cancel-button {
 		position: absolute;
 		top: 0;

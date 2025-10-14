@@ -73,6 +73,25 @@ $page-size: 1200px;
 					line-height: 3rem;
 					margin-bottom: 0.5rem;
 					font-weight: lighter;
+					word-wrap: break-word;
+					overflow-wrap: break-word;
+					hyphens: auto;
+					transition: font-size 0.2s ease;
+
+					&.long-title {
+						font-size: 1.6rem;
+						line-height: 2.4rem;
+					}
+
+					&.very-long-title {
+						font-size: 1.3rem;
+						line-height: 2rem;
+					}
+
+					@media (max-width: 768px) {
+						font-size: 2rem;
+						line-height: 3rem;
+					}
 
 					&.placeholder {
 						height: 4rem;
@@ -161,4 +180,31 @@ app-info-book {
 	width: 100%;
 	max-width: $page-size;
 	margin: 0 auto;
+}
+
+app-aside {
+	h1 {
+		display: inline-flex;
+		font-size: 1.2rem;
+		line-height: 1.7rem;
+		font-weight: lighter;
+		gap: 0.5rem;
+	}
+	.line {
+		width: 90%;
+		height: 3px;
+		border-radius: 9999999px;
+		background-color: var(--app-text-color);
+		margin: 1rem auto;
+	}
+	.actions {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+	}
+	app-button {
+		width: 100%;
+		margin-bottom: 0.4rem;
+		font-size: 1.4rem;
+	}
 }

@@ -2,8 +2,9 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../service/auth.service';
 import { PasswordInputComponent, TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ButtonComponent } from '../../../components/inputs/button/button.component';
+import { MetaDataService } from '../../../service/meta-data.service';
 
 @Component({
   selector: 'app-login',
@@ -19,15 +20,28 @@ import { ButtonComponent } from '../../../components/inputs/button/button.compon
 })
 export class LoginComponent {
   form: FormGroup;
+  private returnUrl: string = '/books';
+
   constructor(
     private fb: FormBuilder,
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly metaService: MetaDataService
   ) {
     this.form = this.fb.group({
       email: [''],
       password: [''],
     });
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/books';
+    this.setMetaData();
+  }
+
+  setMetaData() {
+    this.metaService.setMetaData({
+      title: 'Login',
+      description: 'Acesse sua conta.',
+    })
   }
 
   submit() {
@@ -35,7 +49,7 @@ export class LoginComponent {
     this.authService.login(this.form.value).subscribe({
       next: (response) => {
         console.log('Login successful', response);
-        this.router.navigate(['/books']);
+        this.router.navigateByUrl(this.returnUrl);
       },
       error: (error) => {
         console.error('Login failed', error);
