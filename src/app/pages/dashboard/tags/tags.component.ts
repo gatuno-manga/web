@@ -5,6 +5,7 @@ import { ListCheckboxComponent } from '../../../components/inputs/list-checkbox/
 import { ListCheckboxItem } from '../../../components/inputs/list-checkbox/list-checkbox.type';
 import { ButtonComponent } from '../../../components/inputs/button/button.component';
 import { IconsComponent } from '../../../components/icons/icons.component';
+import { MetaDataService } from '../../../service/meta-data.service';
 
 @Component({
   selector: 'app-tags',
@@ -19,8 +20,18 @@ export class TagsComponent {
   mergingTags: ListCheckboxItem[] = [];
 
   constructor(
-    private tagsService: TagsService
-  ) {}
+    private tagsService: TagsService,
+    private metaService: MetaDataService
+  ) {
+    this.setMetaData();
+  }
+
+  setMetaData() {
+    this.metaService.setMetaData({
+      title: 'Tags | Dashboard',
+      description: 'Gerencie suas tags.',
+    });
+  }
 
   ngOnInit() {
     this.loadTags();

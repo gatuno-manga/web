@@ -7,6 +7,7 @@ import { ButtonComponent } from '../../../components/inputs/button/button.compon
 import { minUppercaseValidator } from '../../../validators/min-uppercase.validator';
 import { minNumberValidator } from '../../../validators/min-number.validator';
 import { minSymbolValidator } from '../../../validators/min-symbol.validator';
+import { MetaDataService } from '../../../service/meta-data.service';
 
 @Component({
   selector: 'app-register',
@@ -24,7 +25,8 @@ export class RegisterComponent {
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly metaService: MetaDataService
   ) {
     this.form = this.fb.nonNullable.group(
       {
@@ -40,6 +42,14 @@ export class RegisterComponent {
       },
       { validators: [this.passwordsMatch] }
     );
+    this.setMetaData();
+  }
+
+  setMetaData() {
+    this.metaService.setMetaData({
+      title: 'Registrar-se',
+      description: 'Crie sua conta para acessar conteúdos.',
+    })
   }
 
   private passwordsMatch(control: AbstractControl): { [key: string]: string | boolean } | null {

@@ -6,6 +6,7 @@ import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ItemBookComponent } from '../../components/item-book/item-book.component';
 import { Page } from '../../models/miscellaneous.models';
 import { SelectComponent } from '../../components/select/select.component';
+import { MetaDataService } from '../../service/meta-data.service';
 
 @Component({
   selector: 'app-books',
@@ -36,7 +37,8 @@ export class BooksComponent {
     private booksService: BookService,
     private localStorage: LocalStorageService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private metaService: MetaDataService
   ) {
     const savedLayout = this.localStorage.get('books-layout');
     if (savedLayout === 'grid' || savedLayout === 'list') {
@@ -67,6 +69,14 @@ export class BooksComponent {
 
       this.filterOptions = filters;
       this.loadBooks();
+    });
+    this.setMetaData();
+  }
+
+  setMetaData() {
+    this.metaService.setMetaData({
+      title: 'Livros',
+      description: 'Navegue por nossa coleção de livros. Encontre títulos por gênero, autor e mais.',
     });
   }
 
