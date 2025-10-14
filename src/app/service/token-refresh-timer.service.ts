@@ -62,7 +62,7 @@ export class TokenRefreshTimerService implements OnDestroy {
                             return false;
                         }
 
-                        if (timeUntilExpiration <= this.REFRESH_THRESHOLD && timeUntilExpiration > 0) {
+                        if (timeUntilExpiration <= this.REFRESH_THRESHOLD) {
                             return true;
                         }
 
