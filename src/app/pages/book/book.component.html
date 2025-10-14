@@ -7,16 +7,17 @@
 		</div>
 		<div class="book-info">
 			<div class="top">
-				<h1>{{ book.title }}</h1>
+				<h1
+					[class.long-title]="book.title.length > 90"
+					[class.very-long-title]="book.title.length > 140"
+				>
+					{{ book.title }}
+				</h1>
 				<h6>
 					{{ getAuthorNames() }}
 				</h6>
 			</div>
 			<div class="bottom">
-				<div *ngIf="admin" class="admin-actions">
-					<button (click)="resetBook()">Resetar</button>
-					<button (click)="fixBook()">Corrigir</button>
-				</div>
 				<div class="caps">{{ book.totalChapters }} Capitulos</div>
 				<div class="release">Lançamento {{ book.publication }}</div>
 			</div>

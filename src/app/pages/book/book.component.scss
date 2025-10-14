@@ -73,6 +73,25 @@ $page-size: 1200px;
 					line-height: 3rem;
 					margin-bottom: 0.5rem;
 					font-weight: lighter;
+					word-wrap: break-word;
+					overflow-wrap: break-word;
+					hyphens: auto;
+					transition: font-size 0.2s ease;
+
+					&.long-title {
+						font-size: 1.6rem;
+						line-height: 2.4rem;
+					}
+
+					&.very-long-title {
+						font-size: 1.3rem;
+						line-height: 2rem;
+					}
+
+					@media (max-width: 768px) {
+						font-size: 2rem;
+						line-height: 3rem;
+					}
 
 					&.placeholder {
 						height: 4rem;
