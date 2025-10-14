@@ -1,5 +1,9 @@
-<button #button [id]="id" [type]="type">
-	<app-icons [name]="rightIcon" *ngIf="rightIcon" />
+<button #button [id]="id" [type]="type" [class]="'btn-' + variant">
+	@if(rightIcon){
+	<app-icons [name]="rightIcon" />
+	}
 	<ng-content></ng-content>
-	<app-icons [name]="leftIcon" *ngIf="leftIcon" />
+	@if(leftIcon){
+	<app-icons [name]="leftIcon" />
+	}
 </button>

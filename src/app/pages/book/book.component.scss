@@ -162,3 +162,30 @@ app-info-book {
 	max-width: $page-size;
 	margin: 0 auto;
 }
+
+app-aside {
+	h1 {
+		display: inline-flex;
+		font-size: 1.2rem;
+		line-height: 1.7rem;
+		font-weight: lighter;
+		gap: 0.5rem;
+	}
+	.line {
+		width: 90%;
+		height: 3px;
+		border-radius: 9999999px;
+		background-color: var(--app-text-color);
+		margin: 1rem auto;
+	}
+	.actions {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+	}
+	app-button {
+		width: 100%;
+		margin-bottom: 0.4rem;
+		font-size: 1.4rem;
+	}
+}

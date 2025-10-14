@@ -1,4 +1,5 @@
-import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, Input, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
 import { CommonModule } from '@angular/common';
 
@@ -9,6 +10,8 @@ import { CommonModule } from '@angular/common';
   styleUrl: './aside.component.scss'
 })
 export class AsideComponent implements OnInit, OnDestroy {
+  @Input() position: 'left' | 'right' = 'right';
+  @Input() topOffset: number = 80;
   isOpen = false;
   private touchStartX = 0;
   private touchStartY = 0;
@@ -16,13 +19,22 @@ export class AsideComponent implements OnInit, OnDestroy {
   private readonly EDGE_THRESHOLD = 150;
   private isDragging = false;
   public dragOffset = 0;
+  private isBrowser: boolean;
+
+  constructor(@Inject(PLATFORM_ID) platformId: object) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit() {
-    this.addTouchListeners();
+    if (this.isBrowser) {
+      this.addTouchListeners();
+    }
   }
 
   ngOnDestroy() {
-    this.removeTouchListeners();
+    if (this.isBrowser) {
+      this.removeTouchListeners();
+    }
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -34,23 +46,33 @@ export class AsideComponent implements OnInit, OnDestroy {
   }
 
   private addTouchListeners() {
-    document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
-    document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: true });
-    document.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+    if (this.isBrowser && typeof document !== 'undefined') {
+      document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+      document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: true });
+      document.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+    }
   }
 
   private removeTouchListeners() {
-    document.removeEventListener('touchstart', this.handleTouchStart.bind(this));
-    document.removeEventListener('touchmove', this.handleTouchMove.bind(this));
-    document.removeEventListener('touchend', this.handleTouchEnd.bind(this));
+    if (this.isBrowser && typeof document !== 'undefined') {
+      document.removeEventListener('touchstart', this.handleTouchStart.bind(this));
+      document.removeEventListener('touchmove', this.handleTouchMove.bind(this));
+      document.removeEventListener('touchend', this.handleTouchEnd.bind(this));
+    }
   }
 
   private handleTouchStart(event: TouchEvent) {
+    if (!this.isBrowser) return;
+
     this.touchStartX = event.touches[0].clientX;
     this.touchStartY = event.touches[0].clientY;
     const screenWidth = window.innerWidth;
 
-    if (this.touchStartX > (screenWidth - this.EDGE_THRESHOLD) || this.isOpen) {
+    const isNearEdge = this.position === 'right'
+      ? this.touchStartX > (screenWidth - this.EDGE_THRESHOLD)
+      : this.touchStartX < this.EDGE_THRESHOLD;
+
+    if (isNearEdge || this.isOpen) {
       this.isDragging = true;
     }
   }
@@ -62,9 +84,23 @@ export class AsideComponent implements OnInit, OnDestroy {
     const deltaX = currentX - this.touchStartX;
 
     if (!this.isOpen) {
-      this.dragOffset = Math.max(-300, Math.min(0, deltaX));
+      // Quando fechado, permite arrastar para abrir
+      if (this.position === 'right') {
+        // Arrasta da direita para esquerda (valores negativos)
+        this.dragOffset = Math.max(-300, Math.min(0, deltaX));
+      } else {
+        // Arrasta da esquerda para direita (valores positivos)
+        this.dragOffset = Math.max(0, Math.min(300, deltaX));
+      }
     } else {
-      this.dragOffset = Math.max(0, Math.min(300, deltaX));
+      // Quando aberto, permite arrastar para fechar
+      if (this.position === 'right') {
+        // Arrasta para direita (valores positivos)
+        this.dragOffset = Math.max(0, Math.min(300, deltaX));
+      } else {
+        // Arrasta para esquerda (valores negativos)
+        this.dragOffset = Math.max(-300, Math.min(0, deltaX));
+      }
     }
   }
 
@@ -80,23 +116,46 @@ export class AsideComponent implements OnInit, OnDestroy {
     this.isDragging = false;
     this.dragOffset = 0;
 
-    if (
-      !this.isOpen &&
-      this.touchStartX > (screenWidth - this.EDGE_THRESHOLD) &&
-      deltaX < -this.SWIPE_THRESHOLD &&
-      deltaY < this.SWIPE_THRESHOLD
-    ) {
-      this.open();
-      return;
-    }
+    if (this.position === 'right') {
+      // Lógica para aside à direita
+      if (
+        !this.isOpen &&
+        this.touchStartX > (screenWidth - this.EDGE_THRESHOLD) &&
+        deltaX < -this.SWIPE_THRESHOLD &&
+        deltaY < this.SWIPE_THRESHOLD
+      ) {
+        this.open();
+        return;
+      }
 
-    if (
-      this.isOpen &&
-      deltaX > this.SWIPE_THRESHOLD &&
-      deltaY < this.SWIPE_THRESHOLD
-    ) {
-      this.close();
-      return;
+      if (
+        this.isOpen &&
+        deltaX > this.SWIPE_THRESHOLD &&
+        deltaY < this.SWIPE_THRESHOLD
+      ) {
+        this.close();
+        return;
+      }
+    } else {
+      // Lógica para aside à esquerda
+      if (
+        !this.isOpen &&
+        this.touchStartX < this.EDGE_THRESHOLD &&
+        deltaX > this.SWIPE_THRESHOLD &&
+        deltaY < this.SWIPE_THRESHOLD
+      ) {
+        this.open();
+        return;
+      }
+
+      if (
+        this.isOpen &&
+        deltaX < -this.SWIPE_THRESHOLD &&
+        deltaY < this.SWIPE_THRESHOLD
+      ) {
+        this.close();
+        return;
+      }
     }
   }
 
@@ -114,12 +173,27 @@ export class AsideComponent implements OnInit, OnDestroy {
 
   getDragTransform(): string {
     if (this.isDragging) {
-      if (!this.isOpen) {
-        return `translateX(calc(100% + ${this.dragOffset}px))`;
+      if (this.position === 'right') {
+        // Aside à direita
+        if (!this.isOpen) {
+          return `translateX(calc(100% + ${this.dragOffset}px))`;
+        } else {
+          return `translateX(${this.dragOffset}px)`;
+        }
       } else {
-        return `translateX(${this.dragOffset}px)`;
+        // Aside à esquerda
+        if (!this.isOpen) {
+          return `translateX(calc(-100% + ${this.dragOffset}px))`;
+        } else {
+          return `translateX(${this.dragOffset}px)`;
+        }
       }
     }
-    return this.isOpen ? 'translateX(0)' : 'translateX(100%)';
+
+    if (this.position === 'right') {
+      return this.isOpen ? 'translateX(0)' : 'translateX(100%)';
+    } else {
+      return this.isOpen ? 'translateX(0)' : 'translateX(-100%)';
+    }
   }
 }

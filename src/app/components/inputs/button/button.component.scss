@@ -1,7 +1,6 @@
 button {
 	display: flex;
 	gap: 0.5rem;
-	background-color: var(--primary-color);
 	border-radius: 50px;
 	padding: 5px 15px;
 	width: 100%;
@@ -10,11 +9,44 @@ button {
 	justify-content: center;
 	transition: 0.3s;
 	cursor: pointer;
+	font-weight: 500;
+	background-color: var(--primary-color);
 
-	&:hover {
-		background-color: var(--secondary-color);
-	}
 	&:focus {
 		outline: 2px solid var(--app-text-color);
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	&.btn-primary {
+		color: var(--app-text-color);
+
+		&:hover:not(:disabled) {
+			background-color: var(--secondary-color);
+		}
+	}
+
+	&.btn-outline {
+		background-color: transparent;
+		border: 2px solid var(--primary-color);
+		color: var(--primary-color);
+
+		&:hover:not(:disabled) {
+			background-color: var(--primary-color);
+			color: var(--app-text-color);
+		}
+	}
+
+	&.btn-text {
+		padding: 0 10px;
+		border-radius: 5px;
+		font-size: 1rem;
+
+		&:hover:not(:disabled) {
+			background-color: rgba(0, 0, 0, 0.05);
+		}
 	}
 }

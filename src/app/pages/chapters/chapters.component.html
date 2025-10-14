@@ -1,4 +1,5 @@
 <app-header static />
+@if(chapter) {
 <div id="header" class="header">
 	<div class="title">
 		<h1>Capitulo {{ chapter.index | number }}</h1>
@@ -7,18 +8,19 @@
 		}
 	</div>
 	<div class="controler">
-		<a class="arrow" *ngIf="chapter.previous" (click)="previousPage()">
+		@if(chapter.previous){
+		<a class="arrow" (click)="previousPage()">
 			<app-icons name="arrow-left" size="42" />
 		</a>
+		}
 		<a class="index" (click)="backPage()">
 			{{ chapter.index | number }}/{{ chapter.totalChapters }}
 		</a>
-		<a class="arrow" *ngIf="chapter.next" (click)="nextPage()">
+		@if(chapter.next){
+		<a class="arrow" (click)="nextPage()">
 			<app-icons name="arrow-right" size="42" />
 		</a>
-	</div>
-	<div class="admin-controls" *ngIf="admin">
-		<button (click)="resetChapter()">Resetar capitulo</button>
+		}
 	</div>
 </div>
 <div class="pages">
@@ -56,3 +58,41 @@
 	<a class="next" (click)="backPage()">Voltar a pagina inicial</a>
 	}
 </div>
+<app-aside [topOffset]="0">
+	<div class="title">
+		<h1 (click)="backPage()">
+			<app-icons name="book" /> {{ chapter.bookTitle }}
+		</h1>
+		<h1>
+			<app-icons name="file" />
+			{{ chapter.title || 'Capitulo ' + (chapter.index | number) }}
+		</h1>
+	</div>
+	<div class="controler">
+		@if(chapter.previous){
+		<a class="arrow" (click)="previousPage()">
+			<app-icons name="arrow-left" size="16" />
+		</a>
+		}
+		<a class="index" (click)="backPage()">
+			{{ chapter.index | number }}/{{ chapter.totalChapters }}
+		</a>
+		@if(chapter.next){
+		<a class="arrow" (click)="nextPage()">
+			<app-icons name="arrow-right" size="16" />
+		</a>
+		}
+	</div>
+	@if(admin){
+	<div class="line"></div>
+	<div class="actions">
+		<app-button (click)="resetChapter()" variant="text">
+			Resetar capitulo
+		</app-button>
+		<app-button (click)="openOriginalLink()" variant="text">
+			Link original
+		</app-button>
+	</div>
+	}
+</app-aside>
+}

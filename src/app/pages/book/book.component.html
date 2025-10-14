@@ -66,4 +66,13 @@
 	<div class="placeholder"></div>
 	}
 </div>
+} @if(admin){
+<app-aside>
+	<h1><app-icons name="book" /> {{ book.title }}</h1>
+	<div class="line"></div>
+	<div class="actions">
+		<app-button (click)="resetBook()" variant="text">Resetar</app-button>
+		<app-button (click)="fixBook()" variant="text">Corrigir</app-button>
+	</div>
+</app-aside>
 }
