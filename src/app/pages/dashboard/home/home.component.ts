@@ -16,20 +16,49 @@ import { MetaDataService } from '../../../service/meta-data.service';
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
-  overview!: DashboardOverview;
-  progressBooks!: DashboardProgress;
+  overview: DashboardOverview = {
+    books: 0,
+    chapters: 0,
+    pages: 0,
+    tags: 0,
+    authors: 0,
+    sensitiveContent: 0
+  };
+
+  progressBooks: DashboardProgress = {
+    totalChapters: 0,
+    processingChapters: 0,
+    books: []
+  };
+
   constructor(
     private readonly dashboardService: DashboardService,
     private metaService: MetaDataService
   ) {
-    this.dashboardService.getOverview().subscribe((overview) => {
-      this.overview = overview;
-    });
-    this.dashboardService.getProgressBooks().subscribe((progressBooks) => {
-      this.progressBooks = progressBooks;
-    });
+    this.loadDashboardData();
     this.setMetaData();
   }
+
+  private loadDashboardData(): void {
+    this.dashboardService.getOverview().subscribe({
+      next: (overview) => {
+        this.overview = overview;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar overview do dashboard:', error);
+      }
+    });
+
+    this.dashboardService.getProgressBooks().subscribe({
+      next: (progressBooks) => {
+        this.progressBooks = progressBooks;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar livros em processamento:', error);
+      }
+    });
+  }
+
   setMetaData() {
     this.metaService.setMetaData({
       title: 'Dashboard',

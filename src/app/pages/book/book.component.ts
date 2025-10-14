@@ -133,6 +133,7 @@ export class BookComponent {
       );
     }
   }
+
   confirmResetBook() {
     if (this.book) {
       this.bookService.resetBook(this.book.id).subscribe(() => {
