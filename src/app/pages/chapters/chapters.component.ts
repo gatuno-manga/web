@@ -23,6 +23,7 @@ export class ChaptersComponent {
   showBtnTop = false;
   private lastScrollTop = 0;
   private scrollThreshold = 1500;
+  private readonly BOTTOM_THRESHOLD = 100;
   admin = false;
 
   constructor(
@@ -130,13 +131,12 @@ export class ChaptersComponent {
       }
     }
 
-    // Verifica se está no final da página
-    const isAtBottom = (window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 100;
+    const isAtBottom = (window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - this.BOTTOM_THRESHOLD;
 
     if (isAtBottom && event.key === 'ArrowRight') {
       event.preventDefault();
       this.nextPage();
-    } else if (window.pageYOffset <= 100 && event.key === 'ArrowLeft') {
+    } else if (window.pageYOffset <= this.BOTTOM_THRESHOLD && event.key === 'ArrowLeft') {
       event.preventDefault();
       this.previousPage();
     }
