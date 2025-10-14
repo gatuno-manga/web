@@ -1,6 +1,6 @@
 import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, Inject, Input, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Input, PLATFORM_ID, SimpleChanges } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 let fs: any;
 if (typeof require !== 'undefined') {
@@ -28,48 +28,64 @@ export class IconsComponent {
   constructor(
     private sanitizer: DomSanitizer,
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
     this.loadIcon();
   }
 
   private loadIcon(): void {
     const iconPath = `/assets/icons/${this.name}.svg`;
-
     if (isPlatformBrowser(this.platformId)) {
       this.http.get(iconPath, { responseType: 'text' }).subscribe({
         next: (svg) => {
           svg = this.applySvgAttributes(svg);
           this.svgContent = this.sanitizer.bypassSecurityTrustHtml(svg);
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error(`Erro ao carregar o ícone: ${this.name}`, error);
+          this.svgContent = '';
         }
       });
-    } else if (isPlatformServer(this.platformId) && fs) {
+    } else if (isPlatformServer(this.platformId)) {
       try {
-        const serverIconPath = `./dist/front/browser/assets/icons/${this.name}.svg`;
-        let svg = fs.readFileSync(serverIconPath, 'utf8');
+        const fs = require('fs');
+        const path = require('path');
+
+        const prodPath = path.join(process.cwd(), 'dist', 'browser', 'assets', 'icons', `${this.name}.svg`);
+        const devPath = path.join(process.cwd(), 'public', 'assets', 'icons', `${this.name}.svg`);
+
+        let iconPath = prodPath;
+        if (!fs.existsSync(prodPath) && fs.existsSync(devPath)) {
+          iconPath = devPath;
+        }
+
+        let svg = fs.readFileSync(iconPath, 'utf8');
         svg = this.applySvgAttributes(svg);
         this.svgContent = this.sanitizer.bypassSecurityTrustHtml(svg);
+        this.cdr.markForCheck();
       } catch (error) {
         console.error(`Erro ao carregar o ícone no SSR: ${this.name}`, error);
+        this.svgContent = '';
       }
+    } else {
+      this.svgContent = '';
     }
   }
 
   private applySvgAttributes(svg: string): string {
-    svg = svg
+    let result = svg
       .replace(/width=".*?"/, `width="${this.size}"`)
-      .replace(/height=".*?"/, `height="${this.size}"`)
+      .replace(/height=".*?"/, `height="${this.size}"`);
     if (this.modifier) {
-      svg = svg
+      result = result
         .replace(/stroke=".*?"/, `stroke="${this.color}"`)
         .replace(/fill=".*?"/, `fill="${this.background}"`)
         .replace(/stroke-width=".*?"/, `stroke-width="${this.stroke}"`);
     }
-    return svg;
+    return result;
   }
 }
