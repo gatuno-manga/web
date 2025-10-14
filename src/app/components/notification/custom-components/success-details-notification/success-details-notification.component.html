@@ -1,0 +1,35 @@
+<div class="success-content">
+	<div class="icon-success">
+		<svg
+			width="64"
+			height="64"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+		>
+			<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+			<polyline points="22 4 12 14.01 9 11.01"></polyline>
+		</svg>
+	</div>
+
+	<h2>{{ title }}</h2>
+	<p class="main-message">{{ message }}</p>
+
+	@if(items && items.length > 0) {
+	<div class="items-list">
+		<strong>{{ itemsTitle }}:</strong>
+		<ul>
+			@for(item of items; track $index) {
+			<li>
+				<span class="check">✓</span>
+				{{ item }}
+			</li>
+			}
+		</ul>
+	</div>
+	} @if(actionLabel && actionCallback) {
+	<button class="action-button" (click)="actionCallback()">
+		{{ actionLabel }}
+	</button>
+	}
+</div>

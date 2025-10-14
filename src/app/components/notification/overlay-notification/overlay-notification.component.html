@@ -1,8 +1,21 @@
 @if(modal){
 <div id="overlay-modal">
 	<div id="modal-content" #modalContent tabindex="-1">
+		@if(modal.component) {
+		<!-- Renderiza componente personalizado no modal -->
+		<ng-container
+			*ngComponentOutlet="
+				modal.component;
+				inputs: modal.componentData || {}
+			"
+		>
+		</ng-container>
+		} @else {
+		<!-- Renderização padrão do modal -->
 		<h1>{{ modal.title }}</h1>
 		<p>{{ modal.description }}</p>
+		}
+
 		<div class="button-container">
 			@for (button of modal.buttons; track $index) {
 			<button
@@ -33,13 +46,39 @@
 		}
 	</div>
 </div>
-}@if(notification) {
+} @if(overlays.length > 0) {
 <div id="overlay-notification">
+	@for (overlay of overlays; track overlay.id) {
 	<div
 		class="notification"
-		[ngClass]="{ error: notification.type === 'error' }"
+		[ngClass]="{
+			error: overlay.type === 'error',
+			success: overlay.type === 'success',
+			warning: overlay.type === 'warning',
+			info: overlay.type === 'info'
+		}"
 	>
-		<div class="message">{{ notification.message }}</div>
+		@if(overlay.dismissible) {
+		<button class="close-btn" (click)="dismissOverlay(overlay.id)">
+			×
+		</button>
+		} @if(overlay.component) {
+		<!-- Renderiza componente personalizado -->
+		<ng-container
+			*ngComponentOutlet="
+				overlay.component;
+				inputs: overlay.componentData || {}
+			"
+		>
+		</ng-container>
+		} @else {
+		<!-- Renderização padrão -->
+		@if(overlay.title) {
+		<div class="title">{{ overlay.title }}</div>
+		}
+		<div class="message">{{ overlay.message }}</div>
+		}
 	</div>
+	}
 </div>
 }

@@ -2,6 +2,8 @@ export type NotificationType = 'success' | 'error' | 'info' | 'warning';
 
 interface NotificationBase {
     type: NotificationType;
+    component?: any;
+    componentData?: { [key: string]: any };
 }
 
 export interface ModalButton {
