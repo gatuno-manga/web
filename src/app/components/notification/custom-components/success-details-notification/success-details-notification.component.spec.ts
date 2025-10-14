@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SuccessDetailsNotificationComponent } from '../success-details-notification.component';
+import { SuccessDetailsNotificationComponent } from './success-details-notification.component';
 
 describe('SuccessDetailsNotificationComponent', () => {
     let component: SuccessDetailsNotificationComponent;

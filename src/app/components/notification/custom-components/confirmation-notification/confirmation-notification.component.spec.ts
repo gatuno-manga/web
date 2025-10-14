@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ConfirmationNotificationComponent } from '../confirmation-notification.component';
+import { ConfirmationNotificationComponent } from './confirmation-notification.component';
 
 describe('ConfirmationNotificationComponent', () => {
     let component: ConfirmationNotificationComponent;

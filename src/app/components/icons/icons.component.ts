@@ -1,3 +1,4 @@
+// Compatibilidade SSR: use verificações de plataforma e dependências do Node apenas quando disponíveis
 import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, Inject, Input, PLATFORM_ID, SimpleChanges } from '@angular/core';

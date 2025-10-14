@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ProgressNotificationComponent } from '../progress-notification.component';
+import { ProgressNotificationComponent } from './progress-notification.component';
 
 describe('ProgressNotificationComponent', () => {
     let component: ProgressNotificationComponent;
