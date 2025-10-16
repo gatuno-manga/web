@@ -102,6 +102,17 @@ export class ChaptersComponent {
     }
     this.showBtnTop = this.scrolledUpAmount > this.scrollThreshold;
     this.lastScrollTop = st <= 0 ? 0 : st;
+
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollableHeight = documentHeight - windowHeight;
+
+    if (scrollableHeight > 0) {
+      this.readingProgress = Math.min((scrollTop / scrollableHeight) * 100, 100);
+    } else {
+      this.readingProgress = 0;
+    }
   }
 
   @HostListener('window:keydown', ['$event'])

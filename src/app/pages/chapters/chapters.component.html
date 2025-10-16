@@ -23,7 +23,13 @@
 		}
 	</div>
 </div>
-<div class="pages">
+<div>
+	<div class="reading-progress-bar">
+		<div
+			class="reading-progress-fill"
+			[style.width.%]="readingProgress"
+		></div>
+	</div>
 	@for (page of chapter.pages; track $index) {
 	<img [src]="page.path" alt="Page Image" />
 	}@empty {
