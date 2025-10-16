@@ -4,6 +4,8 @@ interface NotificationBase {
     type: NotificationType;
     component?: any;
     componentData?: { [key: string]: any };
+    useBackdrop?: boolean;
+    backdropOpacity?: number;
 }
 
 export interface ModalButton {

@@ -27,7 +27,9 @@ export class ModalNotificationStrategy implements INotificationStrategy {
             type: this.mapLevelToType(),
             buttons,
             component: this.config.component,
-            componentData: this.config.componentData
+            componentData: this.config.componentData,
+            useBackdrop: this.config.useBackdrop,
+            backdropOpacity: this.config.backdropOpacity
         };
 
         this.modalSubject.next(this.currentModal);

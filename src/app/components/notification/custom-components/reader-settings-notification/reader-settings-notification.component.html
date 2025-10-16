@@ -1,0 +1,79 @@
+<div class="reader-settings-content">
+	<div class="settings-header">
+		<h2>{{ title }}</h2>
+		<p class="subtitle">{{ subtitle }}</p>
+	</div>
+
+	<div class="settings-body">
+		<!-- Filtro de Escala de Cinza -->
+		<div class="setting-item">
+			<div class="setting-info">
+				<div class="setting-icon">
+					<app-icons name="image" size="24" />
+				</div>
+				<div class="setting-text">
+					<h3>Escala de Cinza</h3>
+					<p>Aplica um filtro de escala de cinza às páginas</p>
+				</div>
+			</div>
+			<label class="toggle-switch">
+				<input
+					type="checkbox"
+					[(ngModel)]="settings.grayScale"
+					(change)="onGrayScaleChange()"
+				/>
+				<span class="slider"></span>
+			</label>
+		</div>
+
+		<!-- Posição da Barra Lateral -->
+		<div class="setting-item">
+			<div class="setting-info">
+				<div class="setting-icon">
+					<app-icons name="panel-right" size="24" />
+				</div>
+				<div class="setting-text">
+					<h3>Posição da Barra Lateral</h3>
+					<p>Escolha onde a barra de navegação aparece</p>
+				</div>
+			</div>
+			<select
+				class="setting-select"
+				[(ngModel)]="settings.asidePosition"
+				(change)="onAsidePositionChange()"
+			>
+				<option value="left">Esquerda</option>
+				<option value="right">Direita</option>
+			</select>
+		</div>
+
+		<div class="setting-item">
+			<div class="setting-info">
+				<div class="setting-icon">
+					<app-icons name="hash" size="24" />
+				</div>
+				<div class="setting-text">
+					<h3>Mostrar Números das Páginas</h3>
+					<p>Exibe o número da página no canto de cada imagem</p>
+				</div>
+			</div>
+			<label class="toggle-switch">
+				<input
+					type="checkbox"
+					[(ngModel)]="settings.showPageNumbers"
+					(change)="onShowPageNumbersChange()"
+				/>
+				<span class="slider"></span>
+			</label>
+		</div>
+	</div>
+
+	@if(showResetButton) {
+	<div class="settings-footer">
+		<button class="btn-reset" (click)="resetSettings()">
+			<app-icons name="refresh-ccw" size="16" />
+			<span>Restaurar Padrões</span>
+		</button>
+	</div>
+	}
+</div>
