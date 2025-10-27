@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReaderSettingsNotificationComponent } from './reader-settings-notification.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SettingsService } from '../../../../service/settings.service';
 import { LocalStorageService } from '../../../../service/local-storage.service';
 
@@ -10,7 +11,7 @@ describe('ReaderSettingsNotificationComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [ReaderSettingsNotificationComponent],
+            imports: [ReaderSettingsNotificationComponent, HttpClientTestingModule],
             providers: [SettingsService, LocalStorageService]
         }).compileComponents();
 
