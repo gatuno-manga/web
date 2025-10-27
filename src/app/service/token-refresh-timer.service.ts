@@ -24,11 +24,13 @@ export class TokenRefreshTimerService implements OnDestroy {
         this.isBrowser = isPlatformBrowser(this.platformId);
 
         if (this.isBrowser) {
-            setTimeout(() => {
-                if (this.userTokenService.hasToken) {
-                    this.startAutoRefresh();
-                }
-            }, 1000);
+            this.ngZone.runOutsideAngular(() => {
+                setTimeout(() => {
+                    if (this.userTokenService.hasToken) {
+                        this.startAutoRefresh();
+                    }
+                }, 1000);
+            });
         }
     }
 
