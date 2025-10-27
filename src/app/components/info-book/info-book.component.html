@@ -85,7 +85,7 @@
 				<h1>Titulos alternativos</h1>
 				<div>
 					@defer (when modulesLoad[tab.extraInfo].load()) { @for(title
-					of extraInfo.alternativeTitle; track title) {
+					of extraInfo.alternativeTitle; track $index) {
 					<p class="item">{{ title }}</p>
 					}@empty {
 					<p>Nenhum titulo alternativo disponível</p>
@@ -99,7 +99,7 @@
 				<h1>Fontes</h1>
 				<div>
 					@defer (when modulesLoad[tab.extraInfo].load()) {
-					@for(source of extraInfo.originalUrl; track source) {
+					@for(source of extraInfo.originalUrl; track $index) {
 					<a class="item" [href]="source" target="_blank">{{
 						this.urlTransform(source)
 					}}</a>
