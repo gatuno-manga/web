@@ -51,12 +51,51 @@
 	overflow-y: auto;
 }
 
+.view-selector {
+	margin-bottom: 16px;
+	display: flex;
+	gap: 8px;
+
+	button {
+		flex: 1;
+		padding: 8px 12px;
+		background-color: var(--input-bg, #f9fafb);
+		border: 1px solid var(--border-color, #d1d5db);
+		border-radius: 6px;
+		color: var(--text-secondary, #6b7280);
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+
+		&.active {
+			background-color: var(--primary-color, #3b82f6);
+			border-color: var(--primary-color, #3b82f6);
+			color: white;
+		}
+
+		&:hover {
+			border-color: var(--primary-color, #3b82f6);
+		}
+	}
+}
+
 .setting-item {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	padding: 20px 0;
 	border-bottom: 1px solid var(--border-color, #f3f4f6);
+
+	&.column {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+
+		app-select {
+			width: 100%;
+		}
+	}
 
 	&:last-child {
 		border-bottom: none;

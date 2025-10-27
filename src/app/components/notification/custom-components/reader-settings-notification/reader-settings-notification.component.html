@@ -3,69 +3,239 @@
 		<h2>{{ title }}</h2>
 		<p class="subtitle">{{ subtitle }}</p>
 	</div>
-
 	<div class="settings-body">
-		<!-- Filtro de Escala de Cinza -->
-		<div class="setting-item">
-			<div class="setting-info">
-				<div class="setting-icon">
-					<app-icons name="image" size="24" />
-				</div>
-				<div class="setting-text">
-					<h3>Escala de Cinza</h3>
-					<p>Aplica um filtro de escala de cinza às páginas</p>
-				</div>
-			</div>
-			<label class="toggle-switch">
-				<input
-					type="checkbox"
-					[(ngModel)]="settings.grayScale"
-					(change)="onGrayScaleChange()"
-				/>
-				<span class="slider"></span>
-			</label>
-		</div>
-
-		<!-- Posição da Barra Lateral -->
-		<div class="setting-item">
-			<div class="setting-info">
-				<div class="setting-icon">
-					<app-icons name="panel-right" size="24" />
-				</div>
-				<div class="setting-text">
-					<h3>Posição da Barra Lateral</h3>
-					<p>Escolha onde a barra de navegação aparece</p>
-				</div>
-			</div>
-			<select
-				class="setting-select"
-				[(ngModel)]="settings.asidePosition"
-				(change)="onAsidePositionChange()"
+		<div
+			class="view-selector"
+			role="tablist"
+			aria-label="Selecionar grupo de configurações"
+		>
+			<app-button
+				[variant]="viewFilter === 'all' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'all'"
+				class="selector-btn"
+				(click)="setView('all')"
 			>
-				<option value="left">Esquerda</option>
-				<option value="right">Direita</option>
-			</select>
+				Todos
+			</app-button>
+			<app-button
+				[variant]="viewFilter === 'pages' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'pages'"
+				class="selector-btn"
+				(click)="setView('pages')"
+			>
+				Páginas
+			</app-button>
+			<app-button
+				[variant]="viewFilter === 'filters' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'filters'"
+				class="selector-btn"
+				(click)="setView('filters')"
+			>
+				Filtros
+			</app-button>
+			<app-button
+				[variant]="viewFilter === 'sidebar' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'sidebar'"
+				class="selector-btn"
+				(click)="setView('sidebar')"
+			>
+				Barra Lateral
+			</app-button>
 		</div>
+		@if(showSidebar) {
+		<section
+			id="group-sidebar"
+			class="settings-group"
+			role="group"
+			aria-labelledby="group-sidebar-title"
+		>
+			<h3 id="group-sidebar-title" class="group-title">Barra Lateral</h3>
+			<p class="group-desc">
+				Ajustes relacionados à barra lateral do leitor
+			</p>
 
-		<div class="setting-item">
-			<div class="setting-info">
-				<div class="setting-icon">
-					<app-icons name="hash" size="24" />
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="panel-right" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Posição da Barra Lateral</h3>
+						<p>Escolha onde a barra de navegação aparece</p>
+					</div>
 				</div>
-				<div class="setting-text">
-					<h3>Mostrar Números das Páginas</h3>
-					<p>Exibe o número da página no canto de cada imagem</p>
-				</div>
-			</div>
-			<label class="toggle-switch">
-				<input
-					type="checkbox"
-					[(ngModel)]="settings.showPageNumbers"
-					(change)="onShowPageNumbersChange()"
+				<app-select
+					[(ngModel)]="settings.asidePosition"
+					(change)="onAsidePositionChange()"
+					[options]="[
+						{ value: 'left', label: 'Esquerda' },
+						{ value: 'right', label: 'Direita' }
+					]"
+					placeholder="Escolha uma posição"
 				/>
-				<span class="slider"></span>
-			</label>
-		</div>
+			</div>
+		</section>
+		}
+
+		<!-- Grupo: Páginas -->
+		@if(showPages) {
+		<section
+			id="group-pages"
+			class="settings-group"
+			role="group"
+			aria-labelledby="group-pages-title"
+		>
+			<h3 id="group-pages-title" class="group-title">Páginas</h3>
+			<p class="group-desc">
+				Opções que afetam a renderização das páginas
+			</p>
+
+			<!-- Mostrar Números -->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="hash" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Mostrar Números das Páginas</h3>
+						<p>Exibe o número da página no canto de cada imagem</p>
+					</div>
+				</div>
+				<label class="toggle-switch">
+					<input
+						type="checkbox"
+						[(ngModel)]="settings.showPageNumbers"
+						(change)="onShowPageNumbersChange()"
+					/>
+					<span class="slider"></span>
+				</label>
+			</div>
+		</section>
+		}
+
+		<!-- Grupo: Filtros -->
+		@if(showFilters) {
+		<section
+			id="group-filters"
+			class="settings-group"
+			role="group"
+			aria-labelledby="group-filters-title"
+		>
+			<h3 id="group-filters-title" class="group-title">Filtros</h3>
+			<p class="group-desc">Ajustes visuais aplicados às páginas</p>
+
+			<!-- Escala de Cinza -->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="image" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Escala de Cinza</h3>
+						<p>Aplica um filtro de escala de cinza às páginas</p>
+					</div>
+				</div>
+				<label class="toggle-switch">
+					<input
+						type="checkbox"
+						[(ngModel)]="settings.grayScale"
+						(change)="onGrayScaleChange()"
+					/>
+					<span class="slider"></span>
+				</label>
+			</div>
+			<!-- Brilho -->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="sun" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Brilho</h3>
+						<p>Aumenta o brilho das páginas</p>
+					</div>
+				</div>
+				<label class="toggle-switch">
+					<input
+						type="checkbox"
+						[checked]="settings.brightness === 150"
+						(change)="onBrightnessToggle($event)"
+					/>
+					<span class="slider"></span>
+				</label>
+			</div>
+
+			<!-- Contraste-->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="contrast" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Contraste</h3>
+						<p>Aumenta o contraste das páginas</p>
+					</div>
+				</div>
+				<label class="toggle-switch">
+					<input
+						type="checkbox"
+						[checked]="settings.contrast === 150"
+						(change)="onContrastToggle($event)"
+					/>
+					<span class="slider"></span>
+				</label>
+			</div>
+
+			<!-- Inverter Cores -->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="invert" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Inverter Cores</h3>
+						<p>Inverte as cores das páginas</p>
+					</div>
+				</div>
+				<label class="toggle-switch">
+					<input
+						type="checkbox"
+						[checked]="settings.invert === 100"
+						(change)="onInvertToggle($event)"
+					/>
+					<span class="slider"></span>
+				</label>
+			</div>
+
+			<!-- Modo Noturno -->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="moon" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Modo Noturno</h3>
+						<p>
+							Ativa um preset noturno (inverte cores e ajusta
+							brilho/contraste)
+						</p>
+					</div>
+				</div>
+				<label class="toggle-switch">
+					<input
+						type="checkbox"
+						[(ngModel)]="settings.nightMode"
+						(change)="onNightModeToggle($event)"
+					/>
+					<span class="slider"></span>
+				</label>
+			</div>
+		</section>
+		}
 	</div>
 
 	@if(showResetButton) {

@@ -32,6 +32,7 @@ export class ChaptersComponent implements OnDestroy {
   private readonly BOTTOM_THRESHOLD = 100;
   admin = false;
   settings: ReaderSettings;
+  filterStyle: string = '';
   private settingsSubscription?: Subscription;
 
   constructor(
@@ -52,6 +53,7 @@ export class ChaptersComponent implements OnDestroy {
     this.settingsSubscription = this.settingsService.settings$.subscribe(
       settings => {
         this.settings = settings;
+        this.filterStyle = this.buildFilter(settings);
       }
     );
 
@@ -67,6 +69,29 @@ export class ChaptersComponent implements OnDestroy {
         this.setMetaData();
       });
     });
+  }
+
+  private buildFilter(settings: ReaderSettings): string {
+    const parts: string[] = [];
+    if (settings.brightness != null) {
+      parts.push(`brightness(${settings.brightness}%)`);
+    }
+    if (settings.contrast != null) {
+      parts.push(`contrast(${settings.contrast}%)`);
+    }
+    if (settings.grayScale) {
+      parts.push(`grayscale(100%)`);
+    }
+    if (settings.invert != null && settings.invert > 0) {
+      parts.push(`invert(${settings.invert}%)`);
+    }
+    const filter = parts.length > 0 ? parts.join(' ') : 'none';
+    // debug: log filtro aplicado
+    try {
+      // eslint-disable-next-line no-console
+      console.debug('[Chapters] buildFilter ->', filter, settings);
+    } catch (e) {}
+    return filter;
   }
 
   ngOnDestroy() {

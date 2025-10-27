@@ -63,4 +63,44 @@ export class SettingsService {
     setAsidePosition(position: 'left' | 'right'): void {
         this.updateSettings({ asidePosition: position });
     }
+
+    // novos helpers para filtros
+    toggleBrightness150(): void {
+        const current = this.getSettings();
+        const newValue = current.brightness === 150 ? 100 : 150;
+        this.updateSettings({ brightness: newValue });
+    }
+
+    toggleContrast150(): void {
+        const current = this.getSettings();
+        const newValue = current.contrast === 150 ? 100 : 150;
+        this.updateSettings({ contrast: newValue });
+    }
+
+    toggleInvert(): void {
+        const current = this.getSettings();
+        const newValue = current.invert === 100 ? 0 : 100;
+        this.updateSettings({ invert: newValue });
+    }
+
+    toggleNightMode(): void {
+        const current = this.getSettings();
+        if (current.nightMode) {
+            // desliga modo noturno -> restaura defaults
+            this.updateSettings({
+                nightMode: false,
+                invert: DEFAULT_SETTINGS.invert,
+                brightness: DEFAULT_SETTINGS.brightness,
+                contrast: DEFAULT_SETTINGS.contrast
+            });
+        } else {
+            // liga modo noturno -> preset
+            this.updateSettings({
+                nightMode: true,
+                invert: 100,
+                brightness: 80,
+                contrast: 120
+            });
+        }
+    }
 }
