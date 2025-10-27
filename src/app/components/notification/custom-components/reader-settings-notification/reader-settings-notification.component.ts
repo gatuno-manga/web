@@ -6,11 +6,12 @@ import { ReaderSettings } from '@models/settings.models';
 import { IconsComponent } from '@components/icons/icons.component';
 import { SelectComponent } from '@components/inputs/select/select.component';
 import { ButtonComponent } from '@components/inputs/button/button.component';
+import { SwitchComponent } from '@components/inputs/switch/switch.component';
 
 @Component({
     selector: 'app-reader-settings-notification',
     standalone: true,
-    imports: [CommonModule, FormsModule, IconsComponent, SelectComponent, ButtonComponent],
+    imports: [CommonModule, FormsModule, IconsComponent, SelectComponent, ButtonComponent, SwitchComponent],
     templateUrl: './reader-settings-notification.component.html',
     styleUrls: ['./reader-settings-notification.component.scss']
 })

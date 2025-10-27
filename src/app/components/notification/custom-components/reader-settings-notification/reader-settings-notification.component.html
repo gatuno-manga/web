@@ -105,14 +105,10 @@
 						<p>Exibe o número da página no canto de cada imagem</p>
 					</div>
 				</div>
-				<label class="toggle-switch">
-					<input
-						type="checkbox"
-						[(ngModel)]="settings.showPageNumbers"
-						(change)="onShowPageNumbersChange()"
-					/>
-					<span class="slider"></span>
-				</label>
+				<app-switch
+					[(ngModel)]="settings.showPageNumbers"
+					(change)="onShowPageNumbersChange()"
+				/>
 			</div>
 		</section>
 		}
@@ -139,14 +135,10 @@
 						<p>Aplica um filtro de escala de cinza às páginas</p>
 					</div>
 				</div>
-				<label class="toggle-switch">
-					<input
-						type="checkbox"
-						[(ngModel)]="settings.grayScale"
-						(change)="onGrayScaleChange()"
-					/>
-					<span class="slider"></span>
-				</label>
+				<app-switch
+					[(ngModel)]="settings.grayScale"
+					(change)="onGrayScaleChange()"
+				/>
 			</div>
 			<!-- Brilho -->
 			<div class="setting-item">
@@ -159,14 +151,10 @@
 						<p>Aumenta o brilho das páginas</p>
 					</div>
 				</div>
-				<label class="toggle-switch">
-					<input
-						type="checkbox"
-						[checked]="settings.brightness === 150"
-						(change)="onBrightnessToggle($event)"
-					/>
-					<span class="slider"></span>
-				</label>
+				<app-switch
+					[(ngModel)]="settings.brightness"
+					(change)="onBrightnessToggle($event)"
+				/>
 			</div>
 
 			<!-- Contraste-->
@@ -180,14 +168,10 @@
 						<p>Aumenta o contraste das páginas</p>
 					</div>
 				</div>
-				<label class="toggle-switch">
-					<input
-						type="checkbox"
-						[checked]="settings.contrast === 150"
-						(change)="onContrastToggle($event)"
-					/>
-					<span class="slider"></span>
-				</label>
+				<app-switch
+					[(ngModel)]="settings.contrast"
+					(change)="onContrastToggle($event)"
+				/>
 			</div>
 
 			<!-- Inverter Cores -->
@@ -201,14 +185,10 @@
 						<p>Inverte as cores das páginas</p>
 					</div>
 				</div>
-				<label class="toggle-switch">
-					<input
-						type="checkbox"
-						[checked]="settings.invert === 100"
-						(change)="onInvertToggle($event)"
-					/>
-					<span class="slider"></span>
-				</label>
+				<app-switch
+					[(ngModel)]="settings.invert"
+					(change)="onInvertToggle($event)"
+				/>
 			</div>
 
 			<!-- Modo Noturno -->
@@ -225,14 +205,10 @@
 						</p>
 					</div>
 				</div>
-				<label class="toggle-switch">
-					<input
-						type="checkbox"
-						[(ngModel)]="settings.nightMode"
-						(change)="onNightModeToggle($event)"
-					/>
-					<span class="slider"></span>
-				</label>
+				<app-switch
+					[(ngModel)]="settings.nightMode"
+					(change)="onNightModeToggle($event)"
+				/>
 			</div>
 		</section>
 		}
@@ -240,10 +216,9 @@
 
 	@if(showResetButton) {
 	<div class="settings-footer">
-		<button class="btn-reset" (click)="resetSettings()">
-			<app-icons name="refresh-ccw" size="16" />
+		<app-button (click)="resetSettings()" leftIcon="refresh-ccw">
 			<span>Restaurar Padrões</span>
-		</button>
+		</app-button>
 	</div>
 	}
 </div>
