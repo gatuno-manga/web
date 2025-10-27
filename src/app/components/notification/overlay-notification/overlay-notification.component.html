@@ -13,16 +13,19 @@
 			: 0.5
 	"
 >
-	<div id="modal-content" #modalContent tabindex="-1">
+	<div
+		id="modal-content"
+		#modalContent
+		tabindex="-1"
+		[ngClass]="{ 'custom-modal': modal.component }"
+	>
 		@if(modal.component) {
-		<!-- Renderiza componente personalizado no modal -->
 		<ng-container
 			*ngComponentOutlet="
 				modal.component;
 				inputs: modal.componentData || {}
 			"
-		>
-		</ng-container>
+		/>
 		} @else {
 		<!-- Renderização padrão do modal -->
 		<h1>{{ modal.title }}</h1>
