@@ -1,0 +1,224 @@
+<div class="reader-settings-content">
+	<div class="settings-header">
+		<h2>{{ title }}</h2>
+		<p class="subtitle">{{ subtitle }}</p>
+	</div>
+	<div class="settings-body">
+		<div
+			class="view-selector"
+			role="tablist"
+			aria-label="Selecionar grupo de configurações"
+		>
+			<app-button
+				[variant]="viewFilter === 'all' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'all'"
+				class="selector-btn"
+				(click)="setView('all')"
+			>
+				Todos
+			</app-button>
+			<app-button
+				[variant]="viewFilter === 'pages' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'pages'"
+				class="selector-btn"
+				(click)="setView('pages')"
+			>
+				Páginas
+			</app-button>
+			<app-button
+				[variant]="viewFilter === 'filters' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'filters'"
+				class="selector-btn"
+				(click)="setView('filters')"
+			>
+				Filtros
+			</app-button>
+			<app-button
+				[variant]="viewFilter === 'sidebar' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'sidebar'"
+				class="selector-btn"
+				(click)="setView('sidebar')"
+			>
+				Barra Lateral
+			</app-button>
+		</div>
+		@if(showSidebar) {
+		<section
+			id="group-sidebar"
+			class="settings-group"
+			role="group"
+			aria-labelledby="group-sidebar-title"
+		>
+			<h3 id="group-sidebar-title" class="group-title">Barra Lateral</h3>
+			<p class="group-desc">
+				Ajustes relacionados à barra lateral do leitor
+			</p>
+
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="panel-right" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Posição da Barra Lateral</h3>
+						<p>Escolha onde a barra de navegação aparece</p>
+					</div>
+				</div>
+				<app-select
+					[(ngModel)]="settings.asidePosition"
+					(change)="onAsidePositionChange()"
+					[options]="[
+						{ value: 'left', label: 'Esquerda' },
+						{ value: 'right', label: 'Direita' }
+					]"
+					placeholder="Escolha uma posição"
+				/>
+			</div>
+		</section>
+		}
+
+		<!-- Grupo: Páginas -->
+		@if(showPages) {
+		<section
+			id="group-pages"
+			class="settings-group"
+			role="group"
+			aria-labelledby="group-pages-title"
+		>
+			<h3 id="group-pages-title" class="group-title">Páginas</h3>
+			<p class="group-desc">
+				Opções que afetam a renderização das páginas
+			</p>
+
+			<!-- Mostrar Números -->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="hash" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Mostrar Números das Páginas</h3>
+						<p>Exibe o número da página no canto de cada imagem</p>
+					</div>
+				</div>
+				<app-switch
+					[(ngModel)]="settings.showPageNumbers"
+					(change)="onShowPageNumbersChange()"
+				/>
+			</div>
+		</section>
+		}
+
+		<!-- Grupo: Filtros -->
+		@if(showFilters) {
+		<section
+			id="group-filters"
+			class="settings-group"
+			role="group"
+			aria-labelledby="group-filters-title"
+		>
+			<h3 id="group-filters-title" class="group-title">Filtros</h3>
+			<p class="group-desc">Ajustes visuais aplicados às páginas</p>
+
+			<!-- Escala de Cinza -->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="image" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Escala de Cinza</h3>
+						<p>Aplica um filtro de escala de cinza às páginas</p>
+					</div>
+				</div>
+				<app-switch
+					[(ngModel)]="settings.grayScale"
+					(change)="onGrayScaleChange()"
+				/>
+			</div>
+			<!-- Brilho -->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="sun" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Brilho</h3>
+						<p>Aumenta o brilho das páginas</p>
+					</div>
+				</div>
+				<app-switch
+					[(ngModel)]="settings.brightness"
+					(change)="onBrightnessToggle($event)"
+				/>
+			</div>
+
+			<!-- Contraste-->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="contrast" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Contraste</h3>
+						<p>Aumenta o contraste das páginas</p>
+					</div>
+				</div>
+				<app-switch
+					[(ngModel)]="settings.contrast"
+					(change)="onContrastToggle($event)"
+				/>
+			</div>
+
+			<!-- Inverter Cores -->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="invert" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Inverter Cores</h3>
+						<p>Inverte as cores das páginas</p>
+					</div>
+				</div>
+				<app-switch
+					[(ngModel)]="settings.invert"
+					(change)="onInvertToggle($event)"
+				/>
+			</div>
+
+			<!-- Modo Noturno -->
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="moon" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Modo Noturno</h3>
+						<p>
+							Ativa um preset noturno (inverte cores e ajusta
+							brilho/contraste)
+						</p>
+					</div>
+				</div>
+				<app-switch
+					[(ngModel)]="settings.nightMode"
+					(change)="onNightModeToggle($event)"
+				/>
+			</div>
+		</section>
+		}
+	</div>
+
+	@if(showResetButton) {
+	<div class="settings-footer">
+		<app-button (click)="resetSettings()" leftIcon="refresh-ccw">
+			<span>Restaurar Padrões</span>
+		</app-button>
+	</div>
+	}
+</div>

@@ -1,5 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, NgZone } from "@angular/core";
 import { Book, BookBasic, BookDetail, BookList, BookPageOptions, Chapterlist, Cover, TagResponse } from "../models/book.models";
 import { Page } from "../models/miscellaneous.models";
 import { SensitiveContentService } from "./sensitive-content.service";
@@ -14,19 +14,19 @@ export class BookService {
     private readonly http: HttpClient,
     private readonly sensitiveContentService: SensitiveContentService,
     private readonly userTokenService: UserTokenService,
-    private readonly websocketService: BookWebsocketService
+    private readonly websocketService: BookWebsocketService,
+    private readonly ngZone: NgZone
   ) {
-    // Conecta ao WebSocket após um pequeno delay para garantir que o backend está pronto
-    // Apenas no browser (não no SSR)
     if (typeof window !== 'undefined') {
-      setTimeout(() => {
-        try {
-          this.websocketService.connect();
-        } catch (error) {
-          console.warn('Falha ao conectar WebSocket:', error);
-          // WebSocket é opcional, não deve quebrar a aplicação
-        }
-      }, 2000);
+      this.ngZone.runOutsideAngular(() => {
+        setTimeout(() => {
+          try {
+            this.websocketService.connect();
+          } catch (error) {
+            console.warn('Falha ao conectar WebSocket:', error);
+          }
+        }, 2000);
+      });
     }
   }
 

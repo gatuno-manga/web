@@ -1,15 +1,31 @@
 @if(modal){
-<div id="overlay-modal">
-	<div id="modal-content" #modalContent tabindex="-1">
+<div
+	id="overlay-modal"
+	[ngClass]="{
+		'custom-backdrop': modal.component,
+		'default-backdrop': !modal.component
+	}"
+	[style.--backdrop-opacity]="
+		modal.component && modal.backdropOpacity !== undefined
+			? modal.backdropOpacity
+			: modal.component
+			? 0.75
+			: 0.5
+	"
+>
+	<div
+		id="modal-content"
+		#modalContent
+		tabindex="-1"
+		[ngClass]="{ 'custom-modal': modal.component }"
+	>
 		@if(modal.component) {
-		<!-- Renderiza componente personalizado no modal -->
 		<ng-container
 			*ngComponentOutlet="
 				modal.component;
 				inputs: modal.componentData || {}
 			"
-		>
-		</ng-container>
+		/>
 		} @else {
 		<!-- Renderização padrão do modal -->
 		<h1>{{ modal.title }}</h1>

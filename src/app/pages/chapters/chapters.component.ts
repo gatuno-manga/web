@@ -1,6 +1,5 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { Chapter } from '../../models/book.models';
-import { BookService } from '../../service/book.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
 import { HeaderComponent } from '../../components/header/header.component';
@@ -8,9 +7,15 @@ import { DecimalPipe, NgClass } from '@angular/common';
 import { ChapterService } from '../../service/chapter.service';
 import { UserTokenService } from '../../service/user-token.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
+import { NotificationService } from '../../service/notification.service';
 import { ButtonComponent } from '../../components/inputs/button/button.component';
 import { AsideComponent } from '../../components/aside/aside.component';
 import { MetaDataService } from '../../service/meta-data.service';
+import { SettingsService } from '../../service/settings.service';
+import { ReaderSettings } from '../../models/settings.models';
+import { Subscription } from 'rxjs';
+import { NotificationSeverity } from 'app/service/notification';
+import { ReaderSettingsNotificationComponent } from '@components/notification/custom-components';
 
 @Component({
   selector: 'app-chapters',
@@ -18,13 +23,17 @@ import { MetaDataService } from '../../service/meta-data.service';
   templateUrl: './chapters.component.html',
   styleUrl: './chapters.component.scss'
 })
-export class ChaptersComponent {
+export class ChaptersComponent implements OnDestroy {
   chapter?: Chapter;
   showBtnTop = false;
+  readingProgress = 0;
   private lastScrollTop = 0;
   private scrollThreshold = 1500;
   private readonly BOTTOM_THRESHOLD = 100;
   admin = false;
+  settings: ReaderSettings;
+  filterStyle: string = '';
+  private settingsSubscription?: Subscription;
 
   constructor(
     private chapterService: ChapterService,
@@ -32,12 +41,22 @@ export class ChaptersComponent {
     private router: Router,
     private userTokenService: UserTokenService,
     private metaService: MetaDataService,
-    private modalService: ModalNotificationService
+    private modalService: ModalNotificationService,
+    private notificationService: NotificationService,
+    private settingsService: SettingsService
   ) {
     this.admin = this.userTokenService.isAdmin();
+    this.settings = this.settingsService.getSettings();
   }
 
   ngOnInit() {
+    this.settingsSubscription = this.settingsService.settings$.subscribe(
+      settings => {
+        this.settings = settings;
+        this.filterStyle = this.buildFilter(settings);
+      }
+    );
+
     this.activatedRoute.paramMap.subscribe(params => {
       const id = params.get('id');
       const chapter = params.get('chapter');
@@ -50,6 +69,33 @@ export class ChaptersComponent {
         this.setMetaData();
       });
     });
+  }
+
+  private buildFilter(settings: ReaderSettings): string {
+    const parts: string[] = [];
+    if (settings.brightness != null) {
+      parts.push(`brightness(${settings.brightness}%)`);
+    }
+    if (settings.contrast != null) {
+      parts.push(`contrast(${settings.contrast}%)`);
+    }
+    if (settings.grayScale) {
+      parts.push(`grayscale(100%)`);
+    }
+    if (settings.invert != null && settings.invert > 0) {
+      parts.push(`invert(${settings.invert}%)`);
+    }
+    const filter = parts.length > 0 ? parts.join(' ') : 'none';
+    // debug: log filtro aplicado
+    try {
+      // eslint-disable-next-line no-console
+      console.debug('[Chapters] buildFilter ->', filter, settings);
+    } catch (e) {}
+    return filter;
+  }
+
+  ngOnDestroy() {
+    this.settingsSubscription?.unsubscribe();
   }
 
   private formatNumber(value: number): string {
@@ -102,6 +148,17 @@ export class ChaptersComponent {
     }
     this.showBtnTop = this.scrolledUpAmount > this.scrollThreshold;
     this.lastScrollTop = st <= 0 ? 0 : st;
+
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollableHeight = documentHeight - windowHeight;
+
+    if (scrollableHeight > 0) {
+      this.readingProgress = Math.min((scrollTop / scrollableHeight) * 100, 100);
+    } else {
+      this.readingProgress = 0;
+    }
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -200,5 +257,20 @@ export class ChaptersComponent {
     if (this.chapter && this.chapter.originalUrl) {
       window.open(this.chapter.originalUrl, '_blank');
     }
+  }
+
+  openSettings() {
+    this.notificationService.notify({
+      message: '',
+      level: 'custom',
+      severity: NotificationSeverity.CRITICAL,
+      component: ReaderSettingsNotificationComponent,
+      componentData: {
+        title: 'Configurações do Leitor',
+        subtitle: 'Personalize sua experiência de leitura',
+      },
+      useBackdrop: true,
+      backdropOpacity: 0.8
+    });
   }
 }

@@ -23,9 +23,25 @@
 		}
 	</div>
 </div>
-<div class="pages">
+<div
+	class="pages"
+	[style.filter]="filterStyle"
+	[class.aside-left]="settings.asidePosition === 'left'"
+	[class.aside-right]="settings.asidePosition === 'right'"
+>
+	<div class="reading-progress-bar">
+		<div
+			class="reading-progress-fill"
+			[style.width.%]="readingProgress"
+		></div>
+	</div>
 	@for (page of chapter.pages; track $index) {
-	<img [src]="page.path" alt="Page Image" />
+	<div class="page-container">
+		<img [src]="page.path" alt="Page Image" />
+		@if(settings.showPageNumbers) {
+		<span class="page-number">{{ $index + 1 }}</span>
+		}
+	</div>
 	}@empty {
 	<p>No pages available for this chapter.</p>
 	}
@@ -58,7 +74,7 @@
 	<a class="next" (click)="backPage()">Voltar a pagina inicial</a>
 	}
 </div>
-<app-aside [topOffset]="0">
+<app-aside [topOffset]="0" [position]="settings.asidePosition">
 	<div class="title">
 		<h1 (click)="backPage()">
 			<app-icons name="book" /> {{ chapter.bookTitle }}
@@ -82,6 +98,16 @@
 			<app-icons name="arrow-right" size="16" />
 		</a>
 		}
+	</div>
+	<div class="button">
+		<button
+			class="settings-btn"
+			(click)="openSettings()"
+			title="Configurações"
+			variant="text"
+		>
+			<app-icons name="settings" size="32" />
+		</button>
 	</div>
 	@if(admin){
 	<div class="line"></div>

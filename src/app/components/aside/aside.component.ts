@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, OnDestroy, Input, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, Input, PLATFORM_ID, Inject, OnChanges, SimpleChanges } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
 import { CommonModule } from '@angular/common';
@@ -9,11 +9,12 @@ import { CommonModule } from '@angular/common';
   templateUrl: './aside.component.html',
   styleUrl: './aside.component.scss'
 })
-export class AsideComponent implements OnInit, OnDestroy {
+export class AsideComponent implements OnInit, OnDestroy, OnChanges {
   @Input() position: 'left' | 'right' = 'right';
   @Input() topOffset: number = 80;
   @Input() readonly SWIPE_THRESHOLD = 300;
   @Input() readonly EDGE_THRESHOLD = 150;
+  @Input() readonly ASIDE_WIDTH = 300;
   isOpen = false;
   private touchStartX = 0;
   private touchStartY = 0;
@@ -28,6 +29,15 @@ export class AsideComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (this.isBrowser) {
       this.addTouchListeners();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['position'] && !changes['position'].firstChange) {
+      // Reset state when position changes
+      this.isOpen = false;
+      this.isDragging = false;
+      this.dragOffset = 0;
     }
   }
 
@@ -85,15 +95,15 @@ export class AsideComponent implements OnInit, OnDestroy {
 
     if (!this.isOpen) {
       if (this.position === 'right') {
-        this.dragOffset = Math.max(-300, Math.min(0, deltaX));
+        this.dragOffset = Math.max(-this.ASIDE_WIDTH, Math.min(0, deltaX));
       } else {
-        this.dragOffset = Math.max(0, Math.min(300, deltaX));
+        this.dragOffset = Math.max(0, Math.min(this.ASIDE_WIDTH, deltaX));
       }
     } else {
       if (this.position === 'right') {
-        this.dragOffset = Math.max(0, Math.min(300, deltaX));
+        this.dragOffset = Math.max(0, Math.min(this.ASIDE_WIDTH, deltaX));
       } else {
-        this.dragOffset = Math.max(-300, Math.min(0, deltaX));
+        this.dragOffset = Math.max(-this.ASIDE_WIDTH, Math.min(0, deltaX));
       }
     }
   }

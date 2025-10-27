@@ -17,7 +17,7 @@ export interface INotificationStrategy {
 /**
  * Tipos de notificação disponíveis
  */
-export type NotificationLevel = 'success' | 'error' | 'info' | 'warning' | 'critical';
+export type NotificationLevel = 'success' | 'error' | 'info' | 'warning' | 'critical' | 'custom';
 
 /**
  * Severidade da notificação para determinar o tipo de exibição
@@ -55,4 +55,12 @@ export interface NotificationConfig {
      * Dados a serem passados para o componente personalizado
      */
     componentData?: NotificationComponentData;
+    /**
+     * Se true, usa backdrop escuro (padrão: true para modais com componentes personalizados)
+     */
+    useBackdrop?: boolean;
+    /**
+     * Opacidade do backdrop (0.0 a 1.0, padrão: 0.75 para componentes personalizados)
+     */
+    backdropOpacity?: number;
 }

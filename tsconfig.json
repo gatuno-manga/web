@@ -19,6 +19,15 @@
       ],
       "@models/*": [
         "app/models/*"
+      ],
+      "@pages/*": [
+        "app/pages/*"
+      ],
+      "@service/*": [
+        "app/service/*"
+      ],
+      "@environments/*": [
+        "environments/*"
       ]
     },
     "outDir": "./dist/out-tsc",

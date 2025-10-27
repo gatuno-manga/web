@@ -1,7 +1,7 @@
 .aside-container {
 	position: fixed;
 	top: 0;
-	right: 0;
+	left: 0;
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
@@ -15,7 +15,7 @@
 .aside-overlay {
 	position: absolute;
 	top: 0;
-	right: 0;
+	left: 0;
 	width: 100%;
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.5);
@@ -25,13 +25,10 @@
 .aside-content {
 	position: absolute;
 	top: 80px;
-	right: 0;
 	width: 300px;
 	max-width: 80%;
 	height: 100%;
 	background-color: var(--app-background-color);
-	box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
-	transform: translateX(100%);
 	overflow-y: auto;
 	padding: 0.6rem;
 	will-change: transform;
@@ -40,8 +37,12 @@
 		transition: transform 0.3s ease-in-out;
 	}
 
-	.aside-container.open & {
-		transform: translateX(0);
+	&.position-right {
+		box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+	}
+
+	&.position-left {
+		box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
 	}
 }
 
