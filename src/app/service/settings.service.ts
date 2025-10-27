@@ -64,7 +64,6 @@ export class SettingsService {
         this.updateSettings({ asidePosition: position });
     }
 
-    // novos helpers para filtros
     toggleBrightness150(): void {
         const current = this.getSettings();
         const newValue = current.brightness === 150 ? 100 : 150;
@@ -86,7 +85,6 @@ export class SettingsService {
     toggleNightMode(): void {
         const current = this.getSettings();
         if (current.nightMode) {
-            // desliga modo noturno -> restaura defaults
             this.updateSettings({
                 nightMode: false,
                 invert: DEFAULT_SETTINGS.invert,
@@ -94,7 +92,6 @@ export class SettingsService {
                 contrast: DEFAULT_SETTINGS.contrast
             });
         } else {
-            // liga modo noturno -> preset
             this.updateSettings({
                 nightMode: true,
                 invert: 100,
