@@ -1,0 +1,28 @@
+<div
+	class="custom-select"
+	[class.disabled]="isDisabled"
+	[class.is-open]="isOpen"
+>
+	<div class="overlay" *ngIf="isOpen" (click)="closeDropdown()"></div>
+
+	<div
+		class="select-trigger"
+		(click)="toggleDropdown()"
+		[class.open]="isOpen"
+		[class.has-value]="value"
+	>
+		<span class="selected-value">{{ getSelectedLabel() }}</span>
+		<span class="arrow" [class.rotate]="isOpen">▼</span>
+	</div>
+
+	<div class="select-dropdown" *ngIf="isOpen">
+		<div
+			class="select-option"
+			*ngFor="let option of options"
+			(click)="selectOption(option)"
+			[class.selected]="option.value === value"
+		>
+			{{ option.label }}
+		</div>
+	</div>
+</div>
