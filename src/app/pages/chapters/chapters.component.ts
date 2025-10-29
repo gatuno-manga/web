@@ -86,9 +86,7 @@ export class ChaptersComponent implements OnDestroy {
       parts.push(`invert(${settings.invert}%)`);
     }
     const filter = parts.length > 0 ? parts.join(' ') : 'none';
-    // debug: log filtro aplicado
     try {
-      // eslint-disable-next-line no-console
       console.debug('[Chapters] buildFilter ->', filter, settings);
     } catch (e) {}
     return filter;
