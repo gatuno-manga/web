@@ -29,14 +29,20 @@
 	[class.aside-left]="settings.asidePosition === 'left'"
 	[class.aside-right]="settings.asidePosition === 'right'"
 >
-	<div class="reading-progress-bar">
+	<div
+		class="reading-progress-bar"
+		[class.bottom]="settings.progressBarPosition === 'bottom'"
+	>
 		<div
 			class="reading-progress-fill"
 			[style.width.%]="readingProgress"
 		></div>
+		@for (page of chapter.pages; track $index){
+		<span (click)="goToPage($index)">{{ $index + 1 }}</span>
+		}
 	</div>
 	@for (page of chapter.pages; track $index) {
-	<div class="page-container">
+	<div id="page-{{ $index }}" class="page-container">
 		<img [src]="page.path" alt="Page Image" />
 		@if(settings.showPageNumbers) {
 		<span class="page-number">{{ $index + 1 }}</span>

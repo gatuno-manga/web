@@ -271,4 +271,15 @@ export class ChaptersComponent implements OnDestroy {
       backdropOpacity: 0.8
     });
   }
+
+  goToPage(index: number) {
+    if (this.chapter && this.chapter.pages && index >= 0 && index < this.chapter.pages.length) {
+      const pageElement = document.getElementById(`page-${index}`);
+      if (pageElement) {
+        const yOffset = -15;
+        const y = pageElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }
+  }
 }
