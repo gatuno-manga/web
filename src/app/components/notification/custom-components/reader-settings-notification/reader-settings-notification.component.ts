@@ -23,6 +23,7 @@ export class ReaderSettingsNotificationComponent implements OnInit {
     settings: ReaderSettings = {
         grayScale: false,
         asidePosition: 'right',
+        progressBarPosition: 'top',
         showPageNumbers: false,
         brightness: 100,
         contrast: 100,
@@ -55,18 +56,26 @@ export class ReaderSettingsNotificationComponent implements OnInit {
     }
 
     onGrayScaleChange(): void {
+        this.settings.grayScale = !this.settings.grayScale;
         this.settingsService.updateSettings({ grayScale: this.settings.grayScale });
     }
 
-    onAsidePositionChange(): void {
+    onAsidePositionChange(eventOrValue: Event | string): void {
+        const value = (typeof eventOrValue === 'string') ? eventOrValue : (eventOrValue?.target as HTMLSelectElement)?.value;
+        this.settings.asidePosition = value as 'left' | 'right';
         this.settingsService.updateSettings({ asidePosition: this.settings.asidePosition });
     }
 
     onShowPageNumbersChange(): void {
+        this.settings.showPageNumbers = !this.settings.showPageNumbers;
         this.settingsService.updateSettings({ showPageNumbers: this.settings.showPageNumbers });
     }
 
-    // novos handlers para filtros/toggles
+    onProgressBarPositionChange(value: string): void {
+        this.settings.progressBarPosition = value as 'top' | 'bottom';
+        this.settingsService.updateSettings({ progressBarPosition: this.settings.progressBarPosition });
+    }
+
     onBrightnessToggle(eventOrValue: Event | boolean): void {
         const active = typeof eventOrValue === 'boolean' ? eventOrValue : (eventOrValue?.target as HTMLInputElement)?.checked;
         this.settingsService.updateSettings({ brightness: active ? 150 : 100 });
@@ -86,7 +95,6 @@ export class ReaderSettingsNotificationComponent implements OnInit {
     }
 
     onNightModeToggle(eventOrValue: Event | boolean): void {
-        // aceita tanto o boolean vindo do ngModel quanto o Event do change
         const active = typeof eventOrValue === 'boolean' ? eventOrValue : (eventOrValue?.target as HTMLInputElement)?.checked;
         if (active) {
             this.settingsService.updateSettings({ nightMode: true, invert: 100, brightness: 80, contrast: 120 });

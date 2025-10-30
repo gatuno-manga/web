@@ -1,4 +1,4 @@
-import { Component, Input, forwardRef } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -25,15 +25,18 @@ export class SelectComponent implements ControlValueAccessor {
     @Input() placeholder: string = 'Selecione uma opção';
     @Input() options: { value: string; label: string }[] = [];
     @Input() name: string = '';
+    @Output() valueChange: EventEmitter<string> = new EventEmitter<string>();
+    @Output() change: EventEmitter<string> = new EventEmitter<string>()
 
     value: string = '';
     isOpen: boolean = false;
     isDisabled: boolean = false;
 
+    constructor(private host: ElementRef<HTMLElement>) {}
+
     private onChange: (value: string) => void = () => {};
     private onTouched: () => void = () => {};
 
-    // Implementação do ControlValueAccessor
     writeValue(value: string): void {
         this.value = value || '';
     }
@@ -50,7 +53,6 @@ export class SelectComponent implements ControlValueAccessor {
         this.isDisabled = isDisabled;
     }
 
-    // Métodos do componente
     toggleDropdown(): void {
         if (!this.isDisabled) {
             this.isOpen = !this.isOpen;
@@ -61,6 +63,9 @@ export class SelectComponent implements ControlValueAccessor {
     }
 
     selectOption(option: { value: string; label: string }): void {
+        this.valueChange.emit(option.value);
+        this.change.emit(option.value);
+        this.host.nativeElement.dispatchEvent(new CustomEvent('change', { detail: option.value, bubbles: true }));
         this.value = option.value;
         this.onChange(this.value);
         this.isOpen = false;

@@ -78,6 +78,16 @@
 		flex: 1;
 	}
 
+	.setting-icon {
+		background-color: var(--primary-color);
+		width: 40px;
+		height: 40px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 10px;
+	}
+
 	.setting-text {
 		flex: 1;
 
@@ -135,11 +145,6 @@
 		.setting-icon {
 			width: 36px;
 			height: 36px;
-
-			svg {
-				width: 20px;
-				height: 20px;
-			}
 		}
 
 		.setting-text {
