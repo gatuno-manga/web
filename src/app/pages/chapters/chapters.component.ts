@@ -86,9 +86,7 @@ export class ChaptersComponent implements OnDestroy {
       parts.push(`invert(${settings.invert}%)`);
     }
     const filter = parts.length > 0 ? parts.join(' ') : 'none';
-    // debug: log filtro aplicado
     try {
-      // eslint-disable-next-line no-console
       console.debug('[Chapters] buildFilter ->', filter, settings);
     } catch (e) {}
     return filter;
@@ -272,5 +270,16 @@ export class ChaptersComponent implements OnDestroy {
       useBackdrop: true,
       backdropOpacity: 0.8
     });
+  }
+
+  goToPage(index: number) {
+    if (this.chapter && this.chapter.pages && index >= 0 && index < this.chapter.pages.length) {
+      const pageElement = document.getElementById(`page-${index}`);
+      if (pageElement) {
+        const yOffset = -15;
+        const y = pageElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }
   }
 }

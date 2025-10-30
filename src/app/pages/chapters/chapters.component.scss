@@ -90,23 +90,64 @@
 	position: relative;
 
 	.reading-progress-bar {
-		position: fixed;
-		top: 0;
+		$space: 10px;
+		position: sticky;
+		top: $space;
 		left: 0;
 		right: 0;
 		height: 4px;
-		background-color: rgba(var(--app-text-color-rgb), 0.1);
+		margin: 0 $space;
+		background-color: rgb(from var(--app-background-color) r g b / 0.4);
 		z-index: 1000;
+		border-radius: 15px;
+		opacity: 0.6;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		transition: height 0.3s, top 0.3s;
+
+		&:hover {
+			height: 40px;
+
+			&.bottom {
+				top: calc(100% - $space - 40px);
+			}
+		}
+
+		&.bottom {
+			animation-delay: top 4s, height 4s;
+			top: calc(100% - $space);
+		}
 
 		.reading-progress-fill {
+			position: absolute;
 			height: 100%;
-			background: linear-gradient(
-				90deg,
-				var(--secondary-color),
-				var(--primary-color)
-			);
+			background: var(--primary-color);
 			transition: width 0.1s ease-out;
-			box-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.5);
+			box-shadow: 0 0 10px
+				rgb(from var(--app-background-color) r g b / 0.5);
+			border-radius: inherit;
+		}
+
+		span {
+			height: 100%;
+			width: 100%;
+			border-right: 4px solid rgb(from var(--app-text-color) r g b / 0.4);
+			color: transparent;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			transition: all 0.3s;
+			user-select: none;
+			&:hover {
+				background-color: var(--primary-color);
+				color: var(--app-text-color);
+			}
+
+			&:last-child {
+				border-right: none;
+			}
 		}
 	}
 

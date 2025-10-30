@@ -41,7 +41,7 @@ describe('ReaderSettingsNotificationComponent', () => {
 
     it('should update gray scale setting', () => {
         spyOn(settingsService, 'updateSettings');
-        component.settings.grayScale = true;
+        component.settings.grayScale = false;
 
         component.onGrayScaleChange();
 
@@ -52,7 +52,7 @@ describe('ReaderSettingsNotificationComponent', () => {
         spyOn(settingsService, 'updateSettings');
         component.settings.asidePosition = 'left';
 
-        component.onAsidePositionChange();
+        component.onAsidePositionChange('left');
 
         expect(settingsService.updateSettings).toHaveBeenCalledWith({ asidePosition: 'left' });
     });
@@ -64,7 +64,7 @@ describe('ReaderSettingsNotificationComponent', () => {
 
         component.onShowPageNumbersChange();
 
-        expect(settingsService.updateSettings).toHaveBeenCalledWith({ showPageNumbers: false });
+        expect(settingsService.updateSettings).toHaveBeenCalledWith({ showPageNumbers: true });
     });
 
     it('should reset settings', () => {

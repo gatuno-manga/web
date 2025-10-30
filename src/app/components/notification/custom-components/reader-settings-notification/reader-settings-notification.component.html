@@ -70,7 +70,7 @@
 				</div>
 				<app-select
 					[(ngModel)]="settings.asidePosition"
-					(change)="onAsidePositionChange()"
+					(change)="onAsidePositionChange($event)"
 					[options]="[
 						{ value: 'left', label: 'Esquerda' },
 						{ value: 'right', label: 'Direita' }
@@ -106,8 +106,33 @@
 					</div>
 				</div>
 				<app-switch
-					[(ngModel)]="settings.showPageNumbers"
+					[value]="settings.showPageNumbers"
 					(change)="onShowPageNumbersChange()"
+				/>
+			</div>
+
+			<!-- Posição da barra de progresso -->
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="minus" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Posição da Barra de Progresso</h3>
+						<p>
+							Exibe a barra de leitura no topo ou na parte
+							inferior da página
+						</p>
+					</div>
+				</div>
+				<app-select
+					[(ngModel)]="settings.progressBarPosition"
+					(valueChange)="onProgressBarPositionChange($event)"
+					[options]="[
+						{ value: 'top', label: 'Topo' },
+						{ value: 'bottom', label: 'Inferior' }
+					]"
+					placeholder="Escolha a posição"
 				/>
 			</div>
 		</section>
@@ -136,7 +161,7 @@
 					</div>
 				</div>
 				<app-switch
-					[(ngModel)]="settings.grayScale"
+					[value]="settings.grayScale"
 					(change)="onGrayScaleChange()"
 				/>
 			</div>
@@ -152,7 +177,7 @@
 					</div>
 				</div>
 				<app-switch
-					[(ngModel)]="settings.brightness"
+					[value]="(settings.brightness ?? 100) >= 150"
 					(change)="onBrightnessToggle($event)"
 				/>
 			</div>
@@ -169,7 +194,7 @@
 					</div>
 				</div>
 				<app-switch
-					[(ngModel)]="settings.contrast"
+					[value]="(settings.contrast ?? 100) >= 150"
 					(change)="onContrastToggle($event)"
 				/>
 			</div>
@@ -186,7 +211,7 @@
 					</div>
 				</div>
 				<app-switch
-					[(ngModel)]="settings.invert"
+					[value]="(settings.invert ?? 0) > 0"
 					(change)="onInvertToggle($event)"
 				/>
 			</div>
@@ -206,7 +231,7 @@
 					</div>
 				</div>
 				<app-switch
-					[(ngModel)]="settings.nightMode"
+					[value]="settings.nightMode ?? false"
 					(change)="onNightModeToggle($event)"
 				/>
 			</div>
