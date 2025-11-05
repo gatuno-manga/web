@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Chapter } from '../../models/book.models';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
@@ -16,6 +16,7 @@ import { ReaderSettings } from '../../models/settings.models';
 import { Subscription } from 'rxjs';
 import { NotificationSeverity } from 'app/service/notification';
 import { ReaderSettingsNotificationComponent } from '@components/notification/custom-components';
+import { BookWebsocketService } from '../../service/book-websocket.service';
 
 @Component({
   selector: 'app-chapters',
@@ -23,7 +24,7 @@ import { ReaderSettingsNotificationComponent } from '@components/notification/cu
   templateUrl: './chapters.component.html',
   styleUrl: './chapters.component.scss'
 })
-export class ChaptersComponent implements OnDestroy {
+export class ChaptersComponent implements OnInit, OnDestroy {
   chapter?: Chapter;
   showBtnTop = false;
   readingProgress = 0;
@@ -34,6 +35,7 @@ export class ChaptersComponent implements OnDestroy {
   settings: ReaderSettings;
   filterStyle: string = '';
   private settingsSubscription?: Subscription;
+  private wsSubscription?: Subscription;
 
   constructor(
     private chapterService: ChapterService,
@@ -43,7 +45,8 @@ export class ChaptersComponent implements OnDestroy {
     private metaService: MetaDataService,
     private modalService: ModalNotificationService,
     private notificationService: NotificationService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private wsService: BookWebsocketService
   ) {
     this.admin = this.userTokenService.isAdmin();
     this.settings = this.settingsService.getSettings();
@@ -59,16 +62,70 @@ export class ChaptersComponent implements OnDestroy {
 
     this.activatedRoute.paramMap.subscribe(params => {
       const id = params.get('id');
-      const chapter = params.get('chapter');
-      if (!id || !chapter) {
+      const chapterId = params.get('chapter');
+      if (!id || !chapterId) {
         this.router.navigate(['../'], { relativeTo: this.activatedRoute });
         return;
       }
-      this.chapterService.getChapter(chapter).subscribe((chapter: Chapter) => {
+      this.chapterService.getChapter(chapterId).subscribe((chapter: Chapter) => {
         this.chapter = chapter;
         this.setMetaData();
+
+        // Setup WebSocket para o capítulo
+        this.setupWebSocket(chapterId, id);
       });
     });
+  }
+
+  ngOnDestroy() {
+    this.settingsSubscription?.unsubscribe();
+    this.wsSubscription?.unsubscribe();
+    if (this.chapter) {
+      this.wsService.unsubscribeFromChapter(this.chapter.id);
+    }
+  }
+
+  private setupWebSocket(chapterId: string, bookId: string) {
+    // Conecta se ainda não estiver conectado
+    if (!this.wsService.isConnected()) {
+      this.wsService.connect();
+    }
+
+    // Observa eventos do capítulo
+    this.wsSubscription = this.wsService.watchChapter(chapterId, bookId).subscribe(event => {
+      console.log('📡 Evento recebido no capítulo:', event.type, event.data);
+
+      switch (event.type) {
+        case 'chapter.updated':
+          console.log('📖 Capítulo atualizado em tempo real');
+          this.refreshChapter();
+          break;
+
+        case 'chapter.scraping.started':
+          console.log('🔄 Scraping iniciado para este capítulo');
+          break;
+
+        case 'chapter.scraping.completed':
+          console.log('✅ Scraping completo! Novas páginas disponíveis:', event.data.pagesCount);
+          this.refreshChapter();
+          break;
+
+        case 'chapter.scraping.failed':
+          console.error('❌ Scraping falhou:', event.data.error);
+          break;
+      }
+    });
+  }
+
+  private refreshChapter() {
+    if (this.chapter) {
+      this.chapterService.getChapter(this.chapter.id).subscribe({
+        next: (chapter) => {
+          this.chapter = chapter;
+          console.log('♻️ Capítulo recarregado');
+        }
+      });
+    }
   }
 
   private buildFilter(settings: ReaderSettings): string {
@@ -90,10 +147,6 @@ export class ChaptersComponent implements OnDestroy {
       console.debug('[Chapters] buildFilter ->', filter, settings);
     } catch (e) {}
     return filter;
-  }
-
-  ngOnDestroy() {
-    this.settingsSubscription?.unsubscribe();
   }
 
   private formatNumber(value: number): string {

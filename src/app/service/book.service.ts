@@ -17,11 +17,15 @@ export class BookService {
     private readonly websocketService: BookWebsocketService,
     private readonly ngZone: NgZone
   ) {
+    // WebSocket conecta automaticamente apenas se o usuário estiver logado
     if (typeof window !== 'undefined') {
       this.ngZone.runOutsideAngular(() => {
         setTimeout(() => {
           try {
-            this.websocketService.connect();
+            // Verifica se tem token antes de tentar conectar
+            if (this.userTokenService.hasToken) {
+              this.websocketService.connect();
+            }
           } catch (error) {
             console.warn('Falha ao conectar WebSocket:', error);
           }
