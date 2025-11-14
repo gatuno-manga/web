@@ -52,7 +52,10 @@
 				(chapter.index | number) +
 				(chapter.title ? ': ' + chapter.title : '')
 			"
-			loading="lazy"
+			[loading]="$index === 0 ? 'eager' : 'lazy'"
+			[attr.fetchpriority]="
+				$index === 0 ? 'high' : $index === 1 ? 'high' : 'low'
+			"
 		/>
 		@if(settings.showPageNumbers) {
 		<span class="page-number">{{ $index + 1 }}</span>
