@@ -43,7 +43,17 @@
 	</div>
 	@for (page of chapter.pages; track $index) {
 	<div id="page-{{ $index }}" class="page-container">
-		<img [src]="page.path" alt="Page Image" />
+		<img
+			[src]="page.path"
+			[alt]="
+				'Página ' +
+				($index + 1) +
+				' do capítulo ' +
+				(chapter.index | number) +
+				(chapter.title ? ': ' + chapter.title : '')
+			"
+			loading="lazy"
+		/>
 		@if(settings.showPageNumbers) {
 		<span class="page-number">{{ $index + 1 }}</span>
 		}
