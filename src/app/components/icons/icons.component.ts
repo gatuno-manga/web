@@ -56,12 +56,18 @@ export class IconsComponent {
         const fs = require('fs');
         const path = require('path');
 
-        const prodPath = path.join(process.cwd(), 'dist', 'browser', 'assets', 'icons', `${this.name}.svg`);
-        const devPath = path.join(process.cwd(), 'public', 'assets', 'icons', `${this.name}.svg`);
+        const possiblePaths = [
+          path.join(process.cwd(), 'dist', 'front', 'browser', 'assets', 'icons', `${this.name}.svg`), // Docker prod
+          path.join(process.cwd(), 'dist', 'browser', 'assets', 'icons', `${this.name}.svg`),           // Build local
+          path.join(process.cwd(), 'public', 'assets', 'icons', `${this.name}.svg`)                     // Dev mode
+        ];
 
-        let iconPath = prodPath;
-        if (!fs.existsSync(prodPath) && fs.existsSync(devPath)) {
-          iconPath = devPath;
+        let iconPath = possiblePaths.find(p => fs.existsSync(p));
+
+        if (!iconPath) {
+          console.warn(`Ícone não encontrado no SSR: ${this.name}. Tentou: ${possiblePaths.join(', ')}`);
+          this.svgContent = '';
+          return;
         }
 
         let svg = fs.readFileSync(iconPath, 'utf8');
