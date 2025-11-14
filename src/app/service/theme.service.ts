@@ -20,14 +20,16 @@ export class ThemeService {
     ) {
         this.renderer = this.rendererFactory.createRenderer(null, null);
         if (isPlatformBrowser(this.platformId)) {
-            const initialTheme = document?.documentElement?.getAttribute('data-theme') as 'light' | 'dark' || 'light';
+            const savedTheme = this.localStorageService.get(THEME_KEY) as 'light' | 'dark' | null;
+            const htmlTheme = document?.documentElement?.getAttribute('data-theme') as 'light' | 'dark' | null;
+            const initialTheme = savedTheme || htmlTheme || 'light';
             this.currentTheme.set(initialTheme);
 
             effect(() => {
                 const theme = this.currentTheme();
                 this.renderer.setAttribute(document.documentElement, 'data-theme', theme);
                 this.localStorageService.set(THEME_KEY, theme);
-                this.cookieService.set(THEME_KEY, theme, true, { path: '/' });
+                this.cookieService.set(THEME_KEY, theme, false, { path: '/' });
             });
         }
     }

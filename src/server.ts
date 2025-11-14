@@ -1,6 +1,7 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine, isMainModule } from '@angular/ssr/node';
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import bootstrap from './main.server';
@@ -11,6 +12,7 @@ const indexHtml = join(serverDistFolder, 'index.server.html');
 
 const app = express();
 const commonEngine = new CommonEngine();
+app.use(cookieParser());
 
 /**
  * Example Express Rest API endpoints can be defined here.
@@ -50,7 +52,7 @@ app.get('**', (req, res, next) => {
       providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
     })
     .then((html) => {
-      const theme = req.cookies['theme'] === 'dark' ? 'dark' : 'light';
+      const theme = req.cookies?.['theme'] === 'dark' ? 'dark' : 'light';
       const themedHtml = html.replace('<html lang="pt-BR">', `<html lang="pt-BR" data-theme="${theme}">`);
       res.send(themedHtml);
     })
