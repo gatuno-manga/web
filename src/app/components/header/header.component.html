@@ -1,22 +1,28 @@
 <header>
-	<nav>
-		<a
-			id="logo"
-			[routerLink]="['/']"
-			[ngClass]="{ 'dark-theme': isDarkTheme() }"
-		>
-			<app-icons name="logo" size="72" [modifier]="false" />
-		</a>
-	</nav>
-	<nav>
-		<a [routerLink]="['/dashboard']" *ngIf="isAdmin()">Dashboard</a>
-		<a [routerLink]="['/books']">Mangas</a>
-		<a [routerLink]="['/auth/login']" *ngIf="!isloggedIn()">Login</a>
-		<div class="icons">
-			<app-theme-toggle />
-			<a [routerLink]="['/user']" class="user" *ngIf="isloggedIn()">
-				<app-icons name="user" size="32" />
-			</a>
-		</div>
-	</nav>
+  <nav>
+    <a
+      id="logo"
+      [routerLink]="['/']"
+      [ngClass]="{ 'dark-theme': isDarkTheme() }"
+      >
+      <app-icons name="logo" size="72" [modifier]="false" />
+    </a>
+  </nav>
+  <nav>
+    @if (isAdmin()) {
+      <a [routerLink]="['/dashboard']">Dashboard</a>
+    }
+    <a [routerLink]="['/books']">Mangas</a>
+    @if (!isloggedIn()) {
+      <a [routerLink]="['/auth/login']">Login</a>
+    }
+    <div class="icons">
+      <app-theme-toggle />
+      @if (isloggedIn()) {
+        <a [routerLink]="['/user']" class="user">
+          <app-icons name="user" size="32" />
+        </a>
+      }
+    </div>
+  </nav>
 </header>

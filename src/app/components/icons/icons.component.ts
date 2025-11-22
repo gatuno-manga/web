@@ -1,5 +1,4 @@
-// Compatibilidade SSR: use verificações de plataforma e dependências do Node apenas quando disponíveis
-import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, Inject, Input, PLATFORM_ID, SimpleChanges } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -12,7 +11,7 @@ if (typeof require !== 'undefined') {
 
 @Component({
   selector: 'app-icons',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './icons.component.html',
   styleUrl: './icons.component.scss'
 })

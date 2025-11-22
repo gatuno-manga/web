@@ -1,4 +1,4 @@
-import { Location, NgClass, NgIf } from '@angular/common';
+import { Location, NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
@@ -12,9 +12,8 @@ import { UserTokenService } from '../../service/user-token.service';
     RouterModule,
     IconsComponent,
     ThemeToggleComponent,
-    NgClass,
-    NgIf
-  ],
+    NgClass
+],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })

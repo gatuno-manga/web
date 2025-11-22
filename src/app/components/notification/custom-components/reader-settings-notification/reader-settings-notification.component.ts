@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '@service/settings.service';
 import { ReaderSettings } from '@models/settings.models';
@@ -11,7 +11,7 @@ import { SwitchComponent } from '@components/inputs/switch/switch.component';
 @Component({
     selector: 'app-reader-settings-notification',
     standalone: true,
-    imports: [CommonModule, FormsModule, IconsComponent, SelectComponent, ButtonComponent, SwitchComponent],
+    imports: [FormsModule, IconsComponent, SelectComponent, ButtonComponent, SwitchComponent],
     templateUrl: './reader-settings-notification.component.html',
     styleUrls: ['./reader-settings-notification.component.scss']
 })

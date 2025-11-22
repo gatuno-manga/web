@@ -5,7 +5,7 @@ import { ModalNotificationService } from '../../../service/modal-notification.se
 import { Observable, Subscription } from 'rxjs';
 import { ModalNotification, NotificationToast } from '../../../models/notification.models';
 import { OverlayNotification } from '../../../service/notification/overlay-notification.strategy';
-import { AsyncPipe, NgClass, NgIf, NgComponentOutlet } from '@angular/common';
+import { AsyncPipe, NgClass, NgComponentOutlet } from '@angular/common';
 
 @Component({
   selector: 'app-overlay-notification',

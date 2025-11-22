@@ -2,10 +2,10 @@ import { Component, ElementRef, forwardRef, Input, ViewChild, Output, EventEmitt
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { IconsComponent } from '../../icons/icons.component';
 import { ControlValueAccessor } from '@angular/forms';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 @Component({
 	selector: 'app-input[type="text"], app-input[type="email"]',
-	imports: [IconsComponent, NgClass, NgIf],
+	imports: [IconsComponent, NgClass],
 	providers: [
 		{
 			provide: NG_VALUE_ACCESSOR,
@@ -128,7 +128,7 @@ export class TextInputComponent implements ControlValueAccessor {
 
 @Component({
 	selector: 'app-input[type="password"]',
-	imports: [IconsComponent, NgClass, NgIf],
+	imports: [IconsComponent, NgClass],
 	providers: [
 		{
 			provide: NG_VALUE_ACCESSOR,
