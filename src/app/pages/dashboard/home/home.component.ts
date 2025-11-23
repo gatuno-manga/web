@@ -48,8 +48,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.loadDashboardData();
 
-    // Se for admin, conecta ao WebSocket para receber eventos globais
-    if (this.userTokenService.isAdmin()) {
+    if (this.userTokenService.isAdmin) {
       this.setupWebSocket();
     }
   }
@@ -59,16 +58,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private setupWebSocket() {
-    // Conecta ao WebSocket
     if (!this.wsService.isConnected()) {
       this.wsService.connect();
     }
 
-    // Admin recebe eventos globais automaticamente
     this.wsSubscriptions.push(
       this.wsService.bookCreated$.subscribe(book => {
         console.log('📚 Novo livro criado:', book.title);
-        this.loadDashboardData(); // Recarrega dashboard
+        this.loadDashboardData();
       }),
 
       this.wsService.chaptersUpdated$.subscribe(data => {

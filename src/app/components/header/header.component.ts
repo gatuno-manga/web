@@ -1,6 +1,6 @@
 import { Location, NgClass } from '@angular/common';
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { IconsComponent } from '../icons/icons.component';
 import { ThemeService } from '../../service/theme.service';
@@ -13,7 +13,7 @@ import { UserTokenService } from '../../service/user-token.service';
     IconsComponent,
     ThemeToggleComponent,
     NgClass
-],
+  ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
@@ -33,11 +33,11 @@ export class HeaderComponent {
   }
 
   isloggedIn(): boolean {
-    return this.userTokenService.hasToken;
+    return this.userTokenService.hasValidAccessToken;
   }
 
   isAdmin(): boolean {
-    return this.userTokenService.isAdmin();
+    return this.userTokenService.isAdmin;
   }
 
 }

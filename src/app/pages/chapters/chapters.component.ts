@@ -79,14 +79,13 @@ export class ChaptersComponent implements OnInit {
     return parts.length > 0 ? parts.join(' ') : 'none';
   });
 
-  admin = this.userTokenService.isAdmin();
+  admin = this.userTokenService.isAdmin;
 
   constructor() {
-    // Router params subscription
     this.activatedRoute.paramMap
       .pipe(takeUntilDestroyed())
       .subscribe((params) => {
-        const chapterId = params.get('chapter'); // Original usava 'chapter'
+        const chapterId = params.get('chapter');
         const bookId = params.get('id');
 
         if (chapterId) {
@@ -102,7 +101,6 @@ export class ChaptersComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  // Corrigido: Removido ['$event'] pois não é usado e causava erro de aridade
   @HostListener('window:scroll')
   onWindowScroll() {
     const scrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
@@ -121,7 +119,6 @@ export class ChaptersComponent implements OnInit {
       this.bookWebsocketService.connect();
     }
 
-    // Reimplementando lógica do WebSocket com takeUntilDestroyed
     this.bookWebsocketService.watchChapter(chapterId, bookId)
       .pipe(takeUntilDestroyed())
       .subscribe((event: any) => {
@@ -132,14 +129,11 @@ export class ChaptersComponent implements OnInit {
   }
 
   loadChapter(id: string) {
-    // Corrigido: getById -> getChapter
     this.chapterService.getChapter(id).subscribe({
       next: (chapter: Chapter) => {
         this.chapter.set(chapter);
 
         if (chapter) {
-          // Corrigido: updateMetaData -> setMetaData
-          // Corrigido: .url -> .path
           this.metaDataService.setMetaData({
             title: `${chapter.bookTitle} - ${chapter.title || 'Capítulo ' + chapter.index}`,
             description: `Leia o capítulo ${chapter.index} de ${chapter.bookTitle}`,
@@ -149,11 +143,10 @@ export class ChaptersComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Erro ao carregar capítulo', err);
-        // Corrigido: Adicionado 'level' e ajustado 'severity'
         this.notificationService.notify({
           message: 'Erro ao carregar o capítulo.',
           level: 'custom',
-          severity: NotificationSeverity.CRITICAL // Usando CRITICAL pois ERROR não existia no enum
+          severity: NotificationSeverity.CRITICAL
         });
       }
     });

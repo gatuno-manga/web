@@ -21,7 +21,7 @@ export class TagsService {
         if (!opts.sensitiveContent)
             opts.sensitiveContent = this.sensitiveContentService.getContentAllow();
 
-        if (!this.userTokenService.hasToken)
+        if (!this.userTokenService.hasValidAccessToken)
             opts.sensitiveContent = [];
         return this.http.get<Tag[]>('tags', { params: { ...opts } });
     }

@@ -1,70 +1,45 @@
-import { HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { HttpInterceptorFn } from '@angular/common/http';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../environments/environment';
 import { UserTokenService } from '../service/user-token.service';
-import { switchMap, catchError } from 'rxjs';
-import { of } from 'rxjs';
 
 export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
   const userTokenService = inject(UserTokenService);
   const platformId = inject(PLATFORM_ID);
-  const requestExclude = ['/favicon.ico', '/data/', '/assets/'];
+  const isBrowser = isPlatformBrowser(platformId);
 
-  let clonedRequest = req;
-  if (!/^https?:\/\//i.test(req.url) && !requestExclude.some(url => req.url.includes(url))) {
-    // Usar URL do servidor em SSR, URL do cliente no browser
-    let baseUrl = isPlatformBrowser(platformId)
-      ? environment.apiURL
-      : environment.apiURLServer || environment.apiURL;
+  let requestUrl = req.url;
+  const isAbsoluteUrl = /^https?:\/\//i.test(req.url);
+  const requestExclude = ['/assets/', '/data/'];
 
-    if (!baseUrl) {
-      if (isPlatformBrowser(platformId)) {
-        baseUrl = window.location.origin + '/api';
-      } else {
-        baseUrl = '/api';
-      }
+  if (!isAbsoluteUrl && !requestExclude.some(path => req.url.includes(path))) {
+    let baseUrl = environment.apiURL;
+
+    if (!isBrowser) {
+      baseUrl = environment.apiURLServer || environment.apiURL || 'http://localhost:3000/api';
+    } else if (!baseUrl) {
+      baseUrl = window.location.origin + '/api';
     }
 
-    const url = `${baseUrl.replace(/\/+$/, '')}/${req.url.replace(/^\/+/, '')}`;
-
-    const excludeRefresh = ['/auth/refresh', '/auth/signup'];
-    if (!userTokenService.hasToken && userTokenService.hasValidRefreshToken && !excludeRefresh.some(url => req.url.includes(url))) {
-      return userTokenService.refreshTokens().pipe(
-        switchMap(({ accessToken, refreshToken }) => {
-          userTokenService.setTokens(accessToken, refreshToken);
-          const updatedToken = accessToken;
-          const updatedRequest = req.clone({
-            url,
-            setHeaders: {
-              Authorization: `Bearer ${updatedToken}`,
-              cookie: `accessToken=${updatedToken}`,
-            },
-          });
-          return next(updatedRequest);
-        }),
-        catchError((error) => {
-          console.error('Erro ao renovar tokens:', error);
-          userTokenService.removeTokens();
-          const requestWithoutAuth = req.clone({ url });
-          return next(requestWithoutAuth);
-        })
-      );
-    }
-
-    const token = userTokenService.accessToken;
-    const headers: { [key: string]: string } = {};
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-      headers['cookie'] = `accessToken=${token}`;
-    }
-
-    clonedRequest = req.clone({
-      url,
-      setHeaders: headers,
-    });
+    requestUrl = `${baseUrl.replace(/\/+$/, '')}/${req.url.replace(/^\/+/, '')}`;
   }
+
+  const token = userTokenService.accessToken;
+  let headers = req.headers;
+
+  if (token) {
+    headers = headers.set('Authorization', `Bearer ${token}`);
+
+    if (!isBrowser) {
+      headers = headers.set('cookie', `accessToken=${token}`);
+    }
+  }
+
+  const clonedRequest = req.clone({
+    url: requestUrl,
+    headers: headers
+  });
 
   return next(clonedRequest);
 };
