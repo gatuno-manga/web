@@ -106,6 +106,9 @@
 		align-items: center;
 		justify-content: space-between;
 		transition: height 0.3s, top 0.3s;
+		cursor: pointer;
+		user-select: none;
+		touch-action: none;
 
 		&:hover {
 			height: 40px;

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Chapter } from '../../models/book.models';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
@@ -37,6 +37,55 @@ export class ChaptersComponent implements OnInit, OnDestroy {
   private settingsSubscription?: Subscription;
   private wsSubscription?: Subscription;
 
+  @ViewChild('progressBarRef') progressBarRef!: ElementRef<HTMLDivElement>;
+  isDragging = false;
+  startDrag(event: MouseEvent | TouchEvent) {
+    this.isDragging = true;
+    this.updateScrollFromProgressBar(event);
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  @HostListener('document:touchmove', ['$event'])
+  onDrag(event: MouseEvent | TouchEvent) {
+    if (this.isDragging) {
+      if (event.cancelable) event.preventDefault();
+      this.updateScrollFromProgressBar(event);
+    }
+  }
+
+  @HostListener('document:mouseup')
+  @HostListener('document:touchend')
+  stopDrag() {
+    this.isDragging = false;
+  }
+
+  private updateScrollFromProgressBar(event: MouseEvent | TouchEvent) {
+    if (!this.progressBarRef) return;
+
+    const rect = this.progressBarRef.nativeElement.getBoundingClientRect();
+    let clientX: number;
+
+    if (event instanceof MouseEvent) {
+      clientX = event.clientX;
+    } else if (event instanceof TouchEvent && event.touches.length > 0) {
+      clientX = event.touches[0].clientX;
+    } else {
+      return;
+    }
+
+    let percentage = (clientX - rect.left) / rect.width;
+    percentage = Math.max(0, Math.min(1, percentage));
+
+    const documentHeight = document.documentElement.scrollHeight;
+    const windowHeight = window.innerHeight;
+    const scrollableHeight = documentHeight - windowHeight;
+
+    window.scrollTo({
+      top: scrollableHeight * percentage,
+      behavior: 'auto'
+    });
+  }
+
   constructor(
     private chapterService: ChapterService,
     private activatedRoute: ActivatedRoute,
@@ -71,7 +120,6 @@ export class ChaptersComponent implements OnInit, OnDestroy {
         this.chapter = chapter;
         this.setMetaData();
 
-        // Setup WebSocket para o capítulo
         this.setupWebSocket(chapterId, id);
       });
     });
@@ -86,12 +134,10 @@ export class ChaptersComponent implements OnInit, OnDestroy {
   }
 
   private setupWebSocket(chapterId: string, bookId: string) {
-    // Conecta se ainda não estiver conectado
     if (!this.wsService.isConnected()) {
       this.wsService.connect();
     }
 
-    // Observa eventos do capítulo
     this.wsSubscription = this.wsService.watchChapter(chapterId, bookId).subscribe(event => {
       console.log('📡 Evento recebido no capítulo:', event.type, event.data);
 
