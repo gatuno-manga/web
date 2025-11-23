@@ -242,12 +242,17 @@ app-aside {
 		margin-bottom: 1rem;
 	}
 	h1 {
+		app-icons {
+			flex: none;
+		}
 		display: inline-flex;
+		width: 100%;
 		font-size: 1.2rem;
 		line-height: 1.7rem;
 		font-weight: lighter;
 		gap: 0.5rem;
 		text-decoration: underline;
+		margin-bottom: 10px;
 	}
 	.line {
 		width: 90%;
