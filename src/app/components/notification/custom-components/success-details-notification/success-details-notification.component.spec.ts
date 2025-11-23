@@ -24,11 +24,15 @@ describe('SuccessDetailsNotificationComponent', () => {
         expect(compiled.querySelector('h2')?.textContent).toBe('Sucesso!');
     });
 
-    it('should display custom title', () => {
+    it('should display custom title', (done) => {
         component.title = 'Upload concluído!';
         fixture.detectChanges();
-        const compiled = fixture.nativeElement;
-        expect(compiled.querySelector('h2')?.textContent).toBe('Upload concluído!');
+        setTimeout(() => {
+            fixture.detectChanges();
+            const compiled = fixture.nativeElement;
+            expect(compiled.querySelector('h2')?.textContent).toBe('Upload concluído!');
+            done();
+        });
     });
 
     it('should display message', () => {
@@ -45,22 +49,30 @@ describe('SuccessDetailsNotificationComponent', () => {
         expect(compiled.querySelector('.items-list')).toBeFalsy();
     });
 
-    it('should display items list when items provided', () => {
+    it('should display items list when items provided', (done) => {
         component.items = ['Item 1', 'Item 2', 'Item 3'];
         fixture.detectChanges();
-        const compiled = fixture.nativeElement;
-        const itemsList = compiled.querySelector('.items-list');
-        expect(itemsList).toBeTruthy();
-        const listItems = itemsList.querySelectorAll('li');
-        expect(listItems.length).toBe(3);
+        setTimeout(() => {
+            fixture.detectChanges();
+            const compiled = fixture.nativeElement;
+            const itemsList = compiled.querySelector('.items-list');
+            expect(itemsList).toBeTruthy();
+            const listItems = itemsList.querySelectorAll('li');
+            expect(listItems.length).toBe(3);
+            done();
+        });
     });
 
-    it('should display custom items title', () => {
+    it('should display custom items title', (done) => {
         component.items = ['Item 1'];
         component.itemsTitle = 'Arquivos processados';
         fixture.detectChanges();
-        const compiled = fixture.nativeElement;
-        expect(compiled.querySelector('.items-list strong')?.textContent).toContain('Arquivos processados');
+        setTimeout(() => {
+            fixture.detectChanges();
+            const compiled = fixture.nativeElement;
+            expect(compiled.querySelector('.items-list strong')?.textContent).toContain('Arquivos processados');
+            done();
+        });
     });
 
     it('should not display action button when actionLabel not provided', () => {
@@ -78,26 +90,32 @@ describe('SuccessDetailsNotificationComponent', () => {
         expect(compiled.querySelector('.action-button')).toBeFalsy();
     });
 
-    it('should display action button when both actionLabel and actionCallback provided', () => {
+    it('should display action button when both actionLabel and actionCallback provided', (done) => {
         component.actionLabel = 'Ver detalhes';
         component.actionCallback = () => {};
         fixture.detectChanges();
-        const compiled = fixture.nativeElement;
-        const button = compiled.querySelector('.action-button');
-        expect(button).toBeTruthy();
-        expect(button?.textContent?.trim()).toBe('Ver detalhes');
+        setTimeout(() => {
+            fixture.detectChanges();
+            const compiled = fixture.nativeElement;
+            const button = compiled.querySelector('.action-button');
+            expect(button).toBeTruthy();
+            expect(button?.textContent?.trim()).toBe('Ver detalhes');
+            done();
+        });
     });
 
-    it('should call actionCallback when button clicked', () => {
+    it('should call actionCallback when button clicked', (done) => {
         const mockCallback = jasmine.createSpy('callback');
         component.actionLabel = 'Ação';
         component.actionCallback = mockCallback;
         fixture.detectChanges();
-
-        const button = fixture.nativeElement.querySelector('.action-button');
-        button.click();
-
-        expect(mockCallback).toHaveBeenCalled();
+        setTimeout(() => {
+            fixture.detectChanges();
+            const button = fixture.nativeElement.querySelector('.action-button');
+            button.click();
+            expect(mockCallback).toHaveBeenCalled();
+            done();
+        });
     });
 
     it('should display success icon', () => {

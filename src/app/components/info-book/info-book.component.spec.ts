@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subject, of, EMPTY } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { provideRouter } from '@angular/router';
 
 import { InfoBookComponent } from './info-book.component';
 import { BookService } from '../../service/book.service';
@@ -33,6 +35,7 @@ describe('InfoBookComponent', () => {
     await TestBed.configureTestingModule({
       imports: [InfoBookComponent],
       providers: [
+        provideRouter([]),
         { provide: BookService, useValue: mockBookService },
         { provide: ModalNotificationService, useValue: mockModalService }
       ]

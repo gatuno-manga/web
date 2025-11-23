@@ -38,32 +38,48 @@ describe('ProgressNotificationComponent', () => {
         expect(progressFill.style.width).toBe('75%');
     });
 
-    it('should display status message', () => {
+    it('should display status message', (done) => {
         component.statusMessage = 'Teste de status';
         fixture.detectChanges();
-        const compiled = fixture.nativeElement;
-        expect(compiled.querySelector('.status')?.textContent).toBe('Teste de status');
+        setTimeout(() => {
+            fixture.detectChanges();
+            const compiled = fixture.nativeElement;
+            expect(compiled.querySelector('.status')?.textContent).toBe('Teste de status');
+            done();
+        });
     });
 
-    it('should display current item when provided', () => {
+    it('should display current item when provided', (done) => {
         component.currentItem = 'arquivo.txt';
         fixture.detectChanges();
-        const compiled = fixture.nativeElement;
-        expect(compiled.querySelector('.current-item')).toBeTruthy();
-        expect(compiled.querySelector('.current-item strong')?.textContent).toBe('arquivo.txt');
+        setTimeout(() => {
+            fixture.detectChanges();
+            const compiled = fixture.nativeElement;
+            expect(compiled.querySelector('.current-item')).toBeTruthy();
+            expect(compiled.querySelector('.current-item strong')?.textContent).toBe('arquivo.txt');
+            done();
+        });
     });
 
-    it('should not display current item when not provided', () => {
+    it('should not display current item when not provided', (done) => {
         component.currentItem = undefined;
         fixture.detectChanges();
-        const compiled = fixture.nativeElement;
-        expect(compiled.querySelector('.current-item')).toBeFalsy();
+        setTimeout(() => {
+            fixture.detectChanges();
+            const compiled = fixture.nativeElement;
+            expect(compiled.querySelector('.current-item')).toBeFalsy();
+            done();
+        });
     });
 
-    it('should accept custom title', () => {
+    it('should accept custom title', (done) => {
         component.title = 'Upload em progresso';
         fixture.detectChanges();
-        const compiled = fixture.nativeElement;
-        expect(compiled.querySelector('h3')?.textContent).toBe('Upload em progresso');
+        setTimeout(() => {
+            fixture.detectChanges();
+            const compiled = fixture.nativeElement;
+            expect(compiled.querySelector('h3')?.textContent).toBe('Upload em progresso');
+            done();
+        });
     });
 });
