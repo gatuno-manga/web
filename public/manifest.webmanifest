@@ -1,6 +1,6 @@
 {
-  "name": "front",
-  "short_name": "front",
+  "name": "Gatuno",
+  "short_name": "Gatuno",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
