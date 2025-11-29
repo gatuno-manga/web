@@ -1,11 +1,14 @@
 import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal, OnDestroy } from '@angular/core';
 import { BookService } from '../../service/book.service';
-import { BookDetail, Chapterlist, Cover, ScrapingStatus } from '../../models/book.models';
+import { Book, BookBasic, BookDetail, Chapter, Chapterlist, Cover, ScrapingStatus } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { Subscription } from 'rxjs';
+import { DownloadService } from '../../service/download.service';
+import { ChapterService } from '../../service/chapter.service';
+import { DownloadStatus } from '../../models/offline.models';
 
 enum tab {
   chapters = 0,
@@ -29,9 +32,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   ScrapingStatus = ScrapingStatus;
 
   @Input() id!: string;
+  @Input() bookBasic?: BookBasic;
+  
   selectedTab: tab = tab.chapters;
 
   private websocketSubscription?: Subscription;
+  private downloadSubscription?: Subscription;
 
   modulesLoad: ModulesLoad[] = [
     {
@@ -57,12 +63,17 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     updatedAt: new Date()
   };
 
+  chaptersDownloadStatus = new Map<string, DownloadStatus | 'downloaded'>();
+  chaptersDownloadProgress = new Map<string, number>();
+
   @ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
   @ViewChild('firstTab') firstTab!: ElementRef<HTMLSpanElement>;
 
   constructor(
     private bookService: BookService,
     private modalService: ModalNotificationService,
+    private downloadService: DownloadService,
+    private chapterService: ChapterService
   ) {}
 
   ngAfterViewInit() {
@@ -71,11 +82,27 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     }
 
     this.subscribeToWebSocketEvents();
+    
+    this.downloadSubscription = this.downloadService.downloadProgress$.subscribe((progressMap) => {
+      progressMap.forEach((progress, chapterId) => {
+        this.chaptersDownloadStatus.set(chapterId, progress.status);
+        if (progress.total > 0) {
+          this.chaptersDownloadProgress.set(chapterId, (progress.current / progress.total) * 100);
+        }
+        
+        if (progress.status === 'completed') {
+           this.chaptersDownloadStatus.set(chapterId, 'downloaded');
+        }
+      });
+    });
   }
 
   ngOnDestroy() {
     if (this.websocketSubscription) {
       this.websocketSubscription.unsubscribe();
+    }
+    if (this.downloadSubscription) {
+        this.downloadSubscription.unsubscribe();
     }
   }
 
@@ -165,10 +192,66 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.bookService.getChapters(this.id).subscribe({
       next: (chapters) => {
         this.chapters = chapters;
+        this.checkDownloadedChapters();
       },
       error: (error) => {
         console.error('Error loading chapters:', error);
       }
+    });
+  }
+
+  async checkDownloadedChapters() {
+      for (const chapter of this.chapters) {
+          const isDownloaded = await this.downloadService.isChapterDownloaded(chapter.id);
+          if (isDownloaded) {
+              this.chaptersDownloadStatus.set(chapter.id, 'downloaded');
+          }
+      }
+  }
+
+  async downloadChapter(chapterList: Chapterlist, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (this.chaptersDownloadStatus.get(chapterList.id) === 'downloaded' || 
+        this.chaptersDownloadStatus.get(chapterList.id) === 'downloading') {
+        return;
+    }
+
+    if (!this.bookBasic) {
+        console.error('Book basic info not available');
+        return;
+    }
+
+    // Convert BookBasic to Book structure required by DownloadService (partial is fine if consistent)
+    // We need a full Book object mostly for storage metadata.
+    // Since we don't have the full Book object here, we construct what we can or fetch it.
+    // However, DownloadService.saveBook takes a "Book". Let's see if we can cast or fetch.
+    
+    // Fetch full chapter details first
+    this.chapterService.getChapter(chapterList.id).subscribe({
+        next: async (fullChapter) => {
+             // We need the book object. 
+             // Let's construct a Book object from BookBasic + defaults if needed, or fetch the full book.
+             // Since fetching the full book is safer:
+             this.bookService.getBook(this.id).subscribe({
+                 next: async (fullBookBasic) => {
+                     // BookBasic is what we have. The DownloadService expects 'Book' interface which has 'chapters'.
+                     // But for saving the book metadata, BookBasic is almost enough except for 'chapters'.
+                     // Let's cast it as Book because we only save metadata fields in saveBook.
+                     // Or better, update DownloadService to accept BookBasic.
+                     // For now, let's cast.
+                     const bookToSave = fullBookBasic as unknown as Book; 
+                     
+                     try {
+                        await this.downloadService.downloadChapter(bookToSave, fullChapter);
+                     } catch (e) {
+                         console.error('Download failed', e);
+                     }
+                 }
+             })
+        },
+        error: (err) => console.error('Failed to get chapter details', err)
     });
   }
 

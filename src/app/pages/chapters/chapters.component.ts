@@ -3,6 +3,7 @@ import {
   ElementRef,
   HostListener,
   OnInit,
+  OnDestroy,
   inject,
   signal,
   viewChild,
@@ -26,6 +27,7 @@ import { SettingsService } from '../../service/settings.service';
 import { NotificationSeverity } from 'app/service/notification';
 import { ReaderSettingsNotificationComponent } from '@components/notification/custom-components';
 import { BookWebsocketService } from '../../service/book-websocket.service';
+import { DownloadService } from '../../service/download.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -44,7 +46,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
   templateUrl: './chapters.component.html',
   styleUrl: './chapters.component.scss'
 })
-export class ChaptersComponent implements OnInit {
+export class ChaptersComponent implements OnInit, OnDestroy {
   private activatedRoute = inject(ActivatedRoute);
   private chapterService = inject(ChapterService);
   private userTokenService = inject(UserTokenService);
@@ -53,6 +55,7 @@ export class ChaptersComponent implements OnInit {
   private metaDataService = inject(MetaDataService);
   private settingsService = inject(SettingsService);
   private bookWebsocketService = inject(BookWebsocketService);
+  private downloadService = inject(DownloadService);
   private router = inject(Router);
 
   // Queries
@@ -62,6 +65,8 @@ export class ChaptersComponent implements OnInit {
   chapter = signal<Chapter | null>(null);
   readingProgress = signal<number>(0);
   showBtnTop = signal<boolean>(false);
+  
+  private objectUrls: string[] = [];
 
   // Converte o Observable de settings para Signal
   settings = toSignal(this.settingsService.settings$, {
@@ -100,6 +105,10 @@ export class ChaptersComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+  
+  ngOnDestroy() {
+      this.objectUrls.forEach(url => URL.revokeObjectURL(url));
+  }
 
   @HostListener('window:scroll')
   onWindowScroll() {
@@ -128,18 +137,50 @@ export class ChaptersComponent implements OnInit {
       });
   }
 
-  loadChapter(id: string) {
+  async loadChapter(id: string) {
+    try {
+        const isDownloaded = await this.downloadService.isChapterDownloaded(id);
+        if (isDownloaded) {
+            const offlineChapter = await this.downloadService.getChapter(id);
+            if (offlineChapter) {
+                // Revoke old URLs
+                this.objectUrls.forEach(url => URL.revokeObjectURL(url));
+                this.objectUrls = [];
+
+                const pages = offlineChapter.pages.map((blob, index) => {
+                    const url = URL.createObjectURL(blob);
+                    this.objectUrls.push(url);
+                    return { index: index.toString(), path: url };
+                });
+
+                const offlineBook = await this.downloadService.getBook(offlineChapter.bookId);
+
+                const chapter: Chapter = {
+                    id: offlineChapter.id,
+                    bookId: offlineChapter.bookId,
+                    title: offlineChapter.title,
+                    index: offlineChapter.index,
+                    pages: pages,
+                    bookTitle: offlineBook?.title || '',
+                    totalChapters: offlineBook?.totalChapters || 0,
+                    originalUrl: '',
+                    next: offlineChapter.next,
+                    previous: offlineChapter.previous
+                };
+
+                this.chapter.set(chapter);
+                this.updateMetadata(chapter);
+                return;
+            }
+        }
+    } catch (e) {
+        console.error('Error loading offline chapter', e);
+    }
+
     this.chapterService.getChapter(id).subscribe({
       next: (chapter: Chapter) => {
         this.chapter.set(chapter);
-
-        if (chapter) {
-          this.metaDataService.setMetaData({
-            title: `${chapter.bookTitle} - ${chapter.title || 'Capítulo ' + chapter.index}`,
-            description: `Leia o capítulo ${chapter.index} de ${chapter.bookTitle}`,
-            image: chapter.pages?.[0]?.path || ''
-          });
-        }
+        this.updateMetadata(chapter);
       },
       error: (err: any) => {
         console.error('Erro ao carregar capítulo', err);
@@ -150,6 +191,16 @@ export class ChaptersComponent implements OnInit {
         });
       }
     });
+  }
+
+  private updateMetadata(chapter: Chapter) {
+      if (chapter) {
+          this.metaDataService.setMetaData({
+            title: `${chapter.bookTitle} - ${chapter.title || 'Capítulo ' + chapter.index}`,
+            description: `Leia o capítulo ${chapter.index} de ${chapter.bookTitle}`,
+            image: chapter.pages?.[0]?.path || ''
+          });
+        }
   }
 
   refreshChapter() {
@@ -200,9 +251,26 @@ export class ChaptersComponent implements OnInit {
     calculateProgress(clientX);
   }
 
-  nextPage() {
+  async nextPage() {
     const current = this.chapter();
     if (current?.next) {
+      const isNextDownloaded = await this.downloadService.isChapterDownloaded(current.next);
+      
+      if (!isNextDownloaded && !navigator.onLine) {
+        this.modalNotificationService.show(
+          'Você chegou ao fim',
+          'Você chegou ao último capítulo baixado e está sem internet.',
+          [
+            {
+              label: 'Entendi',
+              type: 'primary'
+            }
+          ],
+          'warning'
+        );
+        return;
+      }
+
       this.navigateToChapter(current.next);
     }
   }

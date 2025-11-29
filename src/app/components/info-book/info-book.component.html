@@ -27,6 +27,15 @@
 							[class.read]="chapter.read"
 						/>
 					</div>
+					<div class="download-container" (click)="$event.preventDefault(); $event.stopPropagation()">
+						@if(chaptersDownloadStatus.get(chapter.id) === 'downloaded') {
+							<app-icons name="check" class="icon-downloaded" />
+						} @else if (chaptersDownloadStatus.get(chapter.id) === 'downloading') {
+							<span class="download-progress">{{ chaptersDownloadProgress.get(chapter.id) | number:'1.0-0' }}%</span>
+						} @else {
+							<app-icons name="download" class="icon-download" (click)="downloadChapter(chapter, $event)"/>
+						}
+					</div>
 					<div
 						class="scraping-status"
 						[class.scrapingStatusReady]="

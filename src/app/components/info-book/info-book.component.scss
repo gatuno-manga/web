@@ -99,6 +99,32 @@
 				cursor: pointer;
 			}
 
+			.download-container {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				width: 24px;
+				height: 24px;
+
+				.icon-download {
+					&:hover {
+						color: var(--app-text-color);
+						opacity: 0.8;
+					}
+				}
+
+				.icon-downloaded {
+					color: var(--scraping-status-ready-color);
+				}
+
+				.download-progress {
+					font-size: 0.75rem;
+					font-weight: bold;
+					white-space: nowrap;
+				}
+			}
+
 			.scraping-status {
 				display: flex;
 				align-items: center;
