@@ -1,6 +1,8 @@
 @defer (when !isLoading()){
 <div class="controller">
-	<div></div>
+	<div class="mode-switch">
+		<app-select [items]="viewModeList" [select]="getViewModeIndex()" [disabled]="isOfflineMode" />
+	</div>
 	<div class="pages">
 		@for(page of pagesToShow; track page) {
 		<div
@@ -21,7 +23,7 @@
 	<app-item-book [book]="book" [type]="bookOptions" />
 	}@empty {
 	<div class="no-books">
-		<p>No books available.</p>
+		<p>Nenhum livro disponível.</p>
 	</div>
 	}
 </div>

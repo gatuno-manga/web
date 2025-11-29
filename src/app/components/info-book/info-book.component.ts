@@ -194,8 +194,28 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         this.chapters = chapters;
         this.checkDownloadedChapters();
       },
-      error: (error) => {
-        console.error('Error loading chapters:', error);
+      error: async (error) => {
+        console.error('Error loading chapters from API, trying offline:', error);
+        try {
+            const offlineChapters = await this.downloadService.getChaptersByBook(this.id);
+            if (offlineChapters && offlineChapters.length > 0) {
+                // Sort by index
+                offlineChapters.sort((a, b) => b.index - a.index); // Ou a.index - b.index dependendo da ordem desejada (DESC geralmente para manga)
+
+                this.chapters = offlineChapters.map(oc => ({
+                    id: oc.id,
+                    title: oc.title,
+                    index: oc.index,
+                    originalUrl: '',
+                    scrapingStatus: ScrapingStatus.READY,
+                    read: false 
+                }));
+                
+                this.chapters.forEach(c => this.chaptersDownloadStatus.set(c.id, 'downloaded'));
+            }
+        } catch (e) {
+            console.error('Error loading offline chapters', e);
+        }
       }
     });
   }

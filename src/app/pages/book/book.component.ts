@@ -10,6 +10,7 @@ import { InfoBookComponent } from '../../components/info-book/info-book.componen
 import { AsideComponent } from '../../components/aside/aside.component';
 import { ButtonComponent } from '../../components/inputs/button/button.component';
 import { BookWebsocketService } from '../../service/book-websocket.service';
+import { DownloadService } from '../../service/download.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -24,6 +25,7 @@ export class BookComponent implements OnInit, OnDestroy {
   admin = false;
   isLoading = signal(true);
   private wsSubscription?: Subscription;
+  private coverUrl?: string;
 
   constructor(
     private bookService: BookService,
@@ -32,7 +34,8 @@ export class BookComponent implements OnInit, OnDestroy {
     private metaService: MetaDataService,
     private modalService: ModalNotificationService,
     private userTokenService: UserTokenService,
-    private wsService: BookWebsocketService
+    private wsService: BookWebsocketService,
+    private downloadService: DownloadService
   ) {
     this.admin = this.userTokenService.isAdmin;
   }
@@ -57,8 +60,33 @@ export class BookComponent implements OnInit, OnDestroy {
         // Conecta ao WebSocket e inscreve no livro
         this.setupWebSocket(book.id);
       },
-      error: () => {
-        this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+      error: async () => {
+        try {
+          const offlineBook = await this.downloadService.getBook(id);
+          if (offlineBook) {
+            if (this.coverUrl) URL.revokeObjectURL(this.coverUrl);
+            this.coverUrl = URL.createObjectURL(offlineBook.cover);
+            
+            this.book = {
+              id: offlineBook.id,
+              title: offlineBook.title,
+              cover: this.coverUrl,
+              description: offlineBook.description,
+              publication: offlineBook.publication,
+              scrapingStatus: ScrapingStatus.READY,
+              tags: offlineBook.tags,
+              sensitiveContent: offlineBook.sensitiveContent,
+              totalChapters: offlineBook.totalChapters,
+              authors: offlineBook.authors || []
+            };
+            this.isLoading.set(false);
+            this.setMetaData();
+          } else {
+            this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+          }
+        } catch (e) {
+            this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+        }
       }
     });
   }
@@ -68,6 +96,9 @@ export class BookComponent implements OnInit, OnDestroy {
     this.wsSubscription?.unsubscribe();
     if (this.book) {
       this.wsService.unsubscribeFromBook(this.book.id);
+    }
+    if (this.coverUrl) {
+        URL.revokeObjectURL(this.coverUrl);
     }
   }
 
@@ -152,7 +183,7 @@ export class BookComponent implements OnInit, OnDestroy {
   }
 
   getAuthorNames(): string {
-    return this.book.authors.map(author => author.name).join(', ');
+    return this.book.authors?.map(author => author.name).join(', ') || '';
   }
   filterByTag(tagId: string) {
     this.router.navigate(['/books'], { queryParams: { tags: tagId } });

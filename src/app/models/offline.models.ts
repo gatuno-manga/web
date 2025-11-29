@@ -1,9 +1,12 @@
-import { tag, SensitiveContentResponse } from './book.models';
+import { tag, SensitiveContentResponse, Author } from './book.models';
 
 export interface OfflineBook {
   id: string;
   title: string;
   cover: Blob;
+  description: string;
+  publication: number;
+  authors: Author[];
   tags: tag[];
   sensitiveContent: SensitiveContentResponse[];
   totalChapters: number;

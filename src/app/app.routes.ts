@@ -7,6 +7,7 @@ import { ChaptersComponent } from './pages/chapters/chapters.component';
 import { HomeComponent } from './pages/home/home.component';
 import { OutletComponent as OutletAuht } from './pages/auth/outlet/outlet.component';
 import { OutletComponent as OutletUser } from './pages/user/outlet/outlet.component';
+import { networkGuard } from './guards/network.guard';
 
 export const routes: Routes = [
   {
@@ -87,6 +88,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DefaltOutletComponent,
+    canActivate: [networkGuard],
     loadChildren: () =>
       import('./pages/dashboard/dashboard.routes').then(
         (module_) => module_.routes,

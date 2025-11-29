@@ -5,6 +5,7 @@ import { CheckboxComponent } from '../../../components/inputs/checkbox/checkbox.
 import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
 import { ListSwitchComponent } from '../../../components/inputs/list-switch/list-switch.component';
 import { MetaDataService } from '../../../service/meta-data.service';
+import { DownloadService } from '../../../service/download.service';
 
 @Component({
   selector: 'app-filter',
@@ -23,13 +24,41 @@ export class FilterComponent {
 
   constructor(
     private readonly sensitiveContentService: SensitiveContentService,
-    private readonly metaService: MetaDataService
+    private readonly metaService: MetaDataService,
+    private readonly downloadService: DownloadService
   ) {
-    this.sensitiveContentService.getSensitiveContent().subscribe((list) => {
-      this.sensitiveContentList = [...this.sensitiveContentList, ...list];
-    });
+    this.loadSensitiveContent();
     this.allowContent = this.sensitiveContentService.getContentAllow();
     this.setMetaData();
+  }
+
+  loadSensitiveContent() {
+    this.sensitiveContentService.getSensitiveContent().subscribe({
+      next: (list) => {
+        this.sensitiveContentList = [...this.sensitiveContentList, ...list];
+      },
+      error: async () => {
+        try {
+          const offlineBooks = await this.downloadService.getAllBooks();
+          const contentMap = new Map<string, SensitiveContentResponse>();
+          
+          offlineBooks.forEach(book => {
+            if (book.sensitiveContent) {
+              book.sensitiveContent.forEach(sc => {
+                contentMap.set(sc.id, sc);
+              });
+            }
+          });
+          
+          const offlineList = Array.from(contentMap.values());
+          // Remove duplicates that might be in initial list (like 'safe' if it comes from books too, though unlikely with id '1')
+          // Actually, just appending unique ones found offline.
+          this.sensitiveContentList = [...this.sensitiveContentList, ...offlineList];
+        } catch (e) {
+          console.error('Error loading offline sensitive content', e);
+        }
+      }
+    });
   }
 
   setMetaData() {

@@ -63,6 +63,9 @@ export class DownloadService {
       id: book.id,
       title: book.title,
       cover: coverBlob,
+      description: book.description,
+      publication: book.publication,
+      authors: book.authors,
       tags: book.tags,
       sensitiveContent: book.sensitiveContent,
       totalChapters: totalChapters,
@@ -75,6 +78,12 @@ export class DownloadService {
     if (!this.dbPromise) return undefined;
     const db = await this.dbPromise;
     return db.get('books', bookId);
+  }
+
+  async getAllBooks(): Promise<OfflineBook[]> {
+    if (!this.dbPromise) return [];
+    const db = await this.dbPromise;
+    return db.getAll('books');
   }
 
   async getChapter(chapterId: string): Promise<OfflineChapter | undefined> {
