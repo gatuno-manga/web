@@ -1,38 +1,26 @@
-FROM node:22-alpine AS deps
+FROM node:24.11.1-alpine AS builder
+
 WORKDIR /usr/src/app
+
+ENV NG_CLI_ANALYTICS=false
 
 COPY package*.json ./
 
-RUN mkdir -p /usr/src/app/node_modules && chown -R node:node /usr/src/app
-
-USER node
-
-RUN npm ci --only=production
-
-FROM node:22-alpine AS builder
-WORKDIR /usr/src/app
-
-COPY --chown=node:node --from=deps /usr/src/app/node_modules ./node_modules
-
-COPY --chown=node:node . .
-
-RUN chown -R node:node /usr/src/app
-
-USER node
-
 RUN npm ci
+
+COPY . .
 
 RUN npm run build
 
-FROM node:22-alpine AS runtime
+FROM node:24.11.1-alpine AS runtime
+
 WORKDIR /usr/src/app
-USER node
 
 ENV NODE_ENV=production
 
-COPY --chown=node:node --from=builder /usr/src/app/dist ./dist
+USER node
 
-COPY --chown=node:node --from=deps /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /usr/src/app/dist ./dist
 
 EXPOSE 4000
 

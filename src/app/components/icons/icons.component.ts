@@ -1,98 +1,58 @@
-// Compatibilidade SSR: use verificações de plataforma e dependências do Node apenas quando disponíveis
-import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, Inject, Input, PLATFORM_ID, SimpleChanges } from '@angular/core';
+import { Component, input, inject, effect, SecurityContext, ElementRef, viewChild, signal } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-let fs: any;
-if (typeof require !== 'undefined') {
-  try {
-    fs = require('fs');
-  } catch {}
-}
+import { IconRegistryService } from '@service/icon-registry.service';
 
 @Component({
   selector: 'app-icons',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './icons.component.html',
   styleUrl: './icons.component.scss'
 })
 export class IconsComponent {
-  @Input() name!: string;
-  @Input() size: string = '24';
-  @Input() color: string = 'currentColor';
-  @Input() background: string = 'none';
-  @Input() stroke: string = '2';
-  @Input() modifier: boolean = true;
+  private registry = inject(IconRegistryService);
+  private sanitizer = inject(DomSanitizer);
+  private el = inject(ElementRef);
 
-  svgContent: SafeHtml = '';
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private cdr: ChangeDetectorRef
-  ) {}
+  name = input<string>();
+  size = input<string>('24px');
+  color = input<string>('currentColor');
+  stroke = input<string>('1');
+  background = input<string>('none');
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.loadIcon();
-  }
+  protected svgContent = signal<SafeHtml>('');
 
-  private loadIcon(): void {
-    const iconPath = `/assets/icons/${this.name}.svg`;
-    if (isPlatformBrowser(this.platformId)) {
-      this.http.get(iconPath, { responseType: 'text' }).subscribe({
+  constructor() {
+    effect(() => {
+      const iconName = this.name();
+      if (!iconName) return;
+
+      this.registry.getIcon(iconName).subscribe({
         next: (svg) => {
-          svg = this.applySvgAttributes(svg);
-          this.svgContent = this.sanitizer.bypassSecurityTrustHtml(svg);
-          this.cdr.markForCheck();
+          const safeSvg = this.sanitizer.bypassSecurityTrustHtml(svg);
+          this.svgContent.set(safeSvg);
         },
-        error: (error) => {
-          console.error(`Erro ao carregar o ícone: ${this.name}`, error);
-          this.svgContent = '';
+        error: () => {
+          this.svgContent.set('');
         }
       });
-    } else if (isPlatformServer(this.platformId)) {
-      try {
-        const fs = require('fs');
-        const path = require('path');
+    });
 
-        const possiblePaths = [
-          path.join(process.cwd(), 'dist', 'front', 'browser', 'assets', 'icons', `${this.name}.svg`), // Docker prod
-          path.join(process.cwd(), 'dist', 'browser', 'assets', 'icons', `${this.name}.svg`),           // Build local
-          path.join(process.cwd(), 'public', 'assets', 'icons', `${this.name}.svg`)                     // Dev mode
-        ];
+    effect(() => {
+      const style = this.el.nativeElement.style;
 
-        let iconPath = possiblePaths.find(p => fs.existsSync(p));
+      style.setProperty('--icon-size', this.ensureUnits(this.size()));
+      style.setProperty('--icon-fill', this.color());
 
-        if (!iconPath) {
-          console.warn(`Ícone não encontrado no SSR: ${this.name}. Tentou: ${possiblePaths.join(', ')}`);
-          this.svgContent = '';
-          return;
-        }
-
-        let svg = fs.readFileSync(iconPath, 'utf8');
-        svg = this.applySvgAttributes(svg);
-        this.svgContent = this.sanitizer.bypassSecurityTrustHtml(svg);
-        this.cdr.markForCheck();
-      } catch (error) {
-        console.error(`Erro ao carregar o ícone no SSR: ${this.name}`, error);
-        this.svgContent = '';
+      if (this.stroke()) {
+        style.setProperty('--icon-stroke', this.stroke());
+      } else {
+        style.removeProperty('--icon-stroke');
       }
-    } else {
-      this.svgContent = '';
-    }
+    });
   }
 
-  private applySvgAttributes(svg: string): string {
-    let result = svg
-      .replace(/width=".*?"/, `width="${this.size}"`)
-      .replace(/height=".*?"/, `height="${this.size}"`);
-    if (this.modifier) {
-      result = result
-        .replace(/stroke=".*?"/, `stroke="${this.color}"`)
-        .replace(/fill=".*?"/, `fill="${this.background}"`)
-        .replace(/stroke-width=".*?"/, `stroke-width="${this.stroke}"`);
-    }
-    return result;
+  private ensureUnits(value: string): string {
+    return value && !isNaN(Number(value)) ? `${value}px` : value;
   }
 }

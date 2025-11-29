@@ -4,14 +4,11 @@ import { loginRequest, loginResponse, registerRequest } from "../models/user.mod
 import { tap } from "rxjs";
 import { CookieService } from "./cookie.service";
 import { UserTokenService } from "./user-token.service";
-import { TokenRefreshTimerService } from "./token-refresh-timer.service";
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthService {
-    private tokenRefreshTimer = inject(TokenRefreshTimerService);
-
     constructor(
         private readonly http: HttpClient,
         private readonly userTokenService: UserTokenService
@@ -26,7 +23,6 @@ export class AuthService {
                 tap(({ body }) => {
                     if (body) {
                         this.userTokenService.setTokens(body.accessToken, body.refreshToken);
-                        this.tokenRefreshTimer.startAutoRefresh();
                     }
                 })
             );
@@ -41,7 +37,6 @@ export class AuthService {
             .pipe(
                 tap(() => {
                     this.userTokenService.removeTokens();
-                    this.tokenRefreshTimer.stopAutoRefresh();
                 })
             );
     }
@@ -57,7 +52,6 @@ export class AuthService {
                 tap(({ body }) => {
                     if (body) {
                         this.userTokenService.setTokens(body.accessToken, body.refreshToken);
-                        this.tokenRefreshTimer.startAutoRefresh();
                     }
                 })
             );

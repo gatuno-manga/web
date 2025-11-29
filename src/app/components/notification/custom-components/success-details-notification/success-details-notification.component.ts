@@ -1,13 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
-/**
- * Componente personalizado para notificação de sucesso com detalhes
- */
+
 @Component({
     selector: 'app-success-details-notification',
     standalone: true,
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './success-details-notification.component.html',
     styleUrls: ['./success-details-notification.component.scss']
 })

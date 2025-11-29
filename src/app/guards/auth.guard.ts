@@ -12,7 +12,7 @@ export class AuthenticateGuard {
   ) {}
 
   isLogged(route?: ActivatedRouteSnapshot, state?: RouterStateSnapshot): boolean {
-    if (!this.tokenService.hasToken) {
+    if (!this.tokenService.hasValidAccessToken) {
       this.tokenService.refreshTokens().subscribe({
         next: () => {
           this.router.navigate(['']);
@@ -28,7 +28,7 @@ export class AuthenticateGuard {
   }
 
   isNotLogged(): boolean {
-    if (this.tokenService.hasToken) {
+    if (this.tokenService.hasValidAccessToken) {
       this.router.navigate(['']);
       return false;
     }

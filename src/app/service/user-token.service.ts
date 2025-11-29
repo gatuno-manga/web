@@ -1,123 +1,134 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject, PLATFORM_ID, NgZone } from "@angular/core";
+import { isPlatformBrowser } from "@angular/common";
 import { CookieService } from "./cookie.service";
 import { HttpClient } from "@angular/common/http";
+import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { payloadToken, Role } from "../models/user.models";
-import { Observable, of } from 'rxjs';
-import { shareReplay, switchMap, tap } from 'rxjs/operators';
+import { Observable, Subscription, timer } from 'rxjs';
+import { shareReplay, tap, finalize } from 'rxjs/operators';
+import { NotificationService } from './notification.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class UserTokenService {
-    ACCESSKEY = 'accessToken';
-    REFRESHKEY = 'refreshToken';
-    private refreshObservable: Observable<{ accessToken: string, refreshToken: string }> | null = null;
+    private http = inject(HttpClient);
+    private cookieService = inject(CookieService);
+    private platformId = inject(PLATFORM_ID);
+    private ngZone = inject(NgZone);
 
-    constructor(
-        private readonly http: HttpClient,
-        private cookieService: CookieService
-    ) {}
+    private router = inject(Router);
+    private notificationService = inject(NotificationService);
+
+    private readonly ACCESSKEY = 'accessToken';
+    private readonly REFRESHKEY = 'refreshToken';
+    private readonly REFRESH_MARGIN_SEC = 60;
+
+    private refreshObservable: Observable<{ accessToken: string, refreshToken: string }> | null = null;
+    private refreshSubscription?: Subscription;
+
+    constructor() {
+        if (this.hasValidAccessToken) {
+            this.scheduleAutoRefresh();
+        }
+    }
 
     setTokens(accessToken: string, refreshToken: string) {
         this.cookieService.set(this.ACCESSKEY, accessToken, false);
         this.cookieService.set(this.REFRESHKEY, refreshToken, false);
+        this.scheduleAutoRefresh();
     }
 
-    removeAccessToken(): void {
+    removeTokens(notifyUser = false): void {
+        this.stopAutoRefresh();
         this.cookieService.delete(this.ACCESSKEY, false);
-    }
-
-    removeRefreshToken(): void {
         this.cookieService.delete(this.REFRESHKEY, false);
+
+        if (notifyUser) {
+            this.handleSessionExpired();
+        }
     }
 
-    removeTokens(): void {
-        this.removeAccessToken();
-        this.removeRefreshToken();
+    private handleSessionExpired() {
+        this.ngZone.run(() => {
+            this.notificationService.show(
+                'Sua sessão expirou por inatividade. Por favor, faça login novamente.',
+                'warning'
+            );
+            this.router.navigate(['/auth/login'], {
+                queryParams: { sessionExpired: 'true' }
+            });
+        });
     }
 
-    get accessToken(): string | null {
-        return this.cookieService.get(this.ACCESSKEY, false)
+    get accessToken(): string | null { return this.cookieService.get(this.ACCESSKEY, false); }
+    get refreshToken(): string | null { return this.cookieService.get(this.REFRESHKEY, false); }
+
+    get hasValidAccessToken(): boolean {
+        const token = this.accessToken;
+        return !!token && this.isTokenValid(token);
     }
-    get refreshToken(): string | null {
-        return this.cookieService.get(this.REFRESHKEY, false);
+
+    get hasValidRefreshToken(): boolean {
+        const token = this.refreshToken;
+        return !!token && this.isTokenValid(token);
     }
 
     private isTokenValid(token: string): boolean {
         try {
-            const { exp, iss } = jwtDecode<payloadToken>(token);
+            const { exp } = jwtDecode<payloadToken>(token);
             if (!exp) return false;
+            return exp > Math.floor(Date.now() / 1000);
+        } catch { return false; }
+    }
 
-            const currentTime = Math.floor(Date.now() / 1000);
-            return exp > currentTime && iss === 'login';
-        } catch (error) {
-            return false;
+    private scheduleAutoRefresh() {
+        if (!isPlatformBrowser(this.platformId) || !this.accessToken) return;
+        this.stopAutoRefresh();
+
+        try {
+            const { exp } = jwtDecode<payloadToken>(this.accessToken);
+            if (!exp) return;
+
+            const expiresAtMs = exp * 1000;
+            const nowMs = Date.now();
+            const marginMs = this.REFRESH_MARGIN_SEC * 1000;
+            const timeToRefresh = expiresAtMs - nowMs - marginMs;
+
+            if (timeToRefresh > 0) {
+                this.ngZone.runOutsideAngular(() => {
+                    this.refreshSubscription = timer(timeToRefresh).subscribe(() => {
+                        this.ngZone.run(() => {
+                            this.refreshTokens().subscribe({
+                                error: () => {
+                                    console.warn('Auto-refresh falhou. Encerrando sessão.');
+                                    this.removeTokens(true);
+                                }
+                            });
+                        });
+                    });
+                });
+            } else {
+                if (this.isTokenValid(this.accessToken)) {
+                    this.refreshTokens().subscribe({
+                        error: () => this.removeTokens(true)
+                    });
+                } else {
+                    this.removeTokens(true);
+                }
+            }
+        } catch (e) {
+            console.error(e);
+            this.removeTokens(false);
         }
     }
 
-    get hasToken() {
-        const token = this.accessToken;
-        if (!token) return false;
-
-        if (!this.isTokenValid(token)) {
-            console.warn('Token inválido ou expirado');
-            this.refreshTokens().pipe(
-                switchMap(({ accessToken, refreshToken }) => {
-                    this.setTokens(accessToken, refreshToken);
-                    return of(true);
-                })
-            );
-            return false;
+    private stopAutoRefresh() {
+        if (this.refreshSubscription) {
+            this.refreshSubscription.unsubscribe();
+            this.refreshSubscription = undefined;
         }
-        return true;
-    }
-
-    get hasValidAccessToken() {
-        const token = this.accessToken;
-        if (!token) return false;
-        return this.isTokenValid(token);
-    }
-
-    get hasValidRefreshToken() {
-        const token = this.refreshToken;
-        if (!token) return false;
-        return this.isTokenValid(token);
-    }
-
-    get timeToExpire() {
-        const token = this.accessToken;
-        if (!token) return 0;
-        const { exp } = jwtDecode<payloadToken>(token);
-        if (!exp) return 0;
-        return exp;
-    }
-
-    get userId() {
-        const token = this.accessToken;
-        if (!token) return 0;
-        const { sub } = jwtDecode<payloadToken>(token);
-        if (!sub) return 0;
-        return sub;
-    }
-
-    private hasRole(role: Role): boolean {
-        const token = this.accessToken;
-        if (!token) return false;
-
-        if (!this.isTokenValid(token)) {
-            this.removeAccessToken();
-            return false;
-        }
-
-        const { roles } = jwtDecode<payloadToken>(token);
-        if (!roles) return false;
-
-        return Array.isArray(roles) && roles.includes(role);
-    }
-
-    isAdmin(): boolean {
-        return this.hasRole(Role.ADMIN);
     }
 
     refreshTokens() {
@@ -125,16 +136,30 @@ export class UserTokenService {
             this.refreshObservable = this.http.get<{ accessToken: string, refreshToken: string }>('/auth/refresh', { withCredentials: true })
                 .pipe(
                     tap(({ accessToken, refreshToken }) => {
-                        console.log('Tokens refreshed successfully');
                         this.setTokens(accessToken, refreshToken);
                     }),
-                    shareReplay(1)
+                    shareReplay(1),
+                    finalize(() => {
+                        this.refreshObservable = null;
+                    })
                 );
-            this.refreshObservable.subscribe({
-                complete: () => this.refreshObservable = null,
-                error: () => this.refreshObservable = null
-            });
         }
         return this.refreshObservable;
+    }
+
+    private hasRole(role: Role): boolean {
+        const token = this.accessToken;
+        if (!token) return false;
+
+        try {
+            const { roles } = jwtDecode<payloadToken>(token);
+            return roles.includes(role);
+        } catch {
+            return false;
+        }
+    }
+
+    get isAdmin(): boolean {
+        return this.hasRole(Role.ADMIN);
     }
 }

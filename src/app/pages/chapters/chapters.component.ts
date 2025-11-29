@@ -1,4 +1,15 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  inject,
+  signal,
+  viewChild,
+  ChangeDetectionStrategy,
+  computed,
+  effect
+} from '@angular/core';
 import { Chapter } from '../../models/book.models';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
@@ -12,301 +23,227 @@ import { ButtonComponent } from '../../components/inputs/button/button.component
 import { AsideComponent } from '../../components/aside/aside.component';
 import { MetaDataService } from '../../service/meta-data.service';
 import { SettingsService } from '../../service/settings.service';
-import { ReaderSettings } from '../../models/settings.models';
-import { Subscription } from 'rxjs';
 import { NotificationSeverity } from 'app/service/notification';
 import { ReaderSettingsNotificationComponent } from '@components/notification/custom-components';
 import { BookWebsocketService } from '../../service/book-websocket.service';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-chapters',
-  imports: [IconsComponent, HeaderComponent, RouterModule, NgClass, DecimalPipe, ButtonComponent, AsideComponent],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    IconsComponent,
+    HeaderComponent,
+    RouterModule,
+    NgClass,
+    DecimalPipe,
+    ButtonComponent,
+    AsideComponent
+  ],
   templateUrl: './chapters.component.html',
   styleUrl: './chapters.component.scss'
 })
-export class ChaptersComponent implements OnInit, OnDestroy {
-  chapter?: Chapter;
-  showBtnTop = false;
-  readingProgress = 0;
-  private lastScrollTop = 0;
-  private scrollThreshold = 1500;
-  private readonly BOTTOM_THRESHOLD = 100;
-  admin = false;
-  settings: ReaderSettings;
-  filterStyle: string = '';
-  private settingsSubscription?: Subscription;
-  private wsSubscription?: Subscription;
+export class ChaptersComponent implements OnInit {
+  private activatedRoute = inject(ActivatedRoute);
+  private chapterService = inject(ChapterService);
+  private userTokenService = inject(UserTokenService);
+  private modalNotificationService = inject(ModalNotificationService);
+  private notificationService = inject(NotificationService);
+  private metaDataService = inject(MetaDataService);
+  private settingsService = inject(SettingsService);
+  private bookWebsocketService = inject(BookWebsocketService);
+  private router = inject(Router);
 
-  constructor(
-    private chapterService: ChapterService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private userTokenService: UserTokenService,
-    private metaService: MetaDataService,
-    private modalService: ModalNotificationService,
-    private notificationService: NotificationService,
-    private settingsService: SettingsService,
-    private wsService: BookWebsocketService
-  ) {
-    this.admin = this.userTokenService.isAdmin();
-    this.settings = this.settingsService.getSettings();
-  }
+  // Queries
+  progressBarRef = viewChild<ElementRef>('progressBarRef');
 
-  ngOnInit() {
-    this.settingsSubscription = this.settingsService.settings$.subscribe(
-      settings => {
-        this.settings = settings;
-        this.filterStyle = this.buildFilter(settings);
-      }
-    );
+  // State Signals
+  chapter = signal<Chapter | null>(null);
+  readingProgress = signal<number>(0);
+  showBtnTop = signal<boolean>(false);
 
-    this.activatedRoute.paramMap.subscribe(params => {
-      const id = params.get('id');
-      const chapterId = params.get('chapter');
-      if (!id || !chapterId) {
-        this.router.navigate(['../'], { relativeTo: this.activatedRoute });
-        return;
-      }
-      this.chapterService.getChapter(chapterId).subscribe((chapter: Chapter) => {
-        this.chapter = chapter;
-        this.setMetaData();
+  // Converte o Observable de settings para Signal
+  settings = toSignal(this.settingsService.settings$, {
+    initialValue: this.settingsService.getSettings()
+  });
 
-        // Setup WebSocket para o capítulo
-        this.setupWebSocket(chapterId, id);
+  // Computed
+  filterStyle = computed(() => {
+    const s = this.settings();
+    const parts: string[] = [];
+    if (s.brightness != null) parts.push(`brightness(${s.brightness}%)`);
+    if (s.contrast != null) parts.push(`contrast(${s.contrast}%)`);
+    if (s.grayScale) parts.push(`grayscale(100%)`);
+    if (s.invert != null && s.invert > 0) parts.push(`invert(${s.invert}%)`);
+    return parts.length > 0 ? parts.join(' ') : 'none';
+  });
+
+  admin = this.userTokenService.isAdmin;
+
+  constructor() {
+    this.activatedRoute.paramMap
+      .pipe(takeUntilDestroyed())
+      .subscribe((params) => {
+        const chapterId = params.get('chapter');
+        const bookId = params.get('id');
+
+        if (chapterId) {
+          this.loadChapter(chapterId);
+          if (bookId) {
+            this.setupWebSocket(chapterId, bookId);
+          }
+        } else {
+          this.backPage();
+        }
       });
-    });
   }
 
-  ngOnDestroy() {
-    this.settingsSubscription?.unsubscribe();
-    this.wsSubscription?.unsubscribe();
-    if (this.chapter) {
-      this.wsService.unsubscribeFromChapter(this.chapter.id);
+  ngOnInit(): void {}
+
+  @HostListener('window:scroll')
+  onWindowScroll() {
+    const scrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
+    const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+
+    this.showBtnTop.set(scrollPosition > 400);
+
+    if (windowHeight > 0) {
+      const progress = (scrollPosition / windowHeight) * 100;
+      this.readingProgress.set(progress);
     }
   }
 
   private setupWebSocket(chapterId: string, bookId: string) {
-    // Conecta se ainda não estiver conectado
-    if (!this.wsService.isConnected()) {
-      this.wsService.connect();
+    if (!this.bookWebsocketService.isConnected()) {
+      this.bookWebsocketService.connect();
     }
 
-    // Observa eventos do capítulo
-    this.wsSubscription = this.wsService.watchChapter(chapterId, bookId).subscribe(event => {
-      console.log('📡 Evento recebido no capítulo:', event.type, event.data);
-
-      switch (event.type) {
-        case 'chapter.updated':
-          console.log('📖 Capítulo atualizado em tempo real');
+    this.bookWebsocketService.watchChapter(chapterId, bookId)
+      .pipe(takeUntilDestroyed())
+      .subscribe((event: any) => {
+        if (event.type === 'chapter.updated' || event.type === 'chapter.scraping.completed') {
           this.refreshChapter();
-          break;
-
-        case 'chapter.scraping.started':
-          console.log('🔄 Scraping iniciado para este capítulo');
-          break;
-
-        case 'chapter.scraping.completed':
-          console.log('✅ Scraping completo! Novas páginas disponíveis:', event.data.pagesCount);
-          this.refreshChapter();
-          break;
-
-        case 'chapter.scraping.failed':
-          console.error('❌ Scraping falhou:', event.data.error);
-          break;
-      }
-    });
-  }
-
-  private refreshChapter() {
-    if (this.chapter) {
-      this.chapterService.getChapter(this.chapter.id).subscribe({
-        next: (chapter) => {
-          this.chapter = chapter;
-          console.log('♻️ Capítulo recarregado');
         }
       });
-    }
   }
 
-  private buildFilter(settings: ReaderSettings): string {
-    const parts: string[] = [];
-    if (settings.brightness != null) {
-      parts.push(`brightness(${settings.brightness}%)`);
-    }
-    if (settings.contrast != null) {
-      parts.push(`contrast(${settings.contrast}%)`);
-    }
-    if (settings.grayScale) {
-      parts.push(`grayscale(100%)`);
-    }
-    if (settings.invert != null && settings.invert > 0) {
-      parts.push(`invert(${settings.invert}%)`);
-    }
-    const filter = parts.length > 0 ? parts.join(' ') : 'none';
-    try {
-      console.debug('[Chapters] buildFilter ->', filter, settings);
-    } catch (e) {}
-    return filter;
-  }
+  loadChapter(id: string) {
+    this.chapterService.getChapter(id).subscribe({
+      next: (chapter: Chapter) => {
+        this.chapter.set(chapter);
 
-  private formatNumber(value: number): string {
-    return Number(value).toLocaleString('pt-BR', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+        if (chapter) {
+          this.metaDataService.setMetaData({
+            title: `${chapter.bookTitle} - ${chapter.title || 'Capítulo ' + chapter.index}`,
+            description: `Leia o capítulo ${chapter.index} de ${chapter.bookTitle}`,
+            image: chapter.pages?.[0]?.path || ''
+          });
+        }
+      },
+      error: (err: any) => {
+        console.error('Erro ao carregar capítulo', err);
+        this.notificationService.notify({
+          message: 'Erro ao carregar o capítulo.',
+          level: 'custom',
+          severity: NotificationSeverity.CRITICAL
+        });
+      }
     });
   }
 
-  setMetaData() {
-    const defaultImage = this.chapter?.pages?.[0]?.path || '';
-
-    this.metaService.setMetaData({
-      title: this.chapter ? `Capitulo ${this.formatNumber(this.chapter.index)} | ${this.chapter.bookTitle}` : 'Capítulo',
-      description: this.chapter ? `Ler online o capítulo ${this.formatNumber(this.chapter.index)} do livro ${this.chapter.bookTitle}.` : 'Capítulo',
-      image: defaultImage,
-    })
-  }
-
-  backPage() {
-    this.router.navigate(['../'], { relativeTo: this.activatedRoute }).then(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  nextPage() {
-    if (this.chapter?.next) {
-      this.router.navigate(['../', this.chapter.next], { relativeTo: this.activatedRoute }).then(() => {
-        window.scrollTo({ top: 0 });
-      });
-    }
-  }
-  previousPage() {
-    if (this.chapter?.previous) {
-      this.router.navigate(['../', this.chapter.previous], { relativeTo: this.activatedRoute }).then(() => {
-        window.scrollTo({ top: 0 });
-      });
-    }
-  }
-
-  scrolledUpAmount = 0;
-
-  @HostListener('window:scroll', [])
-  onWindowScroll() {
-    const st = window.pageYOffset || document.documentElement.scrollTop;
-    if (st < this.lastScrollTop) {
-      this.scrolledUpAmount += this.lastScrollTop - st;
-    } else {
-      this.scrolledUpAmount = 0;
-    }
-    this.showBtnTop = this.scrolledUpAmount > this.scrollThreshold;
-    this.lastScrollTop = st <= 0 ? 0 : st;
-
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollableHeight = documentHeight - windowHeight;
-
-    if (scrollableHeight > 0) {
-      this.readingProgress = Math.min((scrollTop / scrollableHeight) * 100, 100);
-    } else {
-      this.readingProgress = 0;
-    }
-  }
-
-  @HostListener('window:keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent) {
-
-    // Ctrl + Alt + Seta para cima/baixo: pula de página em página
-    if (event.ctrlKey && event.altKey) {
-      if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        this.scrollToTop();
-        return;
-      } else if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        return;
-      }
-    }
-
-    // Ctrl + Seta para cima/baixo: pula de página em página (imagens do capítulo)
-    if (event.ctrlKey) {
-      if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        this.scrollToPreviousImage();
-        return;
-      } else if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        this.scrollToNextImage();
-        return;
-      }
-    }
-
-    const isAtBottom = (window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - this.BOTTOM_THRESHOLD;
-
-    if (isAtBottom && event.key === 'ArrowRight') {
-      event.preventDefault();
-      this.nextPage();
-    } else if (window.pageYOffset <= this.BOTTOM_THRESHOLD && event.key === 'ArrowLeft') {
-      event.preventDefault();
-      this.previousPage();
-    }
-  }
-
-  scrollToNextImage() {
-    const delta = Math.floor(window.innerHeight * 0.7);
-    const maxScroll = Math.max(document.body.scrollHeight - window.innerHeight, 0);
-    const target = Math.min(window.pageYOffset + delta, maxScroll);
-    window.scrollTo({ top: target, behavior: 'smooth' });
-  }
-
-  scrollToPreviousImage() {
-    const delta = Math.floor(window.innerHeight * 0.7);
-    const target = Math.max(window.pageYOffset - delta, 0);
-    window.scrollTo({ top: target, behavior: 'smooth' });
-  }
-
-  clearScrolledUpAmount() {
-    this.scrolledUpAmount = 0;
-    this.showBtnTop = false;
+  refreshChapter() {
+    const current = this.chapter();
+    if (current) this.loadChapter(current.id);
   }
 
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  startDrag(event: MouseEvent | TouchEvent) {
+    const progressBar = this.progressBarRef()?.nativeElement;
+    if (!progressBar) return;
+
+    const calculateProgress = (clientX: number) => {
+      const rect = progressBar.getBoundingClientRect();
+      const offsetX = clientX - rect.left;
+      let percentage = (offsetX / rect.width) * 100;
+      percentage = Math.max(0, Math.min(100, percentage));
+
+      this.readingProgress.set(percentage);
+
+      const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollTo = (percentage / 100) * windowHeight;
+      window.scrollTo({ top: scrollTo, behavior: 'auto' });
+    };
+
+    const onMove = (moveEvent: MouseEvent | TouchEvent) => {
+      moveEvent.preventDefault();
+      const clientX = 'touches' in moveEvent ? moveEvent.touches[0].clientX : (moveEvent as MouseEvent).clientX;
+      calculateProgress(clientX);
+    };
+
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onUp);
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onUp);
+
+    const clientX = 'touches' in event ? event.touches[0].clientX : (event as MouseEvent).clientX;
+    calculateProgress(clientX);
+  }
+
+  nextPage() {
+    const current = this.chapter();
+    if (current?.next) {
+      this.navigateToChapter(current.next);
+    }
+  }
+
+  previousPage() {
+    const current = this.chapter();
+    if (current?.previous) {
+      this.navigateToChapter(current.previous);
+    }
+  }
+
+  private navigateToChapter(chapterId: string) {
+    this.router.navigate(['../', chapterId], { relativeTo: this.activatedRoute }).then(() => {
+      this.scrollToTop();
+    });
+  }
+
+  backPage() {
+    this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+  }
+
   resetChapter() {
-    if (this.chapter) {
-      this.modalService.show(
+    const current = this.chapter();
+    if (current) {
+      this.modalNotificationService.show(
         'Redefinir Capítulo',
-        `Tem certeza que deseja redefinir o capítulo\n"${this.chapter.bookTitle} (${this.formatNumber(this.chapter.index)})"?\nEsta ação não pode ser desfeita.`,
+        `Tem certeza que deseja redefinir este capítulo?`,
         [
-          {
-            label: 'Cancelar',
-            type: 'primary',
-          },
+          { label: 'Cancelar', type: 'primary' },
           {
             label: 'Redefinir',
             type: 'danger',
             callback: () => {
-              this.confirmResetChapter();
+              this.chapterService.resetChapter(current.id).subscribe(() => {
+                this.backPage();
+              });
             }
           }
         ],
         'warning'
       );
-    }
-  }
-  confirmResetChapter() {
-    if (this.chapter) {
-      this.chapterService.resetChapter(this.chapter.id).subscribe(() => {
-        this.router.navigate(['../'], { relativeTo: this.activatedRoute });
-      });
-    }
-  }
-
-  openOriginalLink() {
-    if (this.chapter && this.chapter.originalUrl) {
-      window.open(this.chapter.originalUrl, '_blank');
     }
   }
 
@@ -325,14 +262,10 @@ export class ChaptersComponent implements OnInit, OnDestroy {
     });
   }
 
-  goToPage(index: number) {
-    if (this.chapter && this.chapter.pages && index >= 0 && index < this.chapter.pages.length) {
-      const pageElement = document.getElementById(`page-${index}`);
-      if (pageElement) {
-        const yOffset = -15;
-        const y = pageElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      }
+  openOriginalLink() {
+    const current = this.chapter();
+    if (current && current.originalUrl) {
+      window.open(current.originalUrl, '_blank');
     }
   }
 }

@@ -1,13 +1,13 @@
 import { Component, ElementRef, EventEmitter, Input, Output, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 
 export type SelectOption = { value: any; label: string };
 
 @Component({
     selector: 'app-select',
     standalone: true,
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './select.component.html',
     styleUrls: ['./select.component.scss'],
     providers: [

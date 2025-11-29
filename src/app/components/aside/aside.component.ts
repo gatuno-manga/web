@@ -1,11 +1,11 @@
 import { Component, HostListener, OnInit, OnDestroy, Input, PLATFORM_ID, Inject, OnChanges, SimpleChanges } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-aside',
-  imports: [IconsComponent, CommonModule],
+  imports: [IconsComponent],
   templateUrl: './aside.component.html',
   styleUrl: './aside.component.scss'
 })

@@ -12,14 +12,15 @@ describe('SuccessDetailsNotificationComponent', () => {
 
         fixture = TestBed.createComponent(SuccessDetailsNotificationComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
     });
 
     it('should create', () => {
+        fixture.detectChanges();
         expect(component).toBeTruthy();
     });
 
     it('should display default title', () => {
+        fixture.detectChanges();
         const compiled = fixture.nativeElement;
         expect(compiled.querySelector('h2')?.textContent).toBe('Sucesso!');
     });
@@ -93,14 +94,13 @@ describe('SuccessDetailsNotificationComponent', () => {
         component.actionLabel = 'Ação';
         component.actionCallback = mockCallback;
         fixture.detectChanges();
-
         const button = fixture.nativeElement.querySelector('.action-button');
         button.click();
-
         expect(mockCallback).toHaveBeenCalled();
     });
 
     it('should display success icon', () => {
+        fixture.detectChanges();
         const compiled = fixture.nativeElement;
         expect(compiled.querySelector('.icon-success svg')).toBeTruthy();
     });

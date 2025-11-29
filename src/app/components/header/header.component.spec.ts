@@ -2,19 +2,23 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Location } from '@angular/common';
 
 import { HeaderComponent } from './header.component';
+import { ThemeService } from '../../service/theme.service';
+import { UserTokenService } from '../../service/user-token.service';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
   const mockLocation = { back: jasmine.createSpy('back') };
   const mockThemeService = { currentTheme: () => 'dark' };
-  const mockUserToken = { hasToken: true, isAdmin: () => true };
+  const mockUserTokenService = { hasValidAccessToken: true, isAdmin: true };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HeaderComponent, (await import('@angular/common/http/testing')).HttpClientTestingModule, (await import('@angular/router/testing')).RouterTestingModule],
       providers: [
-        { provide: Location, useValue: mockLocation }
+        { provide: Location, useValue: mockLocation },
+        { provide: ThemeService, useValue: mockThemeService },
+        { provide: UserTokenService, useValue: mockUserTokenService }
       ]
     })
       .compileComponents();
@@ -34,10 +38,6 @@ describe('HeaderComponent', () => {
   });
 
   it('isDarkTheme/isloggedIn/isAdmin rely on services', () => {
-    // access private injected services via casting to any (component uses DI directly)
-    (component as any).themeService = { currentTheme: () => 'dark' };
-    (component as any).userTokenService = { hasToken: true, isAdmin: () => true };
-
     expect(component.isDarkTheme()).toBeTrue();
     expect(component.isloggedIn()).toBeTrue();
     expect(component.isAdmin()).toBeTrue();

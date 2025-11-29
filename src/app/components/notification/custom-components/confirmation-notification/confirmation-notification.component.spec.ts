@@ -12,14 +12,15 @@ describe('ConfirmationNotificationComponent', () => {
 
         fixture = TestBed.createComponent(ConfirmationNotificationComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
     });
 
     it('should create', () => {
+        fixture.detectChanges();
         expect(component).toBeTruthy();
     });
 
     it('should display default title', () => {
+        fixture.detectChanges();
         const compiled = fixture.nativeElement;
         expect(compiled.querySelector('h2')?.textContent).toBe('Confirmação');
     });
@@ -39,6 +40,7 @@ describe('ConfirmationNotificationComponent', () => {
     });
 
     it('should display warning box by default', () => {
+        fixture.detectChanges();
         const compiled = fixture.nativeElement;
         expect(compiled.querySelector('.warning-box')).toBeTruthy();
     });
@@ -71,6 +73,7 @@ describe('ConfirmationNotificationComponent', () => {
     });
 
     it('should display warning icon in SVG', () => {
+        fixture.detectChanges();
         const compiled = fixture.nativeElement;
         expect(compiled.querySelector('.icon-container svg')).toBeTruthy();
     });

@@ -17,13 +17,11 @@ export class BookService {
     private readonly websocketService: BookWebsocketService,
     private readonly ngZone: NgZone
   ) {
-    // WebSocket conecta automaticamente apenas se o usuário estiver logado
     if (typeof window !== 'undefined') {
       this.ngZone.runOutsideAngular(() => {
         setTimeout(() => {
           try {
-            // Verifica se tem token antes de tentar conectar
-            if (this.userTokenService.hasToken) {
+            if (this.userTokenService.hasValidAccessToken) {
               this.websocketService.connect();
             }
           } catch (error) {
@@ -40,7 +38,7 @@ export class BookService {
     if (!opts.sensitiveContent)
       opts.sensitiveContent = this.sensitiveContentService.getContentAllow();
 
-    if (!this.userTokenService.hasToken && !this.userTokenService.hasValidRefreshToken)
+    if (!this.userTokenService.hasValidAccessToken && !this.userTokenService.hasValidRefreshToken)
       opts.sensitiveContent = [];
 
     return this.http.get<Page<BookList>>('books', {

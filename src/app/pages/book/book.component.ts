@@ -34,7 +34,7 @@ export class BookComponent implements OnInit, OnDestroy {
     private userTokenService: UserTokenService,
     private wsService: BookWebsocketService
   ) {
-    this.admin = this.userTokenService.isAdmin();
+    this.admin = this.userTokenService.isAdmin;
   }
 
   ngOnInit() {

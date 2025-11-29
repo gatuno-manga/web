@@ -1,13 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
-/**
- * Componente personalizado para notificação de progresso
- */
+
 @Component({
     selector: 'app-progress-notification',
     standalone: true,
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './progress-notification.component.html',
     styleUrls: ['./progress-notification.component.scss']
 })

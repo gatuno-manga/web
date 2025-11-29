@@ -12,14 +12,15 @@ describe('ProgressNotificationComponent', () => {
 
         fixture = TestBed.createComponent(ProgressNotificationComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
     });
 
     it('should create', () => {
+        fixture.detectChanges();
         expect(component).toBeTruthy();
     });
 
     it('should display default title', () => {
+        fixture.detectChanges();
         const compiled = fixture.nativeElement;
         expect(compiled.querySelector('h3')?.textContent).toBe('Processando');
     });
