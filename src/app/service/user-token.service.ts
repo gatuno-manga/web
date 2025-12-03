@@ -1,4 +1,4 @@
-import { Injectable, inject, PLATFORM_ID, NgZone } from "@angular/core";
+import { Injectable, inject, PLATFORM_ID, NgZone, signal, computed } from "@angular/core";
 import { isPlatformBrowser } from "@angular/common";
 import { CookieService } from "./cookie.service";
 import { HttpClient } from "@angular/common/http";
@@ -28,7 +28,31 @@ export class UserTokenService {
     private refreshObservable: Observable<{ accessToken: string, refreshToken: string }> | null = null;
     private refreshSubscription?: Subscription;
 
+    // Reactive state
+    private _accessToken = signal<string | null>(null);
+    
+    // Computed signals for external consumption
+    public readonly hasValidAccessTokenSignal = computed(() => {
+        const token = this._accessToken();
+        return !!token && this.isTokenValid(token);
+    });
+
+    public readonly isAdminSignal = computed(() => {
+        const token = this._accessToken();
+        if (!token) return false;
+        try {
+            const { roles } = jwtDecode<payloadToken>(token);
+            return roles.includes(Role.ADMIN);
+        } catch {
+            return false;
+        }
+    });
+
     constructor() {
+        // Initialize signal from cookie
+        const initialToken = this.cookieService.get(this.ACCESSKEY, false);
+        this._accessToken.set(initialToken);
+
         if (this.hasValidAccessToken) {
             this.scheduleAutoRefresh();
         }
@@ -37,6 +61,7 @@ export class UserTokenService {
     setTokens(accessToken: string, refreshToken: string) {
         this.cookieService.set(this.ACCESSKEY, accessToken, false);
         this.cookieService.set(this.REFRESHKEY, refreshToken, false);
+        this._accessToken.set(accessToken);
         this.scheduleAutoRefresh();
     }
 
@@ -44,6 +69,7 @@ export class UserTokenService {
         this.stopAutoRefresh();
         this.cookieService.delete(this.ACCESSKEY, false);
         this.cookieService.delete(this.REFRESHKEY, false);
+        this._accessToken.set(null);
 
         if (notifyUser) {
             this.handleSessionExpired();

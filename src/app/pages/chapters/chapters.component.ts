@@ -9,8 +9,14 @@ import {
   viewChild,
   ChangeDetectionStrategy,
   computed,
-  effect
+  effect,
+  DestroyRef,
+  AfterViewInit,
+  ViewChildren,
+  QueryList,
+  PLATFORM_ID
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Chapter } from '../../models/book.models';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
@@ -28,6 +34,7 @@ import { NotificationSeverity } from 'app/service/notification';
 import { ReaderSettingsNotificationComponent } from '@components/notification/custom-components';
 import { BookWebsocketService } from '../../service/book-websocket.service';
 import { DownloadService } from '../../service/download.service';
+import { ReadingProgressService } from '../../service/reading-progress.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -46,7 +53,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
   templateUrl: './chapters.component.html',
   styleUrl: './chapters.component.scss'
 })
-export class ChaptersComponent implements OnInit, OnDestroy {
+export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   private activatedRoute = inject(ActivatedRoute);
   private chapterService = inject(ChapterService);
   private userTokenService = inject(UserTokenService);
@@ -56,10 +63,13 @@ export class ChaptersComponent implements OnInit, OnDestroy {
   private settingsService = inject(SettingsService);
   private bookWebsocketService = inject(BookWebsocketService);
   private downloadService = inject(DownloadService);
+  private readingProgressService = inject(ReadingProgressService);
   private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
 
   // Queries
   progressBarRef = viewChild<ElementRef>('progressBarRef');
+  @ViewChildren('pageRef') pageRefs!: QueryList<ElementRef>;
 
   // State Signals
   chapter = signal<Chapter | null>(null);
@@ -67,6 +77,9 @@ export class ChaptersComponent implements OnInit, OnDestroy {
   showBtnTop = signal<boolean>(false);
   
   private objectUrls: string[] = [];
+  private intersectionObserver: IntersectionObserver | null = null;
+  private destroyRef = inject(DestroyRef);
+  private maxReadPageIndex = 0;
 
   // Converte o Observable de settings para Signal
   settings = toSignal(this.settingsService.settings$, {
@@ -84,7 +97,7 @@ export class ChaptersComponent implements OnInit, OnDestroy {
     return parts.length > 0 ? parts.join(' ') : 'none';
   });
 
-  admin = this.userTokenService.isAdmin;
+  admin = this.userTokenService.isAdminSignal;
 
   constructor() {
     this.activatedRoute.paramMap
@@ -106,12 +119,33 @@ export class ChaptersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {}
   
+  ngAfterViewInit() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    this.pageRefs.changes
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((refs: QueryList<ElementRef>) => {
+        if (refs.length > 0) {
+            // Pequeno delay para garantir que o layout está pronto
+            setTimeout(() => {
+                this.setupIntersectionObserver();
+                this.restoreReadingProgress();
+            }, 100);
+        }
+    });
+  }
+  
   ngOnDestroy() {
       this.objectUrls.forEach(url => URL.revokeObjectURL(url));
+      if (this.intersectionObserver) {
+        this.intersectionObserver.disconnect();
+      }
   }
 
   @HostListener('window:scroll')
   onWindowScroll() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     const scrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
     const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
 
@@ -129,7 +163,7 @@ export class ChaptersComponent implements OnInit, OnDestroy {
     }
 
     this.bookWebsocketService.watchChapter(chapterId, bookId)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((event: any) => {
         if (event.type === 'chapter.updated' || event.type === 'chapter.scraping.completed') {
           this.refreshChapter();
@@ -138,6 +172,7 @@ export class ChaptersComponent implements OnInit, OnDestroy {
   }
 
   async loadChapter(id: string) {
+    this.maxReadPageIndex = 0;
     try {
         const isDownloaded = await this.downloadService.isChapterDownloaded(id);
         if (isDownloaded) {
@@ -209,7 +244,9 @@ export class ChaptersComponent implements OnInit, OnDestroy {
   }
 
   scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (isPlatformBrowser(this.platformId)) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   startDrag(event: MouseEvent | TouchEvent) {
@@ -249,6 +286,55 @@ export class ChaptersComponent implements OnInit, OnDestroy {
 
     const clientX = 'touches' in event ? event.touches[0].clientX : (event as MouseEvent).clientX;
     calculateProgress(clientX);
+  }
+
+  private setupIntersectionObserver() {
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+    }
+
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1 // Reduzido para 0.1 para garantir que páginas altas sejam detectadas ao passar
+    };
+
+    this.intersectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const index = parseInt(entry.target.getAttribute('data-index') || '0', 10);
+          
+          if (index > this.maxReadPageIndex) {
+             this.maxReadPageIndex = index;
+             const currentChapter = this.chapter();
+             if (currentChapter) {
+               this.readingProgressService.saveProgress(currentChapter.id, currentChapter.bookId, index);
+             }
+          }
+        }
+      });
+    }, options);
+
+    this.pageRefs.forEach((el: ElementRef) => {
+      this.intersectionObserver?.observe(el.nativeElement);
+    });
+  }
+
+  private async restoreReadingProgress() {
+    const currentChapter = this.chapter();
+    if (!currentChapter) return;
+
+    const progress = await this.readingProgressService.getProgress(currentChapter.id);
+    this.maxReadPageIndex = progress?.pageIndex || 0;
+
+    if (progress && progress.pageIndex > 0) {
+      const targetElement = this.pageRefs.get(progress.pageIndex);
+      if (targetElement) {
+        targetElement.nativeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    }
   }
 
   async nextPage() {
