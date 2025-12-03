@@ -106,9 +106,99 @@ $page-size: 1200px;
 			}
 
 			.bottom {
+				@media (max-width: 768px) {
+					text-align: center;
+				}
+
 				.admin-actions {
 					display: flex;
 					gap: 1rem;
+				}
+
+				.actions {
+					display: flex;
+					align-items: center;
+					gap: 0.75rem;
+					margin-top: 1rem;
+
+					@media (max-width: 768px) {
+						justify-content: center;
+					}
+
+					app-button {
+						flex: 0 0 auto;
+						min-width: 150px;
+					}
+
+					.options-wrapper {
+						position: relative;
+
+						.options-btn {
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							width: 44px;
+							height: 44px;
+							border: none;
+							border-radius: 50%;
+							background-color: var(--primary-color);
+							cursor: pointer;
+							transition: background-color 0.2s, transform 0.1s;
+
+							&:hover {
+								background-color: var(--secondary-color);
+							}
+
+							&:active {
+								transform: scale(0.95);
+							}
+
+							app-icons {
+								color: var(--app-text-color);
+							}
+						}
+
+						.options-dropdown {
+							position: absolute;
+							top: calc(100% + 8px);
+							right: 0;
+							min-width: 180px;
+							background-color: var(--app-background-color);
+							border: 1px solid rgba(255, 255, 255, 0.15);
+							border-radius: 12px;
+							box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+							overflow: hidden;
+							z-index: 100;
+							animation: fadeIn 0.15s ease-out;
+
+							@media (max-width: 768px) {
+								right: 0;
+								left: auto;
+							}
+
+							button {
+								display: flex;
+								align-items: center;
+								gap: 0.75rem;
+								width: 100%;
+								padding: 14px 18px;
+								border: none;
+								background: none;
+								color: var(--app-text-color);
+								font-size: 1rem;
+								cursor: pointer;
+								transition: background-color 0.15s;
+
+								&:hover {
+									background-color: var(--primary-color);
+								}
+
+								app-icons {
+									opacity: 0.8;
+								}
+							}
+						}
+					}
 				}
 
 				.caps {
@@ -206,5 +296,16 @@ app-aside {
 		width: 100%;
 		margin-bottom: 0.4rem;
 		font-size: 1.4rem;
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
 	}
 }

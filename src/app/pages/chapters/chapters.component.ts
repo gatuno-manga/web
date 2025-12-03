@@ -34,7 +34,7 @@ import { NotificationSeverity } from 'app/service/notification';
 import { ReaderSettingsNotificationComponent } from '@components/notification/custom-components';
 import { BookWebsocketService } from '../../service/book-websocket.service';
 import { DownloadService } from '../../service/download.service';
-import { ReadingProgressService } from '../../service/reading-progress.service';
+import { UnifiedReadingProgressService } from '../../service/unified-reading-progress.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -63,7 +63,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   private settingsService = inject(SettingsService);
   private bookWebsocketService = inject(BookWebsocketService);
   private downloadService = inject(DownloadService);
-  private readingProgressService = inject(ReadingProgressService);
+  private readingProgressService = inject(UnifiedReadingProgressService);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
 
@@ -75,11 +75,12 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   chapter = signal<Chapter | null>(null);
   readingProgress = signal<number>(0);
   showBtnTop = signal<boolean>(false);
-  
+
   private objectUrls: string[] = [];
   private intersectionObserver: IntersectionObserver | null = null;
   private destroyRef = inject(DestroyRef);
   private maxReadPageIndex = 0;
+  private isNavigating = false;
 
   // Converte o Observable de settings para Signal
   settings = toSignal(this.settingsService.settings$, {
@@ -118,7 +119,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {}
-  
+
   ngAfterViewInit() {
     if (!isPlatformBrowser(this.platformId)) return;
 
@@ -126,20 +127,20 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((refs: QueryList<ElementRef>) => {
         if (refs.length > 0) {
-            // Pequeno delay para garantir que o layout está pronto
-            setTimeout(() => {
-                this.setupIntersectionObserver();
-                this.restoreReadingProgress();
-            }, 100);
+          // Pequeno delay para garantir que o layout está pronto
+          setTimeout(() => {
+            this.setupIntersectionObserver();
+            this.restoreReadingProgress();
+          }, 100);
         }
-    });
+      });
   }
-  
+
   ngOnDestroy() {
-      this.objectUrls.forEach(url => URL.revokeObjectURL(url));
-      if (this.intersectionObserver) {
-        this.intersectionObserver.disconnect();
-      }
+    this.objectUrls.forEach(url => URL.revokeObjectURL(url));
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+    }
   }
 
   @HostListener('window:scroll')
@@ -174,42 +175,42 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   async loadChapter(id: string) {
     this.maxReadPageIndex = 0;
     try {
-        const isDownloaded = await this.downloadService.isChapterDownloaded(id);
-        if (isDownloaded) {
-            const offlineChapter = await this.downloadService.getChapter(id);
-            if (offlineChapter) {
-                // Revoke old URLs
-                this.objectUrls.forEach(url => URL.revokeObjectURL(url));
-                this.objectUrls = [];
+      const isDownloaded = await this.downloadService.isChapterDownloaded(id);
+      if (isDownloaded) {
+        const offlineChapter = await this.downloadService.getChapter(id);
+        if (offlineChapter) {
+          // Revoke old URLs
+          this.objectUrls.forEach(url => URL.revokeObjectURL(url));
+          this.objectUrls = [];
 
-                const pages = offlineChapter.pages.map((blob, index) => {
-                    const url = URL.createObjectURL(blob);
-                    this.objectUrls.push(url);
-                    return { index: index.toString(), path: url };
-                });
+          const pages = offlineChapter.pages.map((blob, index) => {
+            const url = URL.createObjectURL(blob);
+            this.objectUrls.push(url);
+            return { index: index.toString(), path: url };
+          });
 
-                const offlineBook = await this.downloadService.getBook(offlineChapter.bookId);
+          const offlineBook = await this.downloadService.getBook(offlineChapter.bookId);
 
-                const chapter: Chapter = {
-                    id: offlineChapter.id,
-                    bookId: offlineChapter.bookId,
-                    title: offlineChapter.title,
-                    index: offlineChapter.index,
-                    pages: pages,
-                    bookTitle: offlineBook?.title || '',
-                    totalChapters: offlineBook?.totalChapters || 0,
-                    originalUrl: '',
-                    next: offlineChapter.next,
-                    previous: offlineChapter.previous
-                };
+          const chapter: Chapter = {
+            id: offlineChapter.id,
+            bookId: offlineChapter.bookId,
+            title: offlineChapter.title,
+            index: offlineChapter.index,
+            pages: pages,
+            bookTitle: offlineBook?.title || '',
+            totalChapters: offlineBook?.totalChapters || 0,
+            originalUrl: '',
+            next: offlineChapter.next,
+            previous: offlineChapter.previous
+          };
 
-                this.chapter.set(chapter);
-                this.updateMetadata(chapter);
-                return;
-            }
+          this.chapter.set(chapter);
+          this.updateMetadata(chapter);
+          return;
         }
+      }
     } catch (e) {
-        console.error('Error loading offline chapter', e);
+      console.error('Error loading offline chapter', e);
     }
 
     this.chapterService.getChapter(id).subscribe({
@@ -229,13 +230,13 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private updateMetadata(chapter: Chapter) {
-      if (chapter) {
-          this.metaDataService.setMetaData({
-            title: `${chapter.bookTitle} - ${chapter.title || 'Capítulo ' + chapter.index}`,
-            description: `Leia o capítulo ${chapter.index} de ${chapter.bookTitle}`,
-            image: chapter.pages?.[0]?.path || ''
-          });
-        }
+    if (chapter) {
+      this.metaDataService.setMetaData({
+        title: `${chapter.bookTitle} - ${chapter.title || 'Capítulo ' + chapter.index}`,
+        description: `Leia o capítulo ${chapter.index} de ${chapter.bookTitle}`,
+        image: chapter.pages?.[0]?.path || ''
+      });
+    }
   }
 
   refreshChapter() {
@@ -245,7 +246,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   scrollToTop() {
     if (isPlatformBrowser(this.platformId)) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
   }
 
@@ -302,16 +303,20 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
     };
 
     this.intersectionObserver = new IntersectionObserver((entries) => {
+      // Não salva progresso enquanto está navegando entre capítulos
+      if (this.isNavigating) return;
+
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const index = parseInt(entry.target.getAttribute('data-index') || '0', 10);
-          
+
           if (index > this.maxReadPageIndex) {
-             this.maxReadPageIndex = index;
-             const currentChapter = this.chapter();
-             if (currentChapter) {
-               this.readingProgressService.saveProgress(currentChapter.id, currentChapter.bookId, index);
-             }
+            this.maxReadPageIndex = index;
+            const currentChapter = this.chapter();
+            if (currentChapter) {
+              // O serviço salva local instantâneo e API com debounce
+              this.readingProgressService.saveProgress(currentChapter.id, currentChapter.bookId, index);
+            }
           }
         }
       });
@@ -341,7 +346,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
     const current = this.chapter();
     if (current?.next) {
       const isNextDownloaded = await this.downloadService.isChapterDownloaded(current.next);
-      
+
       if (!isNextDownloaded && !navigator.onLine) {
         this.modalNotificationService.show(
           'Você chegou ao fim',
@@ -357,20 +362,48 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
         return;
       }
 
+      // Marca o capítulo atual como completamente lido antes de navegar
+      await this.markChapterAsCompleted();
       this.navigateToChapter(current.next);
     }
   }
 
-  previousPage() {
+  async previousPage() {
     const current = this.chapter();
     if (current?.previous) {
+      // Marca o capítulo atual como completamente lido antes de navegar
+      await this.markChapterAsCompleted();
       this.navigateToChapter(current.previous);
     }
   }
 
+  private async markChapterAsCompleted() {
+    // Cancela qualquer sincronização pendente no serviço
+    this.readingProgressService.cancelPendingSync();
+
+    const current = this.chapter();
+    if (current && current.pages) {
+      const lastPageIndex = current.pages.length - 1;
+      // Salva imediatamente como última página ao trocar de capítulo
+      await this.readingProgressService.saveProgressImmediate(
+        current.id,
+        current.bookId,
+        lastPageIndex,
+        current.pages.length,
+        true // completed
+      );
+    }
+  }
+
   private navigateToChapter(chapterId: string) {
+    this.isNavigating = true;
     this.router.navigate(['../', chapterId], { relativeTo: this.activatedRoute }).then(() => {
       this.scrollToTop();
+      // Aguarda um pouco antes de liberar o observer para evitar que o scroll para o topo
+      // interfira no progresso do novo capítulo
+      setTimeout(() => {
+        this.isNavigating = false;
+      }, 500);
     });
   }
 
