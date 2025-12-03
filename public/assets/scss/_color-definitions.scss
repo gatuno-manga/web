@@ -11,6 +11,7 @@
 	--scraping-status-ready-color: var(--dark-green);
 	--scraping-status-processing-color: var(--orange);
 	--scraping-status-error-color: var(--dark-red);
+	--context-menu-bg: rgba(0, 2, 18, 0.8);
 	--degrader: linear-gradient(
 		88deg,
 		var(--black) 55%,
@@ -28,6 +29,7 @@
 	--scraping-status-ready-color: var(--green);
 	--scraping-status-processing-color: var(--orange);
 	--scraping-status-error-color: var(--red);
+	--context-menu-bg: rgba(253, 253, 253, 0.9);
 	--degrader: linear-gradient(
 		88deg,
 		var(--white) 0%,
