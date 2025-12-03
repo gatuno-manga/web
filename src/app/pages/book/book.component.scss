@@ -53,6 +53,23 @@ $page-size: 1200px;
 				border-radius: 12px;
 				object-fit: contain;
 			}
+
+			.cover-placeholder {
+				width: 200px;
+				height: 350px;
+				border-radius: 12px;
+				background-color: var(--secondary-color);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+
+				app-icons {
+					width: 64px;
+					height: 64px;
+					color: var(--app-text-color);
+					opacity: 0.4;
+				}
+			}
 		}
 
 		.book-info {
@@ -191,6 +208,19 @@ $page-size: 1200px;
 
 								&:hover {
 									background-color: var(--primary-color);
+								}
+
+								&.danger {
+									color: #ff6b6b;
+
+									&:hover {
+										background-color: rgba(
+											255,
+											107,
+											107,
+											0.15
+										);
+									}
 								}
 
 								app-icons {

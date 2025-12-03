@@ -12,7 +12,8 @@ import { ButtonComponent } from '../../components/inputs/button/button.component
 import { BookWebsocketService } from '../../service/book-websocket.service';
 import { DownloadService } from '../../service/download.service';
 import { UnifiedReadingProgressService } from '../../service/unified-reading-progress.service';
-import { Subscription } from 'rxjs';
+import { ChapterService } from '../../service/chapter.service';
+import { Subscription, firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-book',
@@ -32,9 +33,16 @@ export class BookComponent implements OnInit, OnDestroy {
   lastReadChapterId: string | null = null;
   lastReadPage: number = 0;
   firstChapterId: string | null = null;
+  private sortedChapters: Chapterlist[] = [];
 
   // Estado para dropdown de opções
   showOptionsDropdown = signal(false);
+
+  // Estado para verificar se o livro está baixado
+  isBookDownloaded = signal(false);
+
+  // Estado para erro de imagem de capa
+  coverImageError = false;
 
   constructor(
     private bookService: BookService,
@@ -45,7 +53,8 @@ export class BookComponent implements OnInit, OnDestroy {
     private userTokenService: UserTokenService,
     private wsService: BookWebsocketService,
     private downloadService: DownloadService,
-    private readingProgressService: UnifiedReadingProgressService
+    private readingProgressService: UnifiedReadingProgressService,
+    private chapterService: ChapterService
   ) {
     this.admin = this.userTokenService.isAdmin;
   }
@@ -53,6 +62,10 @@ export class BookComponent implements OnInit, OnDestroy {
   @HostListener('document:click')
   onDocumentClick() {
     this.closeOptionsDropdown();
+  }
+
+  onCoverImageError() {
+    this.coverImageError = true;
   }
 
   ngOnInit() {
@@ -71,6 +84,9 @@ export class BookComponent implements OnInit, OnDestroy {
         this.book = book;
         this.setMetaData();
         this.isLoading.set(false);
+
+        // Verifica se o livro está baixado
+        this.checkBookDownloaded();
 
         // Carrega o último progresso de leitura
         this.loadLastReadingProgress();
@@ -289,9 +305,9 @@ export class BookComponent implements OnInit, OnDestroy {
     this.bookService.getChapters(this.book.id).subscribe({
       next: (chapters: Chapterlist[]) => {
         if (chapters && chapters.length > 0) {
-          // Ordena por índice e pega o primeiro
-          const sortedChapters = [...chapters].sort((a, b) => a.index - b.index);
-          this.firstChapterId = sortedChapters[0].id;
+          // Ordena por índice e guarda a lista
+          this.sortedChapters = [...chapters].sort((a, b) => a.index - b.index);
+          this.firstChapterId = this.sortedChapters[0].id;
         }
       },
       error: (err) => {
@@ -300,12 +316,29 @@ export class BookComponent implements OnInit, OnDestroy {
     });
   }
 
-  continueReading() {
+  async continueReading() {
     if (this.lastReadChapterId) {
-      this.router.navigate([this.lastReadChapterId], {
-        relativeTo: this.activatedRoute,
-        queryParams: { page: this.lastReadPage }
-      });
+      // Verificar se precisa ir para o próximo capítulo
+      const targetChapter = await this.getTargetChapter();
+
+      if (targetChapter.goToNext && targetChapter.nextChapterId) {
+        // Usuário terminou o capítulo, vai para o próximo
+        this.router.navigate([targetChapter.nextChapterId], {
+          relativeTo: this.activatedRoute
+        });
+      } else if (targetChapter.isLastPage) {
+        // Usuário está na última página e não tem próximo capítulo, volta para o início
+        this.router.navigate([this.lastReadChapterId], {
+          relativeTo: this.activatedRoute,
+          queryParams: { page: 0 }
+        });
+      } else {
+        // Continua no capítulo atual
+        this.router.navigate([this.lastReadChapterId], {
+          relativeTo: this.activatedRoute,
+          queryParams: { page: this.lastReadPage }
+        });
+      }
     } else if (this.firstChapterId) {
       // Se não há progresso, vai para o primeiro capítulo
       this.router.navigate([this.firstChapterId], { relativeTo: this.activatedRoute });
@@ -320,6 +353,42 @@ export class BookComponent implements OnInit, OnDestroy {
     }
   }
 
+  private async getTargetChapter(): Promise<{ goToNext: boolean; nextChapterId: string | null; isLastPage: boolean }> {
+    if (!this.lastReadChapterId) {
+      return { goToNext: false, nextChapterId: null, isLastPage: false };
+    }
+
+    try {
+      // Busca o capítulo atual para saber o total de páginas
+      const chapter = await firstValueFrom(this.chapterService.getChapter(this.lastReadChapterId));
+
+      if (!chapter) {
+        return { goToNext: false, nextChapterId: null, isLastPage: false };
+      }
+
+      const totalPages = chapter.pages?.length || 0;
+      const isLastPage = this.lastReadPage >= totalPages - 1;
+
+      if (isLastPage && chapter.next) {
+        // Usuário está na última página e existe próximo capítulo
+        return { goToNext: true, nextChapterId: chapter.next, isLastPage: true };
+      }
+
+      // Alternativa: usar a lista de capítulos ordenada
+      if (isLastPage && this.sortedChapters.length > 0) {
+        const currentIndex = this.sortedChapters.findIndex(c => c.id === this.lastReadChapterId);
+        if (currentIndex >= 0 && currentIndex < this.sortedChapters.length - 1) {
+          return { goToNext: true, nextChapterId: this.sortedChapters[currentIndex + 1].id, isLastPage: true };
+        }
+      }
+
+      return { goToNext: false, nextChapterId: null, isLastPage };
+    } catch (error) {
+      console.error('Erro ao verificar capítulo:', error);
+      return { goToNext: false, nextChapterId: null, isLastPage: false };
+    }
+  }
+
   // ==================== DROPDOWN DE OPÇÕES ====================
 
   toggleOptionsDropdown() {
@@ -328,6 +397,12 @@ export class BookComponent implements OnInit, OnDestroy {
 
   closeOptionsDropdown() {
     this.showOptionsDropdown.set(false);
+  }
+
+  async checkBookDownloaded() {
+    if (!this.book) return;
+    const isDownloaded = await this.downloadService.isBookDownloaded(this.book.id);
+    this.isBookDownloaded.set(isDownloaded);
   }
 
   async downloadBook() {
@@ -353,19 +428,114 @@ export class BookComponent implements OnInit, OnDestroy {
     );
   }
 
-  private confirmDownloadBook() {
-    // Por enquanto apenas mostra uma mensagem
-    // TODO: Implementar download de todos os capítulos
+  async deleteDownloadedBook() {
+    this.closeOptionsDropdown();
+
+    if (!this.book) return;
+
     this.modalService.show(
-      'Download iniciado',
-      'O download dos capítulos será iniciado em breve. Você pode acompanhar o progresso na lista de capítulos.',
+      'Excluir Download',
+      `Deseja excluir o livro "${this.book.title}" dos downloads? Os capítulos baixados serão removidos do seu dispositivo.`,
       [
         {
-          label: 'Ok',
+          label: 'Cancelar',
           type: 'primary',
+        },
+        {
+          label: 'Excluir',
+          type: 'danger',
+          callback: async () => {
+            await this.downloadService.deleteBook(this.book.id);
+            this.isBookDownloaded.set(false);
+            this.modalService.show(
+              'Download excluído',
+              'O livro foi removido dos downloads.',
+              [{ label: 'Ok', type: 'primary' }],
+              'success'
+            );
+          }
         }
       ],
-      'info'
+      'warning'
+    );
+  }
+
+  private confirmDownloadBook = async () => {
+    if (!this.book) return;
+
+    try {
+      // Buscar lista de capítulos
+      const chapters = await firstValueFrom(this.bookService.getChapters(this.book.id));
+
+      if (chapters.length === 0) {
+        this.modalService.show(
+          'Sem capítulos',
+          'Este livro não possui capítulos para baixar.',
+          [{ label: 'Ok', type: 'primary' }],
+          'info'
+        );
+        return;
+      }
+
+      this.modalService.show(
+        'Download iniciado',
+        `Baixando ${chapters.length} capítulos em segundo plano. Você pode continuar navegando.`,
+        [{ label: 'Ok', type: 'primary' }],
+        'info'
+      );
+
+      // Função auxiliar para delay
+      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+      // Baixar capítulos sequencialmente em segundo plano com intervalo de 1s
+      this.downloadChaptersInBackground(chapters, delay);
+    } catch (error) {
+      console.error('Erro ao buscar capítulos:', error);
+      this.modalService.show(
+        'Erro',
+        'Não foi possível buscar os capítulos do livro.',
+        [{ label: 'Ok', type: 'primary' }],
+        'error'
+      );
+    }
+  }
+
+  private async downloadChaptersInBackground(chapters: Chapterlist[], delay: (ms: number) => Promise<unknown>) {
+    let downloadedCount = 0;
+    let skippedCount = 0;
+
+    for (const chapterInfo of chapters) {
+      try {
+        // Verificar se já foi baixado
+        const isDownloaded = await this.downloadService.isChapterDownloaded(chapterInfo.id);
+        if (isDownloaded) {
+          skippedCount++;
+          continue;
+        }
+
+        // Buscar detalhes do capítulo com as páginas
+        const fullChapter = await firstValueFrom(this.chapterService.getChapter(chapterInfo.id));
+        if (!fullChapter) continue;
+
+        // Baixar capítulo
+        await this.downloadService.downloadChapter(this.book, fullChapter);
+        downloadedCount++;
+
+        // Aguardar 1 segundo antes do próximo para não sobrecarregar o servidor
+        await delay(1000);
+      } catch (error) {
+        console.error(`Erro ao baixar capítulo ${chapterInfo.id}:`, error);
+        // Continua para o próximo capítulo mesmo se houver erro
+      }
+    }
+
+    // Notificar conclusão e atualizar status
+    this.isBookDownloaded.set(true);
+    this.modalService.show(
+      'Download concluído',
+      `${downloadedCount} capítulos baixados${skippedCount > 0 ? `, ${skippedCount} já estavam salvos` : ''}.`,
+      [{ label: 'Ok', type: 'primary' }],
+      'success'
     );
   }
 

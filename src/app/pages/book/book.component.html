@@ -1,9 +1,18 @@
-@defer (when !isLoading()){
-<img [src]="book.cover" class="book-background" />
+@defer (when !isLoading()){ @if (book.cover && !coverImageError) {
+<img [src]="book.cover" class="book-background" (error)="onCoverImageError()" />
+} @else {
+<div class="book-background placeholder-background"></div>
+}
 <div class="book">
 	<div class="book-header">
 		<div class="book-cover">
-			<img [src]="book.cover" />
+			@if (book.cover && !coverImageError) {
+			<img [src]="book.cover" (error)="onCoverImageError()" />
+			} @else {
+			<div class="cover-placeholder">
+				<app-icons name="image" />
+			</div>
+			}
 		</div>
 		<div class="book-info">
 			<div class="top">
@@ -44,6 +53,15 @@
 								<app-icons name="download" />
 								<span>Baixar livro</span>
 							</button>
+							@if (isBookDownloaded()) {
+							<button
+								(click)="deleteDownloadedBook()"
+								class="danger"
+							>
+								<app-icons name="trash" />
+								<span>Excluir download</span>
+							</button>
+							}
 							<button (click)="shareBook()">
 								<app-icons name="share" />
 								<span>Compartilhar</span>

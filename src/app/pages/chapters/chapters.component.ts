@@ -332,10 +332,17 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!currentChapter) return;
 
     const progress = await this.readingProgressService.getProgress(currentChapter.id);
-    this.maxReadPageIndex = progress?.pageIndex || 0;
+    const totalPages = currentChapter.pages?.length || 0;
+    const savedPageIndex = progress?.pageIndex || 0;
 
-    if (progress && progress.pageIndex > 0) {
-      const targetElement = this.pageRefs.get(progress.pageIndex);
+    // Se estava na última página, começa do início
+    const isLastPage = savedPageIndex >= totalPages - 1;
+    const targetPageIndex = isLastPage ? 0 : savedPageIndex;
+
+    this.maxReadPageIndex = targetPageIndex;
+
+    if (targetPageIndex > 0) {
+      const targetElement = this.pageRefs.get(targetPageIndex);
       if (targetElement) {
         targetElement.nativeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
       }
