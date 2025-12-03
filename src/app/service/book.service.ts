@@ -62,6 +62,14 @@ export class BookService {
     return this.http.patch<Book>(`books/${bookId}/covers/${coverId}/selected`, {});
   }
 
+  updateCover(bookId: string, coverId: string, data: { title: string }) {
+    return this.http.patch<Cover>(`books/${bookId}/covers/${coverId}`, data);
+  }
+
+  deleteCover(bookId: string, coverId: string) {
+    return this.http.delete<void>(`books/${bookId}/covers/${coverId}`);
+  }
+
   getInfo(bookId: string) {
     return this.http.get<BookDetail>(`books/${bookId}/infos`);
   }
