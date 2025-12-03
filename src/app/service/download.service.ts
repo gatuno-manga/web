@@ -51,12 +51,12 @@ export class DownloadService {
   async saveBook(book: Book | BookBasic, coverBlob: Blob): Promise<void> {
     if (!this.dbPromise) return;
     const db = await this.dbPromise;
-    
+
     let totalChapters = 0;
     if ('totalChapters' in book) {
-        totalChapters = book.totalChapters;
+      totalChapters = book.totalChapters;
     } else if ('chapters' in book && Array.isArray(book.chapters)) {
-        totalChapters = book.chapters.length;
+      totalChapters = book.chapters.length;
     }
 
     const offlineBook: OfflineBook = {
@@ -110,6 +110,26 @@ export class DownloadService {
     await db.delete('chapters', chapterId);
   }
 
+  async deleteBook(bookId: string): Promise<void> {
+    if (!this.dbPromise) return;
+    const db = await this.dbPromise;
+
+    // Deletar todos os capítulos do livro
+    const chapters = await this.getChaptersByBook(bookId);
+    for (const chapter of chapters) {
+      await db.delete('chapters', chapter.id);
+    }
+
+    // Deletar o livro
+    await db.delete('books', bookId);
+  }
+
+  async isBookDownloaded(bookId: string): Promise<boolean> {
+    if (!this.dbPromise) return false;
+    const chapters = await this.getChaptersByBook(bookId);
+    return chapters.length > 0;
+  }
+
   async downloadChapter(book: Book | BookBasic, chapter: Chapter): Promise<void> {
     if (!this.dbPromise) return;
     if (await this.isChapterDownloaded(chapter.id)) return;
@@ -128,17 +148,17 @@ export class DownloadService {
       const pageBlobs: Blob[] = [];
       let completedCount = 0;
 
-      // Sequential download to avoid overloading network/browser, or parallel with limit? 
+      // Sequential download to avoid overloading network/browser, or parallel with limit?
       // Let's try Promise.all for parallel but formatted for progress updates
-      
+
       const downloadPromises = chapter.pages.map(async (page: Page, index: number) => {
         const blob = await this.fetchImageBlob(page.path); // Assuming page.path is the URL
         completedCount++;
-        this.updateProgress(chapter.id, { 
-          chapterId: chapter.id, 
-          total: chapter.pages.length, 
-          current: completedCount, 
-          status: 'downloading' 
+        this.updateProgress(chapter.id, {
+          chapterId: chapter.id,
+          total: chapter.pages.length,
+          current: completedCount,
+          status: 'downloading'
         });
         return { index, blob };
       });
@@ -172,8 +192,8 @@ export class DownloadService {
 
   private async fetchImageBlob(url: string): Promise<Blob> {
     return this.http.get(url, { responseType: 'blob' }).toPromise().then(blob => {
-        if (!blob) throw new Error('Empty blob received');
-        return blob;
+      if (!blob) throw new Error('Empty blob received');
+      return blob;
     });
   }
 }

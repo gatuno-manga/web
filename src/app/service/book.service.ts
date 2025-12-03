@@ -66,6 +66,24 @@ export class BookService {
     return this.http.patch<Cover>(`books/${bookId}/covers/${coverId}`, data);
   }
 
+  uploadCover(bookId: string, file: File, title?: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (title) {
+      formData.append('title', title);
+    }
+    return this.http.post<Cover>(`books/${bookId}/covers/upload`, formData);
+  }
+
+  replaceCoverImage(bookId: string, coverId: string, file: File, title?: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (title) {
+      formData.append('title', title);
+    }
+    return this.http.patch<Cover>(`books/${bookId}/covers/${coverId}/image`, formData);
+  }
+
   deleteCover(bookId: string, coverId: string) {
     return this.http.delete<void>(`books/${bookId}/covers/${coverId}`);
   }
