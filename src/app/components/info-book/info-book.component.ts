@@ -13,6 +13,8 @@ import { ButtonComponent } from '@components/inputs/button/button.component';
 import { ContextMenuService } from '../../service/context-menu.service';
 import { ContextMenuItem } from '../../models/context-menu.models';
 import { UserTokenService } from '../../service/user-token.service';
+import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
+import { CoverEditModalComponent } from '../cover-edit-modal/cover-edit-modal.component';
 
 enum tab {
   chapters = 0,
@@ -27,7 +29,7 @@ interface ModulesLoad {
 
 @Component({
   selector: 'app-info-book',
-  imports: [RouterModule, DecimalPipe, IconsComponent, ButtonComponent],
+  imports: [RouterModule, DecimalPipe, IconsComponent, ButtonComponent, ImageViewerComponent, CoverEditModalComponent],
   templateUrl: './info-book.component.html',
   styleUrl: './info-book.component.scss'
 })
@@ -72,6 +74,15 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   chaptersDownloadStatus = new Map<string, DownloadStatus | 'downloaded'>();
   chaptersDownloadProgress = new Map<string, number>();
+
+  // Image viewer state
+  showImageViewer = false;
+  viewerImageUrl = '';
+  viewerImageTitle = '';
+
+  // Cover edit modal state
+  showCoverEditModal = false;
+  editingCover: Cover | null = null;
 
   @ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
   @ViewChild('firstTab') firstTab!: ElementRef<HTMLSpanElement>;
@@ -323,8 +334,13 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     const items: ContextMenuItem[] = [
       {
         label: 'Copiar Imagem',
-        icon: 'file',
+        icon: 'copy',
         action: () => this.copyImage(cover.url)
+      },
+      {
+        label: 'Baixar Imagem',
+        icon: 'download',
+        action: () => this.downloadImage(cover.url, cover.title || `cover-${cover.id}`)
       }
     ];
 
@@ -339,7 +355,14 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         {
           label: 'Editar',
           icon: 'settings',
-          action: () => console.log('Edit cover', cover.id)
+          action: () => this.openCoverEditModal(cover)
+        },
+        { type: 'separator' },
+        {
+          label: 'Remover',
+          icon: 'close',
+          danger: true,
+          action: () => this.confirmDeleteCover(cover)
         }
       );
     }
@@ -347,12 +370,115 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.contextMenuService.open(event, items);
   }
 
+  onCoverClick(cover: Cover) {
+    this.openImageViewer(cover.url, cover.title);
+  }
+
+  openImageViewer(url: string, title: string) {
+    this.viewerImageUrl = url;
+    this.viewerImageTitle = title;
+    this.showImageViewer = true;
+    this.lockScroll();
+  }
+
+  closeImageViewer() {
+    this.showImageViewer = false;
+    this.viewerImageUrl = '';
+    this.viewerImageTitle = '';
+    this.unlockScroll();
+  }
+
+  private lockScroll(): void {
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  private unlockScroll(): void {
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = '';
+    }
+  }
+
+  openCoverEditModal(cover: Cover) {
+    this.editingCover = cover;
+    this.showCoverEditModal = true;
+    this.lockScroll();
+  }
+
+  closeCoverEditModal() {
+    this.showCoverEditModal = false;
+    this.editingCover = null;
+    this.unlockScroll();
+  }
+
+  onCoverEditSave(data: { id: string; title: string }) {
+    this.bookService.updateCover(this.id, data.id, { title: data.title }).subscribe({
+      next: () => {
+        const coverIndex = this.covers.findIndex(c => c.id === data.id);
+        if (coverIndex !== -1) {
+          this.covers[coverIndex].title = data.title;
+        }
+        this.closeCoverEditModal();
+      },
+      error: (error: Error) => {
+        console.error('Error updating cover:', error);
+      }
+    });
+  }
+
+  confirmDeleteCover(cover: Cover) {
+    this.modalService.show(
+      'Remover Capa',
+      `Tem certeza que deseja remover esta capa${cover.title ? ` "${cover.title}"` : ''}?`,
+      [
+        {
+          label: 'Cancelar',
+          type: 'primary',
+        },
+        {
+          label: 'Remover',
+          type: 'danger',
+          callback: () => this.deleteCover(cover)
+        }
+      ]
+    );
+  }
+
+  deleteCover(cover: Cover) {
+    this.bookService.deleteCover(this.id, cover.id).subscribe({
+      next: () => {
+        this.covers = this.covers.filter(c => c.id !== cover.id);
+      },
+      error: (error: Error) => {
+        console.error('Error deleting cover:', error);
+      }
+    });
+  }
+
   copyImage(url: string) {
     navigator.clipboard.writeText(url).then(() => {
-       // console.log('Image URL copied');
+      // console.log('Image URL copied');
     }).catch(err => {
       console.error('Failed to copy: ', err);
     });
+  }
+
+  async downloadImage(url: string, filename: string) {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const extension = blob.type.split('/')[1] || 'jpg';
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${filename}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (err) {
+      console.error('Failed to download image: ', err);
+    }
   }
 
   selectCover(cover: Cover) {

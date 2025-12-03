@@ -13,11 +13,11 @@
 		@defer (when modulesLoad[tab.chapters].load()) {
 		<div class="controls">
 			<app-button (click)="toggleSort()" variant="text">
-				<span>Ordem {{ sortAscending() ? 'Crescente' : 'Decrescente' }}</span>
-				<app-icons
-					name="arrow-up"
-					[class.rotated]="!sortAscending()"
-				/>
+				<span
+					>Ordem
+					{{ sortAscending() ? 'Crescente' : 'Decrescente' }}</span
+				>
+				<app-icons name="arrow-up" [class.rotated]="!sortAscending()" />
 			</app-button>
 		</div>
 		<div class="scrollable">
@@ -94,6 +94,7 @@
 			<div
 				class="cover"
 				[class.selected]="cover.selected"
+				(click)="onCoverClick(cover)"
 				(contextmenu)="onCoverContextMenu($event, cover)"
 			>
 				<img [src]="cover.url" [alt]="'Cover ' + cover.id" />
@@ -148,3 +149,21 @@
 		</div>
 	</div>
 </div>
+
+@if(showImageViewer) {
+<app-image-viewer
+	[imageUrl]="viewerImageUrl"
+	[imageTitle]="viewerImageTitle"
+	(close)="closeImageViewer()"
+/>
+} @if(showCoverEditModal && editingCover) {
+<div class="modal-backdrop" (click)="closeCoverEditModal()">
+	<div class="modal-container" (click)="$event.stopPropagation()">
+		<app-cover-edit-modal
+			[cover]="editingCover"
+			(save)="onCoverEditSave($event)"
+			(cancel)="closeCoverEditModal()"
+		/>
+	</div>
+</div>
+}
