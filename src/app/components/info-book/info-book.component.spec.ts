@@ -132,4 +132,22 @@ describe('InfoBookComponent', () => {
 
     expect(component.loadChapters).toHaveBeenCalled();
   });
+
+  it('should toggle sort order and resort chapters', () => {
+    component.chapters = [
+      { id: 'c1', title: 'C1', index: 1 } as any,
+      { id: 'c2', title: 'C2', index: 2 } as any
+    ];
+
+    // Set to Ascending manually first to verify toggle to Descending
+    component.sortAscending.set(true);
+    component.sortChapters();
+    expect(component.chapters[0].index).toBe(1);
+    expect(component.chapters[1].index).toBe(2);
+
+    component.toggleSort(); // Should switch to Descending (false)
+    expect(component.sortAscending()).toBeFalse();
+    expect(component.chapters[0].index).toBe(2);
+    expect(component.chapters[1].index).toBe(1);
+  });
 });

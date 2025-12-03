@@ -42,7 +42,33 @@
 }
 
 #chapters {
+	height: 70vh;
+	display: flex;
+	flex-direction: column;
+
+	.controls {
+		padding: 0 1rem;
+		padding-top: 1rem;
+		display: flex;
+		justify-content: flex-end;
+
+		app-button {
+			width: fit-content;
+			display: block;
+
+			app-icons {
+				transition: transform 0.3s ease;
+				&.rotated {
+					transform: rotate(180deg);
+				}
+			}
+		}
+	}
+
 	.scrollable {
+		flex: 1;
+		height: auto;
+		max-height: none;
 		display: flex;
 		gap: 1rem;
 		flex-direction: column;
