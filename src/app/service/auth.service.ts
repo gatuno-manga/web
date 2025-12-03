@@ -4,11 +4,14 @@ import { loginRequest, loginResponse, registerRequest } from "../models/user.mod
 import { tap } from "rxjs";
 import { CookieService } from "./cookie.service";
 import { UserTokenService } from "./user-token.service";
+import { UnifiedReadingProgressService } from "./unified-reading-progress.service";
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthService {
+    private readingProgressService = inject(UnifiedReadingProgressService);
+
     constructor(
         private readonly http: HttpClient,
         private readonly userTokenService: UserTokenService
@@ -23,6 +26,8 @@ export class AuthService {
                 tap(({ body }) => {
                     if (body) {
                         this.userTokenService.setTokens(body.accessToken, body.refreshToken);
+                        // Sincroniza o histórico de leitura após o login
+                        this.readingProgressService.onUserLogin();
                     }
                 })
             );
@@ -37,6 +42,8 @@ export class AuthService {
             .pipe(
                 tap(() => {
                     this.userTokenService.removeTokens();
+                    // Reseta o estado de leitura para guest
+                    this.readingProgressService.onUserLogout();
                 })
             );
     }
@@ -52,6 +59,8 @@ export class AuthService {
                 tap(({ body }) => {
                     if (body) {
                         this.userTokenService.setTokens(body.accessToken, body.refreshToken);
+                        // Sincroniza o histórico de leitura após o registro
+                        this.readingProgressService.onUserLogin();
                     }
                 })
             );

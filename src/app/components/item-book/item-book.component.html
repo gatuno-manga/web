@@ -1,13 +1,25 @@
 @if(type == 'grid'){
 <a [routerLink]="[book.id]" class="book-card grid">
-	<img [src]="book.cover" alt="" />
+	@if (book.cover && !imageError) {
+	<img [src]="book.cover" alt="" (error)="onImageError()" />
+	} @else {
+	<div class="cover-placeholder">
+		<app-icons name="image" />
+	</div>
+	}
 	<div class="info">
 		<span>{{ book.title }}</span>
 	</div>
 </a>
 } @else {
 <a [routerLink]="[book.id]" class="book-card list">
-	<img [src]="book.cover" alt="" />
+	@if (book.cover && !imageError) {
+	<img [src]="book.cover" alt="" (error)="onImageError()" />
+	} @else {
+	<div class="cover-placeholder">
+		<app-icons name="image" />
+	</div>
+	}
 	<div class="info">
 		<div>
 			<span class="title">{{ book.title }}</span>
@@ -15,5 +27,4 @@
 		<span class="description">{{ book.description }}</span>
 	</div>
 </a>
-
 }

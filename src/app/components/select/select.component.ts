@@ -12,8 +12,12 @@ import { NgClass } from '@angular/common';
 export class SelectComponent {
   @Input() items!: SelectItem[];
   @Input() select = 0;
+  @Input() disabled: boolean = false;
 
   onSelect() {
+    if (this.disabled) {
+      return;
+    }
     this.select = (this.select + 1) % this.items.length;
     this.items[this.select].checked();
   }

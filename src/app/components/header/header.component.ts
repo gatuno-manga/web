@@ -1,5 +1,5 @@
 import { Location, NgClass } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { IconsComponent } from '../icons/icons.component';
@@ -18,11 +18,11 @@ import { UserTokenService } from '../../service/user-token.service';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  constructor(
-    private readonly location: Location,
-    private readonly themeService: ThemeService,
-    private readonly userTokenService: UserTokenService,
-  ) {}
+  private location = inject(Location);
+  private themeService = inject(ThemeService);
+  private userTokenService = inject(UserTokenService);
+
+  constructor() {}
 
   backPage() {
     this.location.back();
@@ -32,12 +32,8 @@ export class HeaderComponent {
     return this.themeService.currentTheme() === 'dark';
   }
 
-  isloggedIn(): boolean {
-    return this.userTokenService.hasValidAccessToken;
-  }
+  isloggedIn = this.userTokenService.hasValidAccessTokenSignal;
 
-  isAdmin(): boolean {
-    return this.userTokenService.isAdmin;
-  }
+  isAdmin = this.userTokenService.isAdminSignal;
 
 }

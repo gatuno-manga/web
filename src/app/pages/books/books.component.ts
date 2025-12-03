@@ -1,12 +1,16 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnDestroy, OnInit, inject, PLATFORM_ID, Injector } from '@angular/core';
 import { LocalStorageService } from '../../service/local-storage.service';
 import { BookService } from '../../service/book.service';
-import { BookList, BookPageOptions } from '../../models/book.models';
+import { BookList, BookPageOptions, ScrapingStatus } from '../../models/book.models';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ItemBookComponent } from '../../components/item-book/item-book.component';
 import { Page } from '../../models/miscellaneous.models';
 import { SelectComponent } from '../../components/select/select.component';
 import { MetaDataService } from '../../service/meta-data.service';
+import { DownloadService } from '../../service/download.service';
+import { SensitiveContentService } from '../../service/sensitive-content.service';
+import { ModalNotificationService } from '../../service/modal-notification.service';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-books',
@@ -14,14 +18,29 @@ import { MetaDataService } from '../../service/meta-data.service';
   templateUrl: './books.component.html',
   styleUrl: './books.component.scss'
 })
-export class BooksComponent {
+export class BooksComponent implements OnInit, OnDestroy {
+  private localStorage = inject(LocalStorageService);
+  private bookService = inject(BookService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private metaService = inject(MetaDataService);
+  private downloadService = inject(DownloadService);
+  private sensitiveContentService = inject(SensitiveContentService);
+  private modalService = inject(ModalNotificationService);
+  private platformId = inject(PLATFORM_ID);
+
+
   books: BookList[] = [];
   currentPage = 1;
   lastPage = 1;
   pagesToShow: number[] = [];
   isLoading = signal(true);
   bookOptions: 'grid' | 'list' = 'grid';
+  viewMode: 'online' | 'offline' = 'online';
+  isOfflineMode: boolean = false;
   filterOptions: BookPageOptions = {};
+  private coverUrls: string[] = [];
+
   selectList = [
     {
       icon: 'grid',
@@ -33,13 +52,18 @@ export class BooksComponent {
     }
   ];
 
-  constructor(
-    private booksService: BookService,
-    private localStorage: LocalStorageService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private metaService: MetaDataService
-  ) {
+  viewModeList = [
+    {
+      icon: 'globe',
+      checked: () => this.toggleViewMode('online'),
+    },
+    {
+      icon: 'download',
+      checked: () => this.toggleViewMode('offline'),
+    }
+  ];
+
+  ngOnInit() {
     const savedLayout = this.localStorage.get('books-layout');
     if (savedLayout === 'grid' || savedLayout === 'list') {
       this.bookOptions = savedLayout;
@@ -48,6 +72,18 @@ export class BooksComponent {
     this.route.queryParams.subscribe(params => {
       const pageFromUrl = params['page'] ? parseInt(params['page'], 10) : 1;
       this.currentPage = pageFromUrl > 0 ? pageFromUrl : 1;
+
+      this.isOfflineMode = isPlatformBrowser(this.platformId) && !navigator.onLine;
+
+      if (this.isOfflineMode) {
+        this.viewMode = 'offline';
+      } else {
+        if (params['mode'] === 'offline') {
+          this.viewMode = 'offline';
+        } else {
+          this.viewMode = 'online';
+        }
+      }
 
       const filters: BookPageOptions = {
         page: this.currentPage,
@@ -73,6 +109,15 @@ export class BooksComponent {
     this.setMetaData();
   }
 
+  ngOnDestroy() {
+    this.clearCoverUrls();
+  }
+
+  clearCoverUrls() {
+    this.coverUrls.forEach(url => URL.revokeObjectURL(url));
+    this.coverUrls = [];
+  }
+
   setMetaData() {
     this.metaService.setMetaData({
       title: 'Livros',
@@ -85,13 +130,105 @@ export class BooksComponent {
     this.localStorage.set('books-layout', option);
   }
 
+  toggleViewMode(mode: 'online' | 'offline') {
+    if (this.viewMode === mode) return;
+
+    if (mode === 'online' && isPlatformBrowser(this.platformId) && !navigator.onLine) {
+      this.modalService.show(
+        'Sem conexão',
+        'Você está sem internet. Não é possível acessar a biblioteca online.',
+        [{ label: 'Ok', type: 'primary' }],
+        'warning'
+      );
+      return;
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { ...this.route.snapshot.queryParams, mode: mode === 'online' ? null : 'offline', page: 1 },
+      queryParamsHandling: 'merge'
+    });
+  }
+
   loadBooks() {
-    this.booksService.getBooks(this.filterOptions).subscribe((bookPage: Page<BookList>) => {
-      this.books = bookPage.data;
-      this.currentPage = bookPage.metadata.page;
-      this.lastPage = bookPage.metadata.lastPage;
+    this.isLoading.set(true);
+    if (this.viewMode === 'offline') {
+      this.loadOfflineBooks();
+    } else {
+      this.loadOnlineBooks();
+    }
+  }
+
+  async loadOfflineBooks() {
+    try {
+      const offlineBooks = await this.downloadService.getAllBooks();
+
+      let filtered = offlineBooks;
+      if (this.filterOptions.search) {
+        const search = this.filterOptions.search.toLowerCase();
+        filtered = filtered.filter(b => b.title.toLowerCase().includes(search));
+      }
+
+      let allowedSensitiveContent = this.filterOptions.sensitiveContent;
+      if (!allowedSensitiveContent) {
+        allowedSensitiveContent = this.sensitiveContentService.getContentAllow();
+      }
+
+      const allowedSet = new Set(allowedSensitiveContent);
+
+      filtered = filtered.filter(b => {
+        if (!b.sensitiveContent || b.sensitiveContent.length === 0) return true;
+        return b.sensitiveContent.every(sc => allowedSet.has(sc.name));
+      });
+
+      const total = filtered.length;
+      const limit = this.filterOptions.limit || 20;
+      const page = this.currentPage;
+      const start = (page - 1) * limit;
+      const end = start + limit;
+      const paginated = filtered.slice(start, end);
+
+      this.clearCoverUrls();
+
+      this.books = paginated.map(ob => {
+        const url = URL.createObjectURL(ob.cover);
+        this.coverUrls.push(url);
+        return {
+          id: ob.id,
+          title: ob.title,
+          cover: url,
+          tags: ob.tags || [],
+          description: ob.description || '',
+          scrapingStatus: ScrapingStatus.READY,
+          publication: ob.publication,
+          authors: ob.authors || [],
+          totalChapters: ob.totalChapters
+        } as any;
+      });
+
+      this.lastPage = Math.ceil(total / limit) || 1;
       this.pagesToShow = this.getPagesToShow();
+    } catch (err) {
+      console.error('Error loading offline books:', err);
+    } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  loadOnlineBooks() {
+    this.bookService.getBooks(this.filterOptions).subscribe({
+      next: (bookPage: Page<BookList>) => {
+        this.books = bookPage.data;
+        this.currentPage = bookPage.metadata.page;
+        this.lastPage = bookPage.metadata.lastPage;
+        this.pagesToShow = this.getPagesToShow();
+        this.isLoading.set(false);
+      },
+      error: async () => {
+        console.log('Online load failed, falling back to offline view');
+        this.viewMode = 'offline';
+        this.loadOfflineBooks();
+      }
     });
   }
 
@@ -117,12 +254,17 @@ export class BooksComponent {
 
       this.router.navigate([], {
         relativeTo: this.route,
-        queryParams: cleanParams
+        queryParams: cleanParams,
+        queryParamsHandling: 'merge'
       });
     }
   }
 
   selectListItem(): number {
     return this.selectList.findIndex(item => item.icon === this.bookOptions);
+  }
+
+  getViewModeIndex(): number {
+    return this.viewMode === 'online' ? 0 : 1;
   }
 }

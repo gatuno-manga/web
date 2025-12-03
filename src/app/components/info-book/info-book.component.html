@@ -11,6 +11,15 @@
 		class="container"
 	>
 		@defer (when modulesLoad[tab.chapters].load()) {
+		<div class="controls">
+			<app-button (click)="toggleSort()" variant="text">
+				<span
+					>Ordem
+					{{ sortAscending() ? 'Crescente' : 'Decrescente' }}</span
+				>
+				<app-icons name="arrow-up" [class.rotated]="!sortAscending()" />
+			</app-button>
+		</div>
 		<div class="scrollable">
 			@for(chapter of chapters; track chapter.id) {
 			<a [routerLink]="[chapter.id]" class="chapter">
@@ -26,6 +35,36 @@
 							[name]="chapter.read ? 'eye' : 'eye-close'"
 							[class.read]="chapter.read"
 						/>
+					</div>
+					<div
+						class="download-container"
+						(click)="
+							$event.preventDefault(); $event.stopPropagation()
+						"
+					>
+						@if(chaptersDownloadStatus.get(chapter.id) ===
+						'downloaded') {
+						<app-icons
+							name="check"
+							class="icon-downloaded"
+							(click)="deleteChapterDownload(chapter, $event)"
+							title="Clique para excluir download"
+						/>
+						} @else if (chaptersDownloadStatus.get(chapter.id) ===
+						'downloading') {
+						<span class="download-progress"
+							>{{
+								chaptersDownloadProgress.get(chapter.id)
+									| number : '1.0-0'
+							}}%</span
+						>
+						} @else {
+						<app-icons
+							name="download"
+							class="icon-download"
+							(click)="downloadChapter(chapter, $event)"
+						/>
+						}
 					</div>
 					<div
 						class="scraping-status"
@@ -60,9 +99,20 @@
 			<div
 				class="cover"
 				[class.selected]="cover.selected"
-				(dblclick)="selectCover(cover)"
+				(click)="onCoverClick(cover)"
+				(contextmenu)="onCoverContextMenu($event, cover)"
 			>
-				<img [src]="cover.url" [alt]="'Cover ' + cover.id" />
+				@if (cover.url && !coverImageErrors.has(cover.id)) {
+				<img
+					[src]="cover.url"
+					[alt]="'Cover ' + cover.id"
+					(error)="onCoverImageError(cover.id)"
+				/>
+				} @else {
+				<div class="cover-placeholder">
+					<app-icons name="image" />
+				</div>
+				}
 				<div class="metadata">{{ cover.title }}</div>
 			</div>
 			}
@@ -114,3 +164,21 @@
 		</div>
 	</div>
 </div>
+
+@if(showImageViewer) {
+<app-image-viewer
+	[imageUrl]="viewerImageUrl"
+	[imageTitle]="viewerImageTitle"
+	(close)="closeImageViewer()"
+/>
+} @if(showCoverEditModal && editingCover) {
+<div class="modal-backdrop" (click)="closeCoverEditModal()">
+	<div class="modal-container" (click)="$event.stopPropagation()">
+		<app-cover-edit-modal
+			[cover]="editingCover"
+			(save)="onCoverEditSave($event)"
+			(cancel)="closeCoverEditModal()"
+		/>
+	</div>
+</div>
+}

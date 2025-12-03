@@ -1,9 +1,18 @@
-@defer (when !isLoading()){
-<img [src]="book.cover" class="book-background" />
+@defer (when !isLoading()){ @if (book.cover && !coverImageError) {
+<img [src]="book.cover" class="book-background" (error)="onCoverImageError()" />
+} @else {
+<div class="book-background placeholder-background"></div>
+}
 <div class="book">
 	<div class="book-header">
 		<div class="book-cover">
-			<img [src]="book.cover" />
+			@if (book.cover && !coverImageError) {
+			<img [src]="book.cover" (error)="onCoverImageError()" />
+			} @else {
+			<div class="cover-placeholder">
+				<app-icons name="image" />
+			</div>
+			}
 		</div>
 		<div class="book-info">
 			<div class="top">
@@ -20,6 +29,47 @@
 			<div class="bottom">
 				<div class="caps">{{ book.totalChapters }} Capitulos</div>
 				<div class="release">Lançamento {{ book.publication }}</div>
+				<div class="actions">
+					<app-button (click)="continueReading()" variant="primary">
+						{{
+							lastReadChapterId
+								? 'Continue lendo'
+								: 'Começar a ler'
+						}}
+					</app-button>
+					<div class="options-wrapper">
+						<button
+							class="options-btn"
+							(click)="
+								toggleOptionsDropdown();
+								$event.stopPropagation()
+							"
+						>
+							<app-icons name="more" />
+						</button>
+						@if (showOptionsDropdown()) {
+						<div class="options-dropdown">
+							<button (click)="downloadBook()">
+								<app-icons name="download" />
+								<span>Baixar livro</span>
+							</button>
+							@if (isBookDownloaded()) {
+							<button
+								(click)="deleteDownloadedBook()"
+								class="danger"
+							>
+								<app-icons name="trash" />
+								<span>Excluir download</span>
+							</button>
+							}
+							<button (click)="shareBook()">
+								<app-icons name="share" />
+								<span>Compartilhar</span>
+							</button>
+						</div>
+						}
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -36,7 +86,7 @@
 		<p class="book-description">{{ book.description }}</p>
 	</div>
 </div>
-<app-info-book [id]="book.id" />
+<app-info-book [id]="book.id" [bookBasic]="book" />
 } @placeholder {
 <div class="book-background placeholder-background"></div>
 <div class="book">
@@ -67,7 +117,7 @@
 	<div class="placeholder"></div>
 	}
 </div>
-} @if(admin){
+} @if(admin && book){
 <app-aside>
 	<h1><app-icons name="book" /> {{ book.title }}</h1>
 	<div class="line"></div>

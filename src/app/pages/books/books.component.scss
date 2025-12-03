@@ -25,6 +25,29 @@
 	flex-wrap: wrap;
 	padding: 0 20px;
 	margin: auto auto;
+	z-index: 5;
+
+    .mode-switch {
+        display: flex;
+        gap: 1rem;
+        
+        app-icons {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                color: var(--primary-color);
+            }
+            
+            &.active {
+                color: var(--primary-color);
+                border-color: var(--primary-color);
+            }
+        }
+    }
 }
 
 .pages {

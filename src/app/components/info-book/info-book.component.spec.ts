@@ -7,6 +7,8 @@ import { InfoBookComponent } from './info-book.component';
 import { BookService } from '../../service/book.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { ScrapingStatus } from '../../models/book.models';
+import { ContextMenuService } from '../../service/context-menu.service';
+import { UserTokenService } from '../../service/user-token.service';
 
 describe('InfoBookComponent', () => {
   let component: InfoBookComponent;
@@ -15,6 +17,8 @@ describe('InfoBookComponent', () => {
   let watchSubject: Subject<any>;
   let mockBookService: any;
   let mockModalService: any;
+  let mockContextMenuService: any;
+  let mockUserTokenService: any;
 
   beforeEach(async () => {
     watchSubject = new Subject<any>();
@@ -32,12 +36,22 @@ describe('InfoBookComponent', () => {
       show: jasmine.createSpy('show')
     };
 
+    mockContextMenuService = {
+      open: jasmine.createSpy('open')
+    };
+
+    mockUserTokenService = {
+      isAdminSignal: jasmine.createSpy('isAdminSignal').and.returnValue(false)
+    };
+
     await TestBed.configureTestingModule({
       imports: [InfoBookComponent],
       providers: [
         provideRouter([]),
         { provide: BookService, useValue: mockBookService },
-        { provide: ModalNotificationService, useValue: mockModalService }
+        { provide: ModalNotificationService, useValue: mockModalService },
+        { provide: ContextMenuService, useValue: mockContextMenuService },
+        { provide: UserTokenService, useValue: mockUserTokenService }
       ]
     })
       .compileComponents();
@@ -131,5 +145,57 @@ describe('InfoBookComponent', () => {
     watchSubject.next({ type: 'chapters.updated' });
 
     expect(component.loadChapters).toHaveBeenCalled();
+  });
+
+  it('should toggle sort order and resort chapters', () => {
+    component.chapters = [
+      { id: 'c1', title: 'C1', index: 1 } as any,
+      { id: 'c2', title: 'C2', index: 2 } as any
+    ];
+
+    // Set to Ascending manually first to verify toggle to Descending
+    component.sortAscending.set(true);
+    component.sortChapters();
+    expect(component.chapters[0].index).toBe(1);
+    expect(component.chapters[1].index).toBe(2);
+
+    component.toggleSort(); // Should switch to Descending (false)
+    expect(component.sortAscending()).toBeFalse();
+    expect(component.chapters[0].index).toBe(2);
+    expect(component.chapters[1].index).toBe(1);
+  });
+
+  it('onCoverContextMenu should show Copy and Download Image for non-admin', () => {
+    const event = new MouseEvent('contextmenu');
+    const cover = { id: 'cv1', url: 'http://img' } as any;
+
+    component.onCoverContextMenu(event, cover);
+
+    expect(mockContextMenuService.open).toHaveBeenCalled();
+    const args = mockContextMenuService.open.calls.mostRecent().args;
+    expect(args[0]).toBe(event);
+    // Non-admin sees 2 items: Copy Image and Download Image
+    expect(args[1].length).toBe(2);
+    expect(args[1][0].label).toBe('Copiar Imagem');
+    expect(args[1][1].label).toBe('Baixar Imagem');
+  });
+
+  it('onCoverContextMenu should show Select Cover, Edit and Remove options for admin', () => {
+    mockUserTokenService.isAdminSignal.and.returnValue(true);
+    const event = new MouseEvent('contextmenu');
+    const cover = { id: 'cv1', url: 'http://img' } as any;
+
+    component.onCoverContextMenu(event, cover);
+
+    const args = mockContextMenuService.open.calls.mostRecent().args;
+    // Admin sees 7 items: Copy Image, Download Image, Separator, Select, Edit, Separator, Remove
+    expect(args[1].length).toBe(7);
+    expect(args[1][0].label).toBe('Copiar Imagem');
+    expect(args[1][1].label).toBe('Baixar Imagem');
+    expect(args[1][2].type).toBe('separator');
+    expect(args[1][3].label).toBe('Selecionar Capa');
+    expect(args[1][4].label).toBe('Editar');
+    expect(args[1][5].type).toBe('separator');
+    expect(args[1][6].label).toBe('Remover');
   });
 });

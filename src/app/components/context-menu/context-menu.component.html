@@ -1,0 +1,24 @@
+@if (state().visible) {
+  <div #menu class="context-menu" [style.left.px]="state().x" [style.top.px]="state().y" (click)="$event.stopPropagation()" (contextmenu)="$event.stopPropagation(); $event.preventDefault()">
+    @for (item of state().items; track $index) {
+      @if (item.type === 'separator') {
+        <div class="separator"></div>
+      } @else {
+        <div 
+          class="menu-item" 
+          [class.disabled]="item.disabled"
+          [class.danger]="item.danger"
+          (click)="onItemClick($event, item)"
+        >
+          @if (item.icon) {
+            <app-icons [name]="item.icon" size="16" class="icon" />
+          }
+          <span class="label">{{ item.label }}</span>
+          @if (item.shortcut) {
+            <span class="shortcut">{{ item.shortcut }}</span>
+          }
+        </div>
+      }
+    }
+  </div>
+}

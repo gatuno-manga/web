@@ -1,0 +1,50 @@
+<div class="modal-content">
+	<div class="modal-header">
+		<h2>Editar Capa</h2>
+	</div>
+
+	<div class="modal-body">
+		<div class="cover-preview" (click)="triggerFileInput(fileInput)">
+			@if (hasImage && !imageError) {
+			<img
+				[src]="previewUrl"
+				[alt]="cover.title"
+				(error)="onImageError()"
+			/>
+			<div class="upload-overlay">
+				<app-icons name="upload" />
+				<span>Trocar imagem</span>
+			</div>
+			} @else {
+			<div class="placeholder-icon">
+				<app-icons name="image" />
+				<span>Clique para adicionar imagem</span>
+			</div>
+			}
+			<input
+				#fileInput
+				type="file"
+				accept="image/*"
+				(change)="onFileSelected($event)"
+				hidden
+			/>
+		</div>
+
+		<div class="form-group">
+			<label for="coverTitle">Título da Capa</label>
+			<input
+				type="text"
+				id="coverTitle"
+				[(ngModel)]="editedTitle"
+				placeholder="Digite o título da capa"
+			/>
+		</div>
+	</div>
+
+	<div class="modal-footer">
+		<app-button variant="outline" (click)="onCancel()">
+			Cancelar
+		</app-button>
+		<app-button variant="primary" (click)="onSave()"> Salvar </app-button>
+	</div>
+</div>
