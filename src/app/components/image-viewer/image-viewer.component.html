@@ -1,0 +1,11 @@
+<div class="image-viewer-backdrop" (click)="onBackdropClick($event)">
+	<button class="close-btn" (click)="closeViewer()">
+		<app-icons name="close" />
+	</button>
+	<div class="image-container">
+		<img [src]="imageUrl" [alt]="imageTitle" />
+		@if(imageTitle) {
+		<div class="image-title">{{ imageTitle }}</div>
+		}
+	</div>
+</div>

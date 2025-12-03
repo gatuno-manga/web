@@ -1,0 +1,28 @@
+<div class="modal-content">
+	<div class="modal-header">
+		<h2>Editar Capa</h2>
+	</div>
+
+	<div class="modal-body">
+		<div class="cover-preview">
+			<img [src]="cover.url" [alt]="cover.title" />
+		</div>
+
+		<div class="form-group">
+			<label for="coverTitle">Título da Capa</label>
+			<input
+				type="text"
+				id="coverTitle"
+				[(ngModel)]="editedTitle"
+				placeholder="Digite o título da capa"
+			/>
+		</div>
+	</div>
+
+	<div class="modal-footer">
+		<app-button variant="outline" (click)="onCancel()">
+			Cancelar
+		</app-button>
+		<app-button variant="primary" (click)="onSave()"> Salvar </app-button>
+	</div>
+</div>
