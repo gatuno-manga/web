@@ -1,7 +1,11 @@
 {
   "name": "Gatuno",
   "short_name": "Gatuno",
+  "description": "Leia seus livros e mangás favoritos",
   "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#000212",
+  "background_color": "#000212",
   "scope": "./",
   "start_url": "./",
   "icons": [
