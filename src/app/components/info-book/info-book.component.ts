@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal, OnDestroy } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal, OnDestroy, inject } from '@angular/core';
 import { BookService } from '../../service/book.service';
 import { Book, BookBasic, BookDetail, Chapter, Chapterlist, Cover, ScrapingStatus } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
@@ -10,6 +10,9 @@ import { DownloadService } from '../../service/download.service';
 import { ChapterService } from '../../service/chapter.service';
 import { DownloadStatus } from '../../models/offline.models';
 import { ButtonComponent } from '@components/inputs/button/button.component';
+import { ContextMenuService } from '../../service/context-menu.service';
+import { ContextMenuItem } from '../../models/context-menu.models';
+import { UserTokenService } from '../../service/user-token.service';
 
 enum tab {
   chapters = 0,
@@ -29,6 +32,8 @@ interface ModulesLoad {
   styleUrl: './info-book.component.scss'
 })
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
+  private userTokenService = inject(UserTokenService);
+
   tab = tab;
   ScrapingStatus = ScrapingStatus;
 
@@ -75,7 +80,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     private bookService: BookService,
     private modalService: ModalNotificationService,
     private downloadService: DownloadService,
-    private chapterService: ChapterService
+    private chapterService: ChapterService,
+    private contextMenuService: ContextMenuService
   ) {}
 
   ngAfterViewInit() {
@@ -311,6 +317,42 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   urlTransform(url: string): string {
     return new URL(url).hostname;
+  }
+
+  onCoverContextMenu(event: MouseEvent, cover: Cover) {
+    const items: ContextMenuItem[] = [
+      {
+        label: 'Copiar Imagem',
+        icon: 'file',
+        action: () => this.copyImage(cover.url)
+      }
+    ];
+
+    if (this.userTokenService.isAdminSignal()) {
+      items.push(
+        { type: 'separator' },
+        {
+          label: 'Selecionar Capa',
+          icon: 'image',
+          action: () => this.selectCover(cover)
+        },
+        {
+          label: 'Editar',
+          icon: 'settings',
+          action: () => console.log('Edit cover', cover.id)
+        }
+      );
+    }
+
+    this.contextMenuService.open(event, items);
+  }
+
+  copyImage(url: string) {
+    navigator.clipboard.writeText(url).then(() => {
+       // console.log('Image URL copied');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
   }
 
   selectCover(cover: Cover) {

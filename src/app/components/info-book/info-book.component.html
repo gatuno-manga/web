@@ -94,7 +94,7 @@
 			<div
 				class="cover"
 				[class.selected]="cover.selected"
-				(dblclick)="selectCover(cover)"
+				(contextmenu)="onCoverContextMenu($event, cover)"
 			>
 				<img [src]="cover.url" [alt]="'Cover ' + cover.id" />
 				<div class="metadata">{{ cover.title }}</div>

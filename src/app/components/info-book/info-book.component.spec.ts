@@ -7,6 +7,8 @@ import { InfoBookComponent } from './info-book.component';
 import { BookService } from '../../service/book.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { ScrapingStatus } from '../../models/book.models';
+import { ContextMenuService } from '../../service/context-menu.service';
+import { UserTokenService } from '../../service/user-token.service';
 
 describe('InfoBookComponent', () => {
   let component: InfoBookComponent;
@@ -15,6 +17,8 @@ describe('InfoBookComponent', () => {
   let watchSubject: Subject<any>;
   let mockBookService: any;
   let mockModalService: any;
+  let mockContextMenuService: any;
+  let mockUserTokenService: any;
 
   beforeEach(async () => {
     watchSubject = new Subject<any>();
@@ -32,12 +36,22 @@ describe('InfoBookComponent', () => {
       show: jasmine.createSpy('show')
     };
 
+    mockContextMenuService = {
+        open: jasmine.createSpy('open')
+    };
+
+    mockUserTokenService = {
+        isAdminSignal: jasmine.createSpy('isAdminSignal').and.returnValue(false)
+    };
+
     await TestBed.configureTestingModule({
       imports: [InfoBookComponent],
       providers: [
         provideRouter([]),
         { provide: BookService, useValue: mockBookService },
-        { provide: ModalNotificationService, useValue: mockModalService }
+        { provide: ModalNotificationService, useValue: mockModalService },
+        { provide: ContextMenuService, useValue: mockContextMenuService },
+        { provide: UserTokenService, useValue: mockUserTokenService }
       ]
     })
       .compileComponents();
@@ -149,5 +163,35 @@ describe('InfoBookComponent', () => {
     expect(component.sortAscending()).toBeFalse();
     expect(component.chapters[0].index).toBe(2);
     expect(component.chapters[1].index).toBe(1);
+  });
+
+  it('onCoverContextMenu should only show Copy Image for non-admin', () => {
+    const event = new MouseEvent('contextmenu');
+    const cover = { id: 'cv1', url: 'http://img' } as any;
+
+    component.onCoverContextMenu(event, cover);
+
+    expect(mockContextMenuService.open).toHaveBeenCalled();
+    const args = mockContextMenuService.open.calls.mostRecent().args;
+    expect(args[0]).toBe(event);
+    // Non-admin sees 1 item: Copy Image
+    expect(args[1].length).toBe(1);
+    expect(args[1][0].label).toBe('Copiar Imagem');
+  });
+
+  it('onCoverContextMenu should show Select Cover and Edit options for admin', () => {
+    mockUserTokenService.isAdminSignal.and.returnValue(true);
+    const event = new MouseEvent('contextmenu');
+    const cover = { id: 'cv1', url: 'http://img' } as any;
+
+    component.onCoverContextMenu(event, cover);
+
+    const args = mockContextMenuService.open.calls.mostRecent().args;
+    // Admin sees 4 items: Copy, Separator, Select, Edit
+    expect(args[1].length).toBe(4);
+    expect(args[1][0].label).toBe('Copiar Imagem');
+    expect(args[1][1].type).toBe('separator');
+    expect(args[1][2].label).toBe('Selecionar Capa');
+    expect(args[1][3].label).toBe('Editar');
   });
 });
