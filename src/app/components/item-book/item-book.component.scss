@@ -20,6 +20,24 @@ $width: 250px;
 		object-fit: cover;
 		border-radius: 15px;
 	}
+
+	.cover-placeholder {
+		width: 250px;
+		height: 355px;
+		border-radius: 15px;
+		background-color: var(--secondary-color);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		app-icons {
+			width: 48px;
+			height: 48px;
+			color: var(--app-text-color);
+			opacity: 0.4;
+		}
+	}
+
 	.info {
 		padding: 20px;
 		border: 1px solid var(--primary-color);
@@ -50,6 +68,24 @@ $width: 250px;
 		object-fit: cover;
 		border-radius: 15px;
 	}
+
+	.cover-placeholder {
+		width: $width * 0.8;
+		height: 100%;
+		border-radius: 15px;
+		background-color: var(--secondary-color);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		app-icons {
+			width: 48px;
+			height: 48px;
+			color: var(--app-text-color);
+			opacity: 0.4;
+		}
+	}
+
 	.info {
 		display: flex;
 		flex-direction: column;

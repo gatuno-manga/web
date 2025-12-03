@@ -4,8 +4,30 @@
 	</div>
 
 	<div class="modal-body">
-		<div class="cover-preview">
-			<img [src]="cover.url" [alt]="cover.title" />
+		<div class="cover-preview" (click)="triggerFileInput(fileInput)">
+			@if (hasImage && !imageError) {
+			<img
+				[src]="previewUrl"
+				[alt]="cover.title"
+				(error)="onImageError()"
+			/>
+			<div class="upload-overlay">
+				<app-icons name="upload" />
+				<span>Trocar imagem</span>
+			</div>
+			} @else {
+			<div class="placeholder-icon">
+				<app-icons name="image" />
+				<span>Clique para adicionar imagem</span>
+			</div>
+			}
+			<input
+				#fileInput
+				type="file"
+				accept="image/*"
+				(change)="onFileSelected($event)"
+				hidden
+			/>
 		</div>
 
 		<div class="form-group">

@@ -14,7 +14,7 @@ import { ContextMenuService } from '../../service/context-menu.service';
 import { ContextMenuItem } from '../../models/context-menu.models';
 import { UserTokenService } from '../../service/user-token.service';
 import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
-import { CoverEditModalComponent } from '../cover-edit-modal/cover-edit-modal.component';
+import { CoverEditModalComponent, CoverEditSaveEvent } from '../cover-edit-modal/cover-edit-modal.component';
 
 enum tab {
   chapters = 0,
@@ -43,7 +43,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   @Input() bookBasic?: BookBasic;
 
   selectedTab: tab = tab.chapters;
-  sortAscending = signal(false);
+  sortAscending = signal(true);
 
   private websocketSubscription?: Subscription;
   private downloadSubscription?: Subscription;
@@ -83,6 +83,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   // Cover edit modal state
   showCoverEditModal = false;
   editingCover: Cover | null = null;
+
+  // Track cover image loading errors
+  coverImageErrors = new Set<string>();
 
   @ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
   @ViewChild('firstTab') firstTab!: ElementRef<HTMLSpanElement>;
@@ -304,6 +307,33 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  async deleteChapterDownload(chapter: Chapterlist, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.modalService.show(
+      'Excluir Download',
+      `Deseja excluir o capítulo ${chapter.index}${chapter.title ? ` - ${chapter.title}` : ''} dos downloads?`,
+      [
+        {
+          label: 'Cancelar',
+          type: 'primary',
+        },
+        {
+          label: 'Excluir',
+          type: 'danger',
+          callback: async () => {
+            await this.downloadService.deleteChapter(chapter.id);
+            this.chaptersDownloadStatus.delete(chapter.id);
+            // Força atualização da view
+            this.chaptersDownloadStatus = new Map(this.chaptersDownloadStatus);
+          }
+        }
+      ],
+      'warning'
+    );
+  }
+
   loadCovers() {
     this.bookService.getCovers(this.id).subscribe({
       next: (covers) => {
@@ -330,28 +360,43 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     return new URL(url).hostname;
   }
 
+  onCoverImageError(coverId: string) {
+    this.coverImageErrors.add(coverId);
+  }
+
   onCoverContextMenu(event: MouseEvent, cover: Cover) {
-    const items: ContextMenuItem[] = [
-      {
-        label: 'Copiar Imagem',
-        icon: 'copy',
-        action: () => this.copyImage(cover.url)
-      },
-      {
-        label: 'Baixar Imagem',
-        icon: 'download',
-        action: () => this.downloadImage(cover.url, cover.title || `cover-${cover.id}`)
-      }
-    ];
+    const items: ContextMenuItem[] = [];
+
+    // Only show image-related options if cover has a URL and no error
+    if (cover.url && !this.coverImageErrors.has(cover.id)) {
+      items.push(
+        {
+          label: 'Copiar Imagem',
+          icon: 'copy',
+          action: () => this.copyImage(cover.url)
+        },
+        {
+          label: 'Baixar Imagem',
+          icon: 'download',
+          action: () => this.downloadImage(cover.url, cover.title || `cover-${cover.id}`)
+        }
+      );
+    }
 
     if (this.userTokenService.isAdminSignal()) {
-      items.push(
-        { type: 'separator' },
-        {
+      if (items.length > 0) {
+        items.push({ type: 'separator' });
+      }
+
+      if (cover.url) {
+        items.push({
           label: 'Selecionar Capa',
           icon: 'image',
           action: () => this.selectCover(cover)
-        },
+        });
+      }
+
+      items.push(
         {
           label: 'Editar',
           icon: 'settings',
@@ -371,7 +416,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   }
 
   onCoverClick(cover: Cover) {
-    this.openImageViewer(cover.url, cover.title);
+    if (cover.url && !this.coverImageErrors.has(cover.id)) {
+      this.openImageViewer(cover.url, cover.title);
+    } else {
+      // Open edit modal for covers without image or with loading error
+      this.openCoverEditModal(cover);
+    }
   }
 
   openImageViewer(url: string, title: string) {
@@ -412,19 +462,42 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.unlockScroll();
   }
 
-  onCoverEditSave(data: { id: string; title: string }) {
-    this.bookService.updateCover(this.id, data.id, { title: data.title }).subscribe({
-      next: () => {
-        const coverIndex = this.covers.findIndex(c => c.id === data.id);
-        if (coverIndex !== -1) {
-          this.covers[coverIndex].title = data.title;
+  onCoverEditSave(data: CoverEditSaveEvent) {
+    if (data.file) {
+      // Replace existing cover image
+      this.bookService.replaceCoverImage(this.id, data.id, data.file, data.title).subscribe({
+        next: (updatedCover) => {
+          const coverIndex = this.covers.findIndex(c => c.id === data.id);
+          if (coverIndex !== -1) {
+            // Add cache-busting parameter to force image reload
+            if (updatedCover.url && !updatedCover.url.includes('?')) {
+              updatedCover.url = `${updatedCover.url}?t=${Date.now()}`;
+            }
+            this.covers[coverIndex] = updatedCover;
+            // Clear any previous image error for this cover
+            this.coverImageErrors.delete(data.id);
+          }
+          this.closeCoverEditModal();
+        },
+        error: (error: Error) => {
+          console.error('Error replacing cover image:', error);
         }
-        this.closeCoverEditModal();
-      },
-      error: (error: Error) => {
-        console.error('Error updating cover:', error);
-      }
-    });
+      });
+    } else {
+      // Just update the title
+      this.bookService.updateCover(this.id, data.id, { title: data.title }).subscribe({
+        next: () => {
+          const coverIndex = this.covers.findIndex(c => c.id === data.id);
+          if (coverIndex !== -1) {
+            this.covers[coverIndex].title = data.title;
+          }
+          this.closeCoverEditModal();
+        },
+        error: (error: Error) => {
+          console.error('Error updating cover:', error);
+        }
+      });
+    }
   }
 
   confirmDeleteCover(cover: Cover) {

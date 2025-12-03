@@ -44,7 +44,12 @@
 					>
 						@if(chaptersDownloadStatus.get(chapter.id) ===
 						'downloaded') {
-						<app-icons name="check" class="icon-downloaded" />
+						<app-icons
+							name="check"
+							class="icon-downloaded"
+							(click)="deleteChapterDownload(chapter, $event)"
+							title="Clique para excluir download"
+						/>
 						} @else if (chaptersDownloadStatus.get(chapter.id) ===
 						'downloading') {
 						<span class="download-progress"
@@ -97,7 +102,17 @@
 				(click)="onCoverClick(cover)"
 				(contextmenu)="onCoverContextMenu($event, cover)"
 			>
-				<img [src]="cover.url" [alt]="'Cover ' + cover.id" />
+				@if (cover.url && !coverImageErrors.has(cover.id)) {
+				<img
+					[src]="cover.url"
+					[alt]="'Cover ' + cover.id"
+					(error)="onCoverImageError(cover.id)"
+				/>
+				} @else {
+				<div class="cover-placeholder">
+					<app-icons name="image" />
+				</div>
+				}
 				<div class="metadata">{{ cover.title }}</div>
 			</div>
 			}
