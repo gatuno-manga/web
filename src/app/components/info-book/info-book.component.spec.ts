@@ -37,11 +37,11 @@ describe('InfoBookComponent', () => {
     };
 
     mockContextMenuService = {
-        open: jasmine.createSpy('open')
+      open: jasmine.createSpy('open')
     };
 
     mockUserTokenService = {
-        isAdminSignal: jasmine.createSpy('isAdminSignal').and.returnValue(false)
+      isAdminSignal: jasmine.createSpy('isAdminSignal').and.returnValue(false)
     };
 
     await TestBed.configureTestingModule({
@@ -165,7 +165,7 @@ describe('InfoBookComponent', () => {
     expect(component.chapters[1].index).toBe(1);
   });
 
-  it('onCoverContextMenu should only show Copy Image for non-admin', () => {
+  it('onCoverContextMenu should show Copy and Download Image for non-admin', () => {
     const event = new MouseEvent('contextmenu');
     const cover = { id: 'cv1', url: 'http://img' } as any;
 
@@ -174,12 +174,13 @@ describe('InfoBookComponent', () => {
     expect(mockContextMenuService.open).toHaveBeenCalled();
     const args = mockContextMenuService.open.calls.mostRecent().args;
     expect(args[0]).toBe(event);
-    // Non-admin sees 1 item: Copy Image
-    expect(args[1].length).toBe(1);
+    // Non-admin sees 2 items: Copy Image and Download Image
+    expect(args[1].length).toBe(2);
     expect(args[1][0].label).toBe('Copiar Imagem');
+    expect(args[1][1].label).toBe('Baixar Imagem');
   });
 
-  it('onCoverContextMenu should show Select Cover and Edit options for admin', () => {
+  it('onCoverContextMenu should show Select Cover, Edit and Remove options for admin', () => {
     mockUserTokenService.isAdminSignal.and.returnValue(true);
     const event = new MouseEvent('contextmenu');
     const cover = { id: 'cv1', url: 'http://img' } as any;
@@ -187,11 +188,14 @@ describe('InfoBookComponent', () => {
     component.onCoverContextMenu(event, cover);
 
     const args = mockContextMenuService.open.calls.mostRecent().args;
-    // Admin sees 4 items: Copy, Separator, Select, Edit
-    expect(args[1].length).toBe(4);
+    // Admin sees 7 items: Copy Image, Download Image, Separator, Select, Edit, Separator, Remove
+    expect(args[1].length).toBe(7);
     expect(args[1][0].label).toBe('Copiar Imagem');
-    expect(args[1][1].type).toBe('separator');
-    expect(args[1][2].label).toBe('Selecionar Capa');
-    expect(args[1][3].label).toBe('Editar');
+    expect(args[1][1].label).toBe('Baixar Imagem');
+    expect(args[1][2].type).toBe('separator');
+    expect(args[1][3].label).toBe('Selecionar Capa');
+    expect(args[1][4].label).toBe('Editar');
+    expect(args[1][5].type).toBe('separator');
+    expect(args[1][6].label).toBe('Remover');
   });
 });

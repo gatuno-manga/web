@@ -4,13 +4,19 @@ import { Location } from '@angular/common';
 import { HeaderComponent } from './header.component';
 import { ThemeService } from '../../service/theme.service';
 import { UserTokenService } from '../../service/user-token.service';
+import { signal } from '@angular/core';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
   const mockLocation = { back: jasmine.createSpy('back') };
   const mockThemeService = { currentTheme: () => 'dark' };
-  const mockUserTokenService = { hasValidAccessToken: true, isAdmin: true };
+  const mockUserTokenService = {
+    hasValidAccessToken: true,
+    isAdmin: true,
+    hasValidAccessTokenSignal: signal(true),
+    isAdminSignal: signal(true)
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
