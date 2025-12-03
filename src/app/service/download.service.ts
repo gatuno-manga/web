@@ -1,9 +1,8 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import { OfflineBook, OfflineChapter, DownloadProgress, DownloadStatus } from '../models/offline.models';
-import { BehaviorSubject, Observable, from, of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { OfflineBook, OfflineChapter, DownloadProgress } from '../models/offline.models';
+import { BehaviorSubject } from 'rxjs';
 import { Book, BookBasic, Chapter, Page } from '../models/book.models';
 import { HttpClient } from '@angular/common/http';
 
@@ -145,7 +144,6 @@ export class DownloadService {
       }
 
       // 2. Download all pages
-      const pageBlobs: Blob[] = [];
       let completedCount = 0;
 
       // Sequential download to avoid overloading network/browser, or parallel with limit?

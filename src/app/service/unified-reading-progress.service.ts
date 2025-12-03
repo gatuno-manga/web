@@ -1,9 +1,9 @@
-import { Injectable, Inject, PLATFORM_ID, OnDestroy, inject } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ReadingProgressService, ReadingProgress } from './reading-progress.service';
-import { ReadingProgressSyncService, RemoteReadingProgress, SyncStatus } from './reading-progress-sync.service';
+import { ReadingProgressSyncService, RemoteReadingProgress } from './reading-progress-sync.service';
 import { UserTokenService } from './user-token.service';
 import { jwtDecode } from 'jwt-decode';
 

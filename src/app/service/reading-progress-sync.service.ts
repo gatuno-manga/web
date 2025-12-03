@@ -2,7 +2,7 @@ import { Injectable, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
-import { BehaviorSubject, Subject, Observable, firstValueFrom, Subscription } from 'rxjs';
+import { BehaviorSubject, Subject, firstValueFrom, Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { UserTokenService } from './user-token.service';
 import { ReadingProgressService, ReadingProgress } from './reading-progress.service';

@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal, OnDestroy, inject } from '@angular/core';
 import { BookService } from '../../service/book.service';
-import { Book, BookBasic, BookDetail, Chapter, Chapterlist, Cover, ScrapingStatus } from '../../models/book.models';
+import { Book, BookBasic, BookDetail, Chapterlist, Cover, ScrapingStatus } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
