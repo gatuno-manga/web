@@ -66,6 +66,12 @@
 								<app-icons name="share" />
 								<span>Compartilhar</span>
 							</button>
+							@if (admin) {
+							<button (click)="forceCheckUpdates()">
+								<app-icons name="refresh-ccw" />
+								<span>Forçar atualização</span>
+							</button>
+							}
 						</div>
 						}
 					</div>

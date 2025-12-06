@@ -287,6 +287,52 @@ export class BookComponent implements OnInit, OnDestroy {
     }
   }
 
+  forceCheckUpdates() {
+    if (this.book) {
+      this.modalService.show(
+        'Forçar Atualização',
+        `Deseja forçar a verificação de atualizações para o livro "${this.book.title}"? Isso buscará novos capítulos na fonte original.`,
+        [
+          {
+            label: 'Cancelar',
+            type: 'primary',
+          },
+          {
+            label: 'Atualizar',
+            type: 'danger',
+            callback: () => {
+              this.confirmForceCheckUpdates();
+            }
+          }
+        ],
+        'info'
+      );
+    }
+  }
+
+  confirmForceCheckUpdates() {
+    if (this.book) {
+      this.bookService.checkUpdates(this.book.id).subscribe({
+        next: () => {
+          this.modalService.show(
+            'Atualização Agendada',
+            'A verificação de atualizações foi agendada. Novos capítulos aparecerão automaticamente quando encontrados.',
+            [{ label: 'Ok', type: 'primary' }],
+            'success'
+          );
+        },
+        error: () => {
+          this.modalService.show(
+            'Erro',
+            'Não foi possível agendar a verificação de atualizações.',
+            [{ label: 'Ok', type: 'primary' }],
+            'error'
+          );
+        }
+      });
+    }
+  }
+
   // ==================== CONTINUE LENDO ====================
 
   private async loadLastReadingProgress() {
