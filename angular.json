@@ -115,6 +115,11 @@
             "styles": [
               "src/styles.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "public/assets/scss"
+              ]
+            },
             "scripts": []
           }
         }
