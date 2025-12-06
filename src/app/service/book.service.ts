@@ -104,6 +104,10 @@ export class BookService {
     return this.http.patch<Book>(`books/${id}/reset`, {});
   }
 
+  checkUpdates(id: string) {
+    return this.http.post<{ message: string; bookId: string }>(`books/${id}/check-updates`, {});
+  }
+
   /**
    * Retorna os observables do WebSocket para eventos em tempo real
    */

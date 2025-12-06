@@ -1,0 +1,76 @@
+// Mixin base para dropdowns e context menus
+@mixin dropdown-menu-base {
+	min-width: 180px;
+	background-color: var(--context-menu-bg);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border: 1px solid var(--primary-color);
+	border-radius: 12px;
+	padding: 6px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	animation: dropdown-fadeIn 0.1s ease-out;
+}
+
+@mixin dropdown-menu-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	padding: 8px 12px;
+	border: none;
+	border-radius: 8px;
+	background: none;
+	color: var(--app-text-color);
+	font-size: 0.9rem;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	user-select: none;
+	-webkit-user-drag: none;
+
+	&:hover:not(.disabled) {
+		background-color: var(--primary-color);
+	}
+
+	&.disabled {
+		opacity: 0.5;
+		cursor: default;
+	}
+
+	&.danger {
+		color: #ff4d4f;
+
+		&:hover:not(.disabled) {
+			background-color: rgba(255, 77, 79, 0.1);
+		}
+	}
+}
+
+@mixin dropdown-menu-icon {
+	display: flex;
+	align-items: center;
+}
+
+@mixin dropdown-menu-label {
+	flex: 1;
+	white-space: nowrap;
+}
+
+@mixin dropdown-menu-separator {
+	height: 1px;
+	background-color: rgba(255, 255, 255, 0.1);
+	margin: 4px 0;
+}
+
+@keyframes dropdown-fadeIn {
+	from {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
