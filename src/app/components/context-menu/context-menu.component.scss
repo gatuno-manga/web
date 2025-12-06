@@ -1,4 +1,4 @@
-@use '/dropdown-menu' as dropdown;
+@use 'dropdown-menu' as dropdown;
 
 .context-menu {
 	@include dropdown.dropdown-menu-base;
