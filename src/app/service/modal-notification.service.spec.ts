@@ -11,14 +11,16 @@ describe('ModalNotificationService', () => {
 
     it('should emit modal notification when show is called', (done) => {
         service.modal$.subscribe((modal) => {
-            try {
-                expect(modal.title).toBe('Title');
-                expect(modal.description).toBe('Desc');
-                expect(modal.type).toBe('info');
-                expect(modal.buttons.length).toBe(2);
-                done();
-            } catch (e) {
-                done.fail(e as any);
+            if (modal) {
+                try {
+                    expect(modal.title).toBe('Title');
+                    expect(modal.description).toBe('Desc');
+                    expect(modal.type).toBe('info');
+                    expect(modal.buttons.length).toBe(2);
+                    done();
+                } catch (e) {
+                    done.fail(e as any);
+                }
             }
         });
 
