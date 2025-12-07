@@ -3,6 +3,7 @@
 	<span #firstTab (click)="selectTab(tab.chapters, $event)">Capitulos</span>
 	<span (click)="selectTab(tab.covers, $event)">Capas</span>
 	<span (click)="selectTab(tab.extraInfo, $event)">Informações extras</span>
+	<span (click)="selectTab(tab.savedPages, $event)">Páginas Salvas</span>
 </div>
 <div id="container" [style.--current-tab-index]="selectedTab">
 	<div
@@ -163,12 +164,59 @@
 			</div>
 		</div>
 	</div>
+	<div
+		id="saved-pages"
+		[class.selected]="selectedTab === tab.savedPages"
+		class="container"
+	>
+		@defer (when modulesLoad[tab.savedPages].load()) {
+		<div class="scrollable">
+			@for(savedPage of savedPages; track savedPage.id) {
+			<div
+				class="cover"
+				(click)="onSavedPageClick(savedPage)"
+				(contextmenu)="onSavedPageContextMenu($event, savedPage)"
+			>
+				@if (savedPage.page?.path) {
+				<img
+					[src]="savedPage.page.path"
+					[alt]="'Page ' + savedPage.page.index"
+					loading="lazy"
+				/>
+				} @else {
+				<div class="cover-placeholder">
+					<app-icons name="image" />
+				</div>
+				}
+				<div class="metadata">
+					Cap. {{ savedPage.chapter.index }} - Pág.
+					{{ savedPage.page.index }}
+                    @if (savedPage.comment) {
+                        <div class="comment">"{{ savedPage.comment }}"</div>
+                    }
+				</div>
+			</div>
+			}@empty {
+			<div class="empty-state">
+				<p>Nenhuma página salva para este livro.</p>
+			</div>
+			}
+		</div>
+		}@placeholder {
+		<div class="placeholder-container">
+			@for (i of [].constructor(10); track $index) {
+			<div class="placeholder"></div>
+			}
+		</div>
+		}
+	</div>
 </div>
 
 @if(showImageViewer) {
 <app-image-viewer
 	[imageUrl]="viewerImageUrl"
 	[imageTitle]="viewerImageTitle"
+    [imageDescription]="viewerImageDescription"
 	(close)="closeImageViewer()"
 />
 } @if(showCoverEditModal && editingCover) {

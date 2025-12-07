@@ -5,10 +5,14 @@ import { ModalButton, ModalNotification, NotificationType } from '../models/noti
 
 @Injectable({ providedIn: 'root' })
 export class ModalNotificationService {
-    private modalSubject = new Subject<ModalNotification>();
+    private modalSubject = new Subject<ModalNotification | null>();
     public modal$ = this.modalSubject.asObservable();
 
     show(title: string, description: string, buttons: ModalButton[], type: NotificationType = 'info') {
         this.modalSubject.next({ title, description, buttons, type });
+    }
+
+    close() {
+        this.modalSubject.next(null);
     }
 }

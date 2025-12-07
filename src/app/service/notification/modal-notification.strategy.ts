@@ -8,12 +8,12 @@ import { ModalNotification, ModalButton } from '../../models/notification.models
  * e bloqueiam a interação até serem fechadas
  */
 export class ModalNotificationStrategy implements INotificationStrategy {
-    private modalSubject: Subject<ModalNotification>;
+    private modalSubject: Subject<ModalNotification | null>;
     private currentModal: ModalNotification | null = null;
 
     constructor(
         private config: NotificationConfig,
-        modalSubject: Subject<ModalNotification>
+        modalSubject: Subject<ModalNotification | null>
     ) {
         this.modalSubject = modalSubject;
     }
@@ -37,7 +37,7 @@ export class ModalNotificationStrategy implements INotificationStrategy {
 
     dismiss(): void {
         this.currentModal = null;
-        // Emitir um sinal de fechamento se necessário
+        this.modalSubject.next(null);
     }
 
     private getDefaultTitle(): string {

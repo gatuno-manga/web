@@ -194,4 +194,15 @@ export class DownloadService {
       return blob;
     });
   }
+
+  saveToDevice(url: string, filename: string) {
+    this.http.get(url, { responseType: 'blob' }).subscribe(blob => {
+      const a = document.createElement('a');
+      const objectUrl = URL.createObjectURL(blob);
+      a.href = objectUrl;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(objectUrl);
+    });
+  }
 }

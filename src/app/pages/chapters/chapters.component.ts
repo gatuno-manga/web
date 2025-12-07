@@ -32,10 +32,14 @@ import { MetaDataService } from '../../service/meta-data.service';
 import { SettingsService } from '../../service/settings.service';
 import { NotificationSeverity } from 'app/service/notification';
 import { ReaderSettingsNotificationComponent } from '@components/notification/custom-components';
+import { PromptModalComponent } from '@components/notification/custom-components/prompt-modal/prompt-modal.component';
 import { BookWebsocketService } from '../../service/book-websocket.service';
 import { DownloadService } from '../../service/download.service';
 import { UnifiedReadingProgressService } from '../../service/unified-reading-progress.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ContextMenuService } from '../../service/context-menu.service';
+import { SavedPagesService } from '../../service/saved-pages.service';
+import { Page } from '../../models/book.models';
 
 @Component({
   selector: 'app-chapters',
@@ -64,6 +68,8 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   private bookWebsocketService = inject(BookWebsocketService);
   private downloadService = inject(DownloadService);
   private readingProgressService = inject(UnifiedReadingProgressService);
+  private contextMenuService = inject(ContextMenuService);
+  private savedPagesService = inject(SavedPagesService);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
 
@@ -461,5 +467,69 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
     if (current && current.originalUrl) {
       window.open(current.originalUrl, '_blank');
     }
+  }
+
+  onContextMenu(event: MouseEvent, page: Page, index: number) {
+    const currentChapter = this.chapter();
+    if (!currentChapter) return;
+
+    this.contextMenuService.open(event, [
+      {
+        label: 'Baixar Página',
+        icon: 'download',
+        action: () => {
+          const filename = `Page ${index + 1} - Chapter ${currentChapter.index}.jpg`;
+          this.downloadService.saveToDevice(page.path, filename);
+        }
+      },
+      {
+        label: 'Salvar Página',
+        icon: 'bookmark',
+        action: () => {
+          if (!page.id) {
+            this.notificationService.warning('Não é possível salvar páginas de capítulos baixados/offline. Tente ler online.');
+            return;
+          }
+
+          this.notificationService.notify({
+            message: '',
+            level: 'custom',
+            severity: NotificationSeverity.CRITICAL,
+            component: PromptModalComponent,
+            componentData: {
+              title: 'Salvar Página',
+              message: 'Deseja adicionar uma nota a esta página?',
+              placeholder: 'Ex: Cena importante...',
+              close: (comment: string | null) => {
+                this.modalNotificationService.close();
+
+                if (comment !== null) {
+                  this.savedPagesService.savePage({
+                    pageId: page.id!,
+                    chapterId: currentChapter.id,
+                    bookId: currentChapter.bookId,
+                    comment: comment
+                  }).subscribe({
+                    next: () => {
+                      this.notificationService.success('Página salva com sucesso!');
+                    },
+                    error: (err) => {
+                      console.error('Error saving page', err);
+                      if (err.status === 400) {
+                        this.notificationService.info('Esta página já está salva.');
+                      } else {
+                        this.notificationService.error('Erro ao salvar página.');
+                      }
+                    }
+                  });
+                }
+              }
+            },
+            useBackdrop: true,
+            backdropOpacity: 0.5
+          });
+        }
+      }
+    ]);
   }
 }

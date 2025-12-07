@@ -12,6 +12,7 @@ import { IconsComponent } from '../icons/icons.component';
 export class ImageViewerComponent {
     @Input() imageUrl: string = '';
     @Input() imageTitle: string = '';
+    @Input() imageDescription: string = '';
     @Output() close = new EventEmitter<void>();
 
     @HostListener('document:keydown.escape')

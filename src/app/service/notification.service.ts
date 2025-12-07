@@ -28,13 +28,13 @@ import { OverlayNotification } from "./notification/overlay-notification.strateg
 export class NotificationService {
     // Subjects para diferentes tipos de notificação
     private toastSubject = new Subject<NotificationToast>();
-    private modalSubject = new Subject<ModalNotification>();
+    private modalSubject = new Subject<ModalNotification | null>();
     private overlaySubject = new Subject<OverlayNotification>();
     private overlayDismissSubject = new Subject<string>();
 
     // Observables públicos para os componentes se inscreverem
     public toasts$: Observable<NotificationToast> = this.toastSubject.asObservable();
-    public modals$: Observable<ModalNotification> = this.modalSubject.asObservable();
+    public modals$: Observable<ModalNotification | null> = this.modalSubject.asObservable();
     public overlays$: Observable<OverlayNotification> = this.overlaySubject.asObservable();
     public overlayDismiss$: Observable<string> = this.overlayDismissSubject.asObservable();
 
