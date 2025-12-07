@@ -1,7 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
-import { BookList, Book } from '../../models/book.models';
+import { BookList } from '../../models/book.models';
 import { IconsComponent } from '../icons/icons.component';
 import { ContextMenuService } from '../../service/context-menu.service';
 import { DownloadService } from '../../service/download.service';
