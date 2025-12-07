@@ -6,6 +6,7 @@ import { IconsComponent } from '../icons/icons.component';
 import { ContextMenuService } from '../../service/context-menu.service';
 import { DownloadService } from '../../service/download.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
+import { NotificationService } from '../../service/notification.service';
 import { BookService } from '../../service/book.service';
 import { ContextMenuItem } from '../../models/context-menu.models';
 import { firstValueFrom } from 'rxjs';
@@ -25,6 +26,7 @@ export class ItemBookComponent {
   private contextMenuService = inject(ContextMenuService);
   private downloadService = inject(DownloadService);
   private modalService = inject(ModalNotificationService);
+  private notificationService = inject(NotificationService);
   private bookService = inject(BookService);
   private chapterService = inject(ChapterService);
 
@@ -109,11 +111,10 @@ export class ItemBookComponent {
       const fullBook = await firstValueFrom(this.bookService.getBook(this.book.id));
       if (!fullBook) throw new Error('Book not found');
 
-      this.modalService.show(
-        'Download iniciado',
+      this.modalService.close(); // Close the initial 'Aguarde' modal or confirmation modal if any
+      this.notificationService.info(
         `Baixando ${chapters.length} capítulos em segundo plano.`,
-        [{ label: 'Ok', type: 'primary' }],
-        'info'
+        'Download iniciado'
       );
 
       // Background download logic similar to BookComponent
@@ -136,11 +137,10 @@ export class ItemBookComponent {
           }
       }
 
-       this.modalService.show(
-        'Download concluído',
-        `${downloadedCount} novos capítulos baixados.`,
-        [{ label: 'Ok', type: 'primary' }],
-        'success'
+       this.modalService.close();
+       this.notificationService.success(
+        `${downloadedCount} novos capítulos baixados de "${this.book.title}".`,
+        'Download concluído'
       );
 
     } catch (e) {
@@ -160,7 +160,8 @@ export class ItemBookComponent {
           type: 'danger',
           callback: async () => {
             await this.downloadService.deleteBook(this.book.id);
-            this.modalService.show('Sucesso', 'Livro removido dos downloads.', [{ label: 'Ok', type: 'primary' }], 'success');
+            this.modalService.close();
+            this.notificationService.success('Livro removido dos downloads.');
           }
         }
       ],
@@ -178,7 +179,7 @@ export class ItemBookComponent {
       }).catch(console.error);
     } else {
       navigator.clipboard.writeText(url).then(() => {
-        this.modalService.show('Link copiado', 'Link copiado para a área de transferência.', [{ label: 'Ok', type: 'primary' }], 'success');
+        this.notificationService.success('Link copiado para a área de transferência.', 'Link copiado');
       });
     }
   }

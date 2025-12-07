@@ -177,7 +177,7 @@
 				(click)="onSavedPageClick(savedPage)"
 				(contextmenu)="onSavedPageContextMenu($event, savedPage)"
 			>
-				@if (savedPage.page?.path) {
+				@if (savedPage.page.path) {
 				<img
 					[src]="savedPage.page.path"
 					[alt]="'Page ' + savedPage.page.index"

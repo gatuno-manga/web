@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookBasic, Chapterlist, ScrapingStatus } from '../../models/book.models';
 import { BookService } from '../../service/book.service';
@@ -14,6 +14,8 @@ import { DownloadService } from '../../service/download.service';
 import { UnifiedReadingProgressService } from '../../service/unified-reading-progress.service';
 import { ChapterService } from '../../service/chapter.service';
 import { Subscription, firstValueFrom } from 'rxjs';
+
+import { NotificationService } from '../../service/notification.service';
 
 @Component({
   selector: 'app-book',
@@ -44,13 +46,15 @@ export class BookComponent implements OnInit, OnDestroy {
   // Estado para erro de imagem de capa
   coverImageError = false;
 
+  private metaService = inject(MetaDataService);
+  private modalService = inject(ModalNotificationService);
+  private notificationService = inject(NotificationService);
+  private userTokenService = inject(UserTokenService);
+
   constructor(
     private bookService: BookService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private metaService: MetaDataService,
-    private modalService: ModalNotificationService,
-    private userTokenService: UserTokenService,
     private wsService: BookWebsocketService,
     private downloadService: DownloadService,
     private readingProgressService: UnifiedReadingProgressService,
@@ -314,19 +318,17 @@ export class BookComponent implements OnInit, OnDestroy {
     if (this.book) {
       this.bookService.checkUpdates(this.book.id).subscribe({
         next: () => {
-          this.modalService.show(
-            'Atualização Agendada',
+          this.modalService.close();
+          this.notificationService.success(
             'A verificação de atualizações foi agendada. Novos capítulos aparecerão automaticamente quando encontrados.',
-            [{ label: 'Ok', type: 'primary' }],
-            'success'
+            'Atualização Agendada'
           );
         },
         error: () => {
-          this.modalService.show(
-            'Erro',
+          this.modalService.close();
+          this.notificationService.error(
             'Não foi possível agendar a verificação de atualizações.',
-            [{ label: 'Ok', type: 'primary' }],
-            'error'
+            'Erro'
           );
         }
       });
@@ -493,12 +495,8 @@ export class BookComponent implements OnInit, OnDestroy {
           callback: async () => {
             await this.downloadService.deleteBook(this.book.id);
             this.isBookDownloaded.set(false);
-            this.modalService.show(
-              'Download excluído',
-              'O livro foi removido dos downloads.',
-              [{ label: 'Ok', type: 'primary' }],
-              'success'
-            );
+            this.modalService.close();
+            this.notificationService.success('O livro foi removido dos downloads.', 'Download excluído');
           }
         }
       ],
@@ -523,11 +521,9 @@ export class BookComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.modalService.show(
-        'Download iniciado',
+      this.notificationService.info(
         `Baixando ${chapters.length} capítulos em segundo plano. Você pode continuar navegando.`,
-        [{ label: 'Ok', type: 'primary' }],
-        'info'
+        'Download iniciado'
       );
 
       // Função auxiliar para delay
@@ -577,11 +573,10 @@ export class BookComponent implements OnInit, OnDestroy {
 
     // Notificar conclusão e atualizar status
     this.isBookDownloaded.set(true);
-    this.modalService.show(
-      'Download concluído',
-      `${downloadedCount} capítulos baixados${skippedCount > 0 ? `, ${skippedCount} já estavam salvos` : ''}.`,
-      [{ label: 'Ok', type: 'primary' }],
-      'success'
+    this.modalService.close();
+    this.notificationService.success(
+      `${downloadedCount} capítulos baixados de "${this.book.title}"${skippedCount > 0 ? `, ${skippedCount} já estavam salvos` : ''}.`,
+      'Download concluído'
     );
   }
 
@@ -597,12 +592,7 @@ export class BookComponent implements OnInit, OnDestroy {
     } else {
       // Fallback: copia o link
       navigator.clipboard.writeText(window.location.href).then(() => {
-        this.modalService.show(
-          'Link copiado!',
-          'O link do livro foi copiado para a área de transferência.',
-          [{ label: 'Ok', type: 'primary' }],
-          'success'
-        );
+        this.notificationService.success('Link copiado para a área de transferência.', 'Link copiado');
       });
     }
   }
