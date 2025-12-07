@@ -1,33 +1,87 @@
 <div id="infos" class="mural">
-	<a id="all-books" class="info-item item">
-		<app-icons name="sun" />
+	<div id="all-books" class="info-item item">
+		<app-icons name="book" />
 		<span class="label">Total de livros</span>
-		<span class="value">{{ overview.books }}</span>
-	</a>
-	<a id="all-chapters" class="info-item item">
-		<app-icons name="sun" />
+		<span class="value">{{ overview.counts.books }}</span>
+	</div>
+	<div id="all-chapters" class="info-item item">
+		<app-icons name="file" />
 		<span class="label">Total de capítulos</span>
-		<span class="value">{{ overview.chapters }}</span>
-	</a>
-	<a id="all-users" class="info-item item">
-		<app-icons name="sun" />
+		<span class="value">{{ overview.counts.chapters }}</span>
+	</div>
+	<div id="all-users" class="info-item item">
+		<app-icons name="user" />
 		<span class="label">Total de autores</span>
-		<span class="value">{{ overview.authors }}</span>
-	</a>
-	<a id="all-pages" class="info-item item">
-		<app-icons name="sun" />
+		<span class="value">{{ overview.counts.authors }}</span>
+	</div>
+	<div id="all-pages" class="info-item item">
+		<app-icons name="file" />
 		<span class="label">Total de páginas</span>
-		<span class="value">{{ overview.pages }}</span>
-	</a>
+		<span class="value">{{ overview.counts.pages }}</span>
+	</div>
+	<div id="all-sensitive" class="info-item item">
+		<app-icons name="alert-triangle" />
+		<span class="label">Conteúdos Sensíveis</span>
+		<span class="value">{{ overview.counts.sensitiveContent }}</span>
+	</div>
 	<a id="all-tags" class="info-item item" routerLink="/dashboard/tags">
-		<app-icons name="sun" />
+		<app-icons name="hash" />
 		<span class="label">Total de tags</span>
-		<span class="value">{{ overview.tags }}</span>
+		<span class="value">{{ overview.counts.tags }}</span>
 	</a>
 </div>
+
+<div class="item charts-wrapper">
+	<div class="section-title">
+		<h4>Status de Scraping</h4>
+	</div>
+	<div class="charts-container">
+		@if (isBrowser) {
+		<div class="chart-card">
+			<div
+				echarts
+				[options]="scrapingStatusChartOption"
+				class="chart"
+			></div>
+		</div>
+		<div class="chart-card">
+			<div
+				echarts
+				[options]="chapterStatusChartOption"
+				class="chart"
+			></div>
+		</div>
+		}
+	</div>
+</div>
+
+<div class="item charts-wrapper">
+	<div class="section-title">
+		<h4>Distribuições</h4>
+	</div>
+	<div class="charts-container">
+		@if (isBrowser) {
+		<div class="chart-card full-width">
+			<div
+				echarts
+				[options]="sensitiveContentChartOption"
+				class="chart"
+			></div>
+		</div>
+        <div class="chart-card full-width">
+			<div
+				echarts
+				[options]="tagsChartOption"
+				class="chart"
+			></div>
+		</div>
+		}
+	</div>
+</div>
+
 <div id="book">
 	<div id="process-books" class="book-item item">
-		<div class="title">
+		<div class="section-title">
 			<h4>Livros em processamento</h4>
 		</div>
 		<div class="content">
@@ -38,14 +92,9 @@
 				</div>
 				<div class="book-title">{{ item.title }}</div>
 			</div>
+			}@empty {
+			<div class="empty-state">Nenhum livro em processamento</div>
 			}
 		</div>
 	</div>
-	<!--
-	<div id="sensitive-books" class="book-item item">
-		<div class="title">
-			<h4>Livros por conteudo sensivel</h4>
-		</div>
-		<div class="content"></div>
-	</div> -->
 </div>

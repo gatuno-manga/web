@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { IconsComponent } from '../../../components/icons/icons.component';
 import { DashboardService } from '../../../service/dashboard.service';
 import { DashboardOverview, DashboardProgress } from '../../../models/dashboard.models';
@@ -7,25 +8,39 @@ import { MetaDataService } from '../../../service/meta-data.service';
 import { BookWebsocketService } from '../../../service/book-websocket.service';
 import { UserTokenService } from '../../../service/user-token.service';
 import { Subscription } from 'rxjs';
-
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { EChartsOption } from 'echarts';
 
 @Component({
   selector: 'app-home',
+  standalone: true,
   imports: [
+    CommonModule,
     IconsComponent,
     RouterModule,
+    NgxEchartsDirective
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  // Inicialização padrão compatível com a nova estrutura
   overview: DashboardOverview = {
-    books: 0,
-    chapters: 0,
-    pages: 0,
-    tags: 0,
-    authors: 0,
-    sensitiveContent: 0
+    counts: {
+      books: 0,
+      chapters: 0,
+      users: 0,
+      pages: 0,
+      authors: 0,
+      tags: 0,
+      sensitiveContent: 0
+    },
+    status: {
+      books: [],
+      chapters: []
+    },
+    sensitiveContent: [],
+    tags: []
   };
 
   progressBooks: DashboardProgress = {
@@ -34,7 +49,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     books: []
   };
 
+  scrapingStatusChartOption: EChartsOption = {};
+  chapterStatusChartOption: EChartsOption = {};
+  sensitiveContentChartOption: EChartsOption = {};
+  tagsChartOption: EChartsOption = {};
+
+  isBrowser = false;
+
   private wsSubscriptions: Subscription[] = [];
+  private platformId = inject(PLATFORM_ID);
 
   constructor(
     private readonly dashboardService: DashboardService,
@@ -43,6 +66,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private userTokenService: UserTokenService
   ) {
     this.setMetaData();
+    this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit() {
@@ -86,19 +110,20 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private loadDashboardData(): void {
     this.dashboardService.getOverview().subscribe({
-      next: (overview) => {
+      next: (overview: DashboardOverview) => {
         this.overview = overview;
+        this.setupCharts(overview);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Erro ao carregar overview do dashboard:', error);
       }
     });
 
     this.dashboardService.getProgressBooks().subscribe({
-      next: (progressBooks) => {
+      next: (progressBooks: DashboardProgress) => {
         this.progressBooks = progressBooks;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Erro ao carregar livros em processamento:', error);
       }
     });
@@ -111,4 +136,209 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  setupCharts(data: DashboardOverview) {
+    const textColor = '#aaa';
+
+    // Gráfico de Status dos Livros
+    const bookStatusData = data.status.books.map(item => ({
+      value: item.count,
+      name: item.status
+    }));
+
+    this.scrapingStatusChartOption = {
+      title: {
+        text: 'Status de Scraping (Livros)',
+        left: 'center',
+        textStyle: { color: textColor }
+      },
+      tooltip: {
+        trigger: 'item'
+      },
+      series: [
+        {
+          name: 'Status',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2
+          },
+          label: {
+            show: false,
+            position: 'center'
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: '20',
+              fontWeight: 'bold'
+            }
+          },
+          labelLine: {
+            show: false
+          },
+          data: bookStatusData
+        }
+      ]
+    };
+
+    // Gráfico de Status dos Capítulos
+    const chapterStatusData = data.status.chapters.map(item => ({
+      value: item.count,
+      name: item.status
+    }));
+
+    this.chapterStatusChartOption = {
+      title: {
+        text: 'Status de Scraping (Capítulos)',
+        left: 'center',
+        textStyle: { color: textColor }
+      },
+      tooltip: {
+        trigger: 'item'
+      },
+      series: [
+        {
+          name: 'Status',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2
+          },
+          label: {
+            show: false,
+            position: 'center'
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: '20',
+              fontWeight: 'bold'
+            }
+          },
+          labelLine: {
+            show: false
+          },
+          data: chapterStatusData
+        }
+      ]
+    };
+
+    // Gráfico de Conteúdo Sensível (Bar Chart)
+    const sensitiveContentNames = data.sensitiveContent.map(item => item.name);
+    const sensitiveContentCounts = data.sensitiveContent.map(item => item.count);
+
+    this.sensitiveContentChartOption = {
+      title: {
+        text: 'Distribuição de Conteúdo Sensível',
+        left: 'center',
+        textStyle: { color: textColor }
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: [
+        {
+          type: 'category',
+          data: sensitiveContentNames,
+          axisTick: {
+            alignWithLabel: true
+          },
+          axisLabel: {
+            color: textColor,
+            rotate: 45
+          }
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value',
+          axisLabel: {
+            color: textColor
+          }
+        }
+      ],
+      series: [
+        {
+          name: 'Livros',
+          type: 'bar',
+          barWidth: '60%',
+          data: sensitiveContentCounts,
+          itemStyle: {
+            color: '#d48265'
+          }
+        }
+      ]
+    };
+
+    // Gráfico de Tags (Bar Chart)
+    const tagNames = data.tags ? data.tags.map(item => item.name) : [];
+    const tagCounts = data.tags ? data.tags.map(item => item.count) : [];
+
+    this.tagsChartOption = {
+      title: {
+        text: 'Top 10 Tags',
+        left: 'center',
+        textStyle: { color: textColor }
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: [
+        {
+          type: 'category',
+          data: tagNames,
+          axisTick: {
+            alignWithLabel: true
+          },
+          axisLabel: {
+            color: textColor,
+            rotate: 45
+          }
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value',
+          axisLabel: {
+            color: textColor
+          }
+        }
+      ],
+      series: [
+        {
+          name: 'Livros',
+          type: 'bar',
+          barWidth: '60%',
+          data: tagCounts,
+          itemStyle: {
+            color: '#5470c6'
+          }
+        }
+      ]
+    };
+  }
 }
