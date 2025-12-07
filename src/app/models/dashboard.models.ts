@@ -1,10 +1,19 @@
 export interface DashboardOverview {
-    authors: number;
-    books: number;
-    chapters: number;
-    pages: number;
-    sensitiveContent: number;
-    tags: number;
+    counts: {
+        books: number;
+        chapters: number;
+        users: number;
+        pages: number;
+        tags: number;
+        authors: number;
+        sensitiveContent: number;
+    };
+    status: {
+        books: { status: string; count: number }[];
+        chapters: { status: string; count: number }[];
+    };
+    sensitiveContent: { name: string; count: number }[];
+    tags: { name: string; count: number }[];
 }
 
 export interface DashboardProgress {

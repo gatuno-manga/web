@@ -1,5 +1,5 @@
 @if(type == 'grid'){
-<a [routerLink]="[book.id]" class="book-card grid">
+<a [routerLink]="[book.id]" class="book-card grid" (contextmenu)="onContextMenu($event)">
 	@if (book.cover && !imageError) {
 	<img [src]="book.cover" alt="" (error)="onImageError()" />
 	} @else {
@@ -12,7 +12,7 @@
 	</div>
 </a>
 } @else {
-<a [routerLink]="[book.id]" class="book-card list">
+<a [routerLink]="[book.id]" class="book-card list" (contextmenu)="onContextMenu($event)">
 	@if (book.cover && !imageError) {
 	<img [src]="book.cover" alt="" (error)="onImageError()" />
 	} @else {

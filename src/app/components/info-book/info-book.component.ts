@@ -14,12 +14,18 @@ import { ContextMenuService } from '../../service/context-menu.service';
 import { ContextMenuItem } from '../../models/context-menu.models';
 import { UserTokenService } from '../../service/user-token.service';
 import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
+import { SavedPagesService } from '../../service/saved-pages.service';
+import { SavedPage } from '../../models/saved-page.models';
 import { CoverEditModalComponent, CoverEditSaveEvent } from '../cover-edit-modal/cover-edit-modal.component';
+import { PromptModalComponent } from '../notification/custom-components/prompt-modal/prompt-modal.component';
+import { NotificationService } from '../../service/notification.service';
+import { NotificationSeverity } from 'app/service/notification';
 
 enum tab {
   chapters = 0,
   covers = 1,
-  extraInfo = 2
+  extraInfo = 2,
+  savedPages = 3
 }
 
 interface ModulesLoad {
@@ -35,6 +41,7 @@ interface ModulesLoad {
 })
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
   private userTokenService = inject(UserTokenService);
+  private notificationService = inject(NotificationService);
 
   tab = tab;
   ScrapingStatus = ScrapingStatus;
@@ -60,10 +67,15 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     {
       load: signal(false),
       function: async () => this.loadExtraInfo()
+    },
+    {
+      load: signal(false),
+      function: async () => this.loadSavedPages()
     }
   ];
   chapters: Chapterlist[] = [];
   covers: Cover[] = [];
+  savedPages: SavedPage[] = [];
   extraInfo: BookDetail = {
     alternativeTitle: [],
     originalUrl: [],
@@ -79,6 +91,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   showImageViewer = false;
   viewerImageUrl = '';
   viewerImageTitle = '';
+  viewerImageDescription = '';
 
   // Cover edit modal state
   showCoverEditModal = false;
@@ -95,7 +108,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     private modalService: ModalNotificationService,
     private downloadService: DownloadService,
     private chapterService: ChapterService,
-    private contextMenuService: ContextMenuService
+    private contextMenuService: ContextMenuService,
+    private savedPagesService: SavedPagesService
   ) {}
 
   ngAfterViewInit() {
@@ -356,12 +370,125 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  loadSavedPages() {
+    this.savedPagesService.getSavedPagesByBook(this.id).subscribe({
+      next: (pages) => {
+        this.savedPages = pages;
+      },
+      error: (error) => {
+        console.error('Error loading saved pages:', error);
+      }
+    });
+  }
+
   urlTransform(url: string): string {
     return new URL(url).hostname;
   }
 
   onCoverImageError(coverId: string) {
     this.coverImageErrors.add(coverId);
+  }
+
+  onSavedPageClick(savedPage: SavedPage) {
+    if (savedPage.page?.path) {
+      this.openImageViewer(
+        savedPage.page.path, 
+        `Capítulo ${savedPage.chapter.index} - Página ${savedPage.page.index}`,
+        savedPage.comment
+      );
+    }
+  }
+
+  onSavedPageContextMenu(event: MouseEvent, savedPage: SavedPage) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const items: ContextMenuItem[] = [
+      {
+        label: 'Ver Imagem',
+        icon: 'eye',
+        action: () => this.onSavedPageClick(savedPage)
+      },
+      {
+        label: 'Baixar Imagem',
+        icon: 'download',
+        action: () => this.downloadImage(savedPage.page.path, `Page ${savedPage.page.index} - Chapter ${savedPage.chapter.index}`)
+      },
+      {
+        label: 'Editar Comentário',
+        icon: 'edit',
+        action: () => {
+          this.notificationService.notify({
+            message: '',
+            level: 'custom',
+            severity: NotificationSeverity.CRITICAL,
+            component: PromptModalComponent,
+            componentData: {
+              title: 'Editar Comentário',
+              message: 'Atualize o comentário desta página:',
+              placeholder: 'Comentário...',
+              value: savedPage.comment || '',
+              close: (newComment: string | null) => {
+                this.modalService.close();
+                
+                if (newComment !== null) {
+                  this.savedPagesService.updateComment(savedPage.id, newComment).subscribe({
+                    next: (updatedPage) => {
+                      // Update local state
+                      const index = this.savedPages.findIndex(p => p.id === savedPage.id);
+                      if (index !== -1) {
+                        this.savedPages[index] = { ...this.savedPages[index], comment: newComment };
+                      }
+                      this.notificationService.success('Comentário atualizado!');
+                    },
+                    error: (err) => {
+                      console.error('Error updating comment', err);
+                      this.notificationService.error('Erro ao atualizar comentário.');
+                    }
+                  });
+                }
+              }
+            },
+            useBackdrop: true,
+            backdropOpacity: 0.5
+          });
+        }
+      },
+      { type: 'separator' },
+      {
+        label: 'Remover',
+        icon: 'trash',
+        danger: true,
+        action: () => this.confirmDeleteSavedPage(savedPage)
+      }
+    ];
+
+    this.contextMenuService.open(event, items);
+  }
+
+  confirmDeleteSavedPage(savedPage: SavedPage) {
+    this.modalService.show(
+      'Remover Página Salva',
+      'Tem certeza que deseja remover esta página dos seus salvos?',
+      [
+        {
+          label: 'Cancelar',
+          type: 'primary',
+        },
+        {
+          label: 'Remover',
+          type: 'danger',
+          callback: () => {
+            this.savedPagesService.unsavePage(savedPage.id).subscribe({
+              next: () => {
+                this.savedPages = this.savedPages.filter(p => p.id !== savedPage.id);
+              },
+              error: (err) => console.error('Error removing saved page:', err)
+            });
+          }
+        }
+      ]
+    );
   }
 
   onCoverContextMenu(event: MouseEvent, cover: Cover) {
@@ -424,9 +551,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  openImageViewer(url: string, title: string) {
+  openImageViewer(url: string, title: string, description: string = '') {
     this.viewerImageUrl = url;
     this.viewerImageTitle = title;
+    this.viewerImageDescription = description;
     this.showImageViewer = true;
     this.lockScroll();
   }
@@ -435,6 +563,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.showImageViewer = false;
     this.viewerImageUrl = '';
     this.viewerImageTitle = '';
+    this.viewerImageDescription = '';
     this.unlockScroll();
   }
 

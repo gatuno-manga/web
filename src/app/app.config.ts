@@ -6,7 +6,9 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { HttpClientRequestInterceptor } from './interceptor/http-client-request.interceptor';
 import { httpClientResponseInterceptor } from './interceptor/http-client-response.interceptor';
+import { importProvidersFrom } from '@angular/core';
 import { provideServiceWorker } from '@angular/service-worker';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,6 +21,9 @@ export const appConfig: ApplicationConfig = {
     ), provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'
-    })
+    }),
+    importProvidersFrom(NgxEchartsModule.forRoot({
+      echarts: () => import('echarts')
+    })),
   ]
 };

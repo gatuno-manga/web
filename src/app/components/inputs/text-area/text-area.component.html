@@ -1,0 +1,32 @@
+<div class="input-container">
+  <div
+    class="input"
+		[ngClass]="{
+			label: isFocused || touched || value,
+			focused: isFocused
+		}"
+    >
+    <div class="input-wrapper">
+      <textarea
+        #textarea
+        [id]="id"
+        [value]="value"
+        [rows]="rows"
+        (input)="onInput($event)"
+        (blur)="onBlur(value); isFocused = false"
+        (focus)="isFocused = true"
+      ></textarea>
+      <label
+        [for]="id"
+        [ngClass]="{ ative: touched || value }"
+        >
+        {{ placeholder }}
+      </label>
+    </div>
+  </div>
+  <div class="error-messages" [style.--error-count]="errorMessages().length">
+    @for (item of errorMessages(); track $index) {
+      <span class="error-message">{{ item }}</span>
+    }
+  </div>
+</div>

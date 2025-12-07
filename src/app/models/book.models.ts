@@ -107,6 +107,7 @@ export interface TagResponse {
 }
 
 export interface Page {
+  id?: number;
   index: string;
   path: string;
 }

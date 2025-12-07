@@ -21,7 +21,7 @@ import { NotificationToast, ModalNotification } from '../../models/notification.
 export class NotificationFactory {
     constructor(
         private toastSubject: Subject<NotificationToast>,
-        private modalSubject: Subject<ModalNotification>,
+        private modalSubject: Subject<ModalNotification | null>,
         private overlaySubject: Subject<OverlayNotification>,
         private overlayDismissSubject: Subject<string>
     ) {}

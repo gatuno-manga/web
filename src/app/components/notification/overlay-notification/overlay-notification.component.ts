@@ -33,15 +33,14 @@ export class OverlayNotificationComponent implements OnInit, OnDestroy {
     // Subscreve aos novos observables do NotificationService refatorado
     this.subs.push(
       this.notificationService.toasts$.subscribe(toast => {
-        // Toast já é gerenciado pelo ToastNotificationService
-        // Mantido para compatibilidade se necessário
+        this.toastService.show(toast.message, toast.timeout, toast.type);
       })
     );
 
     this.subs.push(
       this.notificationService.overlays$.subscribe(overlay => {
         if (overlay) {
-          this.overlays.push(overlay);
+          this.overlays = [...this.overlays, overlay];
         }
       })
     );
@@ -54,17 +53,13 @@ export class OverlayNotificationComponent implements OnInit, OnDestroy {
 
     this.subs.push(
       this.modalService.modal$.subscribe(modal => {
-        if (modal) {
-          this.modal = modal;
-        }
+        this.modal = modal;
       })
     );
 
     this.subs.push(
       this.notificationService.modals$.subscribe(modal => {
-        if (modal) {
-          this.modal = modal;
-        }
+        this.modal = modal;
       })
     );
   }
