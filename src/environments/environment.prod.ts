@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiURL: 'http://localhost:3001/api',
+    apiURL: 'http://api.gatuno.barbosa.local/api',
     apiURLServer: 'http://api:3000/api',
 };
