@@ -62,7 +62,7 @@ export class BookService {
     return this.http.patch<Book>(`books/${bookId}/covers/${coverId}/selected`, {});
   }
 
-  updateCover(bookId: string, coverId: string, data: { title: string }) {
+  updateCover(bookId: string, coverId: string, data: { title: string; }) {
     return this.http.patch<Cover>(`books/${bookId}/covers/${coverId}`, data);
   }
 
@@ -105,7 +105,7 @@ export class BookService {
   }
 
   checkUpdates(id: string) {
-    return this.http.post<{ message: string; bookId: string }>(`books/${id}/check-updates`, {});
+    return this.http.post<{ message: string; bookId: string; }>(`books/${id}/check-updates`, {});
   }
 
   /**
@@ -120,5 +120,24 @@ export class BookService {
    */
   watchBook(bookId: string) {
     return this.websocketService.watchBook(bookId);
+  }
+
+  /**
+   * Faz download de um livro (capítulos selecionados ou todos)
+   * @param bookId ID do livro
+   * @param format Formato do download (images ou pdfs)
+   * @param chapterIds IDs dos capítulos (opcional, vazio = todos)
+   */
+  downloadBook(bookId: string, format: 'images' | 'pdfs', chapterIds?: string[]) {
+    return this.http.post(`books/${bookId}/download`,
+      {
+        chapterIds: chapterIds || [],
+        format: format === 'pdfs' ? 'pdfs' : 'images'
+      },
+      {
+        responseType: 'blob',
+        observe: 'response'
+      }
+    );
   }
 }
