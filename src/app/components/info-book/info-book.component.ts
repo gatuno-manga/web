@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
 import { ModalNotificationService } from '../../service/modal-notification.service';
-import { Subscription } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
 import { DownloadService } from '../../service/download.service';
 import { ChapterService } from '../../service/chapter.service';
 import { DownloadStatus } from '../../models/offline.models';
@@ -86,6 +86,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   chaptersDownloadStatus = new Map<string, DownloadStatus | 'downloaded'>();
   chaptersDownloadProgress = new Map<string, number>();
+
+  // Multi-selection state
+  selectedChapters = signal<Set<string>>(new Set());
 
   // Image viewer state
   showImageViewer = false;
@@ -275,9 +278,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  async downloadChapter(chapterList: Chapterlist, event: Event) {
-    event.preventDefault();
-    event.stopPropagation();
+  async downloadChapter(chapterList: Chapterlist, event?: Event): Promise<void> {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
 
     if (this.chaptersDownloadStatus.get(chapterList.id) === 'downloaded' ||
       this.chaptersDownloadStatus.get(chapterList.id) === 'downloading') {
@@ -289,41 +294,25 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // Convert BookBasic to Book structure required by DownloadService (partial is fine if consistent)
-    // We need a full Book object mostly for storage metadata.
-    // Since we don't have the full Book object here, we construct what we can or fetch it.
-    // However, DownloadService.saveBook takes a "Book". Let's see if we can cast or fetch.
+    try {
+      // Fetch full chapter details first
+      const fullChapter = await firstValueFrom(this.chapterService.getChapter(chapterList.id));
 
-    // Fetch full chapter details first
-    this.chapterService.getChapter(chapterList.id).subscribe({
-      next: async (fullChapter) => {
-        // We need the book object.
-        // Let's construct a Book object from BookBasic + defaults if needed, or fetch the full book.
-        // Since fetching the full book is safer:
-        this.bookService.getBook(this.id).subscribe({
-          next: async (fullBookBasic) => {
-            // BookBasic is what we have. The DownloadService expects 'Book' interface which has 'chapters'.
-            // But for saving the book metadata, BookBasic is almost enough except for 'chapters'.
-            // Let's cast it as Book because we only save metadata fields in saveBook.
-            // Or better, update DownloadService to accept BookBasic.
-            // For now, let's cast.
-            const bookToSave = fullBookBasic as unknown as Book;
+      // Fetch full book details
+      const fullBookBasic = await firstValueFrom(this.bookService.getBook(this.id));
 
-            try {
-              await this.downloadService.downloadChapter(bookToSave, fullChapter);
-            } catch (e) {
-              console.error('Download failed', e);
-            }
-          }
-        })
-      },
-      error: (err) => console.error('Failed to get chapter details', err)
-    });
+      const bookToSave = fullBookBasic as unknown as Book;
+      await this.downloadService.downloadChapter(bookToSave, fullChapter);
+    } catch (e) {
+      console.error('Download failed', e);
+    }
   }
 
-  async deleteChapterDownload(chapter: Chapterlist, event: Event) {
-    event.preventDefault();
-    event.stopPropagation();
+  async deleteChapterDownload(chapter: Chapterlist, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
 
     this.modalService.show(
       'Excluir Download',
@@ -346,6 +335,28 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
       ],
       'warning'
     );
+  }
+
+  markChapterAsRead(chapter: Chapterlist) {
+    this.chapterService.markAsRead(chapter.id).subscribe({
+      next: () => {
+        chapter.read = true;
+      },
+      error: (error) => {
+        console.error('Error marking chapter as read:', error);
+      }
+    });
+  }
+
+  markChapterAsUnread(chapter: Chapterlist) {
+    this.chapterService.markAsUnread(chapter.id).subscribe({
+      next: () => {
+        chapter.read = false;
+      },
+      error: (error) => {
+        console.error('Error marking chapter as unread:', error);
+      }
+    });
   }
 
   loadCovers() {
@@ -392,7 +403,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   onSavedPageClick(savedPage: SavedPage) {
     if (savedPage.page?.path) {
       this.openImageViewer(
-        savedPage.page.path, 
+        savedPage.page.path,
         `Capítulo ${savedPage.chapter.index} - Página ${savedPage.page.index}`,
         savedPage.comment
       );
@@ -402,7 +413,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   onSavedPageContextMenu(event: MouseEvent, savedPage: SavedPage) {
     event.preventDefault();
     event.stopPropagation();
-    
+
     const items: ContextMenuItem[] = [
       {
         label: 'Ver Imagem',
@@ -430,7 +441,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
               value: savedPage.comment || '',
               close: (newComment: string | null) => {
                 this.modalService.close();
-                
+
                 if (newComment !== null) {
                   this.savedPagesService.updateComment(savedPage.id, newComment).subscribe({
                     next: (updatedPage) => {
@@ -489,6 +500,246 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         }
       ]
     );
+  }
+
+  onChapterClick(event: MouseEvent, chapter: Chapterlist) {
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.toggleChapterSelection(chapter.id);
+    }
+  }
+
+  toggleChapterSelection(chapterId: string) {
+    const current = new Set(this.selectedChapters());
+    if (current.has(chapterId)) {
+      current.delete(chapterId);
+    } else {
+      current.add(chapterId);
+    }
+    this.selectedChapters.set(current);
+  }
+
+  clearSelection() {
+    this.selectedChapters.set(new Set());
+  }
+
+  selectAllChapters() {
+    const allIds = new Set(this.chapters.map(c => c.id));
+    this.selectedChapters.set(allIds);
+  }
+
+  isChapterSelected(chapterId: string): boolean {
+    return this.selectedChapters().has(chapterId);
+  }
+
+  hasDownloadedInSelection(): boolean {
+    return Array.from(this.selectedChapters()).some(
+      id => this.chaptersDownloadStatus.get(id) === 'downloaded'
+    );
+  }
+
+  async downloadSelectedChapters() {
+    const selectedIds = Array.from(this.selectedChapters());
+
+    // Filtrar apenas capítulos que não estão baixados ou em download
+    const chaptersToDownload = selectedIds.filter(id => {
+      const status = this.chaptersDownloadStatus.get(id);
+      return !status || status === 'error';
+    });
+
+    if (chaptersToDownload.length === 0) {
+      this.clearSelection();
+      return;
+    }
+
+    // Marcar todos como "pending" antes de iniciar
+    for (const chapterId of chaptersToDownload) {
+      this.chaptersDownloadStatus.set(chapterId, 'pending');
+    }
+    this.chaptersDownloadStatus = new Map(this.chaptersDownloadStatus);
+
+    for (const chapterId of chaptersToDownload) {
+      const chapter = this.chapters.find(c => c.id === chapterId);
+      if (chapter) {
+        try {
+          await this.downloadChapter(chapter);
+        } catch (e) {
+          console.error('Failed to download chapter:', chapterId, e);
+        }
+        // Delay maior para garantir que o download termine
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+    }
+
+    this.clearSelection();
+  }
+
+  deleteSelectedChaptersDownloads() {
+    const selectedIds = Array.from(this.selectedChapters());
+
+    // Filtrar apenas os que estão baixados
+    const downloadedIds = selectedIds.filter(
+      id => this.chaptersDownloadStatus.get(id) === 'downloaded'
+    );
+
+    if (downloadedIds.length === 0) {
+      this.clearSelection();
+      return;
+    }
+
+    this.modalService.show(
+      'Excluir Downloads',
+      `Deseja excluir ${downloadedIds.length} capítulo(s) dos downloads?`,
+      [
+        {
+          label: 'Cancelar',
+          type: 'primary',
+        },
+        {
+          label: 'Excluir',
+          type: 'danger',
+          callback: async () => {
+            for (const chapterId of downloadedIds) {
+              await this.downloadService.deleteChapter(chapterId);
+              this.chaptersDownloadStatus.delete(chapterId);
+            }
+            this.chaptersDownloadStatus = new Map(this.chaptersDownloadStatus);
+            this.clearSelection();
+          }
+        }
+      ],
+      'warning'
+    );
+  }
+
+  async toggleSelectedReadStatus() {
+    const selectedIds = Array.from(this.selectedChapters());
+    const selectedChapters = this.chapters.filter(c => selectedIds.includes(c.id));
+
+    // Se pelo menos um capítulo está lido, marcar todos como não lidos
+    const hasReadChapter = selectedChapters.some(c => c.read);
+
+    try {
+      if (hasReadChapter) {
+        const results = await firstValueFrom(this.chapterService.markManyAsUnread(selectedIds));
+        // Atualizar estado local para os que foram marcados com sucesso
+        results.forEach(result => {
+          if (result.success) {
+            const chapter = this.chapters.find(c => c.id === result.chapterId);
+            if (chapter) chapter.read = false;
+          }
+        });
+      } else {
+        const results = await firstValueFrom(this.chapterService.markManyAsRead(selectedIds));
+        // Atualizar estado local para os que foram marcados com sucesso
+        results.forEach(result => {
+          if (result.success) {
+            const chapter = this.chapters.find(c => c.id === result.chapterId);
+            if (chapter) chapter.read = true;
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling chapters read status:', error);
+    }
+
+    this.clearSelection();
+  }
+
+  onChapterContextMenu(event: MouseEvent, chapter: Chapterlist) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const items: ContextMenuItem[] = [];
+    const selectedCount = this.selectedChapters().size;
+
+    // Se houver múltiplos capítulos selecionados, mostrar opções em lote
+    if (selectedCount > 1) {
+      const hasDownloaded = Array.from(this.selectedChapters()).some(
+        id => this.chaptersDownloadStatus.get(id) === 'downloaded'
+      );
+      const hasNotDownloaded = Array.from(this.selectedChapters()).some(
+        id => !this.chaptersDownloadStatus.get(id) || this.chaptersDownloadStatus.get(id) === 'error'
+      );
+
+      if (hasNotDownloaded) {
+        items.push({
+          label: `Baixar ${selectedCount} Capítulos`,
+          icon: 'download',
+          action: () => this.downloadSelectedChapters()
+        });
+      }
+
+      if (hasDownloaded) {
+        items.push({
+          label: `Excluir ${selectedCount} Downloads`,
+          icon: 'trash',
+          danger: true,
+          action: () => this.deleteSelectedChaptersDownloads()
+        });
+      }
+
+      // Verificar se algum capítulo está lido
+      const selectedChapters = this.chapters.filter(c =>
+        Array.from(this.selectedChapters()).includes(c.id)
+      );
+      const hasReadChapter = selectedChapters.some(c => c.read);
+
+      items.push(
+        { type: 'separator' },
+        {
+          label: hasReadChapter
+            ? `Marcar ${selectedCount} como Não Lidos`
+            : `Marcar ${selectedCount} como Lidos`,
+          icon: hasReadChapter ? 'eye-close' : 'eye',
+          action: () => this.toggleSelectedReadStatus()
+        },
+        { type: 'separator' },
+        {
+          label: 'Limpar Seleção',
+          icon: 'close',
+          action: () => this.clearSelection()
+        }
+      );
+
+      this.contextMenuService.open(event, items);
+      return;
+    }
+
+    // Menu para capítulo único
+    const downloadStatus = this.chaptersDownloadStatus.get(chapter.id);
+
+    if (downloadStatus === 'downloaded') {
+      items.push({
+        label: 'Excluir Download',
+        icon: 'trash',
+        danger: true,
+        action: () => this.deleteChapterDownload(chapter)
+      });
+    } else if (!downloadStatus || downloadStatus === 'error') {
+      items.push({
+        label: 'Baixar Capítulo',
+        icon: 'download',
+        action: () => this.downloadChapter(chapter)
+      });
+    }
+
+    if (chapter.read) {
+      items.push({
+        label: 'Marcar como Não Lido',
+        icon: 'eye-close',
+        action: () => this.markChapterAsUnread(chapter)
+      });
+    } else {
+      items.push({
+        label: 'Marcar como Lido',
+        icon: 'eye',
+        action: () => this.markChapterAsRead(chapter)
+      });
+    }
+
+    this.contextMenuService.open(event, items);
   }
 
   onCoverContextMenu(event: MouseEvent, cover: Cover) {
