@@ -16,6 +16,8 @@ import { ChapterService } from '../../service/chapter.service';
 import { Subscription, firstValueFrom } from 'rxjs';
 
 import { NotificationService } from '../../service/notification.service';
+import { NotificationSeverity } from '../../service/notification/notification-strategy.interface';
+import { BookDownloadModalComponent, BookDownloadResult } from '../../components/notification/custom-components/book-download-modal/book-download-modal.component';
 
 @Component({
   selector: 'app-book',
@@ -248,7 +250,7 @@ export class BookComponent implements OnInit, OnDestroy {
           }
         ],
         'warning'
-      )
+      );
     }
   }
 
@@ -401,7 +403,7 @@ export class BookComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async getTargetChapter(): Promise<{ goToNext: boolean; nextChapterId: string | null; isLastPage: boolean }> {
+  private async getTargetChapter(): Promise<{ goToNext: boolean; nextChapterId: string | null; isLastPage: boolean; }> {
     if (!this.lastReadChapterId) {
       return { goToNext: false, nextChapterId: null, isLastPage: false };
     }
@@ -453,27 +455,129 @@ export class BookComponent implements OnInit, OnDestroy {
     this.isBookDownloaded.set(isDownloaded);
   }
 
-  async downloadBook() {
+  async downloadForApp() {
     this.closeOptionsDropdown();
 
     if (!this.book) return;
 
     this.modalService.show(
-      'Baixar Livro',
-      `Deseja baixar todos os capítulos do livro "${this.book.title}"? Isso pode demorar dependendo do número de capítulos.`,
+      'Salvar no App',
+      `Deseja salvar todos os capítulos do livro "${this.book.title}" para leitura offline no app? Isso pode demorar dependendo do número de capítulos.`,
       [
         {
           label: 'Cancelar',
           type: 'primary',
         },
         {
-          label: 'Baixar',
+          label: 'Salvar',
           type: 'danger',
           callback: () => this.confirmDownloadBook()
         }
       ],
       'info'
     );
+  }
+
+  async downloadBookFiles() {
+    this.closeOptionsDropdown();
+
+    if (!this.book) return;
+
+    try {
+      // Buscar lista de capítulos
+      const chapters = await firstValueFrom(this.bookService.getChapters(this.book.id));
+
+      if (chapters.length === 0) {
+        this.modalService.show(
+          'Sem capítulos',
+          'Este livro não possui capítulos para baixar.',
+          [{ label: 'Ok', type: 'primary' }],
+          'info'
+        );
+        return;
+      }
+
+      // Abrir modal de seleção de formato e capítulos
+      this.openDownloadFilesModal(chapters);
+    } catch (error) {
+      console.error('Erro ao buscar capítulos:', error);
+      this.modalService.show(
+        'Erro',
+        'Não foi possível buscar os capítulos do livro.',
+        [{ label: 'Ok', type: 'primary' }],
+        'error'
+      );
+    }
+  }
+
+  private openDownloadFilesModal(chapters: Chapterlist[]) {
+    this.notificationService.notify({
+      message: '',
+      level: 'custom',
+      severity: NotificationSeverity.CRITICAL,
+      component: BookDownloadModalComponent,
+      componentData: {
+        chapters: chapters.map(ch => ({ id: ch.id, title: ch.title, index: ch.index })),
+        bookTitle: this.book.title,
+        close: (result: BookDownloadResult | null) => {
+          this.modalService.close();
+          if (result) {
+            this.processBookDownload(result.format, result.chapterIds, chapters.length);
+          }
+        }
+      },
+      useBackdrop: true,
+      backdropOpacity: 0.5
+    });
+  }
+
+  private async processBookDownload(format: 'images' | 'pdfs', selectedChapterIds: string[], totalChapters: number) {
+    if (!this.book) return;
+
+    // Se todos selecionados, envia array vazio (otimização)
+    const chapterIds = selectedChapterIds.length === totalChapters ? [] : selectedChapterIds;
+
+    try {
+      this.notificationService.info(
+        `Iniciando download de ${selectedChapterIds.length} capítulo(s) no formato ${format === 'pdfs' ? 'PDFs' : 'imagens'}...`,
+        'Download iniciado'
+      );
+
+      const response: any = await firstValueFrom(
+        this.bookService.downloadBook(this.book.id, format, chapterIds)
+      );
+
+      if (response?.body) {
+        const contentDisposition = response.headers?.get('Content-Disposition');
+        let fileName = `${this.book.title}.zip`;
+
+        if (contentDisposition) {
+          const matches = /filename="([^"]+)"/.exec(contentDisposition);
+          if (matches && matches[1]) {
+            fileName = matches[1];
+          }
+        }
+
+        const blob = response.body;
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        window.URL.revokeObjectURL(url);
+
+        this.notificationService.success(
+          `Download de "${fileName}" concluído com sucesso!`,
+          'Download completo'
+        );
+      }
+    } catch (error) {
+      console.error('Erro ao baixar livro:', error);
+      this.notificationService.error(
+        'Não foi possível fazer o download do livro. Tente novamente.',
+        'Erro no download'
+      );
+    }
   }
 
   async deleteDownloadedBook() {
@@ -540,7 +644,7 @@ export class BookComponent implements OnInit, OnDestroy {
         'error'
       );
     }
-  }
+  };
 
   private async downloadChaptersInBackground(chapters: Chapterlist[], delay: (ms: number) => Promise<unknown>) {
     let downloadedCount = 0;

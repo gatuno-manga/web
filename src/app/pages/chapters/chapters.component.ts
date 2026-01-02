@@ -1,20 +1,22 @@
 import {
   Component,
   ElementRef,
-  HostListener,
   OnInit,
   OnDestroy,
   inject,
   signal,
   viewChild,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   computed,
   effect,
   DestroyRef,
   AfterViewInit,
   ViewChildren,
   QueryList,
-  PLATFORM_ID
+  PLATFORM_ID,
+  afterNextRender,
+  Injector
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Chapter } from '../../models/book.models';
@@ -37,6 +39,8 @@ import { BookWebsocketService } from '../../service/book-websocket.service';
 import { DownloadService } from '../../service/download.service';
 import { UnifiedReadingProgressService } from '../../service/unified-reading-progress.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { fromEvent } from 'rxjs';
+import { throttleTime } from 'rxjs/operators';
 import { ContextMenuService } from '../../service/context-menu.service';
 import { SavedPagesService } from '../../service/saved-pages.service';
 import { Page } from '../../models/book.models';
@@ -72,12 +76,12 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   private savedPagesService = inject(SavedPagesService);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
+  private cdr = inject(ChangeDetectorRef);
+  private injector = inject(Injector);
 
-  // Queries
   progressBarRef = viewChild<ElementRef>('progressBarRef');
   @ViewChildren('pageRef') pageRefs!: QueryList<ElementRef>;
 
-  // State Signals
   chapter = signal<Chapter | null>(null);
   readingProgress = signal<number>(0);
   showBtnTop = signal<boolean>(false);
@@ -87,13 +91,12 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroyRef = inject(DestroyRef);
   private maxReadPageIndex = 0;
   private isNavigating = false;
+  private lastScrollPosition = 0;
 
-  // Converte o Observable de settings para Signal
   settings = toSignal(this.settingsService.settings$, {
     initialValue: this.settingsService.getSettings()
   });
 
-  // Computed
   filterStyle = computed(() => {
     const s = this.settings();
     const parts: string[] = [];
@@ -122,6 +125,10 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
           this.backPage();
         }
       });
+
+    afterNextRender(() => {
+      this.setupScrollListener();
+    }, { injector: this.injector });
   }
 
   ngOnInit(): void {}
@@ -133,7 +140,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((refs: QueryList<ElementRef>) => {
         if (refs.length > 0) {
-          // Pequeno delay para garantir que o layout está pronto
           setTimeout(() => {
             this.setupIntersectionObserver();
             this.restoreReadingProgress();
@@ -142,25 +148,41 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
+  private setupScrollListener() {
+    this.lastScrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
+
+    fromEvent(window, 'scroll')
+      .pipe(
+        throttleTime(50, undefined, { leading: true, trailing: true }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        const currentScroll = window.scrollY || document.documentElement.scrollTop || 0;
+        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+
+        if (windowHeight > 0) {
+          const progress = (currentScroll / windowHeight) * 100;
+          this.readingProgress.set(progress);
+        }
+
+        const isScrolledDown = currentScroll > 400;
+        const isScrollingUp = currentScroll < this.lastScrollPosition;
+
+        if (isScrolledDown && isScrollingUp) {
+          this.showBtnTop.set(true);
+        } else {
+          this.showBtnTop.set(false);
+        }
+
+        this.lastScrollPosition = currentScroll;
+        this.cdr.markForCheck();
+      });
+  }
+
   ngOnDestroy() {
     this.objectUrls.forEach(url => URL.revokeObjectURL(url));
     if (this.intersectionObserver) {
       this.intersectionObserver.disconnect();
-    }
-  }
-
-  @HostListener('window:scroll')
-  onWindowScroll() {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const scrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
-    const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-
-    this.showBtnTop.set(scrollPosition > 400);
-
-    if (windowHeight > 0) {
-      const progress = (scrollPosition / windowHeight) * 100;
-      this.readingProgress.set(progress);
     }
   }
 
@@ -185,7 +207,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
       if (isDownloaded) {
         const offlineChapter = await this.downloadService.getChapter(id);
         if (offlineChapter) {
-          // Revoke old URLs
           this.objectUrls.forEach(url => URL.revokeObjectURL(url));
           this.objectUrls = [];
 
@@ -305,11 +326,10 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
     const options = {
       root: null,
       rootMargin: '0px',
-      threshold: 0.1 // Reduzido para 0.1 para garantir que páginas altas sejam detectadas ao passar
+      threshold: 0.1
     };
 
     this.intersectionObserver = new IntersectionObserver((entries) => {
-      // Não salva progresso enquanto está navegando entre capítulos
       if (this.isNavigating) return;
 
       entries.forEach(entry => {
@@ -320,7 +340,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
             this.maxReadPageIndex = index;
             const currentChapter = this.chapter();
             if (currentChapter) {
-              // O serviço salva local instantâneo e API com debounce
               this.readingProgressService.saveProgress(currentChapter.id, currentChapter.bookId, index);
             }
           }
@@ -341,7 +360,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
     const totalPages = currentChapter.pages?.length || 0;
     const savedPageIndex = progress?.pageIndex || 0;
 
-    // Se estava na última página, começa do início
     const isLastPage = savedPageIndex >= totalPages - 1;
     const targetPageIndex = isLastPage ? 0 : savedPageIndex;
 
@@ -375,7 +393,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
         return;
       }
 
-      // Marca o capítulo atual como completamente lido antes de navegar
+
       await this.markChapterAsCompleted();
       this.navigateToChapter(current.next);
     }
@@ -384,26 +402,24 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   async previousPage() {
     const current = this.chapter();
     if (current?.previous) {
-      // Marca o capítulo atual como completamente lido antes de navegar
       await this.markChapterAsCompleted();
       this.navigateToChapter(current.previous);
     }
   }
 
   private async markChapterAsCompleted() {
-    // Cancela qualquer sincronização pendente no serviço
     this.readingProgressService.cancelPendingSync();
 
     const current = this.chapter();
     if (current && current.pages) {
       const lastPageIndex = current.pages.length - 1;
-      // Salva imediatamente como última página ao trocar de capítulo
+
       await this.readingProgressService.saveProgressImmediate(
         current.id,
         current.bookId,
         lastPageIndex,
         current.pages.length,
-        true // completed
+        true
       );
     }
   }
@@ -412,8 +428,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isNavigating = true;
     this.router.navigate(['../', chapterId], { relativeTo: this.activatedRoute }).then(() => {
       this.scrollToTop();
-      // Aguarda um pouco antes de liberar o observer para evitar que o scroll para o topo
-      // interfira no progresso do novo capítulo
       setTimeout(() => {
         this.isNavigating = false;
       }, 500);

@@ -16,10 +16,7 @@
 		</div>
 		<div class="book-info">
 			<div class="top">
-				<h1
-					[class.long-title]="book.title.length > 90"
-					[class.very-long-title]="book.title.length > 140"
-				>
+				<h1 [class.long-title]="book.title.length > 90" [class.very-long-title]="book.title.length > 140">
 					{{ book.title }}
 				</h1>
 				<h6>
@@ -32,32 +29,26 @@
 				<div class="actions">
 					<app-button (click)="continueReading()" variant="primary">
 						{{
-							lastReadChapterId
-								? 'Continue lendo'
-								: 'Começar a ler'
+						lastReadChapterId
+						? 'Continue lendo'
+						: 'Começar a ler'
 						}}
 					</app-button>
 					<div class="options-wrapper">
-						<button
-							class="options-btn"
-							(click)="
+						<button class="options-btn" (click)="
 								toggleOptionsDropdown();
 								$event.stopPropagation()
-							"
-						>
+							">
 							<app-icons name="more" />
 						</button>
 						@if (showOptionsDropdown()) {
 						<div class="options-dropdown">
-							<button (click)="downloadBook()">
-								<app-icons name="download" />
-								<span>Baixar livro</span>
+							<button (click)="downloadForApp()">
+								<app-icons name="smartphone" />
+								<span>Salvar no app</span>
 							</button>
 							@if (isBookDownloaded()) {
-							<button
-								(click)="deleteDownloadedBook()"
-								class="danger"
-							>
+							<button (click)="deleteDownloadedBook()" class="danger">
 								<app-icons name="trash" />
 								<span>Excluir download</span>
 							</button>
@@ -72,6 +63,10 @@
 								<span>Forçar atualização</span>
 							</button>
 							}
+							<button (click)="downloadBookFiles()">
+								<app-icons name="download" />
+								<span>Baixar arquivos</span>
+							</button>
 						</div>
 						}
 					</div>
@@ -86,7 +81,7 @@
 			} @for(tag of book.tags; track tag.id) {
 			<span class="tag" (click)="filterByTag(tag.id)">{{
 				tag.name
-			}}</span>
+				}}</span>
 			}
 		</div>
 		<p class="book-description">{{ book.description }}</p>
