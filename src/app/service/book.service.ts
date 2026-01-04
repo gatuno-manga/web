@@ -5,11 +5,15 @@ import { Page } from "../models/miscellaneous.models";
 import { SensitiveContentService } from "./sensitive-content.service";
 import { UserTokenService } from "./user-token.service";
 import { BookWebsocketService } from "./book-websocket.service";
+import { Observable } from "rxjs";
+import { environment } from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookService {
+  private readonly apiUrl = '/api';
+
   constructor(
     private readonly http: HttpClient,
     private readonly sensitiveContentService: SensitiveContentService,
@@ -123,21 +127,87 @@ export class BookService {
   }
 
   /**
-   * Faz download de um livro (capítulos selecionados ou todos)
+   * Faz download de um livro usando Fetch API com streaming real
+   * Processa chunks à medida que chegam, evitando OOM em arquivos grandes (>900MB)
    * @param bookId ID do livro
    * @param format Formato do download (images ou pdfs)
    * @param chapterIds IDs dos capítulos (opcional, vazio = todos)
+   * @returns Observable que emite eventos de progresso e o blob final
    */
-  downloadBook(bookId: string, format: 'images' | 'pdfs', chapterIds?: string[]) {
-    return this.http.post(`books/${bookId}/download`,
-      {
-        chapterIds: chapterIds || [],
-        format: format === 'pdfs' ? 'pdfs' : 'images'
-      },
-      {
-        responseType: 'blob',
-        observe: 'response'
-      }
-    );
+  downloadBook(bookId: string, format: 'images' | 'pdfs', chapterIds?: string[]): Observable<{
+    progress?: number;
+    loaded?: number;
+    total?: number;
+    blob?: Blob;
+  }> {
+    return new Observable(observer => {
+      // Usar token do UserTokenService (mesma lógica do interceptor)
+      const token = this.userTokenService.accessToken;
+
+      // Construir URL completa usando environment (mesma lógica do interceptor)
+      const baseUrl = environment.apiURL || (window.location.origin + '/api');
+      const url = `${baseUrl.replace(/\/+$/, '')}/books/${bookId}/download`;
+
+      console.log('Fetch download URL:', url);
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          chapterIds: chapterIds || [],
+          format: format === 'pdfs' ? 'pdfs' : 'images'
+        })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          // Extrair Content-Length para progresso
+          const contentLength = response.headers.get('Content-Length');
+          const total = contentLength ? parseInt(contentLength, 10) : 0;
+
+          if (!response.body) {
+            throw new Error('ReadableStream não suportado');
+          }
+
+          const reader = response.body.getReader();
+          const chunks: BlobPart[] = [];
+          let loaded = 0;
+
+          // Função recursiva para ler chunks
+          const readChunk = (): Promise<void> => {
+            return reader.read().then(({ done, value }) => {
+              if (done) {
+                // Stream completo - montar blob
+                const blob = new Blob(chunks, { type: 'application/zip' });
+                observer.next({ blob, progress: 100, loaded, total });
+                observer.complete();
+                return;
+              }
+
+              // Chunk recebido
+              chunks.push(value);
+              loaded += value.length;
+
+              // Emitir progresso
+              const progress = total > 0 ? Math.round((loaded / total) * 100) : 0;
+              observer.next({ progress, loaded, total });
+
+              // Continuar lendo
+              return readChunk();
+            });
+          };
+
+          return readChunk();
+        })
+        .catch(error => {
+          console.error('Fetch streaming error:', error);
+          observer.error(error);
+        });
+    });
   }
 }

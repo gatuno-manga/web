@@ -11,6 +11,7 @@ import { AsideComponent } from '../../components/aside/aside.component';
 import { ButtonComponent } from '../../components/inputs/button/button.component';
 import { BookWebsocketService } from '../../service/book-websocket.service';
 import { DownloadService } from '../../service/download.service';
+import { DownloadManagerService } from '../../service/download-manager.service';
 import { UnifiedReadingProgressService } from '../../service/unified-reading-progress.service';
 import { ChapterService } from '../../service/chapter.service';
 import { Subscription, firstValueFrom } from 'rxjs';
@@ -531,53 +532,28 @@ export class BookComponent implements OnInit, OnDestroy {
     });
   }
 
-  private async processBookDownload(format: 'images' | 'pdfs', selectedChapterIds: string[], totalChapters: number) {
+  // Injetar o serviço de download manager
+  private downloadManager = inject(DownloadManagerService);
+
+  private processBookDownload(format: 'images' | 'pdfs', selectedChapterIds: string[], totalChapters: number) {
     if (!this.book) return;
 
     // Se todos selecionados, envia array vazio (otimização)
     const chapterIds = selectedChapterIds.length === totalChapters ? [] : selectedChapterIds;
 
-    try {
-      this.notificationService.info(
-        `Iniciando download de ${selectedChapterIds.length} capítulo(s) no formato ${format === 'pdfs' ? 'PDFs' : 'imagens'}...`,
-        'Download iniciado'
-      );
+    // Usar o DownloadManagerService para download em background
+    // O download continua mesmo se o usuário navegar para outra página
+    this.downloadManager.startDownload(
+      this.book.id,
+      this.book.title,
+      format,
+      chapterIds
+    );
 
-      const response: any = await firstValueFrom(
-        this.bookService.downloadBook(this.book.id, format, chapterIds)
-      );
-
-      if (response?.body) {
-        const contentDisposition = response.headers?.get('Content-Disposition');
-        let fileName = `${this.book.title}.zip`;
-
-        if (contentDisposition) {
-          const matches = /filename="([^"]+)"/.exec(contentDisposition);
-          if (matches && matches[1]) {
-            fileName = matches[1];
-          }
-        }
-
-        const blob = response.body;
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        link.click();
-        window.URL.revokeObjectURL(url);
-
-        this.notificationService.success(
-          `Download de "${fileName}" concluído com sucesso!`,
-          'Download completo'
-        );
-      }
-    } catch (error) {
-      console.error('Erro ao baixar livro:', error);
-      this.notificationService.error(
-        'Não foi possível fazer o download do livro. Tente novamente.',
-        'Erro no download'
-      );
-    }
+    this.notificationService.info(
+      `Download iniciado em background. Você pode navegar para outras páginas.`,
+      'Download iniciado'
+    );
   }
 
   async deleteDownloadedBook() {
