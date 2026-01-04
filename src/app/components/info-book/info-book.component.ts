@@ -105,6 +105,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
   @ViewChild('firstTab') firstTab!: ElementRef<HTMLSpanElement>;
+  @ViewChild('container') containerElement!: ElementRef<HTMLDivElement>;
+
+  containerHeight = 'auto';
 
   constructor(
     private bookService: BookService,
@@ -119,6 +122,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     if (this.firstTab) {
       this.firstTab.nativeElement.click();
     }
+
+    // Garantir que a altura seja calculada após a view estar pronta
+    setTimeout(() => this.updateContainerHeight(), 500);
 
     this.subscribeToWebSocketEvents();
 
@@ -205,6 +211,45 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         selectorEl.style.width = `${width}px`;
       }
     }
+
+    // Atualizar altura imediatamente e após animação
+    this.updateContainerHeight();
+    setTimeout(() => this.updateContainerHeight(), 350);
+  }
+
+  private updateContainerHeight() {
+    requestAnimationFrame(() => {
+      if (!this.containerElement?.nativeElement) {
+        console.warn('⚠️ Container element não encontrado');
+        return;
+      }
+
+      const container = this.containerElement.nativeElement;
+      const tabs = container.querySelectorAll('.container');
+
+      if (tabs.length === 0) {
+        console.warn('⚠️ Nenhuma tab encontrada');
+        return;
+      }
+
+      const activeTab = tabs[this.selectedTab] as HTMLElement;
+
+      if (activeTab) {
+        const height = activeTab.scrollHeight;
+        const offsetHeight = activeTab.offsetHeight;
+        const clientHeight = activeTab.clientHeight;
+
+        console.log('📏 Tab:', this.selectedTab);
+        console.log('  scrollHeight:', height);
+        console.log('  offsetHeight:', offsetHeight);
+        console.log('  clientHeight:', clientHeight);
+
+        this.containerHeight = `${height}px`;
+        console.log('  Altura final aplicada:', this.containerHeight);
+      } else {
+        console.warn('⚠️ Tab ativa não encontrada, index:', this.selectedTab);
+      }
+    });
   }
 
   getScrapingStatusClass(status: ScrapingStatus): string {
@@ -243,6 +288,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         this.chapters = chapters;
         this.sortChapters();
         this.checkDownloadedChapters();
+        this.updateContainerHeight();
       },
       error: async (error) => {
         console.error('Error loading chapters from API, trying offline:', error);
@@ -363,6 +409,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.bookService.getCovers(this.id).subscribe({
       next: (covers) => {
         this.covers = covers;
+        this.updateContainerHeight();
       },
       error: (error) => {
         console.error('Error loading covers:', error);
@@ -374,6 +421,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.bookService.getInfo(this.id).subscribe({
       next: (info) => {
         this.extraInfo = info;
+        this.updateContainerHeight();
       },
       error: (error) => {
         console.error('Error loading extra info:', error);
@@ -385,6 +433,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.savedPagesService.getSavedPagesByBook(this.id).subscribe({
       next: (pages) => {
         this.savedPages = pages;
+        this.updateContainerHeight();
       },
       error: (error) => {
         console.error('Error loading saved pages:', error);

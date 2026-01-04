@@ -5,7 +5,7 @@
 	<span (click)="selectTab(tab.extraInfo, $event)">Informações extras</span>
 	<span (click)="selectTab(tab.savedPages, $event)">Páginas Salvas</span>
 </div>
-<div id="container" [style.--current-tab-index]="selectedTab">
+<div id="container" #container [style.--current-tab-index]="selectedTab" [style.height]="containerHeight">
 	<div id="chapters" [class.selected]="selectedTab === tab.chapters" class="container">
 		@defer (when modulesLoad[tab.chapters].load()) {
 		<div class="controls">
