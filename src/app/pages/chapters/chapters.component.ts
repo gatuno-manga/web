@@ -200,11 +200,11 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
-  async loadChapter(id: string) {
+  async loadChapter(id: string, forceOnline = false) {
     this.maxReadPageIndex = 0;
     try {
       const isDownloaded = await this.downloadService.isChapterDownloaded(id);
-      if (isDownloaded) {
+      if (isDownloaded && !forceOnline) {
         const offlineChapter = await this.downloadService.getChapter(id);
         if (offlineChapter) {
           this.objectUrls.forEach(url => URL.revokeObjectURL(url));
@@ -501,49 +501,63 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
         icon: 'bookmark',
         action: () => {
           if (!page.id) {
-            this.notificationService.warning('Não é possível salvar páginas de capítulos baixados/offline. Tente ler online.');
+            this.loadChapter(currentChapter.id, true).then(() => {
+              const updatedChapter = this.chapter();
+              if (updatedChapter) {
+                const updatedPage = updatedChapter.pages.find(p => p.index === page.index);
+                if (updatedPage && updatedPage.id) {
+                  this.savePage(updatedPage, currentChapter);
+                } else {
+                  this.notificationService.warning('Não foi possível obter os dados da página. Verifique sua conexão.');
+                }
+              }
+            });
             return;
           }
 
-          this.notificationService.notify({
-            message: '',
-            level: 'custom',
-            severity: NotificationSeverity.CRITICAL,
-            component: PromptModalComponent,
-            componentData: {
-              title: 'Salvar Página',
-              message: 'Deseja adicionar uma nota a esta página?',
-              placeholder: 'Ex: Cena importante...',
-              close: (comment: string | null) => {
-                this.modalNotificationService.close();
-
-                if (comment !== null) {
-                  this.savedPagesService.savePage({
-                    pageId: page.id!,
-                    chapterId: currentChapter.id,
-                    bookId: currentChapter.bookId,
-                    comment: comment
-                  }).subscribe({
-                    next: () => {
-                      this.notificationService.success('Página salva com sucesso!');
-                    },
-                    error: (err) => {
-                      console.error('Error saving page', err);
-                      if (err.status === 400) {
-                        this.notificationService.info('Esta página já está salva.');
-                      } else {
-                        this.notificationService.error('Erro ao salvar página.');
-                      }
-                    }
-                  });
-                }
-              }
-            },
-            useBackdrop: true,
-            backdropOpacity: 0.5
-          });
+          this.savePage(page, currentChapter);
         }
       }
     ]);
+  }
+
+  private savePage(page: Page, chapter: Chapter) {
+    this.notificationService.notify({
+      message: '',
+      level: 'custom',
+      severity: NotificationSeverity.CRITICAL,
+      component: PromptModalComponent,
+      componentData: {
+        title: 'Salvar Página',
+        message: 'Deseja adicionar uma nota a esta página?',
+        placeholder: 'Ex: Cena importante...',
+        close: (comment: string | null) => {
+          this.modalNotificationService.close();
+
+          if (comment !== null) {
+            this.savedPagesService.savePage({
+              pageId: page.id!,
+              chapterId: chapter.id,
+              bookId: chapter.bookId,
+              comment: comment
+            }).subscribe({
+              next: () => {
+                this.notificationService.success('Página salva com sucesso!');
+              },
+              error: (err) => {
+                console.error('Error saving page', err);
+                if (err.status === 400) {
+                  this.notificationService.info('Esta página já está salva.');
+                } else {
+                  this.notificationService.error('Erro ao salvar página.');
+                }
+              }
+            });
+          }
+        }
+      },
+      useBackdrop: true,
+      backdropOpacity: 0.5
+    });
   }
 }
