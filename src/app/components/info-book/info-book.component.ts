@@ -894,7 +894,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   onSourceAddSave(data: SourceAddSaveEvent) {
     // Adicionar nova URL ao array existente
     const updatedUrls = [...this.extraInfo.originalUrl, data.url];
-    
+
     // Chamar API para atualizar o livro
     this.bookService.updateBook(this.id, { originalUrl: updatedUrls }).subscribe({
       next: () => {
@@ -945,10 +945,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
       `Tem certeza que deseja remover a fonte "${this.urlTransform(source)}"?`,
       [
         { label: 'Cancelar', type: 'primary' },
-        { 
-          label: 'Remover', 
-          type: 'danger', 
-          callback: () => this.removeSource(index) 
+        {
+          label: 'Remover',
+          type: 'danger',
+          callback: () => this.removeSource(index)
         }
       ],
       'warning'
@@ -957,7 +957,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   removeSource(index: number) {
     const updatedUrls = this.extraInfo.originalUrl.filter((_, i) => i !== index);
-    
+
     this.bookService.updateBook(this.id, { originalUrl: updatedUrls }).subscribe({
       next: () => {
         this.extraInfo.originalUrl = updatedUrls;
