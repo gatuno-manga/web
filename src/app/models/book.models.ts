@@ -31,6 +31,7 @@ export interface BookBasic {
   description: string;
   publication: number;
   scrapingStatus: ScrapingStatus;
+  autoUpdate: boolean;
   tags: tag[];
   sensitiveContent: SensitiveContentResponse[];
   totalChapters: number;

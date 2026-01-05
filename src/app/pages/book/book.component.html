@@ -47,12 +47,11 @@
 								: 'Começar a ler'
 						}}
 					</app-button>
-					<app-button
-						rounded="small"
-						padding="none"
-						class="options-wrapper"
-					>
-						<button
+					<div class="options-wrapper btn-actions">
+						<app-button
+							radio="square"
+							rounded="small"
+							padding="none"
 							class="options-btn"
 							(click)="
 								toggleOptionsDropdown();
@@ -60,7 +59,7 @@
 							"
 						>
 							<app-icons name="more" />
-						</button>
+						</app-button>
 						@if (showOptionsDropdown()) {
 						<div class="options-dropdown">
 							<button (click)="downloadForApp()">
@@ -82,7 +81,7 @@
 							</button>
 							@if (admin) {
 							<button (click)="forceCheckUpdates()">
-								<app-icons name="refresh-ccw" />
+								<app-icons name="refresh-ccw-dot" />
 								<span>Forçar atualização</span>
 							</button>
 							}
@@ -92,6 +91,23 @@
 							</button>
 						</div>
 						}
+					</div>
+					<app-button
+						class="btn-actions"
+						type="primary"
+						radio="square"
+						rounded="small"
+						padding="none"
+						[disabled]="!admin"
+						(click)="toggleAutoUpdate()"
+					>
+						<app-icons
+							[name]="
+								book.autoUpdate
+									? 'refresh-ccw'
+									: 'refresh-cw-off'
+							"
+						/>
 					</app-button>
 				</div>
 			</div>

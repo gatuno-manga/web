@@ -2,6 +2,7 @@
 	#button
 	[id]="id"
 	[type]="type"
+	[disabled]="disabled"
 	[class]="
 		'btn-' +
 		variant +
@@ -10,7 +11,9 @@
 		' fill-' +
 		fill +
 		' padding-' +
-		padding
+		padding +
+		' radio-' +
+		radio
 	"
 >
 	@if(leftIcon){

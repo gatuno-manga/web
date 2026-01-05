@@ -1,0 +1,176 @@
+<div class="monitoring-container">
+	<div class="header">
+		<h2>
+			<app-icons name="activity" />
+			Monitoramento de Atualizações
+		</h2>
+		<app-button
+			(click)="forceUpdateAll()"
+			variant="primary"
+			rounded="small"
+		>
+			<app-icons name="refresh-cw" />
+			Forçar Todas
+		</app-button>
+	</div>
+
+	@if (isLoading()) {
+	<div class="loading">
+		<app-icons name="loader" class="spin" />
+		<p>Carregando estatísticas...</p>
+	</div>
+	} @else {
+	<!-- Cards de Estatísticas -->
+	<div class="stats-grid">
+		<div class="stat-card waiting">
+			<app-icons name="clock" />
+			<div class="stat-content">
+				<span class="stat-value">{{
+					queueStats().counts.waiting
+				}}</span>
+				<span class="stat-label">Aguardando</span>
+			</div>
+		</div>
+
+		<div class="stat-card active">
+			<app-icons name="loader" class="spin" />
+			<div class="stat-content">
+				<span class="stat-value">{{ queueStats().counts.active }}</span>
+				<span class="stat-label">Em Execução</span>
+			</div>
+		</div>
+
+		<div class="stat-card completed">
+			<app-icons name="check-circle" />
+			<div class="stat-content">
+				<span class="stat-value">{{
+					queueStats().counts.completed
+				}}</span>
+				<span class="stat-label">Concluídos</span>
+			</div>
+		</div>
+
+		<div class="stat-card failed">
+			<app-icons name="x-circle" />
+			<div class="stat-content">
+				<span class="stat-value">{{ queueStats().counts.failed }}</span>
+				<span class="stat-label">Falhados</span>
+			</div>
+		</div>
+	</div>
+
+	<!-- Jobs Ativos -->
+	<div class="section">
+		<h3>
+			<app-icons name="loader" />
+			Jobs em Execução ({{ queueStats().activeJobs.length }})
+		</h3>
+		@if (queueStats().activeJobs.length === 0) {
+		<div class="empty-state">
+			<app-icons name="check-circle" />
+			<p>Nenhum job em execução no momento</p>
+		</div>
+		} @else {
+		<div class="jobs-list">
+			@for (job of queueStats().activeJobs; track job.id) {
+			<div class="job-card active">
+				<div class="job-icon">
+					<app-icons name="loader" class="spin" />
+				</div>
+				<div class="job-info">
+					<a [routerLink]="['/books', job.bookId]" class="job-title">
+						{{ job.bookTitle }}
+					</a>
+					<span class="job-time">{{
+						formatTimestamp(job.timestamp)
+					}}</span>
+				</div>
+				<div class="job-status status-active">
+					<span>Processando</span>
+				</div>
+			</div>
+			}
+		</div>
+		}
+	</div>
+
+	<!-- Fila de Espera -->
+	<div class="section">
+		<h3>
+			<app-icons name="clock" />
+			Próximos na Fila ({{ queueStats().waitingJobs.length }})
+		</h3>
+		@if (queueStats().waitingJobs.length === 0) {
+		<div class="empty-state">
+			<app-icons name="inbox" />
+			<p>Fila vazia</p>
+		</div>
+		} @else {
+		<div class="jobs-list">
+			@for (job of queueStats().waitingJobs; track job.id) {
+			<div class="job-card waiting">
+				<div class="job-icon">
+					<app-icons name="clock" />
+				</div>
+				<div class="job-info">
+					<a [routerLink]="['/books', job.bookId]" class="job-title">
+						{{ job.bookTitle }}
+					</a>
+				</div>
+				<div class="job-status status-waiting">
+					<span>Aguardando</span>
+				</div>
+			</div>
+			}
+		</div>
+		}
+	</div>
+
+	<!-- Eventos Recentes -->
+	<div class="section">
+		<h3>
+			<app-icons name="activity" />
+			Eventos Recentes ({{ recentEvents().length }})
+		</h3>
+		@if (recentEvents().length === 0) {
+		<div class="empty-state">
+			<app-icons name="inbox" />
+			<p>Nenhum evento recente</p>
+		</div>
+		} @else {
+		<div class="events-list">
+			@for (event of recentEvents(); track event.id) {
+			<div class="event-card" [class]="getStatusClass(event.status)">
+				<div class="event-icon">
+					<app-icons
+						[name]="getStatusIcon(event.status)"
+						[class.spin]="event.status === 'active'"
+					/>
+				</div>
+				<div class="event-info">
+					<a
+						[routerLink]="['/books', event.bookId]"
+						class="event-title"
+					>
+						{{ event.bookTitle }}
+					</a>
+					<span class="event-time">{{
+						formatTimestamp(event.timestamp)
+					}}</span>
+				</div>
+				<div class="event-status">
+					@if (event.status === 'active') {
+					<span class="badge badge-active">Em Execução</span>
+					} @else if (event.status === 'completed') {
+					<span class="badge badge-completed">Concluído</span>
+					} @else if (event.status === 'failed') {
+					<span class="badge badge-failed">Falhou</span>
+					}
+				</div>
+			</div>
+			}
+		</div>
+		}
+	</div>
+	}
+</div>

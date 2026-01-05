@@ -112,6 +112,10 @@ export class BookService {
     return this.http.post<{ message: string; bookId: string; }>(`books/${id}/check-updates`, {});
   }
 
+  toggleAutoUpdate(id: string, enabled: boolean) {
+    return this.http.patch<{ id: string; title: string; autoUpdate: boolean; }>(`books/${id}/auto-update`, { enabled });
+  }
+
   /**
    * Retorna os observables do WebSocket para eventos em tempo real
    */

@@ -1,6 +1,7 @@
 import { Routes } from "@angular/router";
 import { HomeComponent } from "./home/home.component";
 import { TagsComponent } from "./tags/tags.component";
+import { MonitoringComponent } from "./monitoring/monitoring.component";
 
 export const routes: Routes = [
     {
@@ -15,5 +16,9 @@ export const routes: Routes = [
     {
         path: 'tags',
         component: TagsComponent,
+    },
+    {
+        path: 'monitoring',
+        component: MonitoringComponent,
     }
 ]

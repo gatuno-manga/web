@@ -139,6 +139,7 @@ export class BookComponent implements OnInit, OnDestroy {
               description: offlineBook.description,
               publication: offlineBook.publication,
               scrapingStatus: ScrapingStatus.READY,
+              autoUpdate: false,
               tags: offlineBook.tags,
               sensitiveContent: offlineBook.sensitiveContent,
               totalChapters: offlineBook.totalChapters,
@@ -368,6 +369,53 @@ export class BookComponent implements OnInit, OnDestroy {
           this.modalService.close();
           this.notificationService.error(
             'Não foi possível agendar a verificação de atualizações.',
+            'Erro'
+          );
+        }
+      });
+    }
+  }
+
+  toggleAutoUpdate() {
+    if (this.book) {
+      const newState = !this.book.autoUpdate;
+      const action = newState ? 'ativar' : 'desativar';
+      this.modalService.show(
+        `${newState ? 'Ativar' : 'Desativar'} Atualizações Automáticas`,
+        `Deseja ${action} as atualizações automáticas para o livro "${this.book.title}"? ${newState ? 'O sistema verificará novos capítulos periodicamente.' : 'O livro não será mais verificado automaticamente.'}`,
+        [
+          {
+            label: 'Cancelar',
+            type: 'primary',
+          },
+          {
+            label: newState ? 'Ativar' : 'Desativar',
+            type: newState ? 'primary' : 'danger',
+            callback: () => {
+              this.confirmToggleAutoUpdate(newState);
+            }
+          }
+        ],
+        'info'
+      );
+    }
+  }
+
+  confirmToggleAutoUpdate(enabled: boolean) {
+    if (this.book) {
+      this.bookService.toggleAutoUpdate(this.book.id, enabled).subscribe({
+        next: (response) => {
+          this.modalService.close();
+          this.book.autoUpdate = response.autoUpdate;
+          this.notificationService.success(
+            `Atualizações automáticas ${enabled ? 'ativadas' : 'desativadas'} com sucesso.`,
+            'Configuração Atualizada'
+          );
+        },
+        error: () => {
+          this.modalService.close();
+          this.notificationService.error(
+            'Não foi possível alterar a configuração de atualizações automáticas.',
             'Erro'
           );
         }
