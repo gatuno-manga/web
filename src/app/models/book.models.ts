@@ -31,6 +31,7 @@ export interface BookBasic {
   description: string;
   publication: number;
   scrapingStatus: ScrapingStatus;
+  autoUpdate: boolean;
   tags: tag[];
   sensitiveContent: SensitiveContentResponse[];
   totalChapters: number;
@@ -43,6 +44,15 @@ export interface BookDetail {
   scrapingStatus: ScrapingStatus;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface UpdateBookDto {
+  title?: string;
+  description?: string;
+  publication?: number;
+  alternativeTitle?: string[];
+  originalUrl?: string[];
+  type?: TypeBook;
 }
 
 export interface Book {

@@ -27,17 +27,17 @@
 .custom-checkbox {
 	width: 20px;
 	height: 20px;
-	border: 2px solid var(--primary-color, #333);
+	border: 2px solid var(--primary-color);
 	border-radius: 4px;
-	background: #fff;
+	background: var(--white);
 	display: inline-block;
 	position: relative;
 	transition: border-color 0.2s;
 }
 
 .custom-checkbox-label input[type='checkbox']:checked + .custom-checkbox {
-	background: var(--primary-color, #333);
-	border-color: var(--primary-color, #333);
+	background: var(--primary-color);
+	border-color: var(--primary-color);
 }
 
 .custom-checkbox-label
@@ -49,12 +49,12 @@
 	top: -2px;
 	width: 6px;
 	height: 12px;
-	border: solid #fff;
+	border: solid var(--white);
 	border-width: 0 3px 3px 0;
 	transform: rotate(45deg);
 }
 
 .custom-checkbox-label input[type='checkbox']:focus + .custom-checkbox {
-	outline: 2px solid var(--primary-color, #333);
+	outline: 2px solid var(--primary-color);
 	outline-offset: 2px;
 }

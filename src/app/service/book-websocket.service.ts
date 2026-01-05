@@ -42,6 +42,40 @@ export interface ScrapingEvent {
     error?: string;
 }
 
+export interface NewChaptersEvent {
+    bookId: string;
+    newChaptersCount: number;
+    chapters: Array<{
+        id: string;
+        title: string;
+        index: number;
+    }>;
+}
+
+export interface UpdateStartedEvent {
+    bookId: string;
+    bookTitle: string;
+    jobId: string;
+    timestamp: number;
+}
+
+export interface UpdateCompletedEvent {
+    bookId: string;
+    bookTitle: string;
+    jobId: string;
+    newChapters: number;
+    newCovers: number;
+    timestamp: number;
+}
+
+export interface UpdateFailedEvent {
+    bookId: string;
+    bookTitle: string;
+    jobId: string;
+    error: string;
+    timestamp: number;
+}
+
 export interface SubscriptionResponse {
     type: 'book' | 'chapter';
     id: string;
@@ -77,6 +111,10 @@ export class BookWebsocketService {
     // Subjects para eventos
     private bookCreatedSubject = new Subject<BookEvent>();
     private bookUpdatedSubject = new Subject<BookEvent>();
+    private bookNewChaptersSubject = new Subject<NewChaptersEvent>();
+    private bookUpdateStartedSubject = new Subject<UpdateStartedEvent>();
+    private bookUpdateCompletedSubject = new Subject<UpdateCompletedEvent>();
+    private bookUpdateFailedSubject = new Subject<UpdateFailedEvent>();
     private chaptersUpdatedSubject = new Subject<ChapterEvent>();
     private chapterUpdatedSubject = new Subject<ChapterEvent>();
     private chaptersFixSubject = new Subject<ChapterEvent>();
@@ -91,6 +129,10 @@ export class BookWebsocketService {
     public connected$ = this.connectedSubject.asObservable();
     public bookCreated$ = this.bookCreatedSubject.asObservable();
     public bookUpdated$ = this.bookUpdatedSubject.asObservable();
+    public bookNewChapters$ = this.bookNewChaptersSubject.asObservable();
+    public bookUpdateStarted$ = this.bookUpdateStartedSubject.asObservable();
+    public bookUpdateCompleted$ = this.bookUpdateCompletedSubject.asObservable();
+    public bookUpdateFailed$ = this.bookUpdateFailedSubject.asObservable();
     public chaptersUpdated$ = this.chaptersUpdatedSubject.asObservable();
     public chapterUpdated$ = this.chapterUpdatedSubject.asObservable();
     public chaptersFix$ = this.chaptersFixSubject.asObservable();
@@ -212,6 +254,27 @@ export class BookWebsocketService {
         this.socket.on('book.updated', (data: BookEvent) => {
             console.log('📝 Livro atualizado:', data);
             this.bookUpdatedSubject.next(data);
+        });
+
+        // Eventos de atualização automática
+        this.socket.on('book.new-chapters', (data: NewChaptersEvent) => {
+            console.log('🆕 Novos capítulos encontrados:', data);
+            this.bookNewChaptersSubject.next(data);
+        });
+
+        this.socket.on('book.update.started', (data: UpdateStartedEvent) => {
+            console.log('🔄 Atualização iniciada:', data);
+            this.bookUpdateStartedSubject.next(data);
+        });
+
+        this.socket.on('book.update.completed', (data: UpdateCompletedEvent) => {
+            console.log('✅ Atualização concluída:', data);
+            this.bookUpdateCompletedSubject.next(data);
+        });
+
+        this.socket.on('book.update.failed', (data: UpdateFailedEvent) => {
+            console.error('❌ Atualização falhou:', data);
+            this.bookUpdateFailedSubject.next(data);
         });
 
         // Eventos de capítulos

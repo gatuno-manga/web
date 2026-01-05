@@ -1,4 +1,21 @@
-<button #button [id]="id" [type]="type" [class]="'btn-' + variant">
+<button
+	#button
+	[id]="id"
+	[type]="type"
+	[disabled]="disabled"
+	[class]="
+		'btn-' +
+		variant +
+		' rounded-' +
+		rounded +
+		' fill-' +
+		fill +
+		' padding-' +
+		padding +
+		' radio-' +
+		radio
+	"
+>
 	@if(leftIcon){
 	<app-icons [name]="leftIcon" />
 	}

@@ -9,7 +9,7 @@
 }
 
 .icon-success svg {
-	color: #28a745;
+	color: var(--success);
 	stroke-width: 2;
 }
 
@@ -24,19 +24,19 @@
 
 h2 {
 	margin: 0 0 12px 0;
-	color: #28a745;
+	color: var(--success);
 	font-size: 1.6em;
 }
 
 .main-message {
 	margin-bottom: 20px;
-	color: #666;
+	color: var(--gray-700);
 	line-height: 1.5;
 }
 
 .items-list {
 	text-align: left;
-	background: #f8f9fa;
+	background: var(--gray-100);
 	padding: 16px;
 	border-radius: 6px;
 	margin-bottom: 16px;
@@ -45,7 +45,7 @@ h2 {
 .items-list strong {
 	display: block;
 	margin-bottom: 8px;
-	color: #333;
+	color: var(--gray-900);
 }
 
 .items-list ul {
@@ -56,17 +56,17 @@ h2 {
 
 .items-list li {
 	padding: 6px 0;
-	color: #555;
+	color: var(--gray-800);
 }
 
 .check {
-	color: #28a745;
+	color: var(--success);
 	font-weight: bold;
 	margin-right: 8px;
 }
 
 .action-button {
-	background: #28a745;
+	background: var(--success);
 	color: white;
 	border: none;
 	padding: 10px 24px;
@@ -77,5 +77,5 @@ h2 {
 }
 
 .action-button:hover {
-	background: #218838;
+	background: var(--success-hover);
 }

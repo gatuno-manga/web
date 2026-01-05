@@ -5,20 +5,37 @@ $page-size: 1200px;
 :host {
 	display: block;
 	padding: 30px 0;
+	overflow: hidden;
 }
 
 .book-background {
 	position: absolute;
 	top: 0;
-	left: 50%;
-	height: 90vw;
-	max-width: 500px;
-	transform: rotate(90deg) translate(-50%, -50%);
+	left: 0;
+	height: 100dvw;
+	background-size: auto 100%;
+	background-position: top left;
+	transform: rotate(90deg) translateY(-99.5dvw);
 	transform-origin: top left;
-	filter: blur(200px);
+	background-repeat: repeat-x;
+	background-color: rgb(from var(--app-background-color) r g b / 0.5);
+	background-blend-mode: overlay;
 	z-index: -1;
-	opacity: 0.6;
 	pointer-events: none;
+	filter: blur(50px);
+
+	.gradient {
+		opacity: 0.65;
+		position: relative;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(
+			to right,
+			transparent 0px,
+			transparent 400px,
+			var(--app-background-color) 800px
+		);
+	}
 }
 .placeholder-background {
 	width: 100vw;
@@ -110,6 +127,7 @@ $page-size: 1200px;
 					@media (max-width: 768px) {
 						font-size: 2rem;
 						line-height: 3rem;
+						text-align: center;
 					}
 
 					&.placeholder {
@@ -118,6 +136,10 @@ $page-size: 1200px;
 				}
 
 				h6 {
+					@media (max-width: 768px) {
+						text-align: center;
+					}
+
 					&.placeholder {
 						height: 2rem;
 					}
@@ -140,41 +162,33 @@ $page-size: 1200px;
 					gap: 0.75rem;
 					margin-top: 1rem;
 
+					.reading-btn {
+						@media (max-width: 768px) {
+							width: 90%;
+							max-width: 300px;
+						}
+					}
+
 					@media (max-width: 768px) {
 						justify-content: center;
 					}
 
 					app-button {
 						flex: 0 0 auto;
-						min-width: 150px;
+					}
+
+					.btn-actions {
+						position: relative;
+						width: 44px;
+						height: 44px;
 					}
 
 					.options-wrapper {
-						position: relative;
-
-						.options-btn {
-							display: flex;
-							align-items: center;
-							justify-content: center;
-							width: 44px;
-							height: 44px;
-							border: none;
-							border-radius: 50%;
-							background-color: var(--primary-color);
+						app-button {
+							width: 100%;
+							height: 100%;
 							cursor: pointer;
 							transition: background-color 0.2s, transform 0.1s;
-
-							&:hover {
-								background-color: var(--secondary-color);
-							}
-
-							&:active {
-								transform: scale(0.95);
-							}
-
-							app-icons {
-								color: var(--app-text-color);
-							}
 						}
 
 						.options-dropdown {
@@ -244,6 +258,24 @@ $page-size: 1200px;
 			}
 			.sensitive {
 				background-color: var(--red);
+			}
+			.auto-update-badge {
+				display: flex;
+				align-items: center;
+				gap: 0.3rem;
+				background-color: var(--secondary-color);
+				opacity: 0.7;
+				cursor: default;
+
+				app-icons {
+					width: 1rem;
+					height: 1rem;
+				}
+
+				&.active {
+					background-color: var(--green);
+					opacity: 1;
+				}
 			}
 
 			.placeholder {

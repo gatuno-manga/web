@@ -8,7 +8,7 @@
 .checkmark {
 	width: 34px;
 	height: 15px;
-	background-color: #ccc;
+	background-color: var(--gray-400);
 	border-radius: 34px;
 	transition: 0.4s;
 	overflow: hidden;
@@ -22,11 +22,11 @@
 		transition: 0.4s;
 		left: 0;
 		display: block;
-		background-color: white;
+		background-color: var(--white);
 		height: 100%;
 		aspect-ratio: 1/1;
 		border-radius: 50%;
-		box-shadow: 0 0 2px rgba(0, 0, 0, 0.5),
+		box-shadow: 0 0 2px rgb(from var(--black) r g b / 0.5),
 			-20px 0px 0px 10px var(--primary-color);
 	}
 }

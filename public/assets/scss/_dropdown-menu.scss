@@ -7,7 +7,7 @@
 	border: 1px solid var(--primary-color);
 	border-radius: 12px;
 	padding: 6px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 4px 12px rgb(from var(--black) r g b / 0.5);
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
@@ -40,10 +40,10 @@
 	}
 
 	&.danger {
-		color: #ff4d4f;
+		color: var(--light-red);
 
 		&:hover:not(.disabled) {
-			background-color: rgba(255, 77, 79, 0.1);
+			background-color: rgb(from var(--light-red) r g b / 0.1);
 		}
 	}
 }
@@ -60,7 +60,7 @@
 
 @mixin dropdown-menu-separator {
 	height: 1px;
-	background-color: rgba(255, 255, 255, 0.1);
+	background-color: rgb(from var(--white) r g b / 0.1);
 	margin: 4px 0;
 }
 
