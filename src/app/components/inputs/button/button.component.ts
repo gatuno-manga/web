@@ -2,6 +2,9 @@ import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { IconsComponent } from '../../icons/icons.component';
 
 export type ButtonVariant = 'primary' | 'outline' | 'text';
+export type ButtonRounded = 'none' | 'small' | 'medium' | 'large' | 'full';
+export type ButtonFill = 'full' | 'border';
+export type ButtonPadding = 'none' | 'normal';
 
 @Component({
   selector: 'app-button',
@@ -14,6 +17,9 @@ export class ButtonComponent {
   @Input() id!: string;
   @Input() type: string = 'button';
   @Input() variant: ButtonVariant = 'primary';
+  @Input() rounded: ButtonRounded = 'full';
+  @Input() fill: ButtonFill = 'full';
+  @Input() padding: ButtonPadding = 'normal';
   @Input() rightIcon: string | null = null;
   @Input() leftIcon: string | null = null;
 }

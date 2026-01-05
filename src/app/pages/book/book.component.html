@@ -1,5 +1,9 @@
 @defer (when !isLoading()){ @if (book.cover && !coverImageError) {
-<div [style.background-image]="'url(' + book.cover + ')'" [style.width.px]="backgroundWidth" class="book-background">
+<div
+	[style.background-image]="'url(' + book.cover + ')'"
+	[style.width.px]="backgroundWidth"
+	class="book-background"
+>
 	<div class="gradient"></div>
 </div>
 } @else {
@@ -18,7 +22,10 @@
 		</div>
 		<div class="book-info">
 			<div class="top">
-				<h1 [class.long-title]="book.title.length > 90" [class.very-long-title]="book.title.length > 140">
+				<h1
+					[class.long-title]="book.title.length > 90"
+					[class.very-long-title]="book.title.length > 140"
+				>
 					{{ book.title }}
 				</h1>
 				<h6>
@@ -29,18 +36,29 @@
 				<div class="caps">{{ book.totalChapters }} Capitulos</div>
 				<div class="release">Lançamento {{ book.publication }}</div>
 				<div class="actions">
-					<app-button (click)="continueReading()" variant="primary">
+					<app-button
+						(click)="continueReading()"
+						variant="primary"
+						rounded="small"
+					>
 						{{
-						lastReadChapterId
-						? 'Continue lendo'
-						: 'Começar a ler'
+							lastReadChapterId
+								? 'Continue lendo'
+								: 'Começar a ler'
 						}}
 					</app-button>
-					<div class="options-wrapper">
-						<button class="options-btn" (click)="
+					<app-button
+						rounded="small"
+						padding="none"
+						class="options-wrapper"
+					>
+						<button
+							class="options-btn"
+							(click)="
 								toggleOptionsDropdown();
 								$event.stopPropagation()
-							">
+							"
+						>
 							<app-icons name="more" />
 						</button>
 						@if (showOptionsDropdown()) {
@@ -50,7 +68,10 @@
 								<span>Salvar no app</span>
 							</button>
 							@if (isBookDownloaded()) {
-							<button (click)="deleteDownloadedBook()" class="danger">
+							<button
+								(click)="deleteDownloadedBook()"
+								class="danger"
+							>
 								<app-icons name="trash" />
 								<span>Excluir download</span>
 							</button>
@@ -71,7 +92,7 @@
 							</button>
 						</div>
 						}
-					</div>
+					</app-button>
 				</div>
 			</div>
 		</div>
@@ -83,7 +104,7 @@
 			} @for(tag of book.tags; track tag.id) {
 			<span class="tag" (click)="filterByTag(tag.id)">{{
 				tag.name
-				}}</span>
+			}}</span>
 			}
 		</div>
 		<p class="book-description">{{ book.description }}</p>

@@ -15,17 +15,15 @@ $page-size: 1200px;
 	height: 100dvw;
 	background-size: contain;
 	background-position: top left;
-	// background-repeat: no-repeat;
 	transform: rotate(90deg) translateY(-99.5dvw);
 	transform-origin: top left;
 	z-index: -1;
 	pointer-events: none;
 	filter: blur(50px);
-	// background-color: var(--app-background-color);
 	background-color: rgb(from var(--app-background-color) r g b / 0.5);
 	background-blend-mode: overlay;
 
-	.gradient{
+	.gradient {
 		opacity: 0.65;
 		position: relative;
 		width: 100%;
@@ -34,7 +32,8 @@ $page-size: 1200px;
 			to right,
 			transparent 0px,
 			transparent 400px,
-			var(--app-background-color) 800px);
+			var(--app-background-color) 800px
+		);
 	}
 }
 .placeholder-background {
@@ -168,6 +167,7 @@ $page-size: 1200px;
 
 					.options-wrapper {
 						position: relative;
+						width: 30px;
 
 						.options-btn {
 							display: flex;
