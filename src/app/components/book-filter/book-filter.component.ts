@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
-import { IconsComponent } from '../icons/icons.component';
 import { ButtonComponent } from '../inputs/button/button.component';
 import { TextInputComponent } from '../inputs/text-input/text-input.component';
 import { BookPageOptions, TypeBook } from '../../models/book.models';
@@ -7,7 +6,7 @@ import { BookPageOptions, TypeBook } from '../../models/book.models';
 @Component({
     selector: 'app-book-filter',
     standalone: true,
-    imports: [IconsComponent, ButtonComponent, TextInputComponent],
+    imports: [ButtonComponent, TextInputComponent],
     templateUrl: './book-filter.component.html',
     styleUrl: './book-filter.component.scss'
 })
