@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, NgZone } from "@angular/core";
-import { Book, BookBasic, BookDetail, BookList, BookPageOptions, Chapterlist, Cover, TagResponse } from "../models/book.models";
+import { Book, BookBasic, BookDetail, BookList, BookPageOptions, Chapterlist, Cover, TagResponse, UpdateBookDto } from "../models/book.models";
 import { Page } from "../models/miscellaneous.models";
 import { SensitiveContentService } from "./sensitive-content.service";
 import { UserTokenService } from "./user-token.service";
@@ -94,6 +94,10 @@ export class BookService {
 
   getInfo(bookId: string) {
     return this.http.get<BookDetail>(`books/${bookId}/infos`);
+  }
+
+  updateBook(bookId: string, data: UpdateBookDto) {
+    return this.http.patch<Book>(`books/${bookId}`, data);
   }
 
   getTags() {

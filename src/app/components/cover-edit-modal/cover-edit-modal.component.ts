@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Cover } from '../../models/book.models';
 import { ButtonComponent } from '../inputs/button/button.component';
+import { TextInputComponent } from '../inputs/text-input/text-input.component';
 import { IconsComponent } from '../icons/icons.component';
 
 export interface CoverEditSaveEvent {
@@ -14,7 +15,7 @@ export interface CoverEditSaveEvent {
 @Component({
     selector: 'app-cover-edit-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule, ButtonComponent, IconsComponent],
+    imports: [CommonModule, FormsModule, ButtonComponent, TextInputComponent, IconsComponent],
     templateUrl: './cover-edit-modal.component.html',
     styleUrl: './cover-edit-modal.component.scss'
 })

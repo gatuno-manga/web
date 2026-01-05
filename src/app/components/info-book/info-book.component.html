@@ -5,51 +5,89 @@
 	<span (click)="selectTab(tab.extraInfo, $event)">Informações extras</span>
 	<span (click)="selectTab(tab.savedPages, $event)">Páginas Salvas</span>
 </div>
-<div id="container" #container [style.--current-tab-index]="selectedTab" [style.height]="containerHeight">
-	<div id="chapters" [class.selected]="selectedTab === tab.chapters" class="container">
+<div
+	id="container"
+	#container
+	[style.--current-tab-index]="selectedTab"
+	[style.height]="containerHeight"
+>
+	<div
+		id="chapters"
+		[class.selected]="selectedTab === tab.chapters"
+		class="container"
+	>
 		@defer (when modulesLoad[tab.chapters].load()) {
 		<div class="controls">
 			@if(selectedChapters().size > 0) {
 			<div class="selection-controls">
 				<div class="selection-header">
-					<span class="selection-count">{{ selectedChapters().size }} selecionado(s)</span>
-					<app-button (click)="clearSelection()" variant="text" size="small">
+					<span class="selection-count"
+						>{{ selectedChapters().size }} selecionado(s)</span
+					>
+					<app-button
+						(click)="clearSelection()"
+						variant="text"
+						size="small"
+					>
 						<app-icons name="close" size="16" />
 						<span>Limpar</span>
 					</app-button>
 				</div>
 				<div class="selection-actions">
-					<app-button (click)="downloadSelectedChapters()" variant="text" size="small">
+					<app-button
+						(click)="downloadSelectedChapters()"
+						variant="text"
+						size="small"
+					>
 						<app-icons name="download" size="16" />
 						<span>Baixar</span>
 					</app-button>
 					@if(hasDownloadedInSelection()) {
-					<app-button (click)="deleteSelectedChaptersDownloads()" variant="text" size="small">
+					<app-button
+						(click)="deleteSelectedChaptersDownloads()"
+						variant="text"
+						size="small"
+					>
 						<app-icons name="trash" size="16" />
 						<span>Excluir Downloads</span>
 					</app-button>
 					}
-					<app-button (click)="toggleSelectedReadStatus()" variant="text" size="small">
+					<app-button
+						(click)="toggleSelectedReadStatus()"
+						variant="text"
+						size="small"
+					>
 						<app-icons name="eye" size="16" />
 						<span>Alternar Leitura</span>
 					</app-button>
 				</div>
 			</div>
 			} @else {
-			<app-button (click)="selectAllChapters()" variant="text" size="small">
+			<app-button
+				(click)="selectAllChapters()"
+				variant="text"
+				size="small"
+			>
 				<span>Selecionar Todos</span>
 			</app-button>
 			}
 			<app-button (click)="toggleSort()" variant="text">
-				<span>Ordem
-					{{ sortAscending() ? 'Crescente' : 'Decrescente' }}</span>
+				<span
+					>Ordem
+					{{ sortAscending() ? 'Crescente' : 'Decrescente' }}</span
+				>
 				<app-icons name="arrow-up" [class.rotated]="!sortAscending()" />
 			</app-button>
 		</div>
 		<div class="scrollable">
 			@for(chapter of chapters; track chapter.id) {
-			<a [routerLink]="[chapter.id]" class="chapter" [class.selected]="isChapterSelected(chapter.id)"
-				(click)="onChapterClick($event, chapter)" (contextmenu)="onChapterContextMenu($event, chapter)">
+			<a
+				[routerLink]="[chapter.id]"
+				class="chapter"
+				[class.selected]="isChapterSelected(chapter.id)"
+				(click)="onChapterClick($event, chapter)"
+				(contextmenu)="onChapterContextMenu($event, chapter)"
+			>
 				<div class="title">
 					<h2>capitulo {{ chapter.index | number }}</h2>
 					@if(chapter.title){
@@ -58,35 +96,60 @@
 				</div>
 				<div class="metadata">
 					<div class="read">
-						<app-icons [name]="chapter.read ? 'eye' : 'eye-close'" [class.read]="chapter.read" />
+						<app-icons
+							[name]="chapter.read ? 'eye' : 'eye-close'"
+							[class.read]="chapter.read"
+						/>
 					</div>
-					<div class="download-container" (click)="
+					<div
+						class="download-container"
+						(click)="
 							$event.preventDefault(); $event.stopPropagation()
-						">
+						"
+					>
 						@if(chaptersDownloadStatus.get(chapter.id) ===
 						'downloaded') {
-						<app-icons name="check" class="icon-downloaded" (click)="deleteChapterDownload(chapter, $event)"
-							title="Clique para excluir download" />
+						<app-icons
+							name="check"
+							class="icon-downloaded"
+							(click)="deleteChapterDownload(chapter, $event)"
+							title="Clique para excluir download"
+						/>
 						} @else if (chaptersDownloadStatus.get(chapter.id) ===
 						'downloading') {
-						<span class="download-progress">{{
-							chaptersDownloadProgress.get(chapter.id)
-							| number : '1.0-0'
-							}}%</span>
+						<span class="download-progress"
+							>{{
+								chaptersDownloadProgress.get(chapter.id)
+									| number : '1.0-0'
+							}}%</span
+						>
 						} @else if (chaptersDownloadStatus.get(chapter.id) ===
 						'pending') {
-						<app-icons name="clock" class="icon-pending" title="Aguardando download" />
+						<app-icons
+							name="clock"
+							class="icon-pending"
+							title="Aguardando download"
+						/>
 						} @else {
-						<app-icons name="download" class="icon-download" (click)="downloadChapter(chapter, $event)" />
+						<app-icons
+							name="download"
+							class="icon-download"
+							(click)="downloadChapter(chapter, $event)"
+						/>
 						}
 					</div>
-					<div class="scraping-status" [class.scrapingStatusReady]="
+					<div
+						class="scraping-status"
+						[class.scrapingStatusReady]="
 							chapter.scrapingStatus === ScrapingStatus.READY
-						" [class.scrapingStatusProcessing]="
+						"
+						[class.scrapingStatusProcessing]="
 							chapter.scrapingStatus === ScrapingStatus.PROCESSING
-						" [class.scrapingStatusError]="
+						"
+						[class.scrapingStatusError]="
 							chapter.scrapingStatus === ScrapingStatus.ERROR
-						">
+						"
+					>
 						{{ getScrapingStatusClass(chapter.scrapingStatus) }}
 					</div>
 				</div>
@@ -97,14 +160,26 @@
 		<div class="placeholder"></div>
 		} }
 	</div>
-	<div id="covers" [class.selected]="selectedTab === tab.covers" class="container">
+	<div
+		id="covers"
+		[class.selected]="selectedTab === tab.covers"
+		class="container"
+	>
 		@defer (when modulesLoad[tab.covers].load()) {
 		<div class="scrollable">
 			@for(cover of covers; track cover.id) {
-			<div class="cover" [class.selected]="cover.selected" (click)="onCoverClick(cover)"
-				(contextmenu)="onCoverContextMenu($event, cover)">
+			<div
+				class="cover"
+				[class.selected]="cover.selected"
+				(click)="onCoverClick(cover)"
+				(contextmenu)="onCoverContextMenu($event, cover)"
+			>
 				@if (cover.url && !coverImageErrors.has(cover.id)) {
-				<img [src]="cover.url" [alt]="'Cover ' + cover.id" (error)="onCoverImageError(cover.id)" />
+				<img
+					[src]="cover.url"
+					[alt]="'Cover ' + cover.id"
+					(error)="onCoverImageError(cover.id)"
+				/>
 				} @else {
 				<div class="cover-placeholder">
 					<app-icons name="image" />
@@ -122,7 +197,11 @@
 		</div>
 		}
 	</div>
-	<div id="extra-info" [class.selected]="selectedTab === tab.extraInfo" class="container">
+	<div
+		id="extra-info"
+		[class.selected]="selectedTab === tab.extraInfo"
+		class="container"
+	>
 		<div class="scrollable">
 			<div class="titles">
 				<h1>Titulos alternativos</h1>
@@ -139,13 +218,31 @@
 				</div>
 			</div>
 			<div class="sources">
-				<h1>Fontes</h1>
-				<div>
+				<div class="sources-header">
+					<h1>Fontes</h1>
+					@if(userTokenService.isAdminSignal()) {
+					<app-button
+						variant="text"
+						size="small"
+						(click)="openSourceAddModal()"
+					>
+						<app-icons name="plus" size="16" />
+						<span>Adicionar</span>
+					</app-button>
+					}
+				</div>
+				<div class="sources-list">
 					@defer (when modulesLoad[tab.extraInfo].load()) {
 					@for(source of extraInfo.originalUrl; track $index) {
-					<a class="item" [href]="source" target="_blank">{{
-						this.urlTransform(source)
-						}}</a>
+					<a
+						class="item"
+						[href]="source"
+						target="_blank"
+						(contextmenu)="
+							onSourceContextMenu($event, source, $index)
+						"
+						>{{ this.urlTransform(source) }}</a
+					>
 					}@empty {
 					<p>Nenhuma fonte disponível</p>
 					}}@placeholder { @for (i of [].constructor(5); track $index)
@@ -156,14 +253,25 @@
 			</div>
 		</div>
 	</div>
-	<div id="saved-pages" [class.selected]="selectedTab === tab.savedPages" class="container">
+	<div
+		id="saved-pages"
+		[class.selected]="selectedTab === tab.savedPages"
+		class="container"
+	>
 		@defer (when modulesLoad[tab.savedPages].load()) {
 		<div class="scrollable">
 			@for(savedPage of savedPages; track savedPage.id) {
-			<div class="cover" (click)="onSavedPageClick(savedPage)"
-				(contextmenu)="onSavedPageContextMenu($event, savedPage)">
+			<div
+				class="cover"
+				(click)="onSavedPageClick(savedPage)"
+				(contextmenu)="onSavedPageContextMenu($event, savedPage)"
+			>
 				@if (savedPage.page.path) {
-				<img [src]="savedPage.page.path" [alt]="'Page ' + savedPage.page.index" loading="lazy" />
+				<img
+					[src]="savedPage.page.path"
+					[alt]="'Page ' + savedPage.page.index"
+					loading="lazy"
+				/>
 				} @else {
 				<div class="cover-placeholder">
 					<app-icons name="image" />
@@ -194,13 +302,30 @@
 </div>
 
 @if(showImageViewer) {
-<app-image-viewer [imageUrl]="viewerImageUrl" [imageTitle]="viewerImageTitle"
-	[imageDescription]="viewerImageDescription" (close)="closeImageViewer()" />
+<app-image-viewer
+	[imageUrl]="viewerImageUrl"
+	[imageTitle]="viewerImageTitle"
+	[imageDescription]="viewerImageDescription"
+	(close)="closeImageViewer()"
+/>
 } @if(showCoverEditModal && editingCover) {
 <div class="modal-backdrop" (click)="closeCoverEditModal()">
 	<div class="modal-container" (click)="$event.stopPropagation()">
-		<app-cover-edit-modal [cover]="editingCover" (save)="onCoverEditSave($event)"
-			(cancel)="closeCoverEditModal()" />
+		<app-cover-edit-modal
+			[cover]="editingCover"
+			(save)="onCoverEditSave($event)"
+			(cancel)="closeCoverEditModal()"
+		/>
+	</div>
+</div>
+} @if(showSourceAddModal) {
+<div class="modal-backdrop" (click)="closeSourceAddModal()">
+	<div class="modal-container" (click)="$event.stopPropagation()">
+		<app-source-add-modal
+			[existingUrls]="extraInfo.originalUrl"
+			(save)="onSourceAddSave($event)"
+			(cancel)="closeSourceAddModal()"
+		/>
 	</div>
 </div>
 }

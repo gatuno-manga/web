@@ -46,6 +46,15 @@ export interface BookDetail {
   updatedAt: Date;
 }
 
+export interface UpdateBookDto {
+  title?: string;
+  description?: string;
+  publication?: number;
+  alternativeTitle?: string[];
+  originalUrl?: string[];
+  type?: TypeBook;
+}
+
 export interface Book {
   id: string;
   title: string;

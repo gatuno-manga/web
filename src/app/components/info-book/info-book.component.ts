@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal, OnDestroy, inject } from '@angular/core';
 import { BookService } from '../../service/book.service';
-import { Book, BookBasic, BookDetail, Chapterlist, Cover, ScrapingStatus } from '../../models/book.models';
+import { Book, BookBasic, BookDetail, Chapterlist, Cover, ScrapingStatus, UpdateBookDto } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
@@ -17,6 +17,7 @@ import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
 import { SavedPagesService } from '../../service/saved-pages.service';
 import { SavedPage } from '../../models/saved-page.models';
 import { CoverEditModalComponent, CoverEditSaveEvent } from '../cover-edit-modal/cover-edit-modal.component';
+import { SourceAddModalComponent, SourceAddSaveEvent } from '../source-add-modal/source-add-modal.component';
 import { PromptModalComponent } from '../notification/custom-components/prompt-modal/prompt-modal.component';
 import { NotificationService } from '../../service/notification.service';
 import { NotificationSeverity } from 'app/service/notification';
@@ -35,12 +36,12 @@ interface ModulesLoad {
 
 @Component({
   selector: 'app-info-book',
-  imports: [RouterModule, DecimalPipe, IconsComponent, ButtonComponent, ImageViewerComponent, CoverEditModalComponent],
+  imports: [RouterModule, DecimalPipe, IconsComponent, ButtonComponent, ImageViewerComponent, CoverEditModalComponent, SourceAddModalComponent],
   templateUrl: './info-book.component.html',
   styleUrl: './info-book.component.scss'
 })
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
-  private userTokenService = inject(UserTokenService);
+  userTokenService = inject(UserTokenService);
   private notificationService = inject(NotificationService);
 
   tab = tab;
@@ -99,6 +100,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   // Cover edit modal state
   showCoverEditModal = false;
   editingCover: Cover | null = null;
+
+  // Source add modal state
+  showSourceAddModal = false;
 
   // Track cover image loading errors
   coverImageErrors = new Set<string>();
@@ -875,6 +879,95 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.showCoverEditModal = false;
     this.editingCover = null;
     this.unlockScroll();
+  }
+
+  openSourceAddModal() {
+    this.showSourceAddModal = true;
+    this.lockScroll();
+  }
+
+  closeSourceAddModal() {
+    this.showSourceAddModal = false;
+    this.unlockScroll();
+  }
+
+  onSourceAddSave(data: SourceAddSaveEvent) {
+    // Adicionar nova URL ao array existente
+    const updatedUrls = [...this.extraInfo.originalUrl, data.url];
+    
+    // Chamar API para atualizar o livro
+    this.bookService.updateBook(this.id, { originalUrl: updatedUrls }).subscribe({
+      next: () => {
+        // Atualizar estado local
+        this.extraInfo.originalUrl = updatedUrls;
+        this.closeSourceAddModal();
+        this.notificationService.success('Fonte adicionada com sucesso!');
+      },
+      error: (error) => {
+        console.error('Error adding source:', error);
+        this.notificationService.error('Erro ao adicionar fonte.');
+        this.closeSourceAddModal();
+      }
+    });
+  }
+
+  onSourceContextMenu(event: MouseEvent, source: string, index: number) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!this.userTokenService.isAdminSignal()) return;
+
+    const items: ContextMenuItem[] = [
+      {
+        label: 'Copiar URL',
+        icon: 'copy',
+        action: () => {
+          navigator.clipboard.writeText(source);
+          this.notificationService.success('URL copiada!');
+        }
+      },
+      { type: 'separator' },
+      {
+        label: 'Remover',
+        icon: 'trash',
+        danger: true,
+        action: () => this.confirmRemoveSource(index)
+      }
+    ];
+
+    this.contextMenuService.open(event, items);
+  }
+
+  confirmRemoveSource(index: number) {
+    const source = this.extraInfo.originalUrl[index];
+    this.modalService.show(
+      'Remover Fonte',
+      `Tem certeza que deseja remover a fonte "${this.urlTransform(source)}"?`,
+      [
+        { label: 'Cancelar', type: 'primary' },
+        { 
+          label: 'Remover', 
+          type: 'danger', 
+          callback: () => this.removeSource(index) 
+        }
+      ],
+      'warning'
+    );
+  }
+
+  removeSource(index: number) {
+    const updatedUrls = this.extraInfo.originalUrl.filter((_, i) => i !== index);
+    
+    this.bookService.updateBook(this.id, { originalUrl: updatedUrls }).subscribe({
+      next: () => {
+        this.extraInfo.originalUrl = updatedUrls;
+        this.notificationService.success('Fonte removida com sucesso!');
+      },
+      error: (error) => {
+        console.error('Error removing source:', error);
+        this.notificationService.error('Erro ao remover fonte.');
+      }
+    });
   }
 
   onCoverEditSave(data: CoverEditSaveEvent) {

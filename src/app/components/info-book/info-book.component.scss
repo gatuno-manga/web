@@ -137,7 +137,7 @@
 
 		&.selected {
 			background-color: var(--primary-color);
-			box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3);
+			box-shadow: 0 0 0 3px rgb(from var(--primary-color) r g b / 0.3);
 			transform: scale(1.02);
 
 			&::before {
@@ -156,7 +156,7 @@
 				justify-content: center;
 				font-size: 14px;
 				font-weight: bold;
-				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+				box-shadow: 0 2px 4px rgb(from var(--black) r g b / 0.2);
 			}
 
 			.title {
@@ -211,7 +211,7 @@
 					transition: color 0.2s;
 
 					&:hover {
-						color: #ff6b6b;
+						color: var(--soft-red);
 					}
 				}
 
@@ -307,7 +307,7 @@
 
 		&:hover {
 			transform: scale(1.02);
-			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+			box-shadow: 0 4px 20px rgb(from var(--black) r g b / 0.3);
 		}
 
 		img {
@@ -342,9 +342,9 @@
 			left: 0;
 			background-image: linear-gradient(
 				to top,
-				rgba(0, 0, 0, 0.9) 0%,
-				rgba(0, 0, 0, 0.7) 30%,
-				rgba(0, 0, 0, 0) 100%
+				rgb(from var(--black) r g b / 0.9) 0%,
+				rgb(from var(--black) r g b / 0.7) 30%,
+				rgb(from var(--black) r g b / 0) 100%
 			);
 			color: white;
 			display: flex;
@@ -407,10 +407,39 @@
 		}
 	}
 	.sources {
+		.sources-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 16px;
+
+			h1 {
+				margin: 0;
+			}
+
+			app-button {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+		}
+
+		.sources-list {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+
 		.item {
 			background-color: var(--primary-color);
 			padding: 5px;
 			border-radius: 15px;
+			cursor: pointer;
+			transition: opacity 0.2s ease;
+
+			&:hover {
+				opacity: 0.8;
+			}
 		}
 		.placeholder {
 			display: inline-block;
@@ -428,7 +457,7 @@
 	left: 0;
 	width: 100vw;
 	height: 100vh;
-	background-color: rgba(0, 0, 0, 0.7);
+	background-color: rgb(from var(--black) r g b / 0.7);
 	display: flex;
 	align-items: center;
 	justify-content: center;
