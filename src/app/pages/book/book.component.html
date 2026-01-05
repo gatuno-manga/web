@@ -1,5 +1,7 @@
 @defer (when !isLoading()){ @if (book.cover && !coverImageError) {
-<img [src]="book.cover" class="book-background" (error)="onCoverImageError()" />
+<div [style.background-image]="'url(' + book.cover + ')'" [style.width.px]="backgroundWidth" class="book-background">
+	<div class="gradient"></div>
+</div>
 } @else {
 <div class="book-background placeholder-background"></div>
 }

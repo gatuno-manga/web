@@ -49,6 +49,10 @@ export class BookComponent implements OnInit, OnDestroy {
   // Estado para erro de imagem de capa
   coverImageError = false;
 
+  // Largura dinâmica do background (rotacionado)
+  backgroundWidth = 0;
+  private resizeObserver?: ResizeObserver;
+
   private metaService = inject(MetaDataService);
   private modalService = inject(ModalNotificationService);
   private notificationService = inject(NotificationService);
@@ -71,6 +75,17 @@ export class BookComponent implements OnInit, OnDestroy {
     this.closeOptionsDropdown();
   }
 
+  @HostListener('window:resize')
+  @HostListener('window:scroll')
+  updateBackgroundSize() {
+    if (typeof document !== 'undefined') {
+      const bodyHeight = document.body.scrollHeight;
+      const viewportHeight = window.innerHeight;
+      // Calcula a largura necessária (que será a altura após rotação)
+      this.backgroundWidth = Math.max(bodyHeight, viewportHeight);
+    }
+  }
+
   onCoverImageError() {
     this.coverImageError = true;
   }
@@ -91,6 +106,12 @@ export class BookComponent implements OnInit, OnDestroy {
         this.book = book;
         this.setMetaData();
         this.isLoading.set(false);
+
+        // Atualiza tamanho do background
+        setTimeout(() => {
+          this.updateBackgroundSize();
+          this.setupResizeObserver();
+        }, 100);
 
         // Verifica se o livro está baixado
         this.checkBookDownloaded();
@@ -143,6 +164,22 @@ export class BookComponent implements OnInit, OnDestroy {
     }
     if (this.coverUrl) {
       URL.revokeObjectURL(this.coverUrl);
+    }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  }
+
+  private setupResizeObserver() {
+    if (typeof window === 'undefined' || !window.ResizeObserver) return;
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.updateBackgroundSize();
+    });
+
+    // Observa mudanças no body
+    if (document.body) {
+      this.resizeObserver.observe(document.body);
     }
   }
 

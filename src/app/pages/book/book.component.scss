@@ -5,20 +5,37 @@ $page-size: 1200px;
 :host {
 	display: block;
 	padding: 30px 0;
+	overflow: hidden;
 }
 
 .book-background {
 	position: absolute;
 	top: 0;
-	left: 50%;
-	height: 90vw;
-	max-width: 500px;
-	transform: rotate(90deg) translate(-50%, -50%);
+	left: 0;
+	height: 100dvw;
+	background-size: contain;
+	background-position: top left;
+	// background-repeat: no-repeat;
+	transform: rotate(90deg) translateY(-99.5dvw);
 	transform-origin: top left;
-	filter: blur(200px);
 	z-index: -1;
-	opacity: 0.6;
 	pointer-events: none;
+	filter: blur(50px);
+	// background-color: var(--app-background-color);
+	background-color: rgb(from var(--app-background-color) r g b / 0.5);
+	background-blend-mode: overlay;
+
+	.gradient{
+		opacity: 0.65;
+		position: relative;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(
+			to right,
+			transparent 0px,
+			transparent 400px,
+			var(--app-background-color) 800px);
+	}
 }
 .placeholder-background {
 	width: 100vw;

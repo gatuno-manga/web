@@ -220,7 +220,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   private updateContainerHeight() {
     requestAnimationFrame(() => {
       if (!this.containerElement?.nativeElement) {
-        console.warn('⚠️ Container element não encontrado');
         return;
       }
 
@@ -228,26 +227,13 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
       const tabs = container.querySelectorAll('.container');
 
       if (tabs.length === 0) {
-        console.warn('⚠️ Nenhuma tab encontrada');
         return;
       }
 
       const activeTab = tabs[this.selectedTab] as HTMLElement;
 
       if (activeTab) {
-        const height = activeTab.scrollHeight;
-        const offsetHeight = activeTab.offsetHeight;
-        const clientHeight = activeTab.clientHeight;
-
-        console.log('📏 Tab:', this.selectedTab);
-        console.log('  scrollHeight:', height);
-        console.log('  offsetHeight:', offsetHeight);
-        console.log('  clientHeight:', clientHeight);
-
-        this.containerHeight = `${height}px`;
-        console.log('  Altura final aplicada:', this.containerHeight);
-      } else {
-        console.warn('⚠️ Tab ativa não encontrada, index:', this.selectedTab);
+        this.containerHeight = `${activeTab.scrollHeight}px`;
       }
     });
   }
