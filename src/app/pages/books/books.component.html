@@ -1,7 +1,17 @@
 @defer (when !isLoading()){
+<div class="filter">
+	<app-book-filter
+		[initialFilters]="filterOptions"
+		(filtersChange)="onFiltersChange($event)"
+	/>
+</div>
 <div class="controller">
 	<div class="mode-switch">
-		<app-select [items]="viewModeList" [select]="getViewModeIndex()" [disabled]="isOfflineMode" />
+		<app-select
+			[items]="viewModeList"
+			[select]="getViewModeIndex()"
+			[disabled]="isOfflineMode"
+		/>
 	</div>
 	<div class="pages">
 		@for(page of pagesToShow; track page) {

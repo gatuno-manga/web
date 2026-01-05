@@ -11,10 +11,11 @@ import { DownloadService } from '../../service/download.service';
 import { SensitiveContentService } from '../../service/sensitive-content.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { isPlatformBrowser } from '@angular/common';
+import { BookFilterComponent } from '../../components/book-filter/book-filter.component';
 
 @Component({
   selector: 'app-books',
-  imports: [RouterModule, ItemBookComponent, SelectComponent],
+  imports: [RouterModule, ItemBookComponent, SelectComponent, BookFilterComponent],
   templateUrl: './books.component.html',
   styleUrl: './books.component.scss'
 })
@@ -89,18 +90,23 @@ export class BooksComponent implements OnInit, OnDestroy {
         page: this.currentPage,
       };
 
+      // Only apply these filters in online mode
+      if (this.viewMode === 'online') {
+        if (params['type']) filters.type = Array.isArray(params['type']) ? params['type'] : [params['type']];
+        if (params['tags']) filters.tags = Array.isArray(params['tags']) ? params['tags'] : [params['tags']];
+        if (params['tagsLogic']) filters.tagsLogic = params['tagsLogic'] as 'and' | 'or';
+        if (params['excludeTags']) filters.excludeTags = Array.isArray(params['excludeTags']) ? params['excludeTags'] : [params['excludeTags']];
+        if (params['excludeTagsLogic']) filters.excludeTagsLogic = params['excludeTagsLogic'] as 'and' | 'or';
+        if (params['authors']) filters.authors = Array.isArray(params['authors']) ? params['authors'] : [params['authors']];
+        if (params['authorsLogic']) filters.authorsLogic = params['authorsLogic'] as 'and' | 'or';
+        if (params['publication']) filters.publication = parseInt(params['publication'], 10);
+        if (params['publicationOperator']) filters.publicationOperator = params['publicationOperator'] as 'eq' | 'gt' | 'lt' | 'gte' | 'lte';
+        if (params['orderBy']) filters.orderBy = params['orderBy'] as 'title' | 'createdAt' | 'updatedAt' | 'publication';
+        if (params['order']) filters.order = params['order'] as 'ASC' | 'DESC';
+      }
+
+      // These filters work in both modes
       if (params['search']) filters.search = params['search'];
-      if (params['type']) filters.type = Array.isArray(params['type']) ? params['type'] : [params['type']];
-      if (params['tags']) filters.tags = Array.isArray(params['tags']) ? params['tags'] : [params['tags']];
-      if (params['tagsLogic']) filters.tagsLogic = params['tagsLogic'] as 'and' | 'or';
-      if (params['excludeTags']) filters.excludeTags = Array.isArray(params['excludeTags']) ? params['excludeTags'] : [params['excludeTags']];
-      if (params['excludeTagsLogic']) filters.excludeTagsLogic = params['excludeTagsLogic'] as 'and' | 'or';
-      if (params['authors']) filters.authors = Array.isArray(params['authors']) ? params['authors'] : [params['authors']];
-      if (params['authorsLogic']) filters.authorsLogic = params['authorsLogic'] as 'and' | 'or';
-      if (params['publication']) filters.publication = parseInt(params['publication'], 10);
-      if (params['publicationOperator']) filters.publicationOperator = params['publicationOperator'] as 'eq' | 'gt' | 'lt' | 'gte' | 'lte';
-      if (params['orderBy']) filters.orderBy = params['orderBy'] as 'title' | 'createdAt' | 'updatedAt' | 'publication';
-      if (params['order']) filters.order = params['order'] as 'ASC' | 'DESC';
       if (params['sensitiveContent']) filters.sensitiveContent = Array.isArray(params['sensitiveContent']) ? params['sensitiveContent'] : [params['sensitiveContent']];
 
       this.filterOptions = filters;
@@ -266,5 +272,67 @@ export class BooksComponent implements OnInit, OnDestroy {
 
   getViewModeIndex(): number {
     return this.viewMode === 'online' ? 0 : 1;
+  }
+
+  onFiltersChange(filters: Partial<BookPageOptions>) {
+    // Check if all filters are empty (clearing filters)
+    const hasAnyFilter = Object.keys(filters).some(key => {
+      const value = filters[key as keyof BookPageOptions];
+      if (value === undefined || value === null || value === '') return false;
+      if (Array.isArray(value) && value.length === 0) return false;
+      return true;
+    });
+
+    // If no filters, navigate with only page=1
+    if (!hasAnyFilter) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { page: 1 },
+        queryParamsHandling: ''
+      });
+      return;
+    }
+
+    // Only keep filters that work in current mode
+    const applicableFilters: Partial<BookPageOptions> = { page: 1 };
+
+    // These filters work in both modes
+    if (filters.search) applicableFilters.search = filters.search;
+    if (filters.sensitiveContent) applicableFilters.sensitiveContent = filters.sensitiveContent;
+
+    // These filters only work in online mode
+    if (this.viewMode === 'online') {
+      if (filters.type) applicableFilters.type = filters.type;
+      if (filters.tags) {
+        applicableFilters.tags = filters.tags;
+        applicableFilters.tagsLogic = filters.tagsLogic;
+      }
+      if (filters.excludeTags) {
+        applicableFilters.excludeTags = filters.excludeTags;
+        applicableFilters.excludeTagsLogic = filters.excludeTagsLogic;
+      }
+      if (filters.authors) {
+        applicableFilters.authors = filters.authors;
+        applicableFilters.authorsLogic = filters.authorsLogic;
+      }
+      if (filters.publication) {
+        applicableFilters.publication = filters.publication;
+        applicableFilters.publicationOperator = filters.publicationOperator;
+      }
+      if (filters.orderBy) {
+        applicableFilters.orderBy = filters.orderBy;
+        applicableFilters.order = filters.order;
+      }
+    }
+
+    const cleanParams = Object.fromEntries(
+      Object.entries(applicableFilters).filter(([_, value]) => value !== undefined && value !== '' && (Array.isArray(value) ? value.length > 0 : true))
+    );
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: cleanParams,
+      queryParamsHandling: ''
+    });
   }
 }

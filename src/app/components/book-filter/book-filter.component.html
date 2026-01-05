@@ -1,0 +1,29 @@
+<div class="book-filter">
+	<app-input
+		type="text"
+		class="search-input"
+		[value]="searchValue()"
+		(input)="onSearchInput($any($event.target).value)"
+		(keydown.enter)="onSearch()"
+		rightIcon="search"
+		[rightIconClick]="onSearchClick"
+	/>
+
+	<div class="filter-actions">
+		@if (hasActiveFilters()) {
+		<app-button variant="text" size="small" (click)="clearAllFilters()">
+			Limpar filtros
+		</app-button>
+		}
+		<app-button variant="primary" leftIcon="search" (click)="onSearch()">
+			Pesquisar
+		</app-button>
+	</div>
+
+	@if (showAdvancedFilters()) {
+	<div class="advanced-filters">
+		<!-- TODO -->
+		<!-- Filtros de tipo, tags, autores, etc serão adicionados aqui -->
+	</div>
+	}
+</div>

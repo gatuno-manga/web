@@ -15,6 +15,13 @@
 	}
 }
 
+.filter {
+	position: relative;
+	max-width: calc(255px * 4.5);
+	margin: auto auto;
+	margin-top: 40px;
+}
+
 .controller {
 	position: relative;
 	max-width: calc(255px * 5);
@@ -27,27 +34,27 @@
 	margin: auto auto;
 	z-index: 5;
 
-    .mode-switch {
-        display: flex;
-        gap: 1rem;
-        
-        app-icons {
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            
-            &:hover {
-                color: var(--primary-color);
-            }
-            
-            &.active {
-                color: var(--primary-color);
-                border-color: var(--primary-color);
-            }
-        }
-    }
+	.mode-switch {
+		display: flex;
+		gap: 1rem;
+
+		app-icons {
+			cursor: pointer;
+			padding: 5px;
+			border-radius: 50%;
+			border: 2px solid transparent;
+			transition: all 0.3s ease;
+
+			&:hover {
+				color: var(--primary-color);
+			}
+
+			&.active {
+				color: var(--primary-color);
+				border-color: var(--primary-color);
+			}
+		}
+	}
 }
 
 .pages {
