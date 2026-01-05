@@ -70,6 +70,7 @@ button {
 	&:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+		background-color: rgb(from var(--black) r g b / 0.05);
 	}
 
 	&.btn-primary {

@@ -32,7 +32,7 @@
 		flex: none;
 		width: 3rem;
 		height: 3rem;
-		background-color: var(--secondary-color, #6b7280);
+		background-color: var(--secondary-color, var(--gray-700));
 		border: none;
 		border-radius: 15px;
 		cursor: pointer;
@@ -42,7 +42,7 @@
 		transition: all 0.2s;
 
 		&:hover {
-			background-color: var(--secondary-color-hover, #4b5563);
+			background-color: var(--secondary-color-hover, var(--gray-800));
 			transform: scale(1.05);
 		}
 
@@ -51,7 +51,7 @@
 		}
 
 		app-icons {
-			color: var(--icon-color, white);
+			color: var(--icon-color, var(--white));
 		}
 	}
 }
@@ -163,7 +163,7 @@
 	}
 }
 
-.btn-top {
+	.btn-top {
 	position: fixed;
 	bottom: 5rem;
 	right: 1rem;
@@ -180,7 +180,7 @@
 	transition: all 0.3s ease-in-out;
 	pointer-events: none;
 	z-index: 9999;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 4px 12px rgb(from var(--black) r g b / 0.3);
 
 	&.show {
 		opacity: 1;
@@ -190,7 +190,6 @@
 		pointer-events: auto;
 	}
 }
-
 .footer {
 	.next {
 		background-color: var(--primary-color);
@@ -319,15 +318,15 @@ app-aside {
 		position: absolute;
 		bottom: 10px;
 		right: 10px;
-		background: rgba(0, 0, 0, 0.75);
-		color: white;
+		background: rgb(from var(--black) r g b / 0.75);
+		color: var(--white);
 		padding: 6px 12px;
 		border-radius: 6px;
 		font-size: 14px;
 		font-weight: 500;
 		backdrop-filter: blur(4px);
 		z-index: 10;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+		box-shadow: 0 2px 8px rgb(from var(--black) r g b / 0.3);
 		pointer-events: none;
 	}
 }
@@ -355,7 +354,7 @@ app-aside {
 @media (prefers-color-scheme: dark) {
 	.page-container {
 		.page-number {
-			background: rgba(17, 24, 39, 0.85);
+			background: rgb(from var(--black) r g b / 0.85);
 		}
 	}
 }

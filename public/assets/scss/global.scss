@@ -50,7 +50,7 @@ body {
 }
 
 .placeholder {
-	background-color: #80808040;
+	background-color: rgb(from var(--gray-600) r g b / 0.25);
 	position: relative;
 	overflow: hidden;
 
@@ -64,7 +64,7 @@ body {
 		background: linear-gradient(
 			120deg,
 			transparent 0%,
-			rgba(255, 255, 255, 0.6) 50%,
+			rgb(from var(--white) r g b / 0.6) 50%,
 			transparent 100%
 		);
 		animation: light-beam-move 1.5s linear infinite;

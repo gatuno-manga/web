@@ -38,7 +38,7 @@
 	border: none;
 	border-radius: 50%;
 	cursor: pointer;
-	color: var(--app-text-color-secondary, #888);
+	color: var(--app-text-color-secondary, var(--gray-600));
 	transition: all 0.2s ease;
 
 	app-icons {
@@ -47,8 +47,8 @@
 	}
 
 	&:hover {
-		background-color: var(--app-background-tertiary, #222);
-		color: var(--app-text-color, #fff);
+		background-color: var(--app-background-tertiary, var(--gray-900));
+		color: var(--app-text-color, var(--white));
 	}
 
 	&:active {
@@ -58,9 +58,9 @@
 
 .advanced-filters {
 	padding: 1rem;
-	border: 1px solid var(--app-border-color, #333);
+	border: 1px solid var(--app-border-color, var(--gray-900));
 	border-radius: 8px;
-	background-color: var(--app-background-secondary, #1a1a1a);
+	background-color: var(--app-background-secondary, var(--dark-gray));
 }
 
 // Responsive

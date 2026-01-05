@@ -182,7 +182,7 @@
 
 		&:hover {
 			transform: translateX(4px);
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+			box-shadow: 0 4px 12px rgb(from var(--black) r g b / 0.15);
 		}
 
 		.job-icon,
@@ -242,17 +242,17 @@
 
 			.badge-active {
 				background-color: var(--primary-color);
-				color: white;
+				color: var(--white);
 			}
 
 			.badge-completed {
 				background-color: var(--green);
-				color: white;
+				color: var(--white);
 			}
 
 			.badge-failed {
 				background-color: var(--red);
-				color: white;
+				color: var(--white);
 			}
 		}
 
