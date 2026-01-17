@@ -21,6 +21,7 @@ import { SourceAddModalComponent, SourceAddSaveEvent } from '../source-add-modal
 import { PromptModalComponent } from '../notification/custom-components/prompt-modal/prompt-modal.component';
 import { NotificationService } from '../../service/notification.service';
 import { NotificationSeverity } from 'app/service/notification';
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 
 enum tab {
   chapters = 0,
@@ -36,7 +37,7 @@ interface ModulesLoad {
 
 @Component({
   selector: 'app-info-book',
-  imports: [RouterModule, DecimalPipe, IconsComponent, ButtonComponent, ImageViewerComponent, CoverEditModalComponent, SourceAddModalComponent],
+  imports: [RouterModule, DecimalPipe, IconsComponent, ButtonComponent, ImageViewerComponent, CoverEditModalComponent, SourceAddModalComponent, DragDropModule],
   templateUrl: './info-book.component.html',
   styleUrl: './info-book.component.scss'
 })
@@ -76,6 +77,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   ];
   chapters: Chapterlist[] = [];
   covers: Cover[] = [];
+  originalCovers: Cover[] = [];
+  isReorderingCovers = false;
+  hasCoversChanged = false;
+
   savedPages: SavedPage[] = [];
   extraInfo: BookDetail = {
     alternativeTitle: [],
@@ -399,12 +404,47 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.bookService.getCovers(this.id).subscribe({
       next: (covers) => {
         this.covers = covers;
+        this.originalCovers = JSON.parse(JSON.stringify(covers));
+        this.hasCoversChanged = false;
         this.updateContainerHeight();
       },
       error: (error) => {
         console.error('Error loading covers:', error);
       }
     });
+  }
+
+  onCoverDrop(event: CdkDragDrop<Cover[]>) {
+    if (!this.userTokenService.isAdminSignal()) return;
+    
+    moveItemInArray(this.covers, event.previousIndex, event.currentIndex);
+    this.hasCoversChanged = true;
+  }
+
+  saveCoversOrder() {
+    if (!this.id) return;
+
+    const coversOrder = this.covers.map((cover, index) => ({
+      id: cover.id,
+      index: index
+    }));
+
+    this.bookService.orderCovers(this.id, coversOrder).subscribe({
+      next: () => {
+        this.originalCovers = JSON.parse(JSON.stringify(this.covers));
+        this.hasCoversChanged = false;
+        this.notificationService.success('Ordem das capas salva com sucesso!');
+      },
+      error: (error) => {
+        console.error('Error saving covers order:', error);
+        this.notificationService.error('Erro ao salvar a ordem das capas.');
+      }
+    });
+  }
+
+  cancelCoversReorder() {
+    this.covers = JSON.parse(JSON.stringify(this.originalCovers));
+    this.hasCoversChanged = false;
   }
 
   loadExtraInfo() {
