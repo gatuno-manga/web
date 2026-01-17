@@ -183,7 +183,7 @@ export class BookService {
           }
 
           const reader = response.body.getReader();
-          const chunks: BlobPart[] = [];
+          const chunks: Uint8Array<ArrayBuffer>[] = [];
           let loaded = 0;
 
           // Função recursiva para ler chunks
@@ -197,9 +197,11 @@ export class BookService {
                 return;
               }
 
-              // Chunk recebido
-              chunks.push(value);
-              loaded += value.length;
+              if (value) {
+                // Chunk recebido
+                chunks.push(value as Uint8Array<ArrayBuffer>);
+                loaded += value.length;
+              }
 
               // Emitir progresso
               const progress = total > 0 ? Math.round((loaded / total) * 100) : 0;
