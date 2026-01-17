@@ -70,6 +70,10 @@ export class BookService {
     return this.http.patch<Cover>(`books/${bookId}/covers/${coverId}`, data);
   }
 
+  orderCovers(bookId: string, covers: { id: string; index: number; }[]) {
+    return this.http.patch<void>(`books/${bookId}/covers/order`, covers);
+  }
+
   uploadCover(bookId: string, file: File, title?: string) {
     const formData = new FormData();
     formData.append('file', file);

@@ -166,14 +166,49 @@
 		class="container"
 	>
 		@defer (when modulesLoad[tab.covers].load()) {
-		<div class="scrollable">
+		@if(userTokenService.isAdminSignal()) {
+		<div class="covers-toolbar">
+			<div class="toolbar-info">
+			</div>
+			<div class="toolbar-actions">
+				@if(hasCoversChanged) {
+				<app-button
+					(click)="cancelCoversReorder()"
+					variant="text"
+					size="small"
+				>
+					<app-icons name="close" size="16" />
+					<span>Cancelar</span>
+				</app-button>
+				<app-button
+					(click)="saveCoversOrder()"
+					variant="primary"
+					size="small"
+				>
+					<app-icons name="check" size="16" />
+					<span>Salvar Ordem</span>
+				</app-button>
+				}
+			</div>
+		</div>
+		}
+		<div
+			class="scrollable"
+			cdkDropList
+			cdkDropListOrientation="mixed"
+			(cdkDropListDropped)="onCoverDrop($event)"
+			[cdkDropListDisabled]="!userTokenService.isAdminSignal()"
+		>
 			@for(cover of covers; track cover.id) {
 			<div
 				class="cover"
 				[class.selected]="cover.selected"
 				(click)="onCoverClick(cover)"
 				(contextmenu)="onCoverContextMenu($event, cover)"
+				cdkDrag
+				[cdkDragDisabled]="!userTokenService.isAdminSignal()"
 			>
+				<div class="drag-placeholder" *cdkDragPlaceholder></div>
 				@if (cover.url && !coverImageErrors.has(cover.id)) {
 				<img
 					[src]="cover.url"
