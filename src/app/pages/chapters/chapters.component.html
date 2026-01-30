@@ -8,7 +8,7 @@
 		<h2>{{ currentChapter.title }}</h2>
 		}
 	</div>
-	<div class="controler">
+	<div class="controls">
 		@if (currentChapter.previous) {
 		<a class="arrow" (click)="previousPage()">
 			<app-icons name="arrow-left" size="42" />
@@ -46,10 +46,11 @@
 		}
 	</div>
 	}
+	<div class="next-chapter-zone" (dblclick)="nextPage()" (touchend)="onZoneTouch($event)"></div>
 </div>
 
 <div class="btn-top" [ngClass]="{
-		show: showBtnTop()
+		show: showScrollToTopButton()
 	}" (click)="scrollToTop()">
 	<app-icons name="arrow-up" size="42" />
 </div>
@@ -79,7 +80,7 @@
 			}}
 		</h1>
 	</div>
-	<div class="controler">
+	<div class="controls">
 		@if (currentChapter.previous) {
 		<a class="arrow" (click)="previousPage()">
 			<app-icons name="arrow-left" size="16" />

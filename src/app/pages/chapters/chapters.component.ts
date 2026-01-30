@@ -39,7 +39,7 @@ import { BookWebsocketService } from '../../service/book-websocket.service';
 import { DownloadService } from '../../service/download.service';
 import { UnifiedReadingProgressService } from '../../service/unified-reading-progress.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { fromEvent } from 'rxjs';
+import { fromEvent, lastValueFrom } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 import { ContextMenuService } from '../../service/context-menu.service';
 import { SavedPagesService } from '../../service/saved-pages.service';
@@ -84,9 +84,9 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   chapter = signal<Chapter | null>(null);
   readingProgress = signal<number>(0);
-  showBtnTop = signal<boolean>(false);
+  showScrollToTopButton = signal<boolean>(false);
 
-  private objectUrls: string[] = [];
+  private pageObjectUrls: string[] = [];
   private intersectionObserver: IntersectionObserver | null = null;
   private destroyRef = inject(DestroyRef);
   private maxReadPageIndex = 0;
@@ -169,9 +169,9 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
         const isScrollingUp = currentScroll < this.lastScrollPosition;
 
         if (isScrolledDown && isScrollingUp) {
-          this.showBtnTop.set(true);
+          this.showScrollToTopButton.set(true);
         } else {
-          this.showBtnTop.set(false);
+          this.showScrollToTopButton.set(false);
         }
 
         this.lastScrollPosition = currentScroll;
@@ -180,7 +180,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy() {
-    this.objectUrls.forEach(url => URL.revokeObjectURL(url));
+    this.pageObjectUrls.forEach(url => URL.revokeObjectURL(url));
     if (this.intersectionObserver) {
       this.intersectionObserver.disconnect();
     }
@@ -203,57 +203,63 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   async loadChapter(id: string, forceOnline = false) {
     this.maxReadPageIndex = 0;
     try {
-      const isDownloaded = await this.downloadService.isChapterDownloaded(id);
-      if (isDownloaded && !forceOnline) {
-        const offlineChapter = await this.downloadService.getChapter(id);
-        if (offlineChapter) {
-          this.objectUrls.forEach(url => URL.revokeObjectURL(url));
-          this.objectUrls = [];
-
-          const pages = offlineChapter.pages.map((blob, index) => {
-            const url = URL.createObjectURL(blob);
-            this.objectUrls.push(url);
-            return { index: index.toString(), path: url };
-          });
-
-          const offlineBook = await this.downloadService.getBook(offlineChapter.bookId);
-
-          const chapter: Chapter = {
-            id: offlineChapter.id,
-            bookId: offlineChapter.bookId,
-            title: offlineChapter.title,
-            index: offlineChapter.index,
-            pages: pages,
-            bookTitle: offlineBook?.title || '',
-            totalChapters: offlineBook?.totalChapters || 0,
-            originalUrl: '',
-            next: offlineChapter.next,
-            previous: offlineChapter.previous
-          };
-
-          this.chapter.set(chapter);
-          this.updateMetadata(chapter);
-          return;
-        }
-      }
-    } catch (e) {
-      console.error('Error loading offline chapter', e);
-    }
-
-    this.chapterService.getChapter(id).subscribe({
-      next: (chapter: Chapter) => {
+      const chapter = await this.resolveChapterData(id, forceOnline);
+      if (chapter) {
         this.chapter.set(chapter);
         this.updateMetadata(chapter);
-      },
-      error: (err: any) => {
-        console.error('Erro ao carregar capítulo', err);
-        this.notificationService.notify({
-          message: 'Erro ao carregar o capítulo.',
-          level: 'custom',
-          severity: NotificationSeverity.CRITICAL
-        });
       }
-    });
+    } catch (e) {
+      console.error('Erro ao carregar capítulo', e);
+      this.notificationService.notify({
+        message: 'Erro ao carregar o capítulo.',
+        level: 'custom',
+        severity: NotificationSeverity.CRITICAL
+      });
+    }
+  }
+
+  private async resolveChapterData(id: string, forceOnline: boolean): Promise<Chapter | null> {
+    if (!forceOnline) {
+      const isDownloaded = await this.downloadService.isChapterDownloaded(id);
+      if (isDownloaded) {
+        return this.loadOfflineChapter(id);
+      }
+    }
+    return lastValueFrom(this.chapterService.getChapter(id));
+  }
+
+  private async loadOfflineChapter(id: string): Promise<Chapter | null> {
+    try {
+      const offlineChapter = await this.downloadService.getChapter(id);
+      if (!offlineChapter) return null;
+
+      this.pageObjectUrls.forEach(url => URL.revokeObjectURL(url));
+      this.pageObjectUrls = [];
+
+      const pages = offlineChapter.pages.map((blob, index) => {
+        const url = URL.createObjectURL(blob);
+        this.pageObjectUrls.push(url);
+        return { index: index.toString(), path: url };
+      });
+
+      const offlineBook = await this.downloadService.getBook(offlineChapter.bookId);
+
+      return {
+        id: offlineChapter.id,
+        bookId: offlineChapter.bookId,
+        title: offlineChapter.title,
+        index: offlineChapter.index,
+        pages: pages,
+        bookTitle: offlineBook?.title || '',
+        totalChapters: offlineBook?.totalChapters || 0,
+        originalUrl: '',
+        next: offlineChapter.next,
+        previous: offlineChapter.previous
+      };
+    } catch (e) {
+      console.error('Error loading offline chapter', e);
+      return null;
+    }
   }
 
   private updateMetadata(chapter: Chapter) {
@@ -374,37 +380,35 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async nextPage() {
-    const current = this.chapter();
-    if (current?.next) {
-      const isNextDownloaded = await this.downloadService.isChapterDownloaded(current.next);
+    await this.handleChapterTransition('next');
+  }
 
+  async previousPage() {
+    await this.handleChapterTransition('previous');
+  }
+
+  private async handleChapterTransition(direction: 'next' | 'previous') {
+    const current = this.chapter();
+    if (!current) return;
+
+    const targetChapterId = direction === 'next' ? current.next : current.previous;
+    if (!targetChapterId) return;
+
+    if (direction === 'next') {
+      const isNextDownloaded = await this.downloadService.isChapterDownloaded(targetChapterId);
       if (!isNextDownloaded && !navigator.onLine) {
         this.modalNotificationService.show(
           'Você chegou ao fim',
           'Você chegou ao último capítulo baixado e está sem internet.',
-          [
-            {
-              label: 'Entendi',
-              type: 'primary'
-            }
-          ],
+          [{ label: 'Entendi', type: 'primary' }],
           'warning'
         );
         return;
       }
-
-
-      await this.markChapterAsCompleted();
-      this.navigateToChapter(current.next);
     }
-  }
 
-  async previousPage() {
-    const current = this.chapter();
-    if (current?.previous) {
-      await this.markChapterAsCompleted();
-      this.navigateToChapter(current.previous);
-    }
+    await this.markChapterAsCompleted();
+    this.navigateToChapter(targetChapterId);
   }
 
   private async markChapterAsCompleted() {
@@ -519,6 +523,21 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     ]);
+  }
+
+  private lastTapTime = 0;
+
+  onZoneTouch(event: TouchEvent) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - this.lastTapTime;
+
+    if (tapLength < 300 && tapLength > 0) {
+      this.nextPage();
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+    }
+    this.lastTapTime = currentTime;
   }
 
   private savePage(page: Page, chapter: Chapter) {
