@@ -220,4 +220,15 @@ export class BookService {
         });
     });
   }
+
+  randomBook(options: BookPageOptions = {}) {
+    const opts = { ...options };
+    if (!opts.sensitiveContent)
+      opts.sensitiveContent = this.sensitiveContentService.getContentAllow();
+    if (!this.userTokenService.hasValidAccessToken && !this.userTokenService.hasValidRefreshToken)
+      opts.sensitiveContent = [];
+    return this.http.get<{ id: string }>('books/random', {
+      params: { ...opts }
+    });
+  }
 }
