@@ -104,10 +104,6 @@ export class BookService {
     return this.http.patch<Book>(`books/${bookId}`, data);
   }
 
-  getTags() {
-    return this.http.get<TagResponse[]>('books/tags');
-  }
-
   fixBook(id: string) {
     return this.http.patch<Book>(`books/${id}/fix`, {});
   }

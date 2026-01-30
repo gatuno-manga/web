@@ -1,7 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Tag, TagsPageOptions } from "../models/tags.models";
-import { BookPageOptions } from "../models/book.models";
 import { SensitiveContentService } from "./sensitive-content.service";
 import { UserTokenService } from "./user-token.service";
 
@@ -27,7 +26,7 @@ export class TagsService {
     }
 
     getAllTags() {
-        return this.http.get<Tag[]>('tags/all');
+        return this.http.get<Tag[]>('tags');
     }
 
     mergeTags(tagId: string, tagsToMerge: string[]) {
