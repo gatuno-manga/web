@@ -4,7 +4,7 @@ import { IconsComponent } from '../../icons/icons.component';
 import { ControlValueAccessor } from '@angular/forms';
 import { NgClass } from '@angular/common';
 @Component({
-	selector: 'app-input[type="text"], app-input[type="email"]',
+	selector: 'app-input[type="text"], app-input[type="email"], app-input[type="number"]',
 	imports: [IconsComponent, NgClass],
 	providers: [
 		{
