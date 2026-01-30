@@ -43,9 +43,9 @@ describe('HeaderComponent', () => {
     expect(mockLocation.back).toHaveBeenCalled();
   });
 
-  it('isDarkTheme/isloggedIn/isAdmin rely on services', () => {
+  it('isDarkTheme/isLoggedIn/isAdmin rely on services', () => {
     expect(component.isDarkTheme()).toBeTrue();
-    expect(component.isloggedIn()).toBeTrue();
+    expect(component.isLoggedIn()).toBeTrue();
     expect(component.isAdmin()).toBeTrue();
   });
 });
