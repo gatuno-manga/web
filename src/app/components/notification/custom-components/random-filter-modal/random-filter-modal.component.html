@@ -1,0 +1,45 @@
+<div class="random-filter-modal">
+    <div class="header">
+        <h2>Filtros Aleatórios</h2>
+        <p class="description">Escolha quais categorias devem ser selecionadas aleatoriamente.</p>
+    </div>
+
+    <div class="body">
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-text">
+                    <h3>Tags</h3>
+                    <p>Selecionar tags aleatórias</p>
+                </div>
+            </div>
+            <app-switch [value]="randomizeTags()" (valueChange)="randomizeTags.set($event)" />
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-text">
+                    <h3>Tipos</h3>
+                    <p>Selecionar tipo de obra aleatório</p>
+                </div>
+            </div>
+            <app-switch [value]="randomizeTypes()" (valueChange)="randomizeTypes.set($event)" />
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-text">
+                    <h3>Conteúdo Sensível</h3>
+                    <p>Incluir conteúdo sensível aleatório</p>
+                </div>
+            </div>
+            <app-switch [value]="randomizeSensitive()" (valueChange)="randomizeSensitive.set($event)" />
+        </div>
+    </div>
+
+    <div class="footer">
+        <app-button (click)="cancel()" variant="text">Cancelar</app-button>
+        <app-button (click)="confirm()" variant="primary" rightIcon="dices">
+            Gerar Filtros
+        </app-button>
+    </div>
+</div>

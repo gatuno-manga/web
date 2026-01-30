@@ -30,7 +30,6 @@
 		<!-- Renderização padrão do modal -->
 		<h1>{{ modal.title }}</h1>
 		<p>{{ modal.description }}</p>
-		}
 
 		<div class="button-container">
 			@for (button of modal.buttons; track $index) {
@@ -46,6 +45,7 @@
 			</button>
 			}
 		</div>
+		}
 	</div>
 </div>
 } @if(toast$) {
