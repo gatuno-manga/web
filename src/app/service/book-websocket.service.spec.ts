@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { BookWebsocketService, BookEvent, ChapterEvent, ScrapingEvent } from './book-websocket.service';
+import { BookWebsocketService } from './book-websocket.service';
+import { BookEvent, ChapterEvent, ScrapingEvent } from '../models/book-events.model';
 import { UserTokenService } from './user-token.service';
 
 describe('BookWebsocketService', () => {
