@@ -2,7 +2,7 @@
   <div
     class="input"
 		[ngClass]="{
-			label: isFocused || touched || value,
+			label: showLabel && (isFocused || touched || value),
 			focused: isFocused
 		}"
     >
@@ -19,16 +19,19 @@
         [id]="id"
         [type]="type"
         [value]="value"
+        [placeholder]="!showLabel ? placeholder : ''"
         (input)="onInput($event)"
         (blur)="onBlur(value); isFocused = false"
         (focus)="isFocused = true"
         />
-      <label
-        [for]="id"
-        [ngClass]="{ ative: touched || value, icons: leftIcon }"
-        >
-        {{ placeholder }}
-      </label>
+      @if (showLabel) {
+        <label
+          [for]="id"
+          [ngClass]="{ ative: touched || value, icons: leftIcon }"
+          >
+          {{ placeholder }}
+        </label>
+      }
     </div>
     @if (rightIcon) {
       <app-icons
