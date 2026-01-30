@@ -4,7 +4,6 @@ import { TextInputComponent } from '../inputs/text-input/text-input.component';
 import { SelectComponent } from '../inputs/select/select.component';
 import { BookPageOptions, TypeBook, TagResponse, SensitiveContentResponse } from '../../models/book.models';
 import { IconsComponent } from "@components/icons/icons.component";
-import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TagsService } from '../../service/tags.service';
@@ -12,7 +11,6 @@ import { SensitiveContentService } from '../../service/sensitive-content.service
 import { NotificationService } from '../../service/notification.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { RandomFilterModalComponent, RandomFilterResult } from '../notification/custom-components/random-filter-modal/random-filter-modal.component';
-import { NotificationSeverity } from '../../service/notification/notification-strategy.interface';
 import { Observable, tap } from 'rxjs';
 
 @Component({
@@ -20,20 +18,7 @@ import { Observable, tap } from 'rxjs';
     standalone: true,
     imports: [CommonModule, FormsModule, ButtonComponent, TextInputComponent, SelectComponent, IconsComponent],
     templateUrl: './book-filter.component.html',
-    styleUrl: './book-filter.component.scss',
-    animations: [
-        // Opção 1: Expandir/Recolher (Ideal para menus/filtros)
-        trigger('expand', [
-            transition(':enter', [
-                style({ height: '0', opacity: 0, overflow: 'hidden' }),
-                animate('300ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '*', opacity: 1 }))
-            ]),
-            transition(':leave', [
-                style({ height: '*', opacity: 1, overflow: 'hidden' }),
-                animate('300ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '0', opacity: 0 }))
-            ])
-        ])
-    ]
+    styleUrl: './book-filter.component.scss'
 })
 export class BookFilterComponent implements OnInit {
     private tagsService = inject(TagsService);
@@ -475,8 +460,8 @@ export class BookFilterComponent implements OnInit {
 
         // 3. Random Sensitive Content
         if (config.sensitive && this.availableSensitiveContent().length > 0) {
-             const randomContent = this.availableSensitiveContent()[Math.floor(Math.random() * this.availableSensitiveContent().length)];
-             this.selectedSensitiveContent.set([randomContent.id]);
+            const randomContent = this.availableSensitiveContent()[Math.floor(Math.random() * this.availableSensitiveContent().length)];
+            this.selectedSensitiveContent.set([randomContent.id]);
         }
 
         // 4. Fetch Tags (based on new sensitive content) AND THEN Randomize Tags

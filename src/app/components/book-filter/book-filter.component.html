@@ -64,7 +64,11 @@
 </div>
 
 @if (showAdvancedFilters()) {
-	<div class="advanced-filters" @expand>
+	<div
+		class="advanced-filters"
+		animate.enter="expand-enter"
+		animate.leave="expand-leave"
+	>
 		<div class="filters-grid">
 			<!-- Row 1: Year & Types -->
 			<div class="filter-group year-group">

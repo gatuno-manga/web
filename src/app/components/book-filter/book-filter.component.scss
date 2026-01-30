@@ -152,6 +152,49 @@
 	overflow: hidden; // Required for animation
 }
 
+@keyframes expand-enter {
+	from {
+		max-height: 0;
+		opacity: 0;
+		padding-top: 0;
+		padding-bottom: 0;
+		margin-top: 0;
+	}
+	to {
+		max-height: 2000px;
+		opacity: 1;
+		padding-top: 25px;
+		padding-bottom: 25px;
+		margin-top: 1.5rem;
+	}
+}
+
+@keyframes expand-leave {
+	from {
+		max-height: 2000px;
+		opacity: 1;
+		padding-top: 25px;
+		padding-bottom: 25px;
+		margin-top: 1.5rem;
+	}
+	to {
+		max-height: 0;
+		opacity: 0;
+		padding-top: 0;
+		padding-bottom: 0;
+		margin-top: 0;
+	}
+}
+
+.expand-enter {
+	animation: expand-enter 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.expand-leave {
+	animation: expand-leave 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+
 .filters-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
