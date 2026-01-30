@@ -1,0 +1,70 @@
+.random-filter-modal {
+    background: var(--app-background-color);
+    padding: 1.5rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.header {
+    h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--app-text-color);
+    }
+
+    .description {
+        margin: 0.5rem 0 0;
+        color: var(--app-text-color-secondary);
+        font-size: 0.9rem;
+    }
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    .setting-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .setting-text {
+        h3 {
+            margin: 0 0 4px 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--app-text-color);
+        }
+
+        p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--app-text-color-secondary);
+        }
+    }
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+}

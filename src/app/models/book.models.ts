@@ -136,4 +136,5 @@ export interface BookPageOptions extends PageRequest {
   authorsLogic?: 'and' | 'or';
   orderBy?: 'title' | 'createdAt' | 'updatedAt' | 'publication';
   order?: 'ASC' | 'DESC';
+  random?: boolean;
 }

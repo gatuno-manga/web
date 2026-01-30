@@ -1,76 +1,452 @@
 .book-filter {
 	width: 100%;
 	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
-}
+	gap: 10px;
+	height: 50px;
 
-.search-container {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	width: 100%;
+	.search-input {
+		flex: 1;
+		height: 100%;
+		--input-bg: #20142a;
+		--input-border: 1px solid white;
+		--input-radius: 15px;
+		--input-color: white;
+		--input-placeholder-color: rgba(255, 255, 255, 0.25);
+	}
+
+	app-button {
+		height: 100%;
+		::ng-deep button {
+			background-color: #f18522 !important;
+			border-radius: 15px !important;
+			width: 58px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			&:hover {
+				filter: brightness(1.1);
+			}
+		}
+	}
 }
 
 .filter-actions {
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between;
 	align-items: center;
-	gap: 0.75rem;
-}
+	margin-top: 1rem;
+	flex-wrap: wrap;
+	gap: 1rem;
 
-.search-input-wrapper {
-	position: relative;
-	flex: 1;
-	display: flex;
-	align-items: center;
-}
+	.random-actions {
+		display: flex;
+		gap: 10px;
 
-.clear-button {
-	position: absolute;
-	right: 8px;
-	width: 28px;
-	height: 28px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: none;
-	border: none;
-	border-radius: 50%;
-	cursor: pointer;
-	color: var(--app-text-color-secondary, var(--gray-600));
-	transition: all 0.2s ease;
+		.orange-btn {
+			::ng-deep button {
+				background-color: #f18522 !important;
+				color: white !important;
+				border: none !important;
+				font-family: 'Inknut Antiqua', sans-serif;
+				font-weight: 700;
+				font-size: 16px;
+				padding: 5px 25px;
+				border-radius: 5px;
+				height: 48px;
 
-	app-icons {
-		width: 16px;
-		height: 16px;
+				&:hover {
+					filter: brightness(1.1);
+				}
+			}
+
+			.btn-content {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.icon-small {
+				width: 24px;
+				height: 24px;
+			}
+		}
 	}
 
-	&:hover {
-		background-color: var(--app-background-tertiary, var(--gray-900));
-		color: var(--app-text-color, var(--white));
+	.actions-group {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
 	}
 
-	&:active {
-		transform: scale(0.95);
+	.clear-filters-btn {
+		::ng-deep button {
+			background-color: transparent !important;
+			color: rgba(255, 255, 255, 0.6) !important;
+			font-family: 'Arimo', sans-serif;
+			font-size: 14px;
+			font-weight: 400;
+			padding: 0 10px;
+			height: 36px;
+
+			&:hover {
+				color: white !important;
+				background-color: rgba(255, 255, 255, 0.1) !important;
+			}
+
+			app-icons {
+				width: 16px;
+				height: 16px;
+				margin-right: 8px;
+			}
+		}
+	}
+
+	.sort-action {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		background: transparent;
+
+		.sort-label {
+			color: rgba(255, 255, 255, 0.6);
+			font-size: 14px;
+			font-family: 'Arimo', sans-serif;
+		}
+
+		.sort-select {
+			width: 180px;
+
+			::ng-deep .select-trigger {
+				background-color: #20142a;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				color: white;
+				border-radius: 8px;
+				height: 36px;
+				min-height: 36px;
+				padding: 0 13px;
+
+				.selected-value {
+					color: white;
+					font-size: 14px;
+					text-align: center;
+				}
+
+				.arrow {
+					color: white;
+				}
+			}
+		}
 	}
 }
 
 .advanced-filters {
-	padding: 1rem;
-	border: 1px solid var(--app-border-color, var(--gray-900));
-	border-radius: 8px;
-	background-color: var(--app-background-secondary, var(--dark-gray));
+	margin-top: 1.5rem;
+	padding: 25px;
+	border: 1px solid #20142a;
+	border-radius: 15px;
+	background-color: rgba(32, 20, 42, 0.2);
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	overflow: hidden; // Required for animation
 }
 
-// Responsive
+@keyframes expand-enter {
+	from {
+		max-height: 0;
+		opacity: 0;
+		padding-top: 0;
+		padding-bottom: 0;
+		margin-top: 0;
+	}
+	to {
+		max-height: 2000px;
+		opacity: 1;
+		padding-top: 25px;
+		padding-bottom: 25px;
+		margin-top: 1.5rem;
+	}
+}
+
+@keyframes expand-leave {
+	from {
+		max-height: 2000px;
+		opacity: 1;
+		padding-top: 25px;
+		padding-bottom: 25px;
+		margin-top: 1.5rem;
+	}
+	to {
+		max-height: 0;
+		opacity: 0;
+		padding-top: 0;
+		padding-bottom: 0;
+		margin-top: 0;
+	}
+}
+
+.expand-enter {
+	animation: expand-enter 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.expand-leave {
+	animation: expand-leave 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+
+.filters-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 30px;
+
+	.filter-group {
+		min-width: 0; // Allows flex/grid items to shrink correctly
+	}
+}
+.filter-title {
+	font-family: 'Inknut Antiqua', sans-serif;
+	font-size: 24px;
+	color: white;
+	margin-bottom: 22px;
+	font-weight: 400;
+}
+
+.year-group {
+	.year-inputs {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+
+		.operator-select {
+			width: 140px;
+
+			::ng-deep .select-trigger {
+				background-color: #20142a;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				color: white;
+				border-radius: 8px;
+				height: 50px;
+
+				.selected-value {
+					color: white;
+					font-size: 14px;
+				}
+			}
+		}
+
+		.year-input {
+			width: 132px;
+			height: 50px;
+		}
+	}
+}
+
+.badges-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+
+	.badge {
+		height: 30px;
+		padding: 0 13px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 8px;
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 12px;
+		font-family: 'Arimo', sans-serif;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		background: transparent;
+		user-select: none;
+		-webkit-user-drag: none;
+		text-transform: capitalize;
+
+		&:hover {
+			background-color: rgba(255, 255, 255, 0.1);
+			color: white;
+		}
+
+		&.selected {
+			background-color: rgba(43, 127, 255, 0.3);
+			border-color: rgba(43, 127, 255, 0.5);
+			color: #bedbff;
+		}
+
+		&.excluded {
+			background-color: rgba(255, 67, 67, 0.2);
+			border-color: rgba(255, 67, 67, 0.4);
+			color: #ffcccc;
+
+			&::before {
+				content: '✕ ';
+				font-size: 10px;
+				margin-right: 4px;
+			}
+		}
+	}
+}
+
+.logic-group {
+	width: 100%;
+	display: flex;
+	gap: 15px;
+	flex-wrap: wrap;
+
+	.logic-select {
+		flex: 1;
+		min-width: 250px;
+		max-width: 400px;
+
+		::ng-deep .select-trigger {
+			background-color: #20142a;
+			border: 1px solid rgba(255, 255, 255, 0.2);
+			color: white;
+			border-radius: 8px;
+			height: 38px;
+			min-height: 38px;
+			justify-content: center;
+
+			.selected-value {
+				color: white;
+				font-size: 14px;
+			}
+		}
+	}
+}
+
+.loading {
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 14px;
+	font-family: 'Arimo', sans-serif;
+	padding: 10px;
+	text-align: center;
+}
+
+.advanced-filters-footer {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+	::ng-deep button {
+		background-color: #f18522 !important;
+		color: white !important;
+		border: none !important;
+		border-radius: 5px;
+		padding: 8px 24px;
+		font-family: 'Inknut Antiqua', sans-serif;
+
+		&:hover {
+			filter: brightness(1.1);
+		}
+	}
+}
+
 @media (max-width: 768px) {
-	.search-container {
+	.filter-actions {
 		flex-direction: column;
 		align-items: stretch;
+
+		.random-actions {
+			flex-direction: column;
+		}
+
+		.actions-group {
+			width: 100%;
+			justify-content: flex-end;
+		}
+
+		.sort-action {
+			justify-content: flex-end;
+			.sort-select {
+				flex: 1;
+			}
+		}
+	}
+}
+
+.active-filters-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 15px;
+}
+
+.active-filter-badge {
+	height: 22px;
+	padding: 0 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	border-radius: 8px;
+	font-size: 12px;
+	font-family: 'Arimo', sans-serif;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	user-select: none;
+	background-color: rgba(43, 127, 255, 0.2);
+	border: 1px solid rgba(43, 127, 255, 0.4);
+	color: #8ec5ff;
+
+	&:hover {
+		filter: brightness(1.2);
 	}
 
-	.search-input {
-		font-size: 16px; // Previne zoom no iOS
+	&.filter-search {
+		background-color: rgba(46, 204, 113, 0.2);
+		border-color: rgba(46, 204, 113, 0.4);
+		color: #a0eebb;
+	}
+
+	&.filter-type {
+		background-color: rgba(241, 133, 34, 0.2);
+		border-color: rgba(241, 133, 34, 0.4);
+		color: #ffcc99;
+	}
+
+	&.filter-tag {
+		background-color: rgba(43, 127, 255, 0.2);
+		border-color: rgba(43, 127, 255, 0.4);
+		color: #8ec5ff;
+	}
+
+	&.filter-excludeTag {
+		background-color: rgba(255, 67, 67, 0.2);
+		border-color: rgba(255, 67, 67, 0.4);
+		color: #ffcccc;
+	}
+
+	&.filter-sensitive {
+		background-color: rgba(155, 89, 182, 0.2);
+		border-color: rgba(155, 89, 182, 0.4);
+		color: #d2b4de;
+	}
+
+	&.filter-publication {
+		background-color: rgba(241, 196, 15, 0.2);
+		border-color: rgba(241, 196, 15, 0.4);
+		color: #f9e79f;
+	}
+
+	&.filter-author {
+		background-color: rgba(26, 188, 156, 0.2);
+		border-color: rgba(26, 188, 156, 0.4);
+		color: #a3e4d7;
+	}
+
+	.close-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0.8;
+		::ng-deep svg {
+			width: 12px;
+			height: 12px;
+		}
 	}
 }

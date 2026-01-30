@@ -329,10 +329,18 @@ export class BooksComponent implements OnInit, OnDestroy {
       Object.entries(applicableFilters).filter(([_, value]) => value !== undefined && value !== '' && (Array.isArray(value) ? value.length > 0 : true))
     );
 
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: cleanParams,
-      queryParamsHandling: ''
-    });
+    if (filters.random) {
+      this.bookService.randomBook(cleanParams).subscribe(book => {
+        this.router.navigate(['/books', book.id]);
+      });
+    }
+    else {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: cleanParams,
+        queryParamsHandling: ''
+      });
+    }
+
   }
 }

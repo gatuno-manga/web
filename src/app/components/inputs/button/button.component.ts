@@ -3,7 +3,7 @@ import { IconsComponent } from '../../icons/icons.component';
 
 export type ButtonVariant = 'primary' | 'outline' | 'text';
 export type ButtonRounded = 'none' | 'small' | 'medium' | 'large' | 'full';
-export type ButtonFill = 'full' | 'border';
+export type ButtonFill = 'full' | 'border' | 'none';
 export type ButtonRadio = 'square' | 'normal';
 export type ButtonPadding = 'none' | 'normal';
 

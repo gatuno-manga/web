@@ -9,12 +9,14 @@ import { httpClientResponseInterceptor } from './interceptor/http-client-respons
 import { importProvidersFrom } from '@angular/core';
 import { provideServiceWorker } from '@angular/service-worker';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
+    provideAnimationsAsync(),
     provideHttpClient(
       withFetch(),
       withInterceptors([HttpClientRequestInterceptor, httpClientResponseInterceptor])

@@ -1,11 +1,13 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, NgZone } from "@angular/core";
-import { Book, BookBasic, BookDetail, BookList, BookPageOptions, Chapterlist, Cover, TagResponse, UpdateBookDto } from "../models/book.models";
+import { Book, BookBasic, BookDetail, BookList, BookPageOptions, Chapterlist, Cover, TagResponse, UpdateBookDto, ScrapingStatus } from "../models/book.models";
 import { Page } from "../models/miscellaneous.models";
 import { SensitiveContentService } from "./sensitive-content.service";
 import { UserTokenService } from "./user-token.service";
 import { BookWebsocketService } from "./book-websocket.service";
-import { Observable } from "rxjs";
+import { DownloadService } from "./download.service";
+import { Observable, from, of } from "rxjs";
+import { catchError, map } from "rxjs/operators";
 import { environment } from "../../environments/environment";
 
 @Injectable({
@@ -19,6 +21,7 @@ export class BookService {
     private readonly sensitiveContentService: SensitiveContentService,
     private readonly userTokenService: UserTokenService,
     private readonly websocketService: BookWebsocketService,
+    private readonly downloadService: DownloadService,
     private readonly ngZone: NgZone
   ) {
     if (typeof window !== 'undefined') {
@@ -47,7 +50,88 @@ export class BookService {
 
     return this.http.get<Page<BookList>>('books', {
       params: { ...opts }
-    });
+    }).pipe(
+      catchError((err) => {
+        console.warn('Online fetch failed, falling back to offline mode', err);
+        return this.getOfflineBooks(options);
+      })
+    );
+  }
+
+  getOfflineBooks(options?: BookPageOptions): Observable<Page<BookList>> {
+    const opts = { ...options };
+    
+    return from(this.downloadService.getAllBooks()).pipe(
+      map(books => {
+        let filteredBooks = books;
+
+        // 1. Filtrar por Conteúdo Sensível
+        // Recarrega as preferências se estiver offline, ignorando estado do token
+        const allowedContent = this.sensitiveContentService.getContentAllow();
+
+        filteredBooks = filteredBooks.filter(book => {
+          // Se o livro não tem conteúdo sensível, é permitido
+          if (!book.sensitiveContent || book.sensitiveContent.length === 0) return true;
+          
+          // Verifica se TODOS os conteúdos sensíveis do livro estão na lista permitida
+          const isAllowed = book.sensitiveContent.every(sc => 
+              allowedContent.includes(sc.name) || allowedContent.includes(sc.id)
+          );
+          
+          return isAllowed;
+        });
+
+        // 2. Filtrar por Pesquisa (Título)
+        if (opts.search) {
+          const term = opts.search.toLowerCase();
+          filteredBooks = filteredBooks.filter(book =>
+            book.title.toLowerCase().includes(term)
+          );
+        }
+
+        // 3. Filtrar por Tags
+        if (opts.tags && opts.tags.length > 0) {
+          filteredBooks = filteredBooks.filter(book => {
+            const tags = book.tags || [];
+            const bookTagIds = tags.map(t => t.id);
+            const bookTagNames = tags.map(t => t.name);
+            
+            const checkTag = (tag: string) => bookTagIds.includes(tag) || bookTagNames.includes(tag);
+
+            if (opts.tagsLogic === 'or') {
+              return opts.tags!.some(checkTag);
+            }
+            return opts.tags!.every(checkTag);
+          });
+        }
+
+        // Mapear para BookList
+        const data: BookList[] = filteredBooks.map(book => ({
+          id: book.id,
+          title: book.title,
+          tags: book.tags || [],
+          cover: (book.cover instanceof Blob) ? URL.createObjectURL(book.cover) : '',
+          description: book.description,
+          scrapingStatus: ScrapingStatus.READY // Livros offline estão sempre "prontos"
+        }));
+
+        // Simular paginação (retornando tudo por enquanto ou implementando slice se necessário)
+        // Para offline, geralmente retorna tudo ou aplica paginação simples em memória
+        const page = opts.page || 1;
+        const limit = opts.limit || 50;
+        const start = (page - 1) * limit;
+        const end = start + limit;
+        
+        return {
+          data: data.slice(start, end),
+          metadata: {
+            total: data.length,
+            page: page,
+            lastPage: Math.ceil(data.length / limit)
+          }
+        };
+      })
+    );
   }
 
   getBook(id: string) {
@@ -102,10 +186,6 @@ export class BookService {
 
   updateBook(bookId: string, data: UpdateBookDto) {
     return this.http.patch<Book>(`books/${bookId}`, data);
-  }
-
-  getTags() {
-    return this.http.get<TagResponse[]>('books/tags');
   }
 
   fixBook(id: string) {
@@ -222,6 +302,17 @@ export class BookService {
           console.error('Fetch streaming error:', error);
           observer.error(error);
         });
+    });
+  }
+
+  randomBook(options: BookPageOptions = {}) {
+    const opts = { ...options };
+    if (!opts.sensitiveContent)
+      opts.sensitiveContent = this.sensitiveContentService.getContentAllow();
+    if (!this.userTokenService.hasValidAccessToken && !this.userTokenService.hasValidRefreshToken)
+      opts.sensitiveContent = [];
+    return this.http.get<{ id: string }>('books/random', {
+      params: { ...opts }
     });
   }
 }

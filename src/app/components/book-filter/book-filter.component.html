@@ -7,23 +7,184 @@
 		(keydown.enter)="onSearch()"
 		rightIcon="search"
 		[rightIconClick]="onSearchClick"
+		[showLabel]="false"
+		placeholder="Pesquise"
 	/>
-
-	<div class="filter-actions">
-		@if (hasActiveFilters()) {
-		<app-button variant="text" size="small" (click)="clearAllFilters()">
-			Limpar filtros
-		</app-button>
-		}
-		<app-button variant="primary" leftIcon="search" (click)="onSearch()">
-			Pesquisar
-		</app-button>
-	</div>
-
-	@if (showAdvancedFilters()) {
-	<div class="advanced-filters">
-		<!-- TODO -->
-		<!-- Filtros de tipo, tags, autores, etc serão adicionados aqui -->
-	</div>
-	}
+	<app-button
+		variant="text"
+		size="small"
+		radio="square"
+		(click)="toggleAdvancedFilters()"
+	>
+		<app-icons name="filter" />
+	</app-button>
 </div>
+
+<div class="filter-actions">
+	<div class="random-actions">
+		<app-button
+			rounded="small"
+			class="orange-btn"
+			rightIcon="shuffle"
+			(click)="openRandomFiltersModal()"
+		>
+			Filtros aleatorios
+		</app-button>
+		<app-button
+			rounded="small"
+			class="orange-btn"
+			rightIcon="dices"
+			(click)="goToRandomBook()"
+		>
+			Livro aleatorio
+		</app-button>
+	</div>
+	<div class="actions-group">
+		@if (hasActiveFilters()) {
+			<app-button
+				variant="text"
+				fill="none"
+				leftIcon="close"
+				(click)="clearAllFilters()"
+				class="clear-filters-btn"
+			>
+				Limpar Filtros
+			</app-button>
+		}
+		<div class="sort-action">
+			<span class="sort-label">Ordenar por:</span>
+			<app-select
+				[options]="sortOptions"
+				[ngModel]="orderBy()"
+				(valueChange)="onSortChange($event)"
+				class="sort-select"
+			></app-select>
+		</div>
+	</div>
+</div>
+
+@if (showAdvancedFilters()) {
+	<div
+		class="advanced-filters"
+		animate.enter="expand-enter"
+		animate.leave="expand-leave"
+	>
+		<div class="filters-grid">
+			<!-- Row 1: Year & Types -->
+			<div class="filter-group year-group">
+				<h3 class="filter-title">Ano de publicação</h3>
+				<div class="year-inputs">
+					<app-select
+						[options]="publicationOperators"
+						[ngModel]="publicationOperator()"
+						(valueChange)="onPublicationOperatorChange($event)"
+						class="operator-select"
+					/>
+					<app-input
+						type="number"
+						placeholder="Ano"
+						[showLabel]="false"
+						[value]="publicationYear()?.toString() || ''"
+						(input)="
+							onPublicationYearChange($any($event.target).value)
+						"
+						class="year-input"
+					/>
+				</div>
+			</div>
+
+			<div class="filter-group type-group">
+				<h3 class="filter-title">Tipos</h3>
+				<div class="badges-container">
+					@for (type of availableTypes; track type.value) {
+						<div
+							class="badge"
+							[class.selected]="isTypeSelected(type.value)"
+							(click)="toggleType(type.value)"
+						>
+							{{ type.label }}
+						</div>
+					}
+				</div>
+			</div>
+
+			<div class="filter-group sensitive-group">
+				<h3 class="filter-title">Conteúdos sensíveis</h3>
+				<div class="badges-container">
+					@for (
+						content of availableSensitiveContent();
+						track content.id
+					) {
+						<div
+							class="badge"
+							[class.selected]="
+								isSensitiveContentSelected(content.id)
+							"
+							(click)="toggleSensitiveContent(content.id)"
+						>
+							{{ content.name }}
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+
+		<!-- Row 2: Tags -->
+		<div class="filter-group tags-group">
+			<h3 class="filter-title">Tags</h3>
+			@if (loadingTags()) {
+				<div class="loading">Carregando tags...</div>
+			} @else {
+				<div class="badges-container">
+					@for (tag of availableTags(); track tag.id) {
+						<div
+							class="badge"
+							[class.selected]="isTagSelected(tag.id)"
+							[class.excluded]="isTagExcluded(tag.id)"
+							(click)="toggleTag(tag.id)"
+						>
+							{{ tag.name }}
+						</div>
+					}
+				</div>
+			}
+		</div>
+
+		<!-- Row 3: Logic -->
+		<div class="logic-group">
+			<app-select
+				[options]="includeLogicOptions"
+				[ngModel]="tagsLogic()"
+				(valueChange)="onTagsLogicChange($event)"
+				class="logic-select"
+				placeholder="Lógica das Tags (Inclusão)"
+			></app-select>
+
+			<app-select
+				[options]="excludeLogicOptions"
+				[ngModel]="excludeTagsLogic()"
+				(valueChange)="onExcludeTagsLogicChange($event)"
+				class="logic-select"
+				placeholder="Lógica das Tags (Exclusão)"
+			></app-select>
+		</div>
+		<div class="advanced-filters-footer">
+			<app-button (click)="applyFilters()">Aplicar Filtros</app-button>
+		</div>
+	</div>
+}
+
+@if (activeFilters().length > 0) {
+	<div class="active-filters-container">
+		@for (filter of activeFilters(); track filter.id) {
+			<div
+				class="active-filter-badge"
+				[ngClass]="'filter-' + filter.type"
+				(click)="removeFilter(filter)"
+			>
+				<span class="filter-label">{{ filter.label }}</span>
+				<app-icons name="close" size="12" class="close-icon" />
+			</div>
+		}
+	</div>
+}
