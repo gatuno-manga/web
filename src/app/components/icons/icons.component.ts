@@ -1,18 +1,26 @@
-import { Component, input, inject, effect, SecurityContext, ElementRef, viewChild, signal } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Component, input, inject, ChangeDetectionStrategy } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { IconRegistryService } from '@service/icon-registry.service';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { switchMap, map } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-icons',
+  standalone: true,
   imports: [],
   templateUrl: './icons.component.html',
-  styleUrl: './icons.component.scss'
+  styleUrl: './icons.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[style.--icon-size]': 'ensureUnits(size())',
+    '[style.--icon-fill]': 'color()',
+    '[style.--icon-stroke]': 'stroke() || null'
+  }
 })
 export class IconsComponent {
   private registry = inject(IconRegistryService);
   private sanitizer = inject(DomSanitizer);
-  private el = inject(ElementRef);
-
 
   name = input<string>();
   size = input<string>('24px');
@@ -20,39 +28,14 @@ export class IconsComponent {
   stroke = input<string>('1');
   background = input<string>('none');
 
-  protected svgContent = signal<SafeHtml>('');
+  private svgRaw$ = toObservable(this.name).pipe(
+    switchMap(name => name ? this.registry.getIcon(name) : of('')),
+    map(svg => this.sanitizer.bypassSecurityTrustHtml(svg))
+  );
 
-  constructor() {
-    effect(() => {
-      const iconName = this.name();
-      if (!iconName) return;
+  protected svgContent = toSignal(this.svgRaw$, { initialValue: '' });
 
-      this.registry.getIcon(iconName).subscribe({
-        next: (svg) => {
-          const safeSvg = this.sanitizer.bypassSecurityTrustHtml(svg);
-          this.svgContent.set(safeSvg);
-        },
-        error: () => {
-          this.svgContent.set('');
-        }
-      });
-    });
-
-    effect(() => {
-      const style = this.el.nativeElement.style;
-
-      style.setProperty('--icon-size', this.ensureUnits(this.size()));
-      style.setProperty('--icon-fill', this.color());
-
-      if (this.stroke()) {
-        style.setProperty('--icon-stroke', this.stroke());
-      } else {
-        style.removeProperty('--icon-stroke');
-      }
-    });
-  }
-
-  private ensureUnits(value: string): string {
+  protected ensureUnits(value: string): string {
     return value && !isNaN(Number(value)) ? `${value}px` : value;
   }
 }

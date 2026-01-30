@@ -3,91 +3,19 @@ import { io, Socket } from 'socket.io-client';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { UserTokenService } from './user-token.service';
-
-export interface BookEvent {
-    id: string;
-    title: string;
-    type?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-}
-
-export interface ChapterEvent {
-    bookId: string;
-    chapters?: Array<{
-        id: string;
-        title: string;
-        index: number;
-        scrapingStatus: string;
-    }>;
-    chapter?: {
-        id: string;
-        title: string;
-        index: number;
-        scrapingStatus: string;
-    };
-    chapterIds?: string[];
-}
-
-export interface CoverEvent {
-    bookId: string;
-    coverId: string;
-    url?: string;
-}
-
-export interface ScrapingEvent {
-    chapterId: string;
-    bookId: string;
-    pagesCount?: number;
-    error?: string;
-}
-
-export interface NewChaptersEvent {
-    bookId: string;
-    newChaptersCount: number;
-    chapters: Array<{
-        id: string;
-        title: string;
-        index: number;
-    }>;
-}
-
-export interface UpdateStartedEvent {
-    bookId: string;
-    bookTitle: string;
-    jobId: string;
-    timestamp: number;
-}
-
-export interface UpdateCompletedEvent {
-    bookId: string;
-    bookTitle: string;
-    jobId: string;
-    newChapters: number;
-    newCovers: number;
-    timestamp: number;
-}
-
-export interface UpdateFailedEvent {
-    bookId: string;
-    bookTitle: string;
-    jobId: string;
-    error: string;
-    timestamp: number;
-}
-
-export interface SubscriptionResponse {
-    type: 'book' | 'chapter';
-    id: string;
-    success: boolean;
-    error?: string;
-}
-
-export interface SubscriptionsListResponse {
-    books: string[];
-    chapters: string[];
-    isAdmin: boolean;
-}
+import { BookEvents } from '../constants/book-events.constants';
+import {
+    BookEvent,
+    ChapterEvent,
+    CoverEvent,
+    NewChaptersEvent,
+    ScrapingEvent,
+    SubscriptionResponse,
+    SubscriptionsListResponse,
+    UpdateCompletedEvent,
+    UpdateFailedEvent,
+    UpdateStartedEvent
+} from '../models/book-events.model';
 
 /**
  * Service para gerenciar conexões WebSocket e receber eventos em tempo real
@@ -226,7 +154,19 @@ export class BookWebsocketService {
     private registerEventListeners(): void {
         if (!this.socket) return;
 
-        // Eventos de confirmação
+        // Helper para registrar eventos de forma mais limpa
+        const register = <T>(event: string, subject: Subject<T>, logPrefix: string, isError = false) => {
+            this.socket?.on(event, (data: T) => {
+                if (isError) {
+                    console.error(logPrefix, data);
+                } else {
+                    console.log(logPrefix, data);
+                }
+                subject.next(data);
+            });
+        };
+
+        // --- Eventos de Confirmação ---
         this.socket.on('subscribed', (data: SubscriptionResponse) => {
             if (data.success) {
                 console.log(`✅ Inscrito em ${data.type}:`, data.id);
@@ -245,80 +185,27 @@ export class BookWebsocketService {
             console.log('📋 Minhas inscrições:', data);
         });
 
-        // Eventos de livros
-        this.socket.on('book.created', (data: BookEvent) => {
-            console.log('📚 Livro criado:', data);
-            this.bookCreatedSubject.next(data);
-        });
+        // --- Eventos de Livros ---
+        register(BookEvents.CREATED, this.bookCreatedSubject, '📚 Livro criado:');
+        register(BookEvents.UPDATED, this.bookUpdatedSubject, '📝 Livro atualizado:');
+        register(BookEvents.NEW_CHAPTERS, this.bookNewChaptersSubject, '🆕 Novos capítulos encontrados:');
+        register(BookEvents.UPDATE_STARTED, this.bookUpdateStartedSubject, '🔄 Atualização iniciada:');
+        register(BookEvents.UPDATE_COMPLETED, this.bookUpdateCompletedSubject, '✅ Atualização concluída:');
+        register(BookEvents.UPDATE_FAILED, this.bookUpdateFailedSubject, '❌ Atualização falhou:', true);
 
-        this.socket.on('book.updated', (data: BookEvent) => {
-            console.log('📝 Livro atualizado:', data);
-            this.bookUpdatedSubject.next(data);
-        });
+        // --- Eventos de Capítulos ---
+        register(BookEvents.CHAPTERS_UPDATED, this.chaptersUpdatedSubject, '📚 Capítulos atualizados:');
+        register(BookEvents.CHAPTER_UPDATED, this.chapterUpdatedSubject, '📖 Capítulo atualizado:');
+        register(BookEvents.CHAPTERS_FIX, this.chaptersFixSubject, '🔧 Capítulos para corrigir:');
 
-        // Eventos de atualização automática
-        this.socket.on('book.new-chapters', (data: NewChaptersEvent) => {
-            console.log('🆕 Novos capítulos encontrados:', data);
-            this.bookNewChaptersSubject.next(data);
-        });
+        // --- Eventos de Scraping ---
+        register(BookEvents.SCRAPING_STARTED, this.chapterScrapingStartedSubject, '🔄 Scraping iniciado:');
+        register(BookEvents.SCRAPING_COMPLETED, this.chapterScrapingCompletedSubject, '✅ Scraping completo:');
+        register(BookEvents.SCRAPING_FAILED, this.chapterScrapingFailedSubject, '❌ Scraping falhou:', true);
 
-        this.socket.on('book.update.started', (data: UpdateStartedEvent) => {
-            console.log('🔄 Atualização iniciada:', data);
-            this.bookUpdateStartedSubject.next(data);
-        });
-
-        this.socket.on('book.update.completed', (data: UpdateCompletedEvent) => {
-            console.log('✅ Atualização concluída:', data);
-            this.bookUpdateCompletedSubject.next(data);
-        });
-
-        this.socket.on('book.update.failed', (data: UpdateFailedEvent) => {
-            console.error('❌ Atualização falhou:', data);
-            this.bookUpdateFailedSubject.next(data);
-        });
-
-        // Eventos de capítulos
-        this.socket.on('chapters.updated', (data: ChapterEvent) => {
-            console.log('📚 Capítulos atualizados:', data);
-            this.chaptersUpdatedSubject.next(data);
-        });
-
-        this.socket.on('chapter.updated', (data: ChapterEvent) => {
-            console.log('📖 Capítulo atualizado:', data);
-            this.chapterUpdatedSubject.next(data);
-        });
-
-        this.socket.on('chapters.fix', (data: ChapterEvent) => {
-            console.log('🔧 Capítulos para corrigir:', data);
-            this.chaptersFixSubject.next(data);
-        });
-
-        // Eventos de scraping
-        this.socket.on('chapter.scraping.started', (data: ScrapingEvent) => {
-            console.log('🔄 Scraping iniciado:', data);
-            this.chapterScrapingStartedSubject.next(data);
-        });
-
-        this.socket.on('chapter.scraping.completed', (data: ScrapingEvent) => {
-            console.log('✅ Scraping completo:', data);
-            this.chapterScrapingCompletedSubject.next(data);
-        });
-
-        this.socket.on('chapter.scraping.failed', (data: ScrapingEvent) => {
-            console.error('❌ Scraping falhou:', data);
-            this.chapterScrapingFailedSubject.next(data);
-        });
-
-        // Eventos de capas
-        this.socket.on('cover.processed', (data: CoverEvent) => {
-            console.log('🖼️ Capa processada:', data);
-            this.coverProcessedSubject.next(data);
-        });
-
-        this.socket.on('cover.selected', (data: CoverEvent) => {
-            console.log('🎨 Capa selecionada:', data);
-            this.coverSelectedSubject.next(data);
-        });
+        // --- Eventos de Capas ---
+        register(BookEvents.COVER_PROCESSED, this.coverProcessedSubject, '🖼️ Capa processada:');
+        register(BookEvents.COVER_SELECTED, this.coverSelectedSubject, '🎨 Capa selecionada:');
     }
 
     // ==================== MÉTODOS DE INSCRIÇÃO ====================
@@ -332,7 +219,7 @@ export class BookWebsocketService {
             return;
         }
 
-        this.socket.emit('subscribe:book', bookId);
+        this.socket.emit(BookEvents.SUBSCRIBE_BOOK, bookId);
         this.subscribedBooks.add(bookId);
     }
 
@@ -342,7 +229,7 @@ export class BookWebsocketService {
     unsubscribeFromBook(bookId: string): void {
         if (!this.socket) return;
 
-        this.socket.emit('unsubscribe:book', bookId);
+        this.socket.emit(BookEvents.UNSUBSCRIBE_BOOK, bookId);
         this.subscribedBooks.delete(bookId);
     }
 
@@ -355,7 +242,7 @@ export class BookWebsocketService {
             return;
         }
 
-        this.socket.emit('subscribe:chapter', chapterId);
+        this.socket.emit(BookEvents.SUBSCRIBE_CHAPTER, chapterId);
         this.subscribedChapters.add(chapterId);
     }
 
@@ -365,7 +252,7 @@ export class BookWebsocketService {
     unsubscribeFromChapter(chapterId: string): void {
         if (!this.socket) return;
 
-        this.socket.emit('unsubscribe:chapter', chapterId);
+        this.socket.emit(BookEvents.UNSUBSCRIBE_CHAPTER, chapterId);
         this.subscribedChapters.delete(chapterId);
     }
 
@@ -375,7 +262,7 @@ export class BookWebsocketService {
     listSubscriptions(): void {
         if (!this.socket) return;
 
-        this.socket.emit('list:subscriptions');
+        this.socket.emit(BookEvents.LIST_SUBSCRIPTIONS);
     }
 
     /**
@@ -385,11 +272,11 @@ export class BookWebsocketService {
         console.log('🔄 Re-inscrevendo em rooms após reconexão...');
 
         this.subscribedBooks.forEach(bookId => {
-            this.socket?.emit('subscribe:book', bookId);
+            this.socket?.emit(BookEvents.SUBSCRIBE_BOOK, bookId);
         });
 
         this.subscribedChapters.forEach(chapterId => {
-            this.socket?.emit('subscribe:chapter', chapterId);
+            this.socket?.emit(BookEvents.SUBSCRIBE_CHAPTER, chapterId);
         });
     }
 
@@ -404,37 +291,37 @@ export class BookWebsocketService {
             const subscriptions = [
                 this.bookUpdated$.subscribe(event => {
                     if (event.id === bookId) {
-                        observer.next({ type: 'book.updated', data: event });
+                        observer.next({ type: BookEvents.UPDATED, data: event });
                     }
                 }),
                 this.chaptersUpdated$.subscribe(event => {
                     if (event.bookId === bookId) {
-                        observer.next({ type: 'chapters.updated', data: event });
+                        observer.next({ type: BookEvents.CHAPTERS_UPDATED, data: event });
                     }
                 }),
                 this.chapterScrapingStarted$.subscribe(event => {
                     if (event.bookId === bookId) {
-                        observer.next({ type: 'chapter.scraping.started', data: event });
+                        observer.next({ type: BookEvents.SCRAPING_STARTED, data: event });
                     }
                 }),
                 this.chapterScrapingCompleted$.subscribe(event => {
                     if (event.bookId === bookId) {
-                        observer.next({ type: 'chapter.scraping.completed', data: event });
+                        observer.next({ type: BookEvents.SCRAPING_COMPLETED, data: event });
                     }
                 }),
                 this.chapterScrapingFailed$.subscribe(event => {
                     if (event.bookId === bookId) {
-                        observer.next({ type: 'chapter.scraping.failed', data: event });
+                        observer.next({ type: BookEvents.SCRAPING_FAILED, data: event });
                     }
                 }),
                 this.coverProcessed$.subscribe(event => {
                     if (event.bookId === bookId) {
-                        observer.next({ type: 'cover.processed', data: event });
+                        observer.next({ type: BookEvents.COVER_PROCESSED, data: event });
                     }
                 }),
                 this.coverSelected$.subscribe(event => {
                     if (event.bookId === bookId) {
-                        observer.next({ type: 'cover.selected', data: event });
+                        observer.next({ type: BookEvents.COVER_SELECTED, data: event });
                     }
                 }),
             ];
@@ -458,22 +345,22 @@ export class BookWebsocketService {
             const subscriptions = [
                 this.chapterUpdated$.subscribe(event => {
                     if (event.chapter?.id === chapterId) {
-                        observer.next({ type: 'chapter.updated', data: event });
+                        observer.next({ type: BookEvents.CHAPTER_UPDATED, data: event });
                     }
                 }),
                 this.chapterScrapingStarted$.subscribe(event => {
                     if (event.chapterId === chapterId) {
-                        observer.next({ type: 'chapter.scraping.started', data: event });
+                        observer.next({ type: BookEvents.SCRAPING_STARTED, data: event });
                     }
                 }),
                 this.chapterScrapingCompleted$.subscribe(event => {
                     if (event.chapterId === chapterId) {
-                        observer.next({ type: 'chapter.scraping.completed', data: event });
+                        observer.next({ type: BookEvents.SCRAPING_COMPLETED, data: event });
                     }
                 }),
                 this.chapterScrapingFailed$.subscribe(event => {
                     if (event.chapterId === chapterId) {
-                        observer.next({ type: 'chapter.scraping.failed', data: event });
+                        observer.next({ type: BookEvents.SCRAPING_FAILED, data: event });
                     }
                 }),
             ];

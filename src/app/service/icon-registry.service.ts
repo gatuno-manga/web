@@ -1,7 +1,7 @@
 import { Injectable, inject, makeStateKey, TransferState, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformServer } from '@angular/common';
-import { map, Observable, of, tap } from 'rxjs';
+import { map, Observable, of, tap, shareReplay, catchError, finalize } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class IconRegistryService {
@@ -10,6 +10,7 @@ export class IconRegistryService {
     private platformId = inject(PLATFORM_ID);
 
     private iconCache = new Map<string, string>();
+    private inFlightRequests = new Map<string, Observable<string>>();
 
     getIcon(name: string): Observable<string> {
         if (this.iconCache.has(name)) {
@@ -24,16 +25,30 @@ export class IconRegistryService {
             return of(svg);
         }
 
+        if (this.inFlightRequests.has(name)) {
+            return this.inFlightRequests.get(name)!;
+        }
+
         const path = `/assets/icons/${name}.svg`;
 
-        return this.http.get(path, { responseType: 'text' }).pipe(
+        const request$ = this.http.get(path, { responseType: 'text' }).pipe(
             tap(svg => {
                 this.iconCache.set(name, svg);
                 if (isPlatformServer(this.platformId)) {
                     this.transferState.set(KEY, svg);
                 }
             }),
-            map(svg => svg || '')
+            catchError(err => {
+                console.error(`Failed to load icon: ${name}`, err);
+                return of('');
+            }),
+            finalize(() => {
+                this.inFlightRequests.delete(name);
+            }),
+            shareReplay(1)
         );
+
+        this.inFlightRequests.set(name, request$);
+        return request$.pipe(map(svg => svg || ''));
     }
 }

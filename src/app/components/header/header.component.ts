@@ -1,5 +1,5 @@
 import { Location, NgClass } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { IconsComponent } from '../icons/icons.component';
@@ -8,6 +8,7 @@ import { UserTokenService } from '../../service/user-token.service';
 
 @Component({
   selector: 'app-header',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterModule,
     IconsComponent,
@@ -22,8 +23,6 @@ export class HeaderComponent {
   private themeService = inject(ThemeService);
   private userTokenService = inject(UserTokenService);
 
-  constructor() {}
-
   backPage() {
     this.location.back();
   }
@@ -32,7 +31,7 @@ export class HeaderComponent {
     return this.themeService.currentTheme() === 'dark';
   }
 
-  isloggedIn = this.userTokenService.hasValidAccessTokenSignal;
+  isLoggedIn = this.userTokenService.hasValidAccessTokenSignal;
 
   isAdmin = this.userTokenService.isAdminSignal;
 

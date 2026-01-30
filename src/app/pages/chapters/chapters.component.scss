@@ -1,4 +1,4 @@
-.controler {
+.controls {
 	display: flex;
 	gap: 1rem;
 	align-items: center;
@@ -105,7 +105,9 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		transition: height 0.3s, top 0.3s;
+		transition:
+			height 0.3s,
+			top 0.3s;
 		cursor: pointer;
 		user-select: none;
 		touch-action: none;
@@ -119,7 +121,9 @@
 		}
 
 		&.bottom {
-			animation-delay: top 4s, height 4s;
+			animation-delay:
+				top 4s,
+				height 4s;
 			top: calc(100% - $space);
 		}
 
@@ -163,7 +167,7 @@
 	}
 }
 
-	.btn-top {
+.btn-top {
 	position: fixed;
 	bottom: 5rem;
 	right: 1rem;
@@ -231,7 +235,7 @@
 }
 
 app-aside {
-	.controler {
+	.controls {
 		height: 2rem;
 
 		.arrow {
@@ -331,6 +335,15 @@ app-aside {
 	}
 }
 
+.next-chapter-zone {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 70vh;
+	z-index: 20;
+}
+
 @media (max-width: 768px) {
 	.page-container {
 		.page-number {
@@ -341,7 +354,7 @@ app-aside {
 		}
 	}
 
-	.controler .settings-btn {
+	.controls .settings-btn {
 		width: 2.5rem;
 		height: 2.5rem;
 

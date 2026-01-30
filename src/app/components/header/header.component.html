@@ -13,12 +13,12 @@
 		<a [routerLink]="['/dashboard']">Dashboard</a>
 		}
 		<a [routerLink]="['/books']">Mangas</a>
-		@if (!isloggedIn()) {
+		@if (!isLoggedIn()) {
 		<a [routerLink]="['/auth/login']">Login</a>
 		}
 		<div class="icons">
 			<app-theme-toggle />
-			@if (isloggedIn()) {
+			@if (isLoggedIn()) {
 			<a [routerLink]="['/user']" class="user">
 				<app-icons name="user" size="32" />
 			</a>

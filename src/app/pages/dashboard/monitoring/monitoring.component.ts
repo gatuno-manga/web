@@ -4,7 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { Subscription, interval } from 'rxjs';
 import { PLATFORM_ID } from '@angular/core';
 import { IconsComponent } from '../../../components/icons/icons.component';
-import { BookWebsocketService, UpdateStartedEvent, UpdateCompletedEvent, UpdateFailedEvent } from '../../../service/book-websocket.service';
+import { BookWebsocketService } from '../../../service/book-websocket.service';
+import { UpdateStartedEvent, UpdateCompletedEvent, UpdateFailedEvent } from '../../../models/book-events.model';
 import { RouterModule } from '@angular/router';
 import { ButtonComponent } from '../../../components/inputs/button/button.component';
 
