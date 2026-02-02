@@ -265,10 +265,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
           subtree: true,
           attributes: true
         });
-        
+
         // Atualização imediata
         this.updateContainerHeight();
-        
+
         // Atualizações com delay para garantir que o @defer carregou
         setTimeout(() => this.updateContainerHeight(), 50);
         setTimeout(() => this.updateContainerHeight(), 150);
