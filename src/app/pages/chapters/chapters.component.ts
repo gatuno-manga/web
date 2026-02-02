@@ -16,10 +16,11 @@ import {
   QueryList,
   PLATFORM_ID,
   afterNextRender,
-  Injector
+  Injector,
+  ViewChild
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Chapter } from '../../models/book.models';
+import { Chapter, ContentType } from '../../models/book.models';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
 import { HeaderComponent } from '../../components/header/header.component';
@@ -44,6 +45,14 @@ import { throttleTime } from 'rxjs/operators';
 import { ContextMenuService } from '../../service/context-menu.service';
 import { SavedPagesService } from '../../service/saved-pages.service';
 import { Page } from '../../models/book.models';
+import {
+  ImageReaderComponent,
+  TextReaderComponent,
+  DocumentReaderComponent,
+  ReadingProgressEvent,
+  TextProgressEvent,
+  DocumentProgressEvent
+} from '../../components/readers';
 
 @Component({
   selector: 'app-chapters',
@@ -56,7 +65,10 @@ import { Page } from '../../models/book.models';
     NgClass,
     DecimalPipe,
     ButtonComponent,
-    AsideComponent
+    AsideComponent,
+    ImageReaderComponent,
+    TextReaderComponent,
+    DocumentReaderComponent
   ],
   templateUrl: './chapters.component.html',
   styleUrl: './chapters.component.scss'
@@ -81,10 +93,14 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
   progressBarRef = viewChild<ElementRef>('progressBarRef');
   @ViewChildren('pageRef') pageRefs!: QueryList<ElementRef>;
+  @ViewChild(ImageReaderComponent) imageReader?: ImageReaderComponent;
+  @ViewChild(TextReaderComponent) textReader?: TextReaderComponent;
+  @ViewChild(DocumentReaderComponent) documentReader?: DocumentReaderComponent;
 
   chapter = signal<Chapter | null>(null);
   readingProgress = signal<number>(0);
   showScrollToTopButton = signal<boolean>(false);
+  savedPageIndex = signal<number>(0);
 
   private pageObjectUrls: string[] = [];
   private intersectionObserver: IntersectionObserver | null = null;
@@ -254,7 +270,12 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
         totalChapters: offlineBook?.totalChapters || 0,
         originalUrl: '',
         next: offlineChapter.next,
-        previous: offlineChapter.previous
+        previous: offlineChapter.previous,
+        contentType: offlineChapter.contentType || 'image',
+        content: offlineChapter.content,
+        contentFormat: offlineChapter.contentFormat,
+        documentPath: offlineChapter.document ? URL.createObjectURL(offlineChapter.document) : undefined,
+        documentFormat: offlineChapter.documentFormat
       };
     } catch (e) {
       console.error('Error loading offline chapter', e);
@@ -262,6 +283,41 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  // === Progress handlers for different reader types ===
+
+  private updateProgressState(pageIndex: number, visualProgressPercentage: number) {
+    if (this.isNavigating) return;
+
+    const currentChapter = this.chapter();
+    if (!currentChapter) return;
+
+    // Atualiza progresso visual
+    this.readingProgress.set(visualProgressPercentage);
+
+    // Persistência inteligente (apenas se avançou)
+    if (pageIndex > this.maxReadPageIndex) {
+      this.maxReadPageIndex = pageIndex;
+      this.readingProgressService.saveProgress(currentChapter.id, currentChapter.bookId, pageIndex);
+    }
+  }
+
+  onImageProgress(event: ReadingProgressEvent) {
+    const percent = ((event.pageIndex + 1) / event.totalPages) * 100;
+    this.updateProgressState(event.pageIndex, percent);
+  }
+
+  onTextProgress(event: TextProgressEvent) {
+    this.updateProgressState(event.pageIndex, event.scrollPercentage);
+  }
+
+  onDocumentProgress(event: DocumentProgressEvent) {
+    const percent = ((event.pageIndex + 1) / event.totalPages) * 100;
+    this.updateProgressState(event.pageIndex, percent);
+  }
+
+  getContentType(): ContentType {
+    return this.chapter()?.contentType || 'image';
+  }
   private updateMetadata(chapter: Chapter) {
     if (chapter) {
       this.metaDataService.setMetaData({

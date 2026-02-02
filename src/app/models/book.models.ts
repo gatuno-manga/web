@@ -78,6 +78,16 @@ export interface tag {
   name: string;
 }
 
+export const ContentTypes = {
+  IMAGE: 'image',
+  TEXT: 'text',
+  DOCUMENT: 'document',
+} as const;
+
+export type ContentType = 'image' | 'text' | 'document';
+export type ContentFormat = 'markdown' | 'html' | 'plain';
+export type DocumentFormat = 'pdf' | 'epub';
+
 export interface Chapterlist {
   id: string;
   title: string;
@@ -85,6 +95,7 @@ export interface Chapterlist {
   scrapingStatus: ScrapingStatus;
   index: number;
   read: boolean;
+  contentType?: ContentType;
 }
 
 export interface Chapter {
@@ -98,6 +109,12 @@ export interface Chapter {
   bookId: string;
   bookTitle: string;
   totalChapters: number;
+  // Multi-format support
+  contentType: ContentType;
+  content?: string;
+  contentFormat?: ContentFormat;
+  documentPath?: string;
+  documentFormat?: DocumentFormat;
 }
 
 export interface Cover {

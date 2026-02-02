@@ -1,6 +1,7 @@
-import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal, OnDestroy, inject } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal, OnDestroy, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { BookService } from '../../service/book.service';
-import { Book, BookBasic, BookDetail, Chapterlist, Cover, ScrapingStatus, UpdateBookDto } from '../../models/book.models';
+import { Book, BookBasic, BookDetail, Chapterlist, Cover, ScrapingStatus, UpdateBookDto, ContentType, ContentTypes } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
@@ -44,6 +45,8 @@ interface ModulesLoad {
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
   userTokenService = inject(UserTokenService);
   private notificationService = inject(NotificationService);
+  private platformId = inject(PLATFORM_ID);
+  private resizeObserver?: ResizeObserver;
 
   tab = tab;
   ScrapingStatus = ScrapingStatus;
@@ -132,8 +135,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
       this.firstTab.nativeElement.click();
     }
 
-    // Garantir que a altura seja calculada após a view estar pronta
-    setTimeout(() => this.updateContainerHeight(), 500);
+    if (isPlatformBrowser(this.platformId)) {
+      this.setupResizeObserver();
+    }
 
     this.subscribeToWebSocketEvents();
 
@@ -152,6 +156,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.resizeObserver?.disconnect();
     if (this.websocketSubscription) {
       this.websocketSubscription.unsubscribe();
     }
@@ -206,6 +211,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
     if (event && this.selector) {
       const clickedElement = event.target as HTMLSpanElement;
+      clickedElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       const headerElement = clickedElement.parentElement;
 
       if (headerElement) {
@@ -222,8 +228,32 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     }
 
     // Atualizar altura imediatamente e após animação
-    this.updateContainerHeight();
-    setTimeout(() => this.updateContainerHeight(), 350);
+    this.observeActiveTab();
+  }
+
+  private setupResizeObserver() {
+    this.resizeObserver = new ResizeObserver(() => {
+      this.updateContainerHeight();
+    });
+  }
+
+  private observeActiveTab() {
+    if (!this.resizeObserver) return;
+    
+    // Disconnect temporarily to avoid observing multiple elements or wrong one
+    this.resizeObserver.disconnect();
+
+    requestAnimationFrame(() => {
+      if (!this.containerElement?.nativeElement) return;
+      
+      const tabs = this.containerElement.nativeElement.querySelectorAll('.container');
+      const activeTab = tabs[this.selectedTab] as HTMLElement;
+
+      if (activeTab) {
+        this.resizeObserver?.observe(activeTab);
+        this.updateContainerHeight();
+      }
+    });
   }
 
   private updateContainerHeight() {
@@ -260,6 +290,18 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  getContentTypeIcon(chapter: Chapterlist): string {
+    const contentType = chapter.contentType || ContentTypes.IMAGE;
+    switch (contentType) {
+      case ContentTypes.TEXT:
+        return 'book';
+      case ContentTypes.DOCUMENT:
+        return 'file';
+      default:
+        return 'image';
+    }
+  }
+
   loadResults(index: number) {
     if (this.modulesLoad[index] && !this.modulesLoad[index].load()) {
       this.modulesLoad[index].function();
@@ -283,7 +325,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         this.chapters = chapters;
         this.sortChapters();
         this.checkDownloadedChapters();
-        this.updateContainerHeight();
       },
       error: async (error) => {
         console.error('Error loading chapters from API, trying offline:', error);
@@ -406,7 +447,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         this.covers = covers;
         this.originalCovers = JSON.parse(JSON.stringify(covers));
         this.hasCoversChanged = false;
-        this.updateContainerHeight();
       },
       error: (error) => {
         console.error('Error loading covers:', error);
@@ -416,7 +456,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   onCoverDrop(event: CdkDragDrop<Cover[]>) {
     if (!this.userTokenService.isAdminSignal()) return;
-    
+
     moveItemInArray(this.covers, event.previousIndex, event.currentIndex);
     this.hasCoversChanged = true;
   }
@@ -451,7 +491,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.bookService.getInfo(this.id).subscribe({
       next: (info) => {
         this.extraInfo = info;
-        this.updateContainerHeight();
       },
       error: (error) => {
         console.error('Error loading extra info:', error);
@@ -463,7 +502,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.savedPagesService.getSavedPagesByBook(this.id).subscribe({
       next: (pages) => {
         this.savedPages = pages;
-        this.updateContainerHeight();
       },
       error: (error) => {
         console.error('Error loading saved pages:', error);

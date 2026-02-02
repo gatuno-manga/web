@@ -1,6 +1,13 @@
 #header {
 	position: relative;
 	border-bottom: 4px solid var(--primary-color);
+	display: flex;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: none; // Firefox
+	&::-webkit-scrollbar {
+		display: none; // Chrome, Safari, Opera
+	}
 
 	.selector {
 		position: absolute;
@@ -11,13 +18,20 @@
 		background-color: var(--primary-color);
 		border-top-left-radius: 15px;
 		border-top-right-radius: 15px;
-		transition: left 0.3s ease, width 0.3s linear;
+		transition:
+			left 0.3s ease,
+			width 0.3s linear;
+		z-index: 0;
 	}
 	span {
 		display: inline-block;
 		padding: 0.8rem;
 		padding-bottom: 0;
 		cursor: pointer;
+		white-space: nowrap;
+		position: relative;
+		z-index: 1;
+		flex-shrink: 0;
 	}
 }
 
@@ -122,7 +136,10 @@
 		padding: 0.6rem 1rem;
 		border-radius: 12px;
 		width: 100%;
-		transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
+		transition:
+			background-color 0.3s,
+			box-shadow 0.3s,
+			transform 0.2s;
 		background-color: rgb(from var(--secondary-color) r g b / 0.7);
 		flex: none;
 		display: flex;
@@ -167,6 +184,18 @@
 		.title {
 			line-height: 2rem;
 			text-transform: capitalize;
+
+			.title-with-icon {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+
+				.content-type-icon {
+					opacity: 0.6;
+					flex-shrink: 0;
+				}
+			}
+
 			h2 {
 				font-size: 1.8rem;
 				font-weight: lighter;
@@ -324,7 +353,9 @@
 		user-select: none;
 		-webkit-user-drag: none;
 		cursor: pointer;
-		transition: transform 0.2s ease, box-shadow 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease;
 		position: relative;
 		background-color: var(--secondary-color);
 

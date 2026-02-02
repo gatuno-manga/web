@@ -2,8 +2,8 @@ import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { OfflineBook, OfflineChapter, DownloadProgress } from '../models/offline.models';
-import { BehaviorSubject } from 'rxjs';
-import { Book, BookBasic, Chapter, Page } from '../models/book.models';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { Book, BookBasic, Chapter, Page, ContentType } from '../models/book.models';
 import { HttpClient } from '@angular/common/http';
 
 interface GatunoOfflineDB extends DBSchema {
@@ -133,7 +133,7 @@ export class DownloadService {
     if (!this.dbPromise) return;
     if (await this.isChapterDownloaded(chapter.id)) return;
 
-    this.updateProgress(chapter.id, { chapterId: chapter.id, total: chapter.pages.length, current: 0, status: 'downloading' });
+    const contentType: ContentType = chapter.contentType || 'image';
 
     try {
       // 1. Ensure Book is saved (fetch cover if needed)
@@ -143,43 +143,18 @@ export class DownloadService {
         await this.saveBook(book, coverBlob);
       }
 
-      // 2. Download all pages
-      let completedCount = 0;
-
-      // Sequential download to avoid overloading network/browser, or parallel with limit?
-      // Let's try Promise.all for parallel but formatted for progress updates
-
-      const downloadPromises = chapter.pages.map(async (page: Page, index: number) => {
-        const blob = await this.fetchImageBlob(page.path); // Assuming page.path is the URL
-        completedCount++;
-        this.updateProgress(chapter.id, {
-          chapterId: chapter.id,
-          total: chapter.pages.length,
-          current: completedCount,
-          status: 'downloading'
-        });
-        return { index, blob };
-      });
-
-      const results = await Promise.all(downloadPromises);
-      // Sort by index just in case
-      const sortedBlobs = results.sort((a, b) => a.index - b.index).map(r => r.blob);
-
-      // 3. Save Chapter
-      const db = await this.dbPromise;
-      const offlineChapter: OfflineChapter = {
-        id: chapter.id,
-        bookId: book.id,
-        title: chapter.title,
-        index: chapter.index,
-        pages: sortedBlobs,
-        downloadedAt: new Date(),
-        next: chapter.next,
-        previous: chapter.previous
-      };
-      await db.put('chapters', offlineChapter);
-
-      this.updateProgress(chapter.id, { chapterId: chapter.id, total: chapter.pages.length, current: chapter.pages.length, status: 'completed' });
+      // 2. Download based on content type
+      switch (contentType) {
+        case 'text':
+          await this.downloadTextChapter(book, chapter);
+          break;
+        case 'document':
+          await this.downloadDocumentChapter(book, chapter);
+          break;
+        default:
+          await this.downloadImageChapter(book, chapter);
+          break;
+      }
 
     } catch (error) {
       console.error('Download failed', error);
@@ -188,8 +163,99 @@ export class DownloadService {
     }
   }
 
+  private async downloadImageChapter(book: Book | BookBasic, chapter: Chapter): Promise<void> {
+    if (!this.dbPromise) return;
+
+    this.updateProgress(chapter.id, { chapterId: chapter.id, total: chapter.pages.length, current: 0, status: 'downloading' });
+
+    let completedCount = 0;
+    const downloadPromises = chapter.pages.map(async (page: Page, index: number) => {
+      const blob = await this.fetchImageBlob(page.path);
+      completedCount++;
+      this.updateProgress(chapter.id, {
+        chapterId: chapter.id,
+        total: chapter.pages.length,
+        current: completedCount,
+        status: 'downloading'
+      });
+      return { index, blob };
+    });
+
+    const results = await Promise.all(downloadPromises);
+    const sortedBlobs = results.sort((a, b) => a.index - b.index).map(r => r.blob);
+
+    const db = await this.dbPromise;
+    const offlineChapter: OfflineChapter = {
+      id: chapter.id,
+      bookId: book.id,
+      title: chapter.title,
+      index: chapter.index,
+      contentType: 'image',
+      pages: sortedBlobs,
+      downloadedAt: new Date(),
+      next: chapter.next,
+      previous: chapter.previous
+    };
+    await db.put('chapters', offlineChapter);
+
+    this.updateProgress(chapter.id, { chapterId: chapter.id, total: chapter.pages.length, current: chapter.pages.length, status: 'completed' });
+  }
+
+  private async downloadTextChapter(book: Book | BookBasic, chapter: Chapter): Promise<void> {
+    if (!this.dbPromise) return;
+
+    // TEXT content is already inline in chapter.content - no network fetch needed
+    this.updateProgress(chapter.id, { chapterId: chapter.id, total: 1, current: 0, status: 'downloading' });
+
+    const db = await this.dbPromise;
+    const offlineChapter: OfflineChapter = {
+      id: chapter.id,
+      bookId: book.id,
+      title: chapter.title,
+      index: chapter.index,
+      contentType: 'text',
+      pages: [], // No image pages
+      content: chapter.content,
+      contentFormat: chapter.contentFormat,
+      downloadedAt: new Date(),
+      next: chapter.next,
+      previous: chapter.previous
+    };
+    await db.put('chapters', offlineChapter);
+
+    this.updateProgress(chapter.id, { chapterId: chapter.id, total: 1, current: 1, status: 'completed' });
+  }
+
+  private async downloadDocumentChapter(book: Book | BookBasic, chapter: Chapter): Promise<void> {
+    if (!this.dbPromise || !chapter.documentPath) return;
+
+    this.updateProgress(chapter.id, { chapterId: chapter.id, total: 1, current: 0, status: 'downloading' });
+
+    // Fetch the document blob
+    const documentBlob = await firstValueFrom(this.http.get(chapter.documentPath, { responseType: 'blob' }));
+    if (!documentBlob) throw new Error('Failed to download document');
+
+    const db = await this.dbPromise;
+    const offlineChapter: OfflineChapter = {
+      id: chapter.id,
+      bookId: book.id,
+      title: chapter.title,
+      index: chapter.index,
+      contentType: 'document',
+      pages: [], // No image pages
+      document: documentBlob,
+      documentFormat: chapter.documentFormat,
+      downloadedAt: new Date(),
+      next: chapter.next,
+      previous: chapter.previous
+    };
+    await db.put('chapters', offlineChapter);
+
+    this.updateProgress(chapter.id, { chapterId: chapter.id, total: 1, current: 1, status: 'completed' });
+  }
+
   private async fetchImageBlob(url: string): Promise<Blob> {
-    return this.http.get(url, { responseType: 'blob' }).toPromise().then(blob => {
+    return firstValueFrom(this.http.get(url, { responseType: 'blob' })).then(blob => {
       if (!blob) throw new Error('Empty blob received');
       return blob;
     });

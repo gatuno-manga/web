@@ -1,0 +1,33 @@
+@if (isPdfFormat) {
+	<div class="pdf-container">
+		@if (isBrowser) {
+			<iframe
+				[src]="safeSrc"
+				class="pdf-iframe"
+				title="PDF Viewer"
+			></iframe>
+		} @else {
+			<div class="ssr-placeholder">
+				<app-icons name="file" size="64" />
+				<p>Carregando visualizador de PDF...</p>
+			</div>
+		}
+	</div>
+
+	<div class="pdf-footer">
+		<a [href]="src" download class="download-btn">
+			<app-icons name="download" size="20" />
+			Baixar PDF
+		</a>
+	</div>
+} @else {
+	<div class="unsupported-format">
+		<app-icons name="file" size="64" />
+		<h2>Formato não suportado</h2>
+		<p>O formato "{{ format }}" ainda não é suportado para visualização.</p>
+		<a [href]="src" download class="download-btn">
+			<app-icons name="download" size="20" />
+			Baixar arquivo
+		</a>
+	</div>
+}

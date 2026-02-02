@@ -1,118 +1,164 @@
 <app-header static />
 
 @if (chapter(); as currentChapter) {
-<div id="header" class="header">
-	<div class="title">
-		<h1>Capitulo {{ currentChapter.index | number }}</h1>
-		@if (currentChapter.title) {
-		<h2>{{ currentChapter.title }}</h2>
-		}
+	<div id="header" class="header">
+		<div class="title">
+			<h1>Capitulo {{ currentChapter.index | number }}</h1>
+			@if (currentChapter.title) {
+				<h2>{{ currentChapter.title }}</h2>
+			}
+		</div>
+		<div class="controls">
+			@if (currentChapter.previous) {
+				<a class="arrow" (click)="previousPage()">
+					<app-icons name="arrow-left" size="42" />
+				</a>
+			}
+			<a class="index" (click)="backPage()">
+				{{ currentChapter.index | number }}/{{
+					currentChapter.totalChapters
+				}}
+			</a>
+			@if (currentChapter.next) {
+				<a class="arrow" (click)="nextPage()">
+					<app-icons name="arrow-right" size="42" />
+				</a>
+			}
+		</div>
 	</div>
-	<div class="controls">
-		@if (currentChapter.previous) {
-		<a class="arrow" (click)="previousPage()">
-			<app-icons name="arrow-left" size="42" />
-		</a>
+
+	<div
+		class="pages"
+		[style.filter]="filterStyle()"
+		[class.aside-left]="settings().asidePosition === 'left'"
+		[class.aside-right]="settings().asidePosition === 'right'"
+	>
+		<!-- Progress bar only for image content -->
+		@if (
+			currentChapter.contentType === 'image' ||
+			!currentChapter.contentType
+		) {
+			<div
+				class="reading-progress-bar"
+				[class.bottom]="settings().progressBarPosition === 'bottom'"
+				#progressBarRef
+				(mousedown)="startDrag($event)"
+				(touchstart)="startDrag($event)"
+			>
+				<div
+					class="reading-progress-fill"
+					[style.width.%]="readingProgress()"
+				></div>
+				@for (page of currentChapter.pages; track $index) {
+					<span>{{ $index + 1 }}</span>
+				}
+			</div>
 		}
-		<a class="index" (click)="backPage()">
-			{{ currentChapter.index | number }}/{{
-			currentChapter.totalChapters
-			}}
-		</a>
+
+		<!-- Content switching based on type -->
+		@switch (currentChapter.contentType) {
+			@case ('text') {
+				<app-text-reader
+					[content]="currentChapter.content || ''"
+					[format]="currentChapter.contentFormat || 'markdown'"
+					[initialScrollPercentage]="
+						savedPageIndex() > 0 ? (savedPageIndex() / 10) * 100 : 0
+					"
+					(progressChange)="onTextProgress($event)"
+				/>
+			}
+			@case ('document') {
+				<app-document-reader
+					[src]="currentChapter.documentPath || ''"
+					[format]="currentChapter.documentFormat || 'pdf'"
+					[initialPage]="savedPageIndex() + 1"
+					(pageChange)="onDocumentProgress($event)"
+				/>
+			}
+			@default {
+				<app-image-reader
+					[pages]="currentChapter.pages"
+					[showPageNumbers]="settings().showPageNumbers"
+					(progressChange)="onImageProgress($event)"
+				/>
+			}
+		}
+
+		<div
+			class="next-chapter-zone"
+			(dblclick)="nextPage()"
+			(touchend)="onZoneTouch($event)"
+		></div>
+	</div>
+
+	<div
+		class="btn-top"
+		[ngClass]="{
+			show: showScrollToTopButton(),
+		}"
+		(click)="scrollToTop()"
+	>
+		<app-icons name="arrow-up" size="42" />
+	</div>
+
+	<div class="footer">
 		@if (currentChapter.next) {
-		<a class="arrow" (click)="nextPage()">
-			<app-icons name="arrow-right" size="42" />
-		</a>
-		}
-	</div>
-</div>
-
-<div class="pages" [style.filter]="filterStyle()" [class.aside-left]="settings().asidePosition === 'left'"
-	[class.aside-right]="settings().asidePosition === 'right'">
-	<div class="reading-progress-bar" [class.bottom]="settings().progressBarPosition === 'bottom'" #progressBarRef
-		(mousedown)="startDrag($event)" (touchstart)="startDrag($event)">
-		<div class="reading-progress-fill" [style.width.%]="readingProgress()"></div>
-		@for (page of currentChapter.pages; track $index) {
-		<span>{{ $index + 1 }}</span>
+			<a class="next" (click)="nextPage()">
+				Proximo capitulo
+				<app-icons name="arrow-right" size="42" />
+			</a>
+		} @else {
+			<a class="next" (click)="backPage()">Voltar a pagina inicial</a>
 		}
 	</div>
 
-	@for (page of currentChapter.pages; track $index) {
-	<div class="page-container" id="page-{{ $index }}" #pageRef [attr.data-index]="$index"
-		(contextmenu)="onContextMenu($event, page, $index)">
-		<img [src]="page.path" loading="lazy" alt="Page {{ $index + 1 }}" />
-		@if(settings().showPageNumbers) {
-		<div class="page-number">{{ $index + 1 }}</div>
+	<app-aside [topOffset]="0" [position]="settings().asidePosition">
+		<div class="title">
+			<h1 (click)="backPage()">
+				<app-icons name="book" size="22" />
+				{{ currentChapter.bookTitle }}
+			</h1>
+			<h1>
+				<app-icons name="file" size="22" />
+				{{
+					currentChapter.title ||
+						'Capitulo ' + (currentChapter.index | number)
+				}}
+			</h1>
+		</div>
+		<div class="controls">
+			@if (currentChapter.previous) {
+				<a class="arrow" (click)="previousPage()">
+					<app-icons name="arrow-left" size="16" />
+				</a>
+			}
+			<a class="index" (click)="backPage()">
+				{{ currentChapter.index | number }}/{{
+					currentChapter.totalChapters
+				}}
+			</a>
+			@if (currentChapter.next) {
+				<a class="arrow" (click)="nextPage()">
+					<app-icons name="arrow-right" size="16" />
+				</a>
+			}
+		</div>
+
+		<div class="button">
+			<button (click)="openSettings()">
+				<app-icons name="settings" size="32" />
+			</button>
+		</div>
+		@if (admin()) {
+			<div class="line"></div>
+			<div class="actions">
+				<app-button (click)="resetChapter()" variant="text">
+					Resetar capitulo
+				</app-button>
+				<app-button (click)="openOriginalLink()" variant="text">
+					Link original
+				</app-button>
+			</div>
 		}
-	</div>
-	}
-	<div class="next-chapter-zone" (dblclick)="nextPage()" (touchend)="onZoneTouch($event)"></div>
-</div>
-
-<div class="btn-top" [ngClass]="{
-		show: showScrollToTopButton()
-	}" (click)="scrollToTop()">
-	<app-icons name="arrow-up" size="42" />
-</div>
-
-<div class="footer">
-	@if (currentChapter.next) {
-	<a class="next" (click)="nextPage()">
-		Proximo capitulo
-		<app-icons name="arrow-right" size="42" />
-	</a>
-	} @else {
-	<a class="next" (click)="backPage()">Voltar a pagina inicial</a>
-	}
-</div>
-
-<app-aside [topOffset]="0" [position]="settings().asidePosition">
-	<div class="title">
-		<h1 (click)="backPage()">
-			<app-icons name="book" size="22" />
-			{{ currentChapter.bookTitle }}
-		</h1>
-		<h1>
-			<app-icons name="file" size="22" />
-			{{
-			currentChapter.title ||
-			'Capitulo ' + (currentChapter.index | number)
-			}}
-		</h1>
-	</div>
-	<div class="controls">
-		@if (currentChapter.previous) {
-		<a class="arrow" (click)="previousPage()">
-			<app-icons name="arrow-left" size="16" />
-		</a>
-		}
-		<a class="index" (click)="backPage()">
-			{{ currentChapter.index | number }}/{{
-			currentChapter.totalChapters
-			}}
-		</a>
-		@if (currentChapter.next) {
-		<a class="arrow" (click)="nextPage()">
-			<app-icons name="arrow-right" size="16" />
-		</a>
-		}
-	</div>
-
-	<div class="button">
-		<button (click)="openSettings()">
-			<app-icons name="settings" size="32" />
-		</button>
-	</div>
-	@if(admin()){
-	<div class="line"></div>
-	<div class="actions">
-		<app-button (click)="resetChapter()" variant="text">
-			Resetar capitulo
-		</app-button>
-		<app-button (click)="openOriginalLink()" variant="text">
-			Link original
-		</app-button>
-	</div>
-	}
-</app-aside>
+	</app-aside>
 }
