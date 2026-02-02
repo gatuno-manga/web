@@ -168,27 +168,29 @@
 									/>
 								}
 							</div>
-							<div
-								class="scraping-status"
-								[class.scrapingStatusReady]="
-									chapter.scrapingStatus ===
-									ScrapingStatus.READY
-								"
-								[class.scrapingStatusProcessing]="
-									chapter.scrapingStatus ===
-									ScrapingStatus.PROCESSING
-								"
-								[class.scrapingStatusError]="
-									chapter.scrapingStatus ===
-									ScrapingStatus.ERROR
-								"
-							>
-								{{
-									getScrapingStatusClass(
-										chapter.scrapingStatus
-									)
-								}}
-							</div>
+							@if (chapter.scrapingStatus) {
+								<div
+									class="scraping-status"
+									[class.scrapingStatusReady]="
+										chapter.scrapingStatus ===
+										ScrapingStatus.READY
+									"
+									[class.scrapingStatusProcessing]="
+										chapter.scrapingStatus ===
+										ScrapingStatus.PROCESSING
+									"
+									[class.scrapingStatusError]="
+										chapter.scrapingStatus ===
+										ScrapingStatus.ERROR
+									"
+								>
+									{{
+										getScrapingStatusClass(
+											chapter.scrapingStatus
+										)
+									}}
+								</div>
+							}
 						</div>
 					</a>
 				}

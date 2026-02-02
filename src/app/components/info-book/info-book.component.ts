@@ -235,13 +235,13 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   private observeActiveTab() {
     if (!this.resizeObserver) return;
-    
+
     // Disconnect temporarily to avoid observing multiple elements or wrong one
     this.resizeObserver.disconnect();
 
     requestAnimationFrame(() => {
       if (!this.containerElement?.nativeElement) return;
-      
+
       const tabs = this.containerElement.nativeElement.querySelectorAll('.container');
       const activeTab = tabs[this.selectedTab] as HTMLElement;
 
