@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy, HostListener, inject, NgZone, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookBasic, Chapterlist, ScrapingStatus } from '../../models/book.models';
 import { BookService } from '../../service/book.service';
@@ -26,7 +26,7 @@ import { BookDownloadModalComponent, BookDownloadResult } from '../../components
   templateUrl: './book.component.html',
   styleUrl: './book.component.scss',
 })
-export class BookComponent implements OnInit, OnDestroy {
+export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
   ScrapingStatus = ScrapingStatus;
   book!: BookBasic;
   admin = false;
@@ -50,13 +50,16 @@ export class BookComponent implements OnInit, OnDestroy {
   coverImageError = false;
 
   // Largura dinâmica do background (rotacionado)
-  backgroundWidth = 0;
+  backgroundWidth = typeof window !== 'undefined' ? window.innerHeight : 0;
   private resizeObserver?: ResizeObserver;
+  private mutationObserver?: MutationObserver;
 
   private metaService = inject(MetaDataService);
   private modalService = inject(ModalNotificationService);
   private notificationService = inject(NotificationService);
   private userTokenService = inject(UserTokenService);
+  private ngZone = inject(NgZone);
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(
     private bookService: BookService,
@@ -80,9 +83,16 @@ export class BookComponent implements OnInit, OnDestroy {
   updateBackgroundSize() {
     if (typeof document !== 'undefined') {
       const bodyHeight = document.body.scrollHeight;
+      const htmlHeight = document.documentElement.scrollHeight;
       const viewportHeight = window.innerHeight;
+      
       // Calcula a largura necessária (que será a altura após rotação)
-      this.backgroundWidth = Math.max(bodyHeight, viewportHeight);
+      const newWidth = Math.max(bodyHeight, htmlHeight, viewportHeight);
+      
+      if (this.backgroundWidth !== newWidth) {
+        this.backgroundWidth = newWidth;
+        this.cdr.detectChanges();
+      }
     }
   }
 
@@ -106,12 +116,6 @@ export class BookComponent implements OnInit, OnDestroy {
         this.book = book;
         this.setMetaData();
         this.isLoading.set(false);
-
-        // Atualiza tamanho do background
-        setTimeout(() => {
-          this.updateBackgroundSize();
-          this.setupResizeObserver();
-        }, 100);
 
         // Verifica se o livro está baixado
         this.checkBookDownloaded();
@@ -157,6 +161,11 @@ export class BookComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngAfterViewInit() {
+    this.updateBackgroundSize();
+    this.setupObservers();
+  }
+
   ngOnDestroy() {
     // Limpa a inscrição do WebSocket
     this.wsSubscription?.unsubscribe();
@@ -166,21 +175,35 @@ export class BookComponent implements OnInit, OnDestroy {
     if (this.coverUrl) {
       URL.revokeObjectURL(this.coverUrl);
     }
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-    }
+    this.resizeObserver?.disconnect();
+    this.mutationObserver?.disconnect();
   }
 
-  private setupResizeObserver() {
-    if (typeof window === 'undefined' || !window.ResizeObserver) return;
+  private setupObservers() {
+    if (typeof window === 'undefined') return;
 
-    this.resizeObserver = new ResizeObserver(() => {
-      this.updateBackgroundSize();
+    // ResizeObserver para body e html
+    if (window.ResizeObserver) {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.ngZone.run(() => this.updateBackgroundSize());
+      });
+
+      if (document.body) this.resizeObserver.observe(document.body);
+      if (document.documentElement) this.resizeObserver.observe(document.documentElement);
+    }
+
+    // MutationObserver para detectar mudanças no DOM (ex: @defer carregando)
+    this.mutationObserver = new MutationObserver(() => {
+      this.ngZone.run(() => this.updateBackgroundSize());
     });
-
-    // Observa mudanças no body
+    
     if (document.body) {
-      this.resizeObserver.observe(document.body);
+      this.mutationObserver.observe(document.body, { 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class']
+      });
     }
   }
 
