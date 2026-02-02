@@ -1,13 +1,17 @@
 .reader-settings-content {
 	width: 100%;
-	max-width: 600px;
+	// max-width: 600px; // Deixar o wrapper controlar a largura
 	padding: 0;
+	display: flex;
+	flex-direction: column;
+	max-height: 80vh;
 }
 
 .settings-header {
 	padding-bottom: 1rem;
 	border-bottom: 1px solid var(--app-text-color);
 	text-align: center;
+	padding-right: 24px; // Espaço para o X
 
 	.icon-container {
 		display: flex;

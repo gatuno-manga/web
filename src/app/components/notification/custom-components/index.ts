@@ -5,3 +5,5 @@ export * from './reader-settings-notification/reader-settings-notification.compo
 export * from './book-download-modal/book-download-modal.component';
 export * from './prompt-modal/prompt-modal.component';
 export * from './random-filter-modal/random-filter-modal.component';
+export * from './cover-edit-modal/cover-edit-modal.component';
+export * from './source-add-modal/source-add-modal.component';

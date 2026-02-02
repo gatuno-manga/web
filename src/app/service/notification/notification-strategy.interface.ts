@@ -33,13 +33,13 @@ export enum NotificationSeverity {
  * Dados que podem ser passados para o componente personalizado
  */
 export interface NotificationComponentData {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 /**
  * Configuração base para todas as notificações
  */
-export interface NotificationConfig {
+export interface NotificationConfig<T = unknown> {
     message: string;
     level: NotificationLevel;
     severity?: NotificationSeverity;
@@ -54,7 +54,7 @@ export interface NotificationConfig {
     /**
      * Dados a serem passados para o componente personalizado
      */
-    componentData?: NotificationComponentData;
+    componentData?: T;
     /**
      * Se true, usa backdrop escuro (padrão: true para modais com componentes personalizados)
      */

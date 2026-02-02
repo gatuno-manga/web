@@ -1,18 +1,28 @@
-<div class="progress-content">
-	<div class="header">
-		<h3>{{ title }}</h3>
-		<span class="percentage">{{ progress }}%</span>
+<div class="progress-content" role="status" aria-live="polite">
+	<div class="settings-header">
+		<h3 id="progress-title">{{ title }}</h3>
+		<span class="percentage" aria-hidden="true">{{ progress }}%</span>
 	</div>
 
-	<div class="progress-bar">
+	<div
+		class="progress-bar"
+		role="progressbar"
+		[attr.aria-valuenow]="progress"
+		aria-valuemin="0"
+		aria-valuemax="100"
+		[attr.aria-label]="title + ': ' + progress + '%'"
+	>
 		<div class="progress-fill" [style.width.%]="progress"></div>
 	</div>
 
 	<p class="status">{{ statusMessage }}</p>
 
-	@if(currentItem) {
-	<div class="current-item">
-		Processando: <strong>{{ currentItem }}</strong>
-	</div>
+	@if (currentItem) {
+		<div class="current-item">
+			<app-icons name="loader" size="14" />
+			<span
+				>Processando: <strong>{{ currentItem }}</strong></span
+			>
+		</div>
 	}
 </div>

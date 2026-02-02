@@ -1,7 +1,7 @@
-.prompt-modal-content {
-	width: 100%;
+.source-add-modal-content {
 	display: flex;
 	flex-direction: column;
+	width: 100%;
 	max-height: 80vh;
 }
 
@@ -17,18 +17,13 @@
 		font-weight: 600;
 		color: var(--app-text-color);
 	}
-
-	.subtitle {
-		margin: 0.5rem 0 0;
-		color: var(--app-text-color-secondary);
-		font-size: 0.9rem;
-	}
 }
 
 .settings-body {
+	overflow-y: auto;
+	flex: 1;
 	padding: 16px 24px;
 	max-height: 60vh;
-	overflow-y: auto;
 }
 
 .setting-item {
@@ -40,20 +35,37 @@
 	&.column {
 		flex-direction: column;
 		align-items: stretch;
-		gap: 12px;
+		gap: 8px;
+	}
+
+	.error {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 0.875rem;
+		color: var(--danger-color);
+
+		app-icons {
+			flex-shrink: 0;
+		}
+	}
+
+	.help-text {
+		font-size: 0.813rem;
+		color: var(--app-text-color-secondary);
 	}
 }
 
 .settings-footer {
+	border-top: 1px solid var(--app-text-color);
+	padding: 16px 24px;
 	display: flex;
 	justify-content: flex-end;
-	gap: 0.75rem;
-	padding: 16px 24px;
-	border-top: 1px solid var(--app-text-color);
+	gap: 12px;
 }
 
 @media (max-width: 768px) {
-	.prompt-modal-content {
+	.source-add-modal-content {
 		max-width: 100%;
 	}
 

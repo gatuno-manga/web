@@ -393,25 +393,3 @@
 		(close)="closeImageViewer()"
 	/>
 }
-@if (showCoverEditModal && editingCover) {
-	<div class="modal-backdrop" (click)="closeCoverEditModal()">
-		<div class="modal-container" (click)="$event.stopPropagation()">
-			<app-cover-edit-modal
-				[cover]="editingCover"
-				(save)="onCoverEditSave($event)"
-				(cancel)="closeCoverEditModal()"
-			/>
-		</div>
-	</div>
-}
-@if (showSourceAddModal) {
-	<div class="modal-backdrop" (click)="closeSourceAddModal()">
-		<div class="modal-container" (click)="$event.stopPropagation()">
-			<app-source-add-modal
-				[existingUrls]="extraInfo.originalUrl"
-				(save)="onSourceAddSave($event)"
-				(cancel)="closeSourceAddModal()"
-			/>
-		</div>
-	</div>
-}

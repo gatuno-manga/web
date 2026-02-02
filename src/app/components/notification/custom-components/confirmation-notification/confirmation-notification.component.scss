@@ -1,50 +1,88 @@
 .confirmation-content {
 	padding: 20px;
 	text-align: center;
+	max-width: 400px;
 }
 
 .icon-container {
 	margin-bottom: 20px;
-}
-
-.icon-container svg {
-	color: var(--yellow);
-	stroke-width: 2;
+	color: var(--warning-color);
 }
 
 h2 {
 	margin: 0 0 15px 0;
 	font-size: 1.5em;
-	color: var(--gray-900);
+	color: var(--app-text-color);
 }
 
 .message {
 	margin-bottom: 20px;
 	line-height: 1.6;
-	color: var(--gray-700);
+	color: var(--app-text-color-secondary);
 }
 
 .details {
 	text-align: left;
-	background: var(--gray-100);
+	background: var(--hover-color);
 	padding: 15px;
-	border-radius: 4px;
+	border-radius: 8px;
 	margin-bottom: 15px;
-}
 
-.details ul {
-	margin: 10px 0 0 0;
-	padding-left: 20px;
-}
+	strong {
+		color: var(--app-text-color);
+	}
 
-.details li {
-	margin: 5px 0;
+	ul {
+		margin: 10px 0 0 0;
+		padding-left: 20px;
+	}
+
+	li {
+		margin: 5px 0;
+		color: var(--app-text-color-secondary);
+	}
 }
 
 .warning-box {
-	background: var(--light-yellow);
-	border: 1px solid var(--yellow);
-	padding: 10px;
-	border-radius: 4px;
-	color: var(--dark-yellow);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	background: rgb(from var(--warning-color) r g b / 0.1);
+	border: 1px solid var(--warning-color);
+	padding: 12px;
+	border-radius: 8px;
+	color: var(--warning-color);
+
+	span {
+		font-size: 0.9rem;
+	}
+}
+
+@media (max-width: 768px) {
+	.confirmation-content {
+		padding: 16px;
+	}
+
+	h2 {
+		font-size: 1.25em;
+	}
+
+	.icon-container {
+		margin-bottom: 16px;
+
+		app-icons {
+			--icon-size: 40px;
+		}
+	}
+
+	.details {
+		padding: 12px;
+	}
+
+	.warning-box {
+		padding: 10px;
+		flex-direction: column;
+		gap: 4px;
+	}
 }

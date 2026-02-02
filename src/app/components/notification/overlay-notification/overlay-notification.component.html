@@ -1,100 +1,49 @@
-@if(modal){
-<div
-	id="overlay-modal"
-	[ngClass]="{
-		'custom-backdrop': modal.component,
-		'default-backdrop': !modal.component
-	}"
-	[style.--backdrop-opacity]="
-		modal.component && modal.backdropOpacity !== undefined
-			? modal.backdropOpacity
-			: modal.component
-			? 0.75
-			: 0.5
-	"
->
-	<div
-		id="modal-content"
-		#modalContent
-		tabindex="-1"
-		[ngClass]="{ 'custom-modal': modal.component }"
-	>
-		@if(modal.component) {
-		<ng-container
-			*ngComponentOutlet="
-				modal.component;
-				inputs: modal.componentData || {}
-			"
-		/>
-		} @else {
-		<!-- Renderização padrão do modal -->
-		<h1>{{ modal.title }}</h1>
-		<p>{{ modal.description }}</p>
-
-		<div class="button-container">
-			@for (button of modal.buttons; track $index) {
-			<button
-				(click)="button.callback?.(); modal = null"
-				[ngClass]="{
-					primary: button.type === 'primary',
-					secondary: button.type === 'secondary',
-					danger: button.type === 'danger'
-				}"
-			>
-				{{ button.label }}
-			</button>
-			}
-		</div>
-		}
-	</div>
-</div>
-} @if(toast$) {
-<div id="overlay-toast">
-	<div id="toast-container">
-		@for (toast of toast$ | async; track $index) {
-		<div
-			class="toast"
-			[ngClass]="{ error: toast.type === 'error' }"
-			[style.--animation-duration]="toast.timeout + 'ms'"
-		>
-			<div class="message">{{ toast.message }}</div>
-		</div>
-		}
-	</div>
-</div>
-} @if(overlays.length > 0) {
-<div id="overlay-notification">
-	@for (overlay of overlays; track overlay.id) {
-	<div
-		class="notification"
-		[ngClass]="{
-			error: overlay.type === 'error',
-			success: overlay.type === 'success',
-			warning: overlay.type === 'warning',
-			info: overlay.type === 'info'
-		}"
-	>
-		@if(overlay.dismissible) {
-		<button class="close-btn" (click)="dismissOverlay(overlay.id)">
-			×
-		</button>
-		} @if(overlay.component) {
-		<!-- Renderiza componente personalizado -->
-		<ng-container
-			*ngComponentOutlet="
-				overlay.component;
-				inputs: overlay.componentData || {}
-			"
-		>
-		</ng-container>
-		} @else {
-		<!-- Renderização padrão -->
-		@if(overlay.title) {
-		<div class="title">{{ overlay.title }}</div>
-		}
-		<div class="message">{{ overlay.message }}</div>
-		}
-	</div>
-	}
-</div>
+@if (currentModal) {
+  <div class="modal-backdrop" [class.show]="currentModal.useBackdrop" [style.opacity]="currentModal.backdropOpacity"></div>
+  <div class="modal-container">
+      <div class="modal-content">
+          <button class="close-modal-btn" (click)="closeModal()">×</button>
+          
+          @if (currentModal.component) {
+              <ng-container *ngComponentOutlet="currentModal.component; inputs: currentModal.componentData" />
+          } @else {
+              <div class="modal-header" [class]="currentModal.type">
+                  <h3>{{ currentModal.title }}</h3>
+              </div>
+              <div class="modal-body">
+                  <p>{{ currentModal.description }}</p>
+              </div>
+              <div class="modal-footer">
+                  @for (button of currentModal.buttons; track button.label) {
+                      <button [class]="button.type" (click)="button.callback?.()">
+                          {{ button.label }}
+                      </button>
+                  }
+              </div>
+          }
+      </div>
+  </div>
 }
+
+<div class="overlays-container">
+  @for (overlay of overlays(); track overlay.id) {
+      <div class="overlay-notification slide-in" [class]="overlay.type">
+          <div class="overlay-content">
+              @if (overlay.component) {
+                  <ng-container *ngComponentOutlet="overlay.component; inputs: overlay.componentData" />
+              } @else {
+                  <div class="overlay-header">
+                      @if (overlay.title) {
+                          <strong>{{ overlay.title }}</strong>
+                      }
+                      <p>{{ overlay.message }}</p>
+                  </div>
+              }
+          </div>
+          
+          @if (overlay.dismissible) {
+              <button class="close-btn" (click)="dismissOverlay(overlay.id)">×</button>
+          }
+      </div>
+  }
+</div>

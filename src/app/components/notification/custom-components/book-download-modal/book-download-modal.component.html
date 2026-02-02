@@ -1,69 +1,119 @@
-<div class="download-modal">
-    <div class="header">
-        <h2>Baixar Arquivos</h2>
-        @if(bookTitle) {
-        <p class="book-title">{{ bookTitle }}</p>
-        }
-        <p class="description">Selecione o formato e os capítulos que deseja baixar:</p>
-    </div>
+<div
+	class="book-download-modal-content"
+	role="dialog"
+	aria-labelledby="download-title"
+>
+	<div class="settings-header">
+		<h2 id="download-title">Baixar Arquivos</h2>
+		@if (bookTitle) {
+			<p class="subtitle">{{ bookTitle }}</p>
+		}
+		<p class="description">
+			Selecione o formato e os capítulos que deseja baixar:
+		</p>
+	</div>
 
-    <div class="body">
-        <div class="format-section">
-            <label class="section-label">Formato:</label>
-            <div class="format-options">
-                <label class="format-option" [class.selected]="selectedFormat() === 'images'">
-                    <input type="radio" name="format" value="images" [checked]="selectedFormat() === 'images'"
-                        (change)="selectedFormat.set('images')" />
-                    <app-icons name="image" size="20" />
-                    <span>ZIP com Imagens</span>
-                </label>
-                <label class="format-option" [class.selected]="selectedFormat() === 'pdfs'">
-                    <input type="radio" name="format" value="pdfs" [checked]="selectedFormat() === 'pdfs'"
-                        (change)="selectedFormat.set('pdfs')" />
-                    <app-icons name="file-text" size="20" />
-                    <span>ZIP com PDFs</span>
-                </label>
-            </div>
-        </div>
+	<div class="settings-body">
+		<section
+			class="settings-group"
+			role="group"
+			aria-labelledby="format-title"
+		>
+			<h3 id="format-title" class="group-title">Formato:</h3>
+			<div
+				class="format-options"
+				role="radiogroup"
+				aria-label="Selecionar formato"
+			>
+				<label
+					class="format-option"
+					[class.selected]="selectedFormat() === 'images'"
+				>
+					<input
+						type="radio"
+						name="format"
+						value="images"
+						[checked]="selectedFormat() === 'images'"
+						(change)="selectedFormat.set('images')"
+					/>
+					<app-icons name="image" size="20" />
+					<span>ZIP com Imagens</span>
+				</label>
+				<label
+					class="format-option"
+					[class.selected]="selectedFormat() === 'pdfs'"
+				>
+					<input
+						type="radio"
+						name="format"
+						value="pdfs"
+						[checked]="selectedFormat() === 'pdfs'"
+						(change)="selectedFormat.set('pdfs')"
+					/>
+					<app-icons name="file-text" size="20" />
+					<span>ZIP com PDFs</span>
+				</label>
+			</div>
+		</section>
 
-        <div class="chapters-section">
-            <label class="section-label">Capítulos:</label>
+		<section
+			class="settings-group"
+			role="group"
+			aria-labelledby="chapters-title"
+		>
+			<h3 id="chapters-title" class="group-title">Capítulos:</h3>
 
-            <div class="select-all-wrapper">
-                <label class="checkbox-label select-all">
-                    <input type="checkbox" [checked]="allSelected()" [indeterminate]="someSelected()"
-                        (change)="toggleSelectAll()" />
-                    <span>Selecionar todos ({{ chapters.length }})</span>
-                </label>
-            </div>
+			<div class="select-all-wrapper">
+				<label class="checkbox-label select-all">
+					<input
+						type="checkbox"
+						[checked]="allSelected()"
+						[indeterminate]="someSelected()"
+						(change)="toggleSelectAll()"
+						aria-label="Selecionar todos os capítulos"
+					/>
+					<span>Selecionar todos ({{ chapters.length }})</span>
+				</label>
+			</div>
 
-            <div class="chapters-list">
-                @for(chapter of chapters; track chapter.id) {
-                <label class="checkbox-label chapter-item" [class.selected]="isChapterSelected(chapter.id)">
-                    <input type="checkbox" [checked]="isChapterSelected(chapter.id)"
-                        (change)="toggleChapter(chapter.id)" />
-                    <span>{{ getChapterLabel(chapter) }}</span>
-                </label>
-                }
-            </div>
-        </div>
-    </div>
+			<div
+				class="chapters-list"
+				role="list"
+				aria-label="Lista de capítulos"
+			>
+				@for (chapter of chapters; track chapter.id) {
+					<label
+						class="checkbox-label chapter-item"
+						[class.selected]="isChapterSelected(chapter.id)"
+						role="listitem"
+					>
+						<input
+							type="checkbox"
+							[checked]="isChapterSelected(chapter.id)"
+							(change)="toggleChapter(chapter.id)"
+							[attr.aria-label]="getChapterLabel(chapter)"
+						/>
+						<span>{{ getChapterLabel(chapter) }}</span>
+					</label>
+				}
+			</div>
+		</section>
+	</div>
 
-    <div class="footer">
-        <span class="selected-count">{{ selectedChapters().size }} selecionado(s)</span>
-        <div class="actions">
-            <app-button (click)="cancel()" variant="text">Cancelar</app-button>
-            @if(selectedChapters().size > 0) {
-            <app-button (click)="confirm()" variant="primary">
-                <app-icons name="download" size="16" />
-                <span>Baixar</span>
-            </app-button>
-            } @else {
-            <app-button variant="text" class="disabled-btn">
-                <app-icons name="download" size="16" />
-                <span>Baixar</span>
-            </app-button>
-            }
-        </div>
-    </div>
+	<div class="settings-footer">
+		<span class="selected-count" aria-live="polite"
+			>{{ selectedChapters().size }} selecionado(s)</span
+		>
+		<div class="actions">
+			<app-button (click)="cancel()" variant="text">Cancelar</app-button>
+			<app-button
+				(click)="confirm()"
+				variant="primary"
+				[disabled]="selectedChapters().size === 0"
+				leftIcon="download"
+			>
+				Baixar
+			</app-button>
+		</div>
+	</div>
 </div>

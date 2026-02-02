@@ -64,26 +64,25 @@ export class NotificationFactory {
      * Determina a severidade baseada no contexto da notificação
      */
     private determineSeverity(config: NotificationConfig): NotificationSeverity {
-        // Critical level sempre gera modal
+        if (config.severity) {
+            return config.severity;
+        }
+
         if (config.level === 'critical') {
             return NotificationSeverity.CRITICAL;
         }
 
-        // Erros são de alta severidade
-        if (config.level === 'error') {
-            // Erros com título são mais críticos
-            if (config.title) {
-                return NotificationSeverity.HIGH;
-            }
-            return NotificationSeverity.MEDIUM;
+        const isError = config.level === 'error';
+        const isWarning = config.level === 'warning';
+        const notDismissible = config.dismissible === false;
+
+        // Regras de Alta Severidade
+        if ((isError && config.title) || (isWarning && notDismissible)) {
+            return NotificationSeverity.HIGH;
         }
 
-        // Warnings são de média severidade
-        if (config.level === 'warning') {
-            // Warnings não dismissíveis são de alta severidade
-            if (config.dismissible === false) {
-                return NotificationSeverity.HIGH;
-            }
+        // Regras de Média Severidade
+        if (isError || isWarning) {
             return NotificationSeverity.MEDIUM;
         }
 

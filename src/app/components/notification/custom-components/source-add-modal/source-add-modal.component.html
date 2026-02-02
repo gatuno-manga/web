@@ -1,0 +1,57 @@
+<div
+	class="source-add-modal-content"
+	role="dialog"
+	aria-labelledby="source-add-title"
+>
+	<div class="settings-header">
+		<h2 id="source-add-title">Adicionar Nova Fonte</h2>
+	</div>
+
+	<div class="settings-body">
+		<div class="setting-item column">
+			<app-input
+				type="text"
+				id="sourceUrl"
+				[ngModel]="newUrl()"
+				(ngModelChange)="newUrl.set($event)"
+				placeholder="URL da Fonte"
+				(blur)="validateUrl()"
+				(keyup.enter)="onSave()"
+				[disabled]="isLoading()"
+				leftIcon="globe"
+				aria-describedby="url-error url-help"
+			/>
+			@if (urlError()) {
+				<span id="url-error" class="error" role="alert">
+					<app-icons name="alert-circle" size="16" />
+					{{ urlError() }}
+				</span>
+			}
+			<span id="url-help" class="help-text">
+				Insira a URL completa da fonte original do livro (ex:
+				https://example.com/manga).
+			</span>
+		</div>
+	</div>
+
+	<div class="settings-footer">
+		<app-button
+			variant="outline"
+			(click)="onCancel()"
+			[disabled]="isLoading()"
+		>
+			Cancelar
+		</app-button>
+		<app-button
+			variant="primary"
+			(click)="onSave()"
+			[disabled]="isLoading() || !newUrl().trim()"
+		>
+			@if (isLoading()) {
+				<span>Adicionando...</span>
+			} @else {
+				<span>Adicionar</span>
+			}
+		</app-button>
+	</div>
+</div>

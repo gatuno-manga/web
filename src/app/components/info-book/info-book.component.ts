@@ -17,8 +17,8 @@ import { UserTokenService } from '../../service/user-token.service';
 import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
 import { SavedPagesService } from '../../service/saved-pages.service';
 import { SavedPage } from '../../models/saved-page.models';
-import { CoverEditModalComponent, CoverEditSaveEvent } from '../cover-edit-modal/cover-edit-modal.component';
-import { SourceAddModalComponent, SourceAddSaveEvent } from '../source-add-modal/source-add-modal.component';
+import { CoverEditModalComponent, CoverEditSaveEvent } from '../notification/custom-components/cover-edit-modal/cover-edit-modal.component';
+import { SourceAddModalComponent, SourceAddSaveEvent } from '../notification/custom-components/source-add-modal/source-add-modal.component';
 import { PromptModalComponent } from '../notification/custom-components/prompt-modal/prompt-modal.component';
 import { NotificationService } from '../../service/notification.service';
 import { NotificationSeverity } from 'app/service/notification';
@@ -38,7 +38,7 @@ interface ModulesLoad {
 
 @Component({
   selector: 'app-info-book',
-  imports: [RouterModule, DecimalPipe, IconsComponent, ButtonComponent, ImageViewerComponent, CoverEditModalComponent, SourceAddModalComponent, DragDropModule],
+  imports: [RouterModule, DecimalPipe, IconsComponent, ButtonComponent, ImageViewerComponent, DragDropModule],
   templateUrl: './info-book.component.html',
   styleUrl: './info-book.component.scss'
 })
@@ -106,11 +106,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   viewerImageDescription = '';
 
   // Cover edit modal state
-  showCoverEditModal = false;
   editingCover: Cover | null = null;
-
-  // Source add modal state
-  showSourceAddModal = false;
 
   // Track cover image loading errors
   coverImageErrors = new Set<string>();
@@ -949,25 +945,67 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   openCoverEditModal(cover: Cover) {
     this.editingCover = cover;
-    this.showCoverEditModal = true;
-    this.lockScroll();
+    this.notificationService.notify({
+      message: '',
+      level: 'custom',
+      severity: NotificationSeverity.CRITICAL,
+      component: CoverEditModalComponent,
+      componentData: {
+        cover: cover,
+        close: (result: CoverEditSaveEvent | null) => {
+          this.modalService.close();
+          if (result) {
+            this.onCoverEditSave(result);
+          }
+        }
+      },
+      useBackdrop: true,
+      backdropOpacity: 0.5
+    });
   }
 
   closeCoverEditModal() {
-    this.showCoverEditModal = false;
+    this.modalService.close();
     this.editingCover = null;
-    this.unlockScroll();
   }
 
+  handleCoverEditClose = (result: CoverEditSaveEvent | null): void => {
+    this.modalService.close();
+    if (result) {
+      this.onCoverEditSave(result);
+    }
+  };
+
   openSourceAddModal() {
-    this.showSourceAddModal = true;
-    this.lockScroll();
+    this.notificationService.notify({
+      message: '',
+      level: 'custom',
+      severity: NotificationSeverity.CRITICAL,
+      component: SourceAddModalComponent,
+      componentData: {
+        existingUrls: this.extraInfo.originalUrl,
+        close: (result: SourceAddSaveEvent | null) => {
+          this.modalService.close();
+          if (result) {
+            this.onSourceAddSave(result);
+          }
+        }
+      },
+      useBackdrop: true,
+      backdropOpacity: 0.5
+    });
   }
 
   closeSourceAddModal() {
-    this.showSourceAddModal = false;
-    this.unlockScroll();
+    this.modalService.close();
   }
+
+  handleSourceAddClose = (result: SourceAddSaveEvent | null): void => {
+    this.modalService.close();
+    if (result) {
+      this.onSourceAddSave(result);
+    }
+  };
 
   onSourceAddSave(data: SourceAddSaveEvent) {
     // Adicionar nova URL ao array existente
