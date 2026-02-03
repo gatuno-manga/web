@@ -1,25 +1,71 @@
 @if (isPdfFormat) {
-	<div class="pdf-container">
-		@if (isBrowser) {
-			<iframe
-				[src]="safeSrc"
-				class="pdf-iframe"
-				title="PDF Viewer"
-			></iframe>
-		} @else {
-			<div class="ssr-placeholder">
+	@if (isBrowser) {
+		@if (isLoading() && pagesArray().length === 0) {
+			<div class="loading-container">
 				<app-icons name="file" size="64" />
-				<p>Carregando visualizador de PDF...</p>
+				<p>Carregando PDF...</p>
 			</div>
 		}
-	</div>
 
-	<div class="pdf-footer">
-		<a [href]="src" download class="download-btn">
-			<app-icons name="download" size="20" />
-			Baixar PDF
-		</a>
-	</div>
+		@if (loadError()) {
+			<div class="error-container">
+				<app-icons name="file" size="64" />
+				<h2>Erro ao carregar PDF</h2>
+				<p>{{ loadError() }}</p>
+				<a [href]="src" download class="download-btn">
+					<app-icons name="download" size="20" />
+					Baixar PDF
+				</a>
+			</div>
+		}
+
+		@if (pdfPageComponent()) {
+			<!-- Hidden probe to detect total pages AND KEEP DOCUMENT ALIVE (v2) -->
+			<div class="pdf-probe">
+				<ng-container
+					[ngComponentOutlet]="pdfPageComponent()"
+					[ngComponentOutletInputs]="probeInputs"
+				/>
+			</div>
+
+			<!-- Virtualized PDF pages -->
+			@if (pagesArray().length > 0) {
+				<div class="pdf-pages-container">
+					@for (pageNum of pagesArray(); track pageNum) {
+						<div
+							class="page-container"
+							id="page-{{ pageNum - 1 }}"
+							#pageRef
+							[attr.data-index]="pageNum - 1"
+							[style.min-height.px]="estimatedPageHeight"
+							(contextmenu)="onContextMenu($event, pageNum)"
+						>
+							@if (isPageVisible(pageNum)) {
+								<ng-container
+									[ngComponentOutlet]="pdfPageComponent()"
+									[ngComponentOutletInputs]="
+										createPdfPageInputs(pageNum)
+									"
+								/>
+							} @else {
+								<div class="page-placeholder">
+									<span>Página {{ pageNum }}</span>
+								</div>
+							}
+							@if (showPageNumbers) {
+								<div class="page-number">{{ pageNum }}</div>
+							}
+						</div>
+					}
+				</div>
+			}
+		}
+	} @else {
+		<div class="ssr-placeholder">
+			<app-icons name="file" size="64" />
+			<p>Carregando visualizador de PDF...</p>
+		</div>
+	}
 } @else {
 	<div class="unsupported-format">
 		<app-icons name="file" size="64" />
