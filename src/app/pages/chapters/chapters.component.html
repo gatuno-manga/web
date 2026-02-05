@@ -33,27 +33,27 @@
 		[class.aside-left]="settings().asidePosition === 'left'"
 		[class.aside-right]="settings().asidePosition === 'right'"
 	>
-		<!-- Progress bar only for image content -->
-		@if (
-			currentChapter.contentType === 'image' ||
-			!currentChapter.contentType
-		) {
+		<!-- Progress bar for all content types -->
+		<div
+			class="reading-progress-bar"
+			[class.bottom]="settings().progressBarPosition === 'bottom'"
+			#progressBarRef
+			(mousedown)="startDrag($event)"
+			(touchstart)="startDrag($event)"
+		>
 			<div
-				class="reading-progress-bar"
-				[class.bottom]="settings().progressBarPosition === 'bottom'"
-				#progressBarRef
-				(mousedown)="startDrag($event)"
-				(touchstart)="startDrag($event)"
-			>
-				<div
-					class="reading-progress-fill"
-					[style.width.%]="readingProgress()"
-				></div>
+				class="reading-progress-fill"
+				[style.width.%]="readingProgress()"
+			></div>
+			@if (
+				currentChapter.contentType === 'image' ||
+				!currentChapter.contentType
+			) {
 				@for (page of currentChapter.pages; track $index) {
 					<span>{{ $index + 1 }}</span>
 				}
-			</div>
-		}
+			}
+		</div>
 
 		<!-- Content switching based on type -->
 		@switch (currentChapter.contentType) {

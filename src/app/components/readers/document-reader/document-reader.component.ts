@@ -44,7 +44,10 @@ const ESTIMATED_PAGE_HEIGHT = 1200;
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [IconsComponent, NgComponentOutlet],
     templateUrl: './document-reader.component.html',
-    styleUrl: './document-reader.component.scss'
+    styleUrl: './document-reader.component.scss',
+    host: {
+        '(window:scroll)': 'onScroll()'
+    }
 })
 export class DocumentReaderComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     @Input() src: string = '';
@@ -62,15 +65,15 @@ export class DocumentReaderComponent implements OnInit, OnChanges, AfterViewInit
 
     private intersectionObserver: IntersectionObserver | null = null;
     private maxReadPageIndex = 0;
-    private scrollTimeout: any = null;
+    private scrollTimeout: ReturnType<typeof setTimeout> | null = null;
 
     // Store the loaded document proxy to share among pages
     pdfDocument = signal<PDFDocumentProxy | null>(null);
 
     // Cache inputs to prevent unnecessary re-renders in OnPush
-    private inputsCache = new Map<number, any>();
+    private inputsCache = new Map<number, Record<string, unknown>>();
 
-    probeInputs: any = null;
+    probeInputs: Record<string, unknown> | undefined = undefined;
 
     currentPage = signal(1);
     totalPages = signal(1);
@@ -78,7 +81,7 @@ export class DocumentReaderComponent implements OnInit, OnChanges, AfterViewInit
     visiblePages = signal<Set<number>>(new Set());
     isLoading = signal(true);
     loadError = signal<string | null>(null);
-    pdfPageComponent = signal<Type<any> | null>(null);
+    pdfPageComponent = signal<Type<unknown> | null>(null);
 
     readonly estimatedPageHeight = ESTIMATED_PAGE_HEIGHT;
 
@@ -92,7 +95,6 @@ export class DocumentReaderComponent implements OnInit, OnChanges, AfterViewInit
         return this.format === 'pdf';
     }
 
-    @HostListener('window:scroll')
     onScroll() {
         if (this.scrollTimeout) {
             clearTimeout(this.scrollTimeout);
@@ -112,8 +114,8 @@ export class DocumentReaderComponent implements OnInit, OnChanges, AfterViewInit
             this.probeInputs = {
                 src: this.src,
                 page: 1,
-                onLoadComplete: (pdf: any) => this.onPdfLoaded(pdf),
-                onError: (error: any) => this.onPdfError(error)
+                onLoadComplete: (pdf: PDFDocumentProxy) => this.onPdfLoaded(pdf),
+                onError: (error: unknown) => this.onPdfError(error)
             };
 
             // Re-emit progress for new document
@@ -135,8 +137,8 @@ export class DocumentReaderComponent implements OnInit, OnChanges, AfterViewInit
             this.probeInputs = {
                 src: this.src,
                 page: 1,
-                onLoadComplete: (pdf: any) => this.onPdfLoaded(pdf),
-                onError: (error: any) => this.onPdfError(error)
+                onLoadComplete: (pdf: PDFDocumentProxy) => this.onPdfLoaded(pdf),
+                onError: (error: unknown) => this.onPdfError(error)
             };
         }
 
@@ -257,7 +259,7 @@ export class DocumentReaderComponent implements OnInit, OnChanges, AfterViewInit
         });
     }
 
-    onPdfLoaded(pdf: any) {
+    onPdfLoaded(pdf: PDFDocumentProxy) {
         this.pdfDocument.set(pdf);
         this.totalPages.set(pdf.numPages);
         this.pagesArray.set(Array.from({ length: pdf.numPages }, (_, i) => i + 1));
@@ -280,7 +282,7 @@ export class DocumentReaderComponent implements OnInit, OnChanges, AfterViewInit
         setTimeout(() => this.updateVisiblePages(), 200);
     }
 
-    onPdfError(error: any) {
+    onPdfError(error: unknown) {
         console.error('PDF loading error:', error);
         this.loadError.set('Erro ao carregar o PDF');
         this.isLoading.set(false);

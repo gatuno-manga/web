@@ -61,13 +61,13 @@ export class PdfPageComponent implements OnChanges, AfterViewInit, OnDestroy {
     @Input() src: string | PDFDocumentProxy = '';
     @Input() page: number = 1;
     @Input() onLoadComplete?: (pdf: PDFDocumentProxy) => void;
-    @Input() onError?: (error: any) => void;
+    @Input() onError?: (error: unknown) => void;
 
     @ViewChild('pdfCanvas') canvasRef?: ElementRef<HTMLCanvasElement>;
-    private renderTask: any;
+    private renderTask: { cancel: () => void; promise: Promise<void> } | null = null;
 
-    isProxy(src: any): boolean {
-        return src && typeof src !== 'string' && 'numPages' in src;
+    isProxy(src: string | PDFDocumentProxy): src is PDFDocumentProxy {
+        return typeof src !== 'string' && src !== null && 'numPages' in src;
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -138,8 +138,8 @@ export class PdfPageComponent implements OnChanges, AfterViewInit, OnDestroy {
                 this.onLoadComplete(pdf);
             }
 
-        } catch (error: any) {
-            if (error?.name !== 'RenderingCancelledException') {
+        } catch (error: unknown) {
+            if ((error as { name?: string })?.name !== 'RenderingCancelledException') {
                 console.error('Page render error:', error);
                 this.handleError(error);
             }
@@ -152,7 +152,7 @@ export class PdfPageComponent implements OnChanges, AfterViewInit, OnDestroy {
         }
     }
 
-    handleError(error: any) {
+    handleError(error: unknown) {
         if (this.onError) {
             this.onError(error);
         }
