@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DocumentReaderComponent } from './document-reader.component';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('DocumentReaderComponent', () => {
     let component: DocumentReaderComponent;
@@ -7,15 +8,16 @@ describe('DocumentReaderComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [DocumentReaderComponent]
+            imports: [DocumentReaderComponent],
+            providers: [provideHttpClient()]
         }).compileComponents();
 
         fixture = TestBed.createComponent(DocumentReaderComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
     });
 
     it('should create', () => {
+        fixture.detectChanges();
         expect(component).toBeTruthy();
     });
 

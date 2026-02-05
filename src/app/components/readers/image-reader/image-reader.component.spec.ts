@@ -12,10 +12,10 @@ describe('ImageReaderComponent', () => {
 
         fixture = TestBed.createComponent(ImageReaderComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
     });
 
     it('should create', () => {
+        fixture.detectChanges();
         expect(component).toBeTruthy();
     });
 

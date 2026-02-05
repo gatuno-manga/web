@@ -22,27 +22,27 @@ describe('SourceAddModalComponent', () => {
     });
 
     it('should validate URL format', () => {
-        component.newUrl = 'invalid-url';
+        component.newUrl.set('invalid-url');
         expect(component.validateUrl()).toBeFalse();
-        expect(component.urlError).toContain('inválida');
+        expect(component.urlError()).toContain('inválida');
     });
 
     it('should accept valid URL', () => {
-        component.newUrl = 'https://example.com/manga';
+        component.newUrl.set('https://example.com/manga');
         expect(component.validateUrl()).toBeTrue();
-        expect(component.urlError).toBe('');
+        expect(component.urlError()).toBe('');
     });
 
     it('should detect duplicate URLs', () => {
         component.existingUrls = ['https://example.com/manga'];
-        component.newUrl = 'https://example.com/manga/';
+        component.newUrl.set('https://example.com/manga/');
         expect(component.validateUrl()).toBeFalse();
-        expect(component.urlError).toContain('já foi adicionada');
+        expect(component.urlError()).toContain('já foi adicionada');
     });
 
     it('should require http or https protocol', () => {
-        component.newUrl = 'ftp://example.com/manga';
+        component.newUrl.set('ftp://example.com/manga');
         expect(component.validateUrl()).toBeFalse();
-        expect(component.urlError).toContain('http://');
+        expect(component.urlError()).toContain('http://');
     });
 });
