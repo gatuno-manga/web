@@ -10,6 +10,7 @@ import { importProvidersFrom } from '@angular/core';
 import { provideServiceWorker } from '@angular/service-worker';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideMarkdown } from 'ngx-markdown';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -27,5 +28,6 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(NgxEchartsModule.forRoot({
       echarts: () => import('echarts')
     })),
+    provideMarkdown(),
   ]
 };

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SuccessDetailsNotificationComponent } from './success-details-notification.component';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('SuccessDetailsNotificationComponent', () => {
     let component: SuccessDetailsNotificationComponent;
@@ -7,7 +8,8 @@ describe('SuccessDetailsNotificationComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [SuccessDetailsNotificationComponent]
+            imports: [SuccessDetailsNotificationComponent],
+            providers: [provideHttpClient()]
         }).compileComponents();
 
         fixture = TestBed.createComponent(SuccessDetailsNotificationComponent);
@@ -68,7 +70,7 @@ describe('SuccessDetailsNotificationComponent', () => {
         component.actionLabel = undefined;
         fixture.detectChanges();
         const compiled = fixture.nativeElement;
-        expect(compiled.querySelector('.action-button')).toBeFalsy();
+        expect(compiled.querySelector('app-button')).toBeFalsy();
     });
 
     it('should not display action button when actionCallback not provided', () => {
@@ -76,15 +78,17 @@ describe('SuccessDetailsNotificationComponent', () => {
         component.actionCallback = undefined;
         fixture.detectChanges();
         const compiled = fixture.nativeElement;
-        expect(compiled.querySelector('.action-button')).toBeFalsy();
+        expect(compiled.querySelector('app-button')).toBeFalsy();
     });
 
-    it('should display action button when both actionLabel and actionCallback provided', () => {
+    it('should display action button when both actionLabel and actionCallback provided', async () => {
         component.actionLabel = 'Ver detalhes';
         component.actionCallback = () => {};
         fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
         const compiled = fixture.nativeElement;
-        const button = compiled.querySelector('.action-button');
+        const button = compiled.querySelector('app-button');
         expect(button).toBeTruthy();
         expect(button?.textContent?.trim()).toBe('Ver detalhes');
     });
@@ -94,22 +98,26 @@ describe('SuccessDetailsNotificationComponent', () => {
         component.actionLabel = 'Ação';
         component.actionCallback = mockCallback;
         fixture.detectChanges();
-        const button = fixture.nativeElement.querySelector('.action-button');
+        const button = fixture.nativeElement.querySelector('app-button');
         button.click();
         expect(mockCallback).toHaveBeenCalled();
     });
 
-    it('should display success icon', () => {
+    it('should display success icon', async () => {
+        fixture.detectChanges();
+        await fixture.whenStable();
         fixture.detectChanges();
         const compiled = fixture.nativeElement;
         expect(compiled.querySelector('.icon-success svg')).toBeTruthy();
     });
 
-    it('should display check marks for each item', () => {
+    it('should display check marks for each item', async () => {
         component.items = ['Item 1', 'Item 2'];
         fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
         const compiled = fixture.nativeElement;
-        const checks = compiled.querySelectorAll('.check');
+        const checks = compiled.querySelectorAll('app-icons[name="check"]');
         expect(checks.length).toBe(2);
     });
 });

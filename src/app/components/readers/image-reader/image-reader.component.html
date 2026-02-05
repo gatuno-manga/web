@@ -1,0 +1,14 @@
+@for (page of pages; track $index) {
+	<div
+		class="page-container"
+		id="page-{{ $index }}"
+		#pageRef
+		[attr.data-index]="$index"
+		(contextmenu)="onContextMenu($event, page, $index)"
+	>
+		<img [src]="page.path" loading="lazy" alt="Page {{ $index + 1 }}" />
+		@if (showPageNumbers) {
+			<div class="page-number">{{ $index + 1 }}</div>
+		}
+	</div>
+}

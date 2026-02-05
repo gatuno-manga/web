@@ -1,0 +1,13 @@
+<div class="text-reader-container" #contentRef>
+	@switch (format) {
+		@case ('markdown') {
+			<markdown [data]="content" class="markdown-content" />
+		}
+		@case ('html') {
+			<div class="html-content" [innerHTML]="content"></div>
+		}
+		@default {
+			<div class="plain-content">{{ content }}</div>
+		}
+	}
+</div>

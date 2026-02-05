@@ -1,71 +1,60 @@
-import { Component, inject, OnInit, OnDestroy, ElementRef, ViewChild, ViewContainerRef, ComponentRef, createComponent, EnvironmentInjector } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NotificationService } from '../../../service/notification.service';
 import { ToastNotificationService } from '../../../service/toast-notification.service';
 import { ModalNotificationService } from '../../../service/modal-notification.service';
-import { Observable, Subscription } from 'rxjs';
-import { ModalNotification, NotificationToast } from '../../../models/notification.models';
-import { OverlayNotification } from '../../../service/notification/overlay-notification.strategy';
-import { AsyncPipe, NgClass, NgComponentOutlet } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NgClass, NgComponentOutlet } from '@angular/common';
 
 @Component({
   selector: 'app-overlay-notification',
-  imports: [NgClass, AsyncPipe, NgComponentOutlet],
+  standalone: true,
+  imports: [NgComponentOutlet],
   templateUrl: './overlay-notification.component.html',
   styleUrl: './overlay-notification.component.scss'
 })
-export class OverlayNotificationComponent implements OnInit, OnDestroy {
-  @ViewChild('modalContent') modalContentRef!: ElementRef<HTMLDivElement>;
+export class OverlayNotificationComponent {
   private notificationService = inject(NotificationService);
   private toastService = inject(ToastNotificationService);
   private modalService = inject(ModalNotificationService);
-  private environmentInjector = inject(EnvironmentInjector);
-  private subs: Subscription[] = [];
 
-  modal: ModalNotification | null = null;
-  toast$: Observable<NotificationToast[]>;
-  overlays: OverlayNotification[] = [];
+  // Facade pattern: Consumindo dados reativos (Signals)
+  // Nota: Para modal e toast, mantemos o padrão anterior por enquanto se não foram refatorados no service para signals
+  // ou usamos toSignal para compatibilidade.
+  
+  // Como o modalService.modal$ é um Observable, convertemos para signal
+  modal = toSignal(this.modalService.modal$);
+  
+  // O mesmo para modals vindos do NotificationService
+  legacyModal = toSignal(this.notificationService.modals$);
+  
+  // Overlays agora vêm diretamente do Signal do serviço
+  overlays = this.notificationService.overlays;
 
   constructor() {
-    this.toast$ = this.toastService.toast$;
+    // Mantendo a integração legado para Toasts, já que o ToastService parece gerenciar a exibição
+    // Idealmente, ToastService deveria ser absorvido pelo NotificationService ou usar Signals também
+    this.notificationService.toasts$.subscribe(toast => {
+      this.toastService.show(toast.message, toast.timeout, toast.type);
+    });
+    
+    // Mantendo sync entre os dois servicos de modal se necessário
+    this.notificationService.modals$.subscribe(modal => {
+       this.handleBodyScroll(!!modal);
+    });
+
+    this.modalService.modal$.subscribe(modal => {
+        this.handleBodyScroll(!!modal);
+    });
   }
 
-  ngOnInit() {
-    // Subscreve aos novos observables do NotificationService refatorado
-    this.subs.push(
-      this.notificationService.toasts$.subscribe(toast => {
-        this.toastService.show(toast.message, toast.timeout, toast.type);
-      })
-    );
-
-    this.subs.push(
-      this.notificationService.overlays$.subscribe(overlay => {
-        if (overlay) {
-          this.overlays = [...this.overlays, overlay];
-        }
-      })
-    );
-
-    this.subs.push(
-      this.notificationService.overlayDismiss$.subscribe(overlayId => {
-        this.overlays = this.overlays.filter(o => o.id !== overlayId);
-      })
-    );
-
-    this.subs.push(
-      this.modalService.modal$.subscribe(modal => {
-        this.modal = modal;
-      })
-    );
-
-    this.subs.push(
-      this.notificationService.modals$.subscribe(modal => {
-        this.modal = modal;
-      })
-    );
-  }
-
-  ngOnDestroy() {
-    this.subs.forEach(sub => sub.unsubscribe());
+  private handleBodyScroll(isOpen: boolean) {
+      if (typeof document !== 'undefined') { // Check for SSR compatibility
+          if (isOpen) {
+              document.body.style.overflow = 'hidden';
+          } else {
+              document.body.style.overflow = '';
+          }
+      }
   }
 
   dismissToast(id: number) {
@@ -73,6 +62,17 @@ export class OverlayNotificationComponent implements OnInit, OnDestroy {
   }
 
   dismissOverlay(overlayId: string) {
-    this.overlays = this.overlays.filter(o => o.id !== overlayId);
+    this.notificationService.dismissOverlay(overlayId);
+  }
+
+  closeModal() {
+    this.modalService.close();
+    this.notificationService.dismissModal();
+  }
+
+  
+  // Helper para combinar os modais (caso existam duas fontes)
+  get currentModal() {
+      return this.modal() || this.legacyModal();
   }
 }

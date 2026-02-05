@@ -1,22 +1,28 @@
 import { Subject } from 'rxjs';
-import { INotificationStrategy, NotificationConfig } from './notification-strategy.interface';
+import { BaseNotificationStrategy } from './base-notification.strategy';
+import { NotificationConfig } from './notification-strategy.interface';
 import { NotificationToast } from '../../models/notification.models';
 
 /**
  * Implementação concreta da estratégia de notificação Toast
  * Exibe notificações leves e temporárias que desaparecem automaticamente
  */
-export class ToastNotificationStrategy implements INotificationStrategy {
-    private static idCounter = 0;
-    private toastSubject: Subject<NotificationToast>;
+export class ToastNotificationStrategy extends BaseNotificationStrategy {
+    // Sobrescrevendo para manter compatibilidade com o tipo numérico do Toast atual (se necessário)
+    // ou podemos refatorar o modelo de Toast para usar string no futuro.
+    // Por enquanto, vou manter a lógica interna de ID numérico específica do Toast se o modelo exigir number,
+    // mas o generateId da base retorna string. Vamos verificar o modelo NotificationToast.
+    // O modelo NotificationToast usa id: number.
+    
     private toastId: number;
 
     constructor(
-        private config: NotificationConfig,
-        toastSubject: Subject<NotificationToast>
+        config: NotificationConfig,
+        private toastSubject: Subject<NotificationToast>
     ) {
-        this.toastSubject = toastSubject;
-        this.toastId = ++ToastNotificationStrategy.idCounter;
+        super(config);
+        // Incrementamos o contador da base, mas usamos como number aqui
+        this.toastId = ++BaseNotificationStrategy.idCounter;
     }
 
     display(): void {
@@ -28,7 +34,7 @@ export class ToastNotificationStrategy implements INotificationStrategy {
             image: undefined,
             link: undefined,
             component: this.config.component,
-            componentData: this.config.componentData
+            componentData: this.config.componentData as any
         };
 
         this.toastSubject.next(toast);
@@ -36,19 +42,9 @@ export class ToastNotificationStrategy implements INotificationStrategy {
 
     dismiss(): void {
         // Toast se auto-destrói após o timeout
-        // Pode ser implementado um método para fechar manualmente se necessário
-    }
-
-    private mapLevelToType(): 'success' | 'error' | 'info' | 'warning' {
-        // Mapeia critical para error no tipo do toast
-        if (this.config.level === 'critical') {
-            return 'error';
-        }
-        return this.config.level as 'success' | 'error' | 'info' | 'warning';
     }
 
     private getDefaultDuration(): number {
-        // Duração baseada no nível da notificação
         switch (this.config.level) {
             case 'error':
             case 'critical':

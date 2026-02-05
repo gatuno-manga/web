@@ -1,0 +1,56 @@
+<div
+	class="cover-edit-modal-content"
+	role="dialog"
+	aria-labelledby="cover-edit-title"
+>
+	<div class="settings-header">
+		<h2 id="cover-edit-title">Editar Capa</h2>
+	</div>
+
+	<div class="settings-body">
+		<div class="cover-preview" (click)="triggerFileInput(fileInput)">
+			@if (hasImage() && !imageError()) {
+				<img
+					[src]="previewUrl()"
+					[alt]="cover.title"
+					(error)="onImageError()"
+				/>
+				<div class="upload-overlay">
+					<app-icons name="upload" />
+					<span>Trocar imagem</span>
+				</div>
+			} @else {
+				<div class="placeholder-icon">
+					<app-icons name="image" />
+					<span>Clique para adicionar imagem</span>
+				</div>
+			}
+			<input
+				#fileInput
+				type="file"
+				accept="image/*"
+				(change)="onFileSelected($event)"
+				hidden
+				aria-label="Selecionar imagem de capa"
+			/>
+		</div>
+
+		<div class="setting-item column">
+			<app-input
+				type="text"
+				id="coverTitle"
+				[ngModel]="editedTitle()"
+				(ngModelChange)="editedTitle.set($event)"
+				placeholder="Título da Capa"
+				leftIcon="edit"
+			/>
+		</div>
+	</div>
+
+	<div class="settings-footer">
+		<app-button variant="outline" (click)="onCancel()">
+			Cancelar
+		</app-button>
+		<app-button variant="primary" (click)="onSave()"> Salvar </app-button>
+	</div>
+</div>

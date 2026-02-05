@@ -17,148 +17,189 @@
 		class="container"
 	>
 		@defer (when modulesLoad[tab.chapters].load()) {
-		<div class="controls">
-			@if(selectedChapters().size > 0) {
-			<div class="selection-controls">
-				<div class="selection-header">
-					<span class="selection-count"
-						>{{ selectedChapters().size }} selecionado(s)</span
-					>
+			<div class="controls">
+				@if (selectedChapters().size > 0) {
+					<div class="selection-controls">
+						<div class="selection-header">
+							<span class="selection-count"
+								>{{
+									selectedChapters().size
+								}}
+								selecionado(s)</span
+							>
+							<app-button
+								(click)="clearSelection()"
+								variant="text"
+								size="small"
+							>
+								<app-icons name="close" size="16" />
+								<span>Limpar</span>
+							</app-button>
+						</div>
+						<div class="selection-actions">
+							<app-button
+								(click)="downloadSelectedChapters()"
+								variant="text"
+								size="small"
+							>
+								<app-icons name="download" size="16" />
+								<span>Baixar</span>
+							</app-button>
+							@if (hasDownloadedInSelection()) {
+								<app-button
+									(click)="deleteSelectedChaptersDownloads()"
+									variant="text"
+									size="small"
+								>
+									<app-icons name="trash" size="16" />
+									<span>Excluir Downloads</span>
+								</app-button>
+							}
+							<app-button
+								(click)="toggleSelectedReadStatus()"
+								variant="text"
+								size="small"
+							>
+								<app-icons name="eye" size="16" />
+								<span>Alternar Leitura</span>
+							</app-button>
+						</div>
+					</div>
+				} @else {
 					<app-button
-						(click)="clearSelection()"
+						(click)="selectAllChapters()"
 						variant="text"
 						size="small"
 					>
-						<app-icons name="close" size="16" />
-						<span>Limpar</span>
+						<span>Selecionar Todos</span>
 					</app-button>
-				</div>
-				<div class="selection-actions">
-					<app-button
-						(click)="downloadSelectedChapters()"
-						variant="text"
-						size="small"
+				}
+				<app-button (click)="toggleSort()" variant="text">
+					<span
+						>Ordem
+						{{
+							sortAscending() ? 'Crescente' : 'Decrescente'
+						}}</span
 					>
-						<app-icons name="download" size="16" />
-						<span>Baixar</span>
-					</app-button>
-					@if(hasDownloadedInSelection()) {
-					<app-button
-						(click)="deleteSelectedChaptersDownloads()"
-						variant="text"
-						size="small"
-					>
-						<app-icons name="trash" size="16" />
-						<span>Excluir Downloads</span>
-					</app-button>
-					}
-					<app-button
-						(click)="toggleSelectedReadStatus()"
-						variant="text"
-						size="small"
-					>
-						<app-icons name="eye" size="16" />
-						<span>Alternar Leitura</span>
-					</app-button>
-				</div>
+					<app-icons
+						name="arrow-up"
+						[class.rotated]="!sortAscending()"
+					/>
+				</app-button>
 			</div>
-			} @else {
-			<app-button
-				(click)="selectAllChapters()"
-				variant="text"
-				size="small"
-			>
-				<span>Selecionar Todos</span>
-			</app-button>
-			}
-			<app-button (click)="toggleSort()" variant="text">
-				<span
-					>Ordem
-					{{ sortAscending() ? 'Crescente' : 'Decrescente' }}</span
-				>
-				<app-icons name="arrow-up" [class.rotated]="!sortAscending()" />
-			</app-button>
-		</div>
-		<div class="scrollable">
-			@for(chapter of chapters; track chapter.id) {
-			<a
-				[routerLink]="[chapter.id]"
-				class="chapter"
-				[class.selected]="isChapterSelected(chapter.id)"
-				(click)="onChapterClick($event, chapter)"
-				(contextmenu)="onChapterContextMenu($event, chapter)"
-			>
-				<div class="title">
-					<h2>capitulo {{ chapter.index | number }}</h2>
-					@if(chapter.title){
-					<h3>{{ chapter.title }}</h3>
-					}
-				</div>
-				<div class="metadata">
-					<div class="read">
-						<app-icons
-							[name]="chapter.read ? 'eye' : 'eye-close'"
-							[class.read]="chapter.read"
-						/>
-					</div>
-					<div
-						class="download-container"
-						(click)="
-							$event.preventDefault(); $event.stopPropagation()
-						"
+			<div class="scrollable">
+				@for (chapter of chapters; track chapter.id) {
+					<a
+						[routerLink]="[chapter.id]"
+						class="chapter"
+						[class.selected]="isChapterSelected(chapter.id)"
+						(click)="onChapterClick($event, chapter)"
+						(contextmenu)="onChapterContextMenu($event, chapter)"
 					>
-						@if(chaptersDownloadStatus.get(chapter.id) ===
-						'downloaded') {
-						<app-icons
-							name="check"
-							class="icon-downloaded"
-							(click)="deleteChapterDownload(chapter, $event)"
-							title="Clique para excluir download"
-						/>
-						} @else if (chaptersDownloadStatus.get(chapter.id) ===
-						'downloading') {
-						<span class="download-progress"
-							>{{
-								chaptersDownloadProgress.get(chapter.id)
-									| number : '1.0-0'
-							}}%</span
-						>
-						} @else if (chaptersDownloadStatus.get(chapter.id) ===
-						'pending') {
-						<app-icons
-							name="clock"
-							class="icon-pending"
-							title="Aguardando download"
-						/>
-						} @else {
-						<app-icons
-							name="download"
-							class="icon-download"
-							(click)="downloadChapter(chapter, $event)"
-						/>
-						}
-					</div>
-					<div
-						class="scraping-status"
-						[class.scrapingStatusReady]="
-							chapter.scrapingStatus === ScrapingStatus.READY
-						"
-						[class.scrapingStatusProcessing]="
-							chapter.scrapingStatus === ScrapingStatus.PROCESSING
-						"
-						[class.scrapingStatusError]="
-							chapter.scrapingStatus === ScrapingStatus.ERROR
-						"
-					>
-						{{ getScrapingStatusClass(chapter.scrapingStatus) }}
-					</div>
-				</div>
-			</a>
+						<div class="title">
+							<div class="title-with-icon">
+								<app-icons
+									[name]="getContentTypeIcon(chapter)"
+									size="16"
+									class="content-type-icon"
+								/>
+								<h2>capitulo {{ chapter.index | number }}</h2>
+							</div>
+							@if (chapter.title) {
+								<h3>{{ chapter.title }}</h3>
+							}
+						</div>
+						<div class="metadata">
+							<div class="read">
+								<app-icons
+									[name]="chapter.read ? 'eye' : 'eye-close'"
+									[class.read]="chapter.read"
+								/>
+							</div>
+							<div
+								class="download-container"
+								(click)="
+									$event.preventDefault();
+									$event.stopPropagation()
+								"
+							>
+								@if (
+									chaptersDownloadStatus.get(chapter.id) ===
+									'downloaded'
+								) {
+									<app-icons
+										name="check"
+										class="icon-downloaded"
+										(click)="
+											deleteChapterDownload(
+												chapter,
+												$event
+											)
+										"
+										title="Clique para excluir download"
+									/>
+								} @else if (
+									chaptersDownloadStatus.get(chapter.id) ===
+									'downloading'
+								) {
+									<span class="download-progress"
+										>{{
+											chaptersDownloadProgress.get(
+												chapter.id
+											) | number: '1.0-0'
+										}}%</span
+									>
+								} @else if (
+									chaptersDownloadStatus.get(chapter.id) ===
+									'pending'
+								) {
+									<app-icons
+										name="clock"
+										class="icon-pending"
+										title="Aguardando download"
+									/>
+								} @else {
+									<app-icons
+										name="download"
+										class="icon-download"
+										(click)="
+											downloadChapter(chapter, $event)
+										"
+									/>
+								}
+							</div>
+							@if (chapter.scrapingStatus) {
+								<div
+									class="scraping-status"
+									[class.scrapingStatusReady]="
+										chapter.scrapingStatus ===
+										ScrapingStatus.READY
+									"
+									[class.scrapingStatusProcessing]="
+										chapter.scrapingStatus ===
+										ScrapingStatus.PROCESSING
+									"
+									[class.scrapingStatusError]="
+										chapter.scrapingStatus ===
+										ScrapingStatus.ERROR
+									"
+								>
+									{{
+										getScrapingStatusClass(
+											chapter.scrapingStatus
+										)
+									}}
+								</div>
+							}
+						</div>
+					</a>
+				}
+			</div>
+		} @placeholder {
+			@for (i of [].constructor(20); track $index) {
+				<div class="placeholder"></div>
 			}
-		</div>
-		} @placeholder { @for (i of [].constructor(20); track $index) {
-		<div class="placeholder"></div>
-		} }
+		}
 	</div>
 	<div
 		id="covers"
@@ -166,70 +207,69 @@
 		class="container"
 	>
 		@defer (when modulesLoad[tab.covers].load()) {
-		@if(userTokenService.isAdminSignal()) {
-		<div class="covers-toolbar">
-			<div class="toolbar-info">
-			</div>
-			<div class="toolbar-actions">
-				@if(hasCoversChanged) {
-				<app-button
-					(click)="cancelCoversReorder()"
-					variant="text"
-					size="small"
-				>
-					<app-icons name="close" size="16" />
-					<span>Cancelar</span>
-				</app-button>
-				<app-button
-					(click)="saveCoversOrder()"
-					variant="primary"
-					size="small"
-				>
-					<app-icons name="check" size="16" />
-					<span>Salvar Ordem</span>
-				</app-button>
-				}
-			</div>
-		</div>
-		}
-		<div
-			class="scrollable"
-			cdkDropList
-			cdkDropListOrientation="mixed"
-			(cdkDropListDropped)="onCoverDrop($event)"
-			[cdkDropListDisabled]="!userTokenService.isAdminSignal()"
-		>
-			@for(cover of covers; track cover.id) {
-			<div
-				class="cover"
-				[class.selected]="cover.selected"
-				(click)="onCoverClick(cover)"
-				(contextmenu)="onCoverContextMenu($event, cover)"
-				cdkDrag
-				[cdkDragDisabled]="!userTokenService.isAdminSignal()"
-			>
-				<div class="drag-placeholder" *cdkDragPlaceholder></div>
-				@if (cover.url && !coverImageErrors.has(cover.id)) {
-				<img
-					[src]="cover.url"
-					[alt]="'Cover ' + cover.id"
-					(error)="onCoverImageError(cover.id)"
-				/>
-				} @else {
-				<div class="cover-placeholder">
-					<app-icons name="image" />
+			@if (userTokenService.isAdminSignal()) {
+				<div class="covers-toolbar">
+					<div class="toolbar-info"></div>
+					<div class="toolbar-actions">
+						@if (hasCoversChanged) {
+							<app-button
+								(click)="cancelCoversReorder()"
+								variant="text"
+								size="small"
+							>
+								<app-icons name="close" size="16" />
+								<span>Cancelar</span>
+							</app-button>
+							<app-button
+								(click)="saveCoversOrder()"
+								variant="primary"
+								size="small"
+							>
+								<app-icons name="check" size="16" />
+								<span>Salvar Ordem</span>
+							</app-button>
+						}
+					</div>
 				</div>
+			}
+			<div
+				class="scrollable"
+				cdkDropList
+				cdkDropListOrientation="mixed"
+				(cdkDropListDropped)="onCoverDrop($event)"
+				[cdkDropListDisabled]="!userTokenService.isAdminSignal()"
+			>
+				@for (cover of covers; track cover.id) {
+					<div
+						class="cover"
+						[class.selected]="cover.selected"
+						(click)="onCoverClick(cover)"
+						(contextmenu)="onCoverContextMenu($event, cover)"
+						cdkDrag
+						[cdkDragDisabled]="!userTokenService.isAdminSignal()"
+					>
+						<div class="drag-placeholder" *cdkDragPlaceholder></div>
+						@if (cover.url && !coverImageErrors.has(cover.id)) {
+							<img
+								[src]="cover.url"
+								[alt]="'Cover ' + cover.id"
+								(error)="onCoverImageError(cover.id)"
+							/>
+						} @else {
+							<div class="cover-placeholder">
+								<app-icons name="image" />
+							</div>
+						}
+						<div class="metadata">{{ cover.title }}</div>
+					</div>
 				}
-				<div class="metadata">{{ cover.title }}</div>
 			</div>
-			}
-		</div>
-		}@placeholder {
-		<div class="placeholder-container">
-			@for (i of [].constructor(10); track $index) {
-			<div class="placeholder"></div>
-			}
-		</div>
+		} @placeholder {
+			<div class="placeholder-container">
+				@for (i of [].constructor(10); track $index) {
+					<div class="placeholder"></div>
+				}
+			</div>
 		}
 	</div>
 	<div
@@ -241,49 +281,56 @@
 			<div class="titles">
 				<h1>Titulos alternativos</h1>
 				<div>
-					@defer (when modulesLoad[tab.extraInfo].load()) { @for(title
-					of extraInfo.alternativeTitle; track $index) {
-					<p class="item">{{ title }}</p>
-					}@empty {
-					<p>Nenhum titulo alternativo disponível</p>
-					}}@placeholder { @for (i of [].constructor(10); track
-					$index) {
-					<div class="placeholder"></div>
-					} }
+					@defer (when modulesLoad[tab.extraInfo].load()) {
+						@for (
+							title of extraInfo.alternativeTitle;
+							track $index
+						) {
+							<p class="item">{{ title }}</p>
+						} @empty {
+							<p>Nenhum titulo alternativo disponível</p>
+						}
+					} @placeholder {
+						@for (i of [].constructor(10); track $index) {
+							<div class="placeholder"></div>
+						}
+					}
 				</div>
 			</div>
 			<div class="sources">
 				<div class="sources-header">
 					<h1>Fontes</h1>
-					@if(userTokenService.isAdminSignal()) {
-					<app-button
-						variant="text"
-						size="small"
-						(click)="openSourceAddModal()"
-					>
-						<app-icons name="plus" size="16" />
-						<span>Adicionar</span>
-					</app-button>
+					@if (userTokenService.isAdminSignal()) {
+						<app-button
+							variant="text"
+							size="small"
+							(click)="openSourceAddModal()"
+						>
+							<app-icons name="plus" size="16" />
+							<span>Adicionar</span>
+						</app-button>
 					}
 				</div>
 				<div class="sources-list">
 					@defer (when modulesLoad[tab.extraInfo].load()) {
-					@for(source of extraInfo.originalUrl; track $index) {
-					<a
-						class="item"
-						[href]="source"
-						target="_blank"
-						(contextmenu)="
-							onSourceContextMenu($event, source, $index)
-						"
-						>{{ this.urlTransform(source) }}</a
-					>
-					}@empty {
-					<p>Nenhuma fonte disponível</p>
-					}}@placeholder { @for (i of [].constructor(5); track $index)
-					{
-					<div class="placeholder"></div>
-					} }
+						@for (source of extraInfo.originalUrl; track $index) {
+							<a
+								class="item"
+								[href]="source"
+								target="_blank"
+								(contextmenu)="
+									onSourceContextMenu($event, source, $index)
+								"
+								>{{ this.urlTransform(source) }}</a
+							>
+						} @empty {
+							<p>Nenhuma fonte disponível</p>
+						}
+					} @placeholder {
+						@for (i of [].constructor(5); track $index) {
+							<div class="placeholder"></div>
+						}
+					}
 				</div>
 			</div>
 		</div>
@@ -294,73 +341,57 @@
 		class="container"
 	>
 		@defer (when modulesLoad[tab.savedPages].load()) {
-		<div class="scrollable">
-			@for(savedPage of savedPages; track savedPage.id) {
-			<div
-				class="cover"
-				(click)="onSavedPageClick(savedPage)"
-				(contextmenu)="onSavedPageContextMenu($event, savedPage)"
-			>
-				@if (savedPage.page.path) {
-				<img
-					[src]="savedPage.page.path"
-					[alt]="'Page ' + savedPage.page.index"
-					loading="lazy"
-				/>
-				} @else {
-				<div class="cover-placeholder">
-					<app-icons name="image" />
-				</div>
+			<div class="scrollable">
+				@for (savedPage of savedPages; track savedPage.id) {
+					<div
+						class="cover"
+						(click)="onSavedPageClick(savedPage)"
+						(contextmenu)="
+							onSavedPageContextMenu($event, savedPage)
+						"
+					>
+						@if (savedPage.page.path) {
+							<img
+								[src]="savedPage.page.path"
+								[alt]="'Page ' + savedPage.page.index"
+								loading="lazy"
+							/>
+						} @else {
+							<div class="cover-placeholder">
+								<app-icons name="image" />
+							</div>
+						}
+						<div class="metadata">
+							Cap. {{ savedPage.chapter.index }} - Pág.
+							{{ savedPage.page.index }}
+							@if (savedPage.comment) {
+								<div class="comment">
+									"{{ savedPage.comment }}"
+								</div>
+							}
+						</div>
+					</div>
+				} @empty {
+					<div class="empty-state">
+						<p>Nenhuma página salva para este livro.</p>
+					</div>
 				}
-				<div class="metadata">
-					Cap. {{ savedPage.chapter.index }} - Pág.
-					{{ savedPage.page.index }}
-					@if (savedPage.comment) {
-					<div class="comment">"{{ savedPage.comment }}"</div>
-					}
-				</div>
 			</div>
-			}@empty {
-			<div class="empty-state">
-				<p>Nenhuma página salva para este livro.</p>
+		} @placeholder {
+			<div class="placeholder-container">
+				@for (i of [].constructor(10); track $index) {
+					<div class="placeholder"></div>
+				}
 			</div>
-			}
-		</div>
-		}@placeholder {
-		<div class="placeholder-container">
-			@for (i of [].constructor(10); track $index) {
-			<div class="placeholder"></div>
-			}
-		</div>
 		}
 	</div>
 </div>
 
-@if(showImageViewer) {
-<app-image-viewer
-	[imageUrl]="viewerImageUrl"
-	[imageTitle]="viewerImageTitle"
-	[imageDescription]="viewerImageDescription"
-	(close)="closeImageViewer()"
-/>
-} @if(showCoverEditModal && editingCover) {
-<div class="modal-backdrop" (click)="closeCoverEditModal()">
-	<div class="modal-container" (click)="$event.stopPropagation()">
-		<app-cover-edit-modal
-			[cover]="editingCover"
-			(save)="onCoverEditSave($event)"
-			(cancel)="closeCoverEditModal()"
-		/>
-	</div>
-</div>
-} @if(showSourceAddModal) {
-<div class="modal-backdrop" (click)="closeSourceAddModal()">
-	<div class="modal-container" (click)="$event.stopPropagation()">
-		<app-source-add-modal
-			[existingUrls]="extraInfo.originalUrl"
-			(save)="onSourceAddSave($event)"
-			(cancel)="closeSourceAddModal()"
-		/>
-	</div>
-</div>
+@if (showImageViewer) {
+	<app-image-viewer
+		[imageUrl]="viewerImageUrl"
+		[imageTitle]="viewerImageTitle"
+		[imageDescription]="viewerImageDescription"
+		(close)="closeImageViewer()"
+	/>
 }

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ConfirmationNotificationComponent } from './confirmation-notification.component';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('ConfirmationNotificationComponent', () => {
     let component: ConfirmationNotificationComponent;
@@ -7,7 +8,8 @@ describe('ConfirmationNotificationComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [ConfirmationNotificationComponent]
+            imports: [ConfirmationNotificationComponent],
+            providers: [provideHttpClient()]
         }).compileComponents();
 
         fixture = TestBed.createComponent(ConfirmationNotificationComponent);
@@ -72,7 +74,9 @@ describe('ConfirmationNotificationComponent', () => {
         expect(listItems[2].textContent).toBe('Detalhe 3');
     });
 
-    it('should display warning icon in SVG', () => {
+    it('should display warning icon in SVG', async () => {
+        fixture.detectChanges();
+        await fixture.whenStable();
         fixture.detectChanges();
         const compiled = fixture.nativeElement;
         expect(compiled.querySelector('.icon-container svg')).toBeTruthy();

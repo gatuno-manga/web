@@ -1,5 +1,6 @@
 import { Subject } from 'rxjs';
-import { INotificationStrategy, NotificationConfig, NotificationComponentData } from './notification-strategy.interface';
+import { BaseNotificationStrategy } from './base-notification.strategy';
+import { NotificationConfig, NotificationComponentData } from './notification-strategy.interface';
 
 /**
  * Interface para notificações de overlay
@@ -16,23 +17,17 @@ export interface OverlayNotification {
 
 /**
  * Implementação concreta da estratégia de notificação Overlay
- * Exibe notificações importantes que permanecem na tela até serem dispensadas
- * Não bloqueiam a interação do usuário como os modais
  */
-export class OverlayNotificationStrategy implements INotificationStrategy {
-    private static idCounter = 0;
-    private overlaySubject: Subject<OverlayNotification>;
+export class OverlayNotificationStrategy extends BaseNotificationStrategy {
     private overlayId: string;
-    private dismissSubject: Subject<string>;
 
     constructor(
-        private config: NotificationConfig,
-        overlaySubject: Subject<OverlayNotification>,
-        dismissSubject: Subject<string>
+        config: NotificationConfig,
+        private overlaySubject: Subject<OverlayNotification>,
+        private dismissSubject: Subject<string>
     ) {
-        this.overlaySubject = overlaySubject;
-        this.dismissSubject = dismissSubject;
-        this.overlayId = `overlay-${++OverlayNotificationStrategy.idCounter}`;
+        super(config);
+        this.overlayId = this.generateId('overlay');
     }
 
     display(): void {
@@ -43,12 +38,11 @@ export class OverlayNotificationStrategy implements INotificationStrategy {
             title: this.config.title,
             dismissible: this.config.dismissible !== false,
             component: this.config.component,
-            componentData: this.config.componentData
+            componentData: this.config.componentData as NotificationComponentData
         };
 
         this.overlaySubject.next(overlay);
 
-        // Auto-dismissão se configurado
         if (this.config.duration && this.config.duration > 0) {
             setTimeout(() => this.dismiss(), this.config.duration);
         }
@@ -56,13 +50,5 @@ export class OverlayNotificationStrategy implements INotificationStrategy {
 
     dismiss(): void {
         this.dismissSubject.next(this.overlayId);
-    }
-
-    private mapLevelToType(): 'success' | 'error' | 'info' | 'warning' {
-        // Mapeia critical para error no tipo do overlay
-        if (this.config.level === 'critical') {
-            return 'error';
-        }
-        return this.config.level as 'success' | 'error' | 'info' | 'warning';
     }
 }

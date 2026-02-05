@@ -1,4 +1,4 @@
-import { Component, Input, signal, computed } from '@angular/core';
+import { Component, Input, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@components/inputs/button/button.component';
 import { IconsComponent } from '@components/icons/icons.component';
@@ -21,7 +21,7 @@ export interface BookDownloadResult {
     templateUrl: './book-download-modal.component.html',
     styleUrls: ['./book-download-modal.component.scss']
 })
-export class BookDownloadModalComponent {
+export class BookDownloadModalComponent implements OnInit {
     @Input() chapters: BookDownloadChapter[] = [];
     @Input() bookTitle: string = '';
     @Input() close!: (result: BookDownloadResult | null) => void;
@@ -39,13 +39,13 @@ export class BookDownloadModalComponent {
         return size > 0 && size < this.chapters.length;
     });
 
-    ngOnInit() {
+    ngOnInit(): void {
         // Inicializa todos os capítulos como selecionados
         const allIds = new Set(this.chapters.map(ch => ch.id));
         this.selectedChapters.set(allIds);
     }
 
-    toggleSelectAll() {
+    toggleSelectAll(): void {
         if (this.allSelected()) {
             this.selectedChapters.set(new Set());
         } else {
@@ -54,7 +54,7 @@ export class BookDownloadModalComponent {
         }
     }
 
-    toggleChapter(id: string) {
+    toggleChapter(id: string): void {
         const current = new Set(this.selectedChapters());
         if (current.has(id)) {
             current.delete(id);
@@ -68,7 +68,7 @@ export class BookDownloadModalComponent {
         return this.selectedChapters().has(id);
     }
 
-    confirm() {
+    confirm(): void {
         if (this.selectedChapters().size === 0) {
             return;
         }
@@ -81,7 +81,7 @@ export class BookDownloadModalComponent {
         }
     }
 
-    cancel() {
+    cancel(): void {
         if (this.close) {
             this.close(null);
         }

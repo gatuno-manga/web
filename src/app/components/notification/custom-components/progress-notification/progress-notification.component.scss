@@ -1,31 +1,32 @@
 .progress-content {
 	padding: 16px;
 	min-width: 350px;
+	max-width: 450px;
 }
 
-.header {
+.settings-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 12px;
-}
 
-h3 {
-	margin: 0;
-	font-size: 1.1em;
-	color: var(--gray-900);
+	h3 {
+		margin: 0;
+		font-size: 1.1em;
+		color: var(--app-text-color);
+	}
 }
 
 .percentage {
 	font-weight: bold;
-	color: var(--cyan);
+	color: var(--primary-color);
 	font-size: 1.2em;
 }
 
 .progress-bar {
 	width: 100%;
 	height: 8px;
-	background: var(--gray-300);
+	background: var(--border-color);
 	border-radius: 4px;
 	overflow: hidden;
 	margin-bottom: 12px;
@@ -33,25 +34,68 @@ h3 {
 
 .progress-fill {
 	height: 100%;
-	background: linear-gradient(90deg, var(--cyan), var(--success));
+	background: linear-gradient(
+		90deg,
+		var(--primary-color),
+		var(--success-color)
+	);
 	transition: width 0.3s ease;
 	border-radius: 4px;
 }
 
 .status {
 	margin: 0 0 8px 0;
-	color: var(--gray-700);
+	color: var(--app-text-color-secondary);
 	font-size: 0.9em;
 }
 
 .current-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	font-size: 0.85em;
-	color: var(--gray-600);
+	color: var(--app-text-color-secondary);
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+
+	app-icons {
+		flex-shrink: 0;
+		animation: spin 1s linear infinite;
+	}
+
+	strong {
+		color: var(--app-text-color);
+	}
 }
 
-.current-item strong {
-	color: var(--gray-900);
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (max-width: 768px) {
+	.progress-content {
+		min-width: 280px;
+		max-width: 100%;
+		padding: 12px;
+	}
+
+	.settings-header {
+		h3 {
+			font-size: 1em;
+		}
+	}
+
+	.percentage {
+		font-size: 1.1em;
+	}
+
+	.current-item {
+		font-size: 0.8em;
+	}
 }

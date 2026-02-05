@@ -1,6 +1,7 @@
-import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal, OnDestroy, inject } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, AfterViewInit, signal, OnDestroy, inject, PLATFORM_ID, NgZone, ChangeDetectorRef } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { BookService } from '../../service/book.service';
-import { Book, BookBasic, BookDetail, Chapterlist, Cover, ScrapingStatus, UpdateBookDto } from '../../models/book.models';
+import { Book, BookBasic, BookDetail, Chapterlist, Cover, ScrapingStatus, UpdateBookDto, ContentType, ContentTypes } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
@@ -16,8 +17,8 @@ import { UserTokenService } from '../../service/user-token.service';
 import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
 import { SavedPagesService } from '../../service/saved-pages.service';
 import { SavedPage } from '../../models/saved-page.models';
-import { CoverEditModalComponent, CoverEditSaveEvent } from '../cover-edit-modal/cover-edit-modal.component';
-import { SourceAddModalComponent, SourceAddSaveEvent } from '../source-add-modal/source-add-modal.component';
+import { CoverEditModalComponent, CoverEditSaveEvent } from '../notification/custom-components/cover-edit-modal/cover-edit-modal.component';
+import { SourceAddModalComponent, SourceAddSaveEvent } from '../notification/custom-components/source-add-modal/source-add-modal.component';
 import { PromptModalComponent } from '../notification/custom-components/prompt-modal/prompt-modal.component';
 import { NotificationService } from '../../service/notification.service';
 import { NotificationSeverity } from 'app/service/notification';
@@ -37,13 +38,18 @@ interface ModulesLoad {
 
 @Component({
   selector: 'app-info-book',
-  imports: [RouterModule, DecimalPipe, IconsComponent, ButtonComponent, ImageViewerComponent, CoverEditModalComponent, SourceAddModalComponent, DragDropModule],
+  imports: [RouterModule, DecimalPipe, IconsComponent, ButtonComponent, ImageViewerComponent, DragDropModule],
   templateUrl: './info-book.component.html',
   styleUrl: './info-book.component.scss'
 })
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
   userTokenService = inject(UserTokenService);
   private notificationService = inject(NotificationService);
+  private platformId = inject(PLATFORM_ID);
+  private ngZone = inject(NgZone);
+  private cdr = inject(ChangeDetectorRef);
+  private resizeObserver?: ResizeObserver;
+  private mutationObserver?: MutationObserver;
 
   tab = tab;
   ScrapingStatus = ScrapingStatus;
@@ -103,11 +109,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
   viewerImageDescription = '';
 
   // Cover edit modal state
-  showCoverEditModal = false;
   editingCover: Cover | null = null;
-
-  // Source add modal state
-  showSourceAddModal = false;
 
   // Track cover image loading errors
   coverImageErrors = new Set<string>();
@@ -132,8 +134,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
       this.firstTab.nativeElement.click();
     }
 
-    // Garantir que a altura seja calculada após a view estar pronta
-    setTimeout(() => this.updateContainerHeight(), 500);
+    if (isPlatformBrowser(this.platformId)) {
+      this.setupResizeObserver();
+    }
 
     this.subscribeToWebSocketEvents();
 
@@ -148,10 +151,15 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
           this.chaptersDownloadStatus.set(chapterId, 'downloaded');
         }
       });
+      // Force view update by creating new Map references
+      this.chaptersDownloadStatus = new Map(this.chaptersDownloadStatus);
+      this.chaptersDownloadProgress = new Map(this.chaptersDownloadProgress);
     });
   }
 
   ngOnDestroy() {
+    this.resizeObserver?.disconnect();
+    this.mutationObserver?.disconnect();
     if (this.websocketSubscription) {
       this.websocketSubscription.unsubscribe();
     }
@@ -206,6 +214,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
     if (event && this.selector) {
       const clickedElement = event.target as HTMLSpanElement;
+      clickedElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       const headerElement = clickedElement.parentElement;
 
       if (headerElement) {
@@ -222,28 +231,81 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     }
 
     // Atualizar altura imediatamente e após animação
-    this.updateContainerHeight();
-    setTimeout(() => this.updateContainerHeight(), 350);
+    this.observeActiveTab();
   }
 
-  private updateContainerHeight() {
+  private setupResizeObserver() {
+    this.resizeObserver = new ResizeObserver(() => {
+      this.ngZone.run(() => this.updateContainerHeight());
+    });
+
+    // MutationObserver para detectar quando o conteúdo do @defer é inserido
+    this.mutationObserver = new MutationObserver(() => {
+      this.ngZone.run(() => this.updateContainerHeight());
+    });
+  }
+
+  private observeActiveTab() {
+    if (!this.resizeObserver || !this.mutationObserver) return;
+
+    // Disconnect temporarily to avoid observing multiple elements or wrong one
+    this.resizeObserver.disconnect();
+    this.mutationObserver.disconnect();
+
     requestAnimationFrame(() => {
-      if (!this.containerElement?.nativeElement) {
-        return;
-      }
+      if (!this.containerElement?.nativeElement) return;
 
-      const container = this.containerElement.nativeElement;
-      const tabs = container.querySelectorAll('.container');
-
-      if (tabs.length === 0) {
-        return;
-      }
-
+      const tabs = this.containerElement.nativeElement.querySelectorAll('.container');
       const activeTab = tabs[this.selectedTab] as HTMLElement;
 
       if (activeTab) {
-        this.containerHeight = `${activeTab.scrollHeight}px`;
+        this.resizeObserver?.observe(activeTab);
+        this.mutationObserver?.observe(activeTab, {
+          childList: true,
+          subtree: true,
+          attributes: true
+        });
+
+        // Atualização imediata
+        this.updateContainerHeight();
+
+        // Atualizações com delay para garantir que o @defer carregou
+        setTimeout(() => this.updateContainerHeight(), 50);
+        setTimeout(() => this.updateContainerHeight(), 150);
+        setTimeout(() => this.updateContainerHeight(), 300);
       }
+    });
+  }
+
+  private updateContainerHeight() {
+    if (!this.containerElement?.nativeElement) {
+      return;
+    }
+
+    const container = this.containerElement.nativeElement;
+    const tabs = container.querySelectorAll('.container');
+
+    if (tabs.length === 0) {
+      return;
+    }
+
+    const activeTab = tabs[this.selectedTab] as HTMLElement;
+
+    if (activeTab) {
+      const newHeight = `${activeTab.scrollHeight}px`;
+      if (this.containerHeight !== newHeight) {
+        this.containerHeight = newHeight;
+      }
+    }
+  }
+
+  private scheduleHeightUpdate() {
+    // Aguarda o Angular renderizar o conteúdo e depois atualiza a altura
+    requestAnimationFrame(() => {
+      this.updateContainerHeight();
+      setTimeout(() => this.updateContainerHeight(), 50);
+      setTimeout(() => this.updateContainerHeight(), 150);
+      setTimeout(() => this.updateContainerHeight(), 500);
     });
   }
 
@@ -257,6 +319,18 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         return 'error';
       default:
         return '';
+    }
+  }
+
+  getContentTypeIcon(chapter: Chapterlist): string {
+    const contentType = chapter.contentType || ContentTypes.IMAGE;
+    switch (contentType) {
+      case ContentTypes.TEXT:
+        return 'book';
+      case ContentTypes.DOCUMENT:
+        return 'file';
+      default:
+        return 'image';
     }
   }
 
@@ -283,7 +357,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         this.chapters = chapters;
         this.sortChapters();
         this.checkDownloadedChapters();
-        this.updateContainerHeight();
+        this.cdr.detectChanges();
+        this.scheduleHeightUpdate();
       },
       error: async (error) => {
         console.error('Error loading chapters from API, trying offline:', error);
@@ -302,6 +377,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
             this.sortChapters();
 
             this.chapters.forEach(c => this.chaptersDownloadStatus.set(c.id, 'downloaded'));
+            this.cdr.detectChanges();
+            this.scheduleHeightUpdate();
           }
         } catch (e) {
           console.error('Error loading offline chapters', e);
@@ -317,6 +394,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         this.chaptersDownloadStatus.set(chapter.id, 'downloaded');
       }
     }
+    // Force view update
+    this.chaptersDownloadStatus = new Map(this.chaptersDownloadStatus);
   }
 
   async downloadChapter(chapterList: Chapterlist, event?: Event): Promise<void> {
@@ -406,7 +485,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
         this.covers = covers;
         this.originalCovers = JSON.parse(JSON.stringify(covers));
         this.hasCoversChanged = false;
-        this.updateContainerHeight();
+        this.cdr.detectChanges();
+        this.scheduleHeightUpdate();
       },
       error: (error) => {
         console.error('Error loading covers:', error);
@@ -416,7 +496,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   onCoverDrop(event: CdkDragDrop<Cover[]>) {
     if (!this.userTokenService.isAdminSignal()) return;
-    
+
     moveItemInArray(this.covers, event.previousIndex, event.currentIndex);
     this.hasCoversChanged = true;
   }
@@ -451,7 +531,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.bookService.getInfo(this.id).subscribe({
       next: (info) => {
         this.extraInfo = info;
-        this.updateContainerHeight();
+        this.cdr.detectChanges();
+        this.scheduleHeightUpdate();
       },
       error: (error) => {
         console.error('Error loading extra info:', error);
@@ -463,7 +544,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
     this.savedPagesService.getSavedPagesByBook(this.id).subscribe({
       next: (pages) => {
         this.savedPages = pages;
-        this.updateContainerHeight();
+        this.cdr.detectChanges();
+        this.scheduleHeightUpdate();
       },
       error: (error) => {
         console.error('Error loading saved pages:', error);
@@ -477,6 +559,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   onCoverImageError(coverId: string) {
     this.coverImageErrors.add(coverId);
+    this.coverImageErrors = new Set(this.coverImageErrors);
   }
 
   onSavedPageClick(savedPage: SavedPage) {
@@ -911,25 +994,67 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
   openCoverEditModal(cover: Cover) {
     this.editingCover = cover;
-    this.showCoverEditModal = true;
-    this.lockScroll();
+    this.notificationService.notify({
+      message: '',
+      level: 'custom',
+      severity: NotificationSeverity.CRITICAL,
+      component: CoverEditModalComponent,
+      componentData: {
+        cover: cover,
+        close: (result: CoverEditSaveEvent | null) => {
+          this.modalService.close();
+          if (result) {
+            this.onCoverEditSave(result);
+          }
+        }
+      },
+      useBackdrop: true,
+      backdropOpacity: 0.5
+    });
   }
 
   closeCoverEditModal() {
-    this.showCoverEditModal = false;
+    this.modalService.close();
     this.editingCover = null;
-    this.unlockScroll();
   }
 
+  handleCoverEditClose = (result: CoverEditSaveEvent | null): void => {
+    this.modalService.close();
+    if (result) {
+      this.onCoverEditSave(result);
+    }
+  };
+
   openSourceAddModal() {
-    this.showSourceAddModal = true;
-    this.lockScroll();
+    this.notificationService.notify({
+      message: '',
+      level: 'custom',
+      severity: NotificationSeverity.CRITICAL,
+      component: SourceAddModalComponent,
+      componentData: {
+        existingUrls: this.extraInfo.originalUrl,
+        close: (result: SourceAddSaveEvent | null) => {
+          this.modalService.close();
+          if (result) {
+            this.onSourceAddSave(result);
+          }
+        }
+      },
+      useBackdrop: true,
+      backdropOpacity: 0.5
+    });
   }
 
   closeSourceAddModal() {
-    this.showSourceAddModal = false;
-    this.unlockScroll();
+    this.modalService.close();
   }
+
+  handleSourceAddClose = (result: SourceAddSaveEvent | null): void => {
+    this.modalService.close();
+    if (result) {
+      this.onSourceAddSave(result);
+    }
+  };
 
   onSourceAddSave(data: SourceAddSaveEvent) {
     // Adicionar nova URL ao array existente
@@ -1024,6 +1149,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
             this.covers[coverIndex] = updatedCover;
             // Clear any previous image error for this cover
             this.coverImageErrors.delete(data.id);
+            this.coverImageErrors = new Set(this.coverImageErrors);
           }
           this.closeCoverEditModal();
         },

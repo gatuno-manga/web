@@ -1,0 +1,92 @@
+.source-add-modal-content {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-height: 80vh;
+}
+
+.settings-header {
+	padding: 16px 24px;
+	padding-right: 40px;
+	border-bottom: 1px solid var(--app-text-color);
+	text-align: center;
+
+	h2 {
+		margin: 0;
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: var(--app-text-color);
+	}
+}
+
+.settings-body {
+	overflow-y: auto;
+	flex: 1;
+	padding: 16px 24px;
+	max-height: 60vh;
+}
+
+.setting-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 0;
+
+	&.column {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 8px;
+	}
+
+	.error {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 0.875rem;
+		color: var(--danger-color);
+
+		app-icons {
+			flex-shrink: 0;
+		}
+	}
+
+	.help-text {
+		font-size: 0.813rem;
+		color: var(--app-text-color-secondary);
+	}
+}
+
+.settings-footer {
+	border-top: 1px solid var(--app-text-color);
+	padding: 16px 24px;
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
+@media (max-width: 768px) {
+	.source-add-modal-content {
+		max-width: 100%;
+	}
+
+	.settings-header {
+		padding: 12px 16px;
+
+		h2 {
+			font-size: 1.25rem;
+		}
+	}
+
+	.settings-body {
+		padding: 12px 16px;
+	}
+
+	.settings-footer {
+		padding: 12px 16px;
+		flex-direction: column;
+
+		app-button {
+			width: 100%;
+		}
+	}
+}

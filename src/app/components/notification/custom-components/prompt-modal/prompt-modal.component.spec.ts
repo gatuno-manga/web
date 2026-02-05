@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { PromptModalComponent } from './prompt-modal.component';
 import { By } from '@angular/platform-browser';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('PromptModalComponent', () => {
   let component: PromptModalComponent;
@@ -8,7 +9,8 @@ describe('PromptModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PromptModalComponent]
+      imports: [PromptModalComponent],
+      providers: [provideHttpClient()]
     })
     .compileComponents();
 
@@ -30,8 +32,8 @@ describe('PromptModalComponent', () => {
     component.message = 'Test Message';
     fixture.detectChanges();
 
-    const titleEl = fixture.debugElement.query(By.css('.header h2')).nativeElement;
-    const messageEl = fixture.debugElement.query(By.css('.header p')).nativeElement;
+    const titleEl = fixture.debugElement.query(By.css('.settings-header h2')).nativeElement;
+    const messageEl = fixture.debugElement.query(By.css('.settings-header p')).nativeElement;
 
     expect(titleEl.textContent).toContain('Test Title');
     expect(messageEl.textContent).toContain('Test Message');
