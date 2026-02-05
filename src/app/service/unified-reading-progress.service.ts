@@ -114,12 +114,15 @@ export class UnifiedReadingProgressService implements OnDestroy {
     ): Promise<void> {
         if (!this.isBrowser) return;
 
+        // Garante que o índice da página nunca seja negativo
+        const safePageIndex = Math.max(0, pageIndex);
+
         // Salva localmente INSTANTANEAMENTE
-        await this.localService.saveProgress(chapterId, bookId, pageIndex);
+        await this.localService.saveProgress(chapterId, bookId, safePageIndex);
 
         // Se usuário está autenticado, sincroniza com DEBOUNCE
         if (this.userTokenService.hasValidAccessToken) {
-            this.debounceSyncToApi(chapterId, bookId, pageIndex, totalPages, completed);
+            this.debounceSyncToApi(chapterId, bookId, safePageIndex, totalPages, completed);
         }
     }
 
@@ -136,15 +139,18 @@ export class UnifiedReadingProgressService implements OnDestroy {
     ): Promise<void> {
         if (!this.isBrowser) return;
 
+        // Garante que o índice da página nunca seja negativo
+        const safePageIndex = Math.max(0, pageIndex);
+
         // Cancela qualquer sync pendente
         this.cancelPendingSync();
 
         // Salva localmente
-        await this.localService.saveProgress(chapterId, bookId, pageIndex);
+        await this.localService.saveProgress(chapterId, bookId, safePageIndex);
 
         // Sincroniza imediatamente se autenticado
         if (this.userTokenService.hasValidAccessToken) {
-            await this.syncService.saveProgress(chapterId, bookId, pageIndex, totalPages, completed);
+            await this.syncService.saveProgress(chapterId, bookId, safePageIndex, totalPages, completed);
         }
     }
 
@@ -281,24 +287,22 @@ export class UnifiedReadingProgressService implements OnDestroy {
                 return;
             }
 
-            console.log(`📤 Sincronizando ${localProgress.length} itens de progresso local...`);
+            console.log(`📤 Sincronizando ${localProgress.length} itens de progresso local em lote...`);
 
-            // Envia cada progresso para o servidor
-            for (const progress of localProgress) {
-                try {
-                    await this.syncService.saveProgress(
-                        progress.chapterId,
-                        progress.bookId,
-                        progress.pageIndex
-                    );
-                } catch (error) {
-                    console.error(`❌ Erro ao sincronizar capítulo ${progress.chapterId}:`, error);
-                }
-            }
+            // Converte para o formato de DTO esperado pela API
+            const progressDtos = localProgress.map(p => ({
+                chapterId: p.chapterId,
+                bookId: p.bookId,
+                pageIndex: Math.max(0, p.pageIndex),
+                // totalPages e completed podem ser inferidos ou omitidos se não disponíveis
+            }));
 
-            console.log('✅ Histórico local sincronizado com o servidor');
+            // Envia todos os progressos em uma única chamada
+            await this.syncService.uploadProgress(progressDtos);
+
+            console.log('✅ Histórico local sincronizado com o servidor com sucesso');
         } catch (error) {
-            console.error('❌ Erro ao sincronizar histórico local:', error);
+            console.error('❌ Erro ao sincronizar histórico local em lote:', error);
         }
     }
 

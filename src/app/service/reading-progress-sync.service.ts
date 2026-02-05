@@ -44,6 +44,11 @@ interface SyncResponse {
     lastSyncAt: Date;
 }
 
+export interface SyncReadingProgressDto {
+    progress: SaveProgressDto[];
+    lastSyncAt?: Date;
+}
+
 /**
  * Service para sincronização de progresso de leitura com o backend via WebSocket
  *
@@ -302,7 +307,50 @@ export class ReadingProgressSyncService implements OnDestroy {
         this.updateSyncStatus({ pendingChanges: this.pendingChanges.size });
     }
 
+    /**
+     * Sincroniza uma lista de progressos em lote com o servidor
+     */
+    async uploadProgress(progress: SaveProgressDto[]): Promise<void> {
+        if (progress.length === 0) return;
+
+        try {
+            await this.syncBulkViaHttp(progress);
+            // Remove da lista de pendentes os itens que foram sincronizados
+            for (const item of progress) {
+                this.pendingChanges.delete(item.chapterId);
+            }
+            this.updateSyncStatus({
+                pendingChanges: this.pendingChanges.size,
+                lastSyncAt: new Date()
+            });
+        } catch (error) {
+            console.error('❌ Erro ao sincronizar progresso em lote:', error);
+            throw error;
+        }
+    }
+
     // ==================== MÉTODOS PRIVADOS ====================
+
+    private async syncBulkViaHttp(progress: SaveProgressDto[]): Promise<SyncResponse> {
+        const dto: SyncReadingProgressDto = {
+            progress,
+            lastSyncAt: this.syncStatusSubject.value.lastSyncAt || undefined
+        };
+
+        try {
+            const response = await firstValueFrom(
+                this.http.post<SyncResponse>(
+                    `${environment.apiURL}/reading-progress/sync`,
+                    dto
+                )
+            );
+            console.log(`✅ ${progress.length} itens sincronizados em lote via HTTP`);
+            return response;
+        } catch (error) {
+            console.error('❌ Erro na sincronização em lote via HTTP:', error);
+            throw error;
+        }
+    }
 
     private setupSocketListeners(): void {
         if (!this.socket) return;
