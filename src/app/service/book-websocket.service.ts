@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject, Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { UserTokenService } from './user-token.service';
+import { NetworkStatusService } from './network-status.service';
 import { BookEvents } from '../constants/book-events.constants';
 import {
     BookEvent,
@@ -30,11 +31,12 @@ import {
 @Injectable({
     providedIn: 'root'
 })
-export class BookWebsocketService {
+export class BookWebsocketService implements OnDestroy {
     private socket: Socket | null = null;
     private connectedSubject = new BehaviorSubject<boolean>(false);
     private subscribedBooks = new Set<string>();
     private subscribedChapters = new Set<string>();
+    private networkSubscription: Subscription | null = null;
 
     // Subjects para eventos
     private bookCreatedSubject = new Subject<BookEvent>();
@@ -71,7 +73,41 @@ export class BookWebsocketService {
     public chapterScrapingFailed$ = this.chapterScrapingFailedSubject.asObservable();
     public error$ = this.errorSubject.asObservable();
 
-    constructor(private userTokenService: UserTokenService) {}
+    constructor(
+        private userTokenService: UserTokenService,
+        private networkStatusService: NetworkStatusService
+    ) {
+        this.setupNetworkListener();
+    }
+
+    ngOnDestroy(): void {
+        this.networkSubscription?.unsubscribe();
+        this.disconnect();
+    }
+
+    /**
+     * Escuta mudanças de rede para desconectar/reconectar automaticamente
+     */
+    private setupNetworkListener(): void {
+        this.networkSubscription = this.networkStatusService.wentOffline$.subscribe(() => {
+            console.log('📡 Rede offline - desconectando WebSocket');
+            this.disconnectForOffline();
+        });
+    }
+
+    /**
+     * Desconecta o WebSocket quando fica offline (sem limpar inscrições)
+     */
+    private disconnectForOffline(): void {
+        if (this.socket) {
+            // Desabilita reconexão automática antes de desconectar
+            this.socket.io.opts.reconnection = false;
+            this.socket.disconnect();
+            this.socket = null;
+            this.connectedSubject.next(false);
+            console.log('🔌 WebSocket desconectado (modo offline)');
+        }
+    }
 
     /**
      * Conecta ao WebSocket com autenticação JWT

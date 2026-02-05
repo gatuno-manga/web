@@ -1,6 +1,24 @@
 :host {
 	display: flex;
+	flex-direction: column;
 	height: 100vh;
+}
+
+.offline-banner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.5rem 1rem;
+	background-color: var(--warning-color, #f59e0b);
+	color: var(--warning-text-color, #1f2937);
+	font-size: 0.875rem;
+	font-weight: 500;
+	flex-shrink: 0;
+
+	.offline-icon {
+		font-size: 1rem;
+	}
 }
 
 aside {

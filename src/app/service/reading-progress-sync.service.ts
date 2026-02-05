@@ -6,6 +6,7 @@ import { BehaviorSubject, Subject, firstValueFrom, Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { UserTokenService } from './user-token.service';
 import { ReadingProgressService, ReadingProgress } from './reading-progress.service';
+import { NetworkStatusService } from './network-status.service';
 
 export interface RemoteReadingProgress {
     id: string;
@@ -61,6 +62,7 @@ export class ReadingProgressSyncService implements OnDestroy {
     private isBrowser: boolean;
     private pendingChanges: Map<string, SaveProgressDto> = new Map();
     private syncSubscription: Subscription | null = null;
+    private networkSubscription: Subscription | null = null;
 
     // Estado da sincronização
     private syncStatusSubject = new BehaviorSubject<SyncStatus>({
@@ -85,19 +87,47 @@ export class ReadingProgressSyncService implements OnDestroy {
         @Inject(PLATFORM_ID) platformId: Object,
         private http: HttpClient,
         private userTokenService: UserTokenService,
-        private localProgressService: ReadingProgressService
+        private localProgressService: ReadingProgressService,
+        private networkStatusService: NetworkStatusService
     ) {
         this.isBrowser = isPlatformBrowser(platformId);
 
         if (this.isBrowser) {
             // Escuta mudanças de autenticação
             this.setupAuthListener();
+            // Escuta mudanças de rede
+            this.setupNetworkListener();
         }
     }
 
     ngOnDestroy(): void {
         this.disconnect();
         this.syncSubscription?.unsubscribe();
+        this.networkSubscription?.unsubscribe();
+    }
+
+    /**
+     * Escuta mudanças de rede para desconectar quando offline
+     */
+    private setupNetworkListener(): void {
+        this.networkSubscription = this.networkStatusService.wentOffline$.subscribe(() => {
+            console.log('📡 Rede offline - desconectando WebSocket de sincronização');
+            this.disconnectForOffline();
+        });
+    }
+
+    /**
+     * Desconecta o WebSocket quando fica offline
+     */
+    private disconnectForOffline(): void {
+        if (this.socket) {
+            // Desabilita reconexão automática antes de desconectar
+            this.socket.io.opts.reconnection = false;
+            this.socket.disconnect();
+            this.socket = null;
+            this.updateSyncStatus({ connected: false });
+            console.log('🔌 WebSocket de sincronização desconectado (modo offline)');
+        }
     }
 
     /**

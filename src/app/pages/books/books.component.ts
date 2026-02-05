@@ -1,4 +1,4 @@
-import { Component, signal, OnDestroy, OnInit, inject, PLATFORM_ID, Injector } from '@angular/core';
+import { Component, signal, OnDestroy, OnInit, inject, computed } from '@angular/core';
 import { LocalStorageService } from '../../service/local-storage.service';
 import { BookService } from '../../service/book.service';
 import { BookList, BookPageOptions, ScrapingStatus } from '../../models/book.models';
@@ -10,7 +10,7 @@ import { MetaDataService } from '../../service/meta-data.service';
 import { DownloadService } from '../../service/download.service';
 import { SensitiveContentService } from '../../service/sensitive-content.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
-import { isPlatformBrowser } from '@angular/common';
+import { NetworkStatusService } from '../../service/network-status.service';
 import { BookFilterComponent } from '../../components/book-filter/book-filter.component';
 
 @Component({
@@ -28,7 +28,7 @@ export class BooksComponent implements OnInit, OnDestroy {
   private downloadService = inject(DownloadService);
   private sensitiveContentService = inject(SensitiveContentService);
   private modalService = inject(ModalNotificationService);
-  private platformId = inject(PLATFORM_ID);
+  private networkStatus = inject(NetworkStatusService);
 
 
   books: BookList[] = [];
@@ -74,7 +74,7 @@ export class BooksComponent implements OnInit, OnDestroy {
       const pageFromUrl = params['page'] ? parseInt(params['page'], 10) : 1;
       this.currentPage = pageFromUrl > 0 ? pageFromUrl : 1;
 
-      this.isOfflineMode = isPlatformBrowser(this.platformId) && !navigator.onLine;
+      this.isOfflineMode = this.networkStatus.isOffline();
 
       if (this.isOfflineMode) {
         this.viewMode = 'offline';
@@ -139,7 +139,7 @@ export class BooksComponent implements OnInit, OnDestroy {
   toggleViewMode(mode: 'online' | 'offline') {
     if (this.viewMode === mode) return;
 
-    if (mode === 'online' && isPlatformBrowser(this.platformId) && !navigator.onLine) {
+    if (mode === 'online' && this.networkStatus.isOffline()) {
       this.modalService.show(
         'Sem conexão',
         'Você está sem internet. Não é possível acessar a biblioteca online.',
