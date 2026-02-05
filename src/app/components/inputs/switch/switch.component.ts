@@ -1,8 +1,9 @@
-import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
+import { Component, input, output, forwardRef } from '@angular/core';
 import { CheckboxControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-switch',
+  standalone: true,
   imports: [],
   providers: [
     {
@@ -15,16 +16,16 @@ import { CheckboxControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
   styleUrl: './switch.component.scss'
 })
 export class SwitchComponent extends CheckboxControlValueAccessor {
-  @Input() value: boolean = false;
-  @Input() disabled: boolean = false;
-  @Output() valueChange = new EventEmitter<boolean>();
+  value = input<boolean>(false);
+  disabled = input<boolean>(false);
+  valueChange = output<boolean>();
 
   onSwitchChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.value = input.checked;
-    this.valueChange.emit(this.value);
+    const newValue = input.checked;
+    this.valueChange.emit(newValue);
     if (this.onChange) {
-      this.onChange(this.value);
+      this.onChange(newValue);
     }
     if (this.onTouched) {
       this.onTouched();

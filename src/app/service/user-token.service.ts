@@ -1,5 +1,6 @@
-import { Injectable, inject, PLATFORM_ID, NgZone, signal, computed } from "@angular/core";
+import { Injectable, inject, PLATFORM_ID, NgZone, signal, computed, DestroyRef } from "@angular/core";
 import { isPlatformBrowser } from "@angular/common";
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CookieService } from "./cookie.service";
 import { HttpClient } from "@angular/common/http";
 import { Router } from '@angular/router';
@@ -8,6 +9,7 @@ import { payloadToken, Role } from "../models/user.models";
 import { Observable, Subscription, timer } from 'rxjs';
 import { shareReplay, tap, finalize } from 'rxjs/operators';
 import { NotificationService } from './notification.service';
+import { CrossTabSyncService, AuthSyncMessage } from './cross-tab-sync.service';
 
 @Injectable({
     providedIn: 'root',
@@ -17,6 +19,8 @@ export class UserTokenService {
     private cookieService = inject(CookieService);
     private platformId = inject(PLATFORM_ID);
     private ngZone = inject(NgZone);
+    private destroyRef = inject(DestroyRef);
+    private crossTabSync = inject(CrossTabSyncService);
 
     private router = inject(Router);
     private notificationService = inject(NotificationService);
@@ -28,34 +32,75 @@ export class UserTokenService {
     private refreshObservable: Observable<{ accessToken: string, refreshToken: string }> | null = null;
     private refreshSubscription?: Subscription;
 
-    // Reactive state
     private _accessToken = signal<string | null>(null);
-    
-    // Computed signals for external consumption
-    public readonly hasValidAccessTokenSignal = computed(() => {
-        const token = this._accessToken();
-        return !!token && this.isTokenValid(token);
-    });
 
-    public readonly isAdminSignal = computed(() => {
+    private readonly _decodedToken = computed(() => {
         const token = this._accessToken();
-        if (!token) return false;
+        if (!token) return null;
         try {
-            const { roles } = jwtDecode<payloadToken>(token);
-            return roles.includes(Role.ADMIN);
+            return jwtDecode<payloadToken>(token);
         } catch {
-            return false;
+            return null;
         }
     });
 
+    public readonly authHeaderSignal = computed(() => {
+        const token = this._accessToken();
+        return token ? `Bearer ${token}` : null;
+    });
+
+    public readonly accessTokenSignal = this._accessToken.asReadonly();
+
+    public readonly hasValidAccessTokenSignal = computed(() => {
+        const decoded = this._decodedToken();
+        if (!decoded?.exp) return false;
+        return decoded.exp > Math.floor(Date.now() / 1000);
+    });
+
+    public readonly isAdminSignal = computed(() => {
+        const decoded = this._decodedToken();
+        return decoded?.roles?.includes(Role.ADMIN) ?? false;
+    });
+
+    public readonly rolesSignal = computed(() => {
+        const decoded = this._decodedToken();
+        return decoded?.roles ?? [];
+    });
+
+    public readonly emailSignal = computed(() => {
+        const decoded = this._decodedToken();
+        return decoded?.email ?? null;
+    });
+
+    public readonly userIdSignal = computed(() => {
+        const decoded = this._decodedToken();
+        return decoded?.sub ?? null;
+    });
+
     constructor() {
-        // Initialize signal from cookie
         const initialToken = this.cookieService.get(this.ACCESSKEY, false);
         this._accessToken.set(initialToken);
+        this.initCrossTabSync();
 
         if (this.hasValidAccessToken) {
             this.scheduleAutoRefresh();
         }
+    }
+
+    private initCrossTabSync(): void {
+        this.crossTabSync.messages$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((message: AuthSyncMessage) => {
+                if (message.type === 'TOKEN_UPDATE') {
+                    this._accessToken.set(message.accessToken ?? null);
+                    if (message.accessToken) {
+                        this.scheduleAutoRefresh();
+                    }
+                } else if (message.type === 'TOKEN_REMOVE') {
+                    this.stopAutoRefresh();
+                    this._accessToken.set(null);
+                }
+            });
     }
 
     setTokens(accessToken: string, refreshToken: string) {
@@ -63,6 +108,7 @@ export class UserTokenService {
         this.cookieService.set(this.REFRESHKEY, refreshToken, false);
         this._accessToken.set(accessToken);
         this.scheduleAutoRefresh();
+        this.crossTabSync.notifyTokenUpdate(accessToken);
     }
 
     removeTokens(notifyUser = false): void {
@@ -70,6 +116,7 @@ export class UserTokenService {
         this.cookieService.delete(this.ACCESSKEY, false);
         this.cookieService.delete(this.REFRESHKEY, false);
         this._accessToken.set(null);
+        this.crossTabSync.notifyTokenRemove();
 
         if (notifyUser) {
             this.handleSessionExpired();
@@ -88,12 +135,16 @@ export class UserTokenService {
         });
     }
 
-    get accessToken(): string | null { return this.cookieService.get(this.ACCESSKEY, false); }
-    get refreshToken(): string | null { return this.cookieService.get(this.REFRESHKEY, false); }
+    get accessToken(): string | null {
+        return this._accessToken();
+    }
+
+    get refreshToken(): string | null {
+        return this.cookieService.get(this.REFRESHKEY, false);
+    }
 
     get hasValidAccessToken(): boolean {
-        const token = this.accessToken;
-        return !!token && this.isTokenValid(token);
+        return this.hasValidAccessTokenSignal();
     }
 
     get hasValidRefreshToken(): boolean {
@@ -174,18 +225,10 @@ export class UserTokenService {
     }
 
     private hasRole(role: Role): boolean {
-        const token = this.accessToken;
-        if (!token) return false;
-
-        try {
-            const { roles } = jwtDecode<payloadToken>(token);
-            return roles.includes(role);
-        } catch {
-            return false;
-        }
+        return this.rolesSignal().includes(role);
     }
 
     get isAdmin(): boolean {
-        return this.hasRole(Role.ADMIN);
+        return this.isAdminSignal();
     }
 }

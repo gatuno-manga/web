@@ -39,6 +39,7 @@ import { PromptModalComponent } from '@components/notification/custom-components
 import { BookWebsocketService } from '../../service/book-websocket.service';
 import { DownloadService } from '../../service/download.service';
 import { UnifiedReadingProgressService } from '../../service/unified-reading-progress.service';
+import { NetworkStatusService } from '../../service/network-status.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { fromEvent, lastValueFrom } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
@@ -88,6 +89,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
   private savedPagesService = inject(SavedPagesService);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
+  private networkStatus = inject(NetworkStatusService);
   private cdr = inject(ChangeDetectorRef);
   private injector = inject(Injector);
 
@@ -452,7 +454,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (direction === 'next') {
       const isNextDownloaded = await this.downloadService.isChapterDownloaded(targetChapterId);
-      if (!isNextDownloaded && !navigator.onLine) {
+      if (!isNextDownloaded && this.networkStatus.isOffline()) {
         this.modalNotificationService.show(
           'Você chegou ao fim',
           'Você chegou ao último capítulo baixado e está sem internet.',

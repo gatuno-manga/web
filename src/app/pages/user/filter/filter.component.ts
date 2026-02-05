@@ -1,64 +1,62 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
 import { SensitiveContentResponse } from '../../../models/book.models';
 import { SensitiveContentService } from '../../../service/sensitive-content.service';
-import { CheckboxComponent } from '../../../components/inputs/checkbox/checkbox.component';
-import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
 import { ListSwitchComponent } from '../../../components/inputs/list-switch/list-switch.component';
 import { MetaDataService } from '../../../service/meta-data.service';
 import { DownloadService } from '../../../service/download.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-filter',
+  standalone: true,
   imports: [ListSwitchComponent],
   templateUrl: './filter.component.html',
-  styleUrl: './filter.component.scss'
+  styleUrl: './filter.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FilterComponent {
-  sensitiveContentList: SensitiveContentResponse[] = [
-    {
-      id: '1',
-      name: 'safe',
-    }
-  ]
-  allowContent: string[] = [];
+export class FilterComponent implements OnInit {
+  private readonly sensitiveContentService = inject(SensitiveContentService);
+  private readonly metaService = inject(MetaDataService);
+  private readonly downloadService = inject(DownloadService);
 
-  constructor(
-    private readonly sensitiveContentService: SensitiveContentService,
-    private readonly metaService: MetaDataService,
-    private readonly downloadService: DownloadService
-  ) {
+  sensitiveContentList = signal<SensitiveContentResponse[]>([{ id: '1', name: 'safe' }]);
+  allowContent = signal<string[]>([]);
+  isLoading = signal<boolean>(false);
+
+  ngOnInit() {
+    this.allowContent.set(this.sensitiveContentService.getContentAllow());
     this.loadSensitiveContent();
-    this.allowContent = this.sensitiveContentService.getContentAllow();
     this.setMetaData();
   }
 
   loadSensitiveContent() {
-    this.sensitiveContentService.getSensitiveContent().subscribe({
-      next: (list) => {
-        this.sensitiveContentList = [...this.sensitiveContentList, ...list];
-      },
-      error: async () => {
-        try {
-          const offlineBooks = await this.downloadService.getAllBooks();
-          const contentMap = new Map<string, SensitiveContentResponse>();
-          
-          offlineBooks.forEach(book => {
-            if (book.sensitiveContent) {
-              book.sensitiveContent.forEach(sc => {
-                contentMap.set(sc.id, sc);
-              });
-            }
-          });
-          
-          const offlineList = Array.from(contentMap.values());
-          // Remove duplicates that might be in initial list (like 'safe' if it comes from books too, though unlikely with id '1')
-          // Actually, just appending unique ones found offline.
-          this.sensitiveContentList = [...this.sensitiveContentList, ...offlineList];
-        } catch (e) {
-          console.error('Error loading offline sensitive content', e);
+    this.isLoading.set(true);
+    this.sensitiveContentService.getSensitiveContent()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (list) => {
+          this.sensitiveContentList.update(current => [...current, ...list]);
+        },
+        error: async () => {
+          try {
+            const offlineBooks = await this.downloadService.getAllBooks();
+            const contentMap = new Map<string, SensitiveContentResponse>();
+            
+            offlineBooks.forEach(book => {
+              if (book.sensitiveContent) {
+                book.sensitiveContent.forEach(sc => {
+                  contentMap.set(sc.id, sc);
+                });
+              }
+            });
+            
+            const offlineList = Array.from(contentMap.values());
+            this.sensitiveContentList.update(current => [...current, ...offlineList]);
+          } catch (e) {
+            console.error('Error loading offline sensitive content', e);
+          }
         }
-      }
-    });
+      });
   }
 
   setMetaData() {
@@ -69,12 +67,16 @@ export class FilterComponent {
   }
 
   toggleContentAllow(content: SensitiveContentResponse): void {
-    const index = this.allowContent.indexOf(content.name);
-    if (index > -1) {
-      this.allowContent.splice(index, 1);
-    } else {
-      this.allowContent.push(content.name);
-    }
-    this.sensitiveContentService.setContentAllow(this.allowContent);
+    this.allowContent.update(current => {
+      const index = current.indexOf(content.name);
+      const newList = [...current];
+      if (index > -1) {
+        newList.splice(index, 1);
+      } else {
+        newList.push(content.name);
+      }
+      this.sensitiveContentService.setContentAllow(newList);
+      return newList;
+    });
   }
 }

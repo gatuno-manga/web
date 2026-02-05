@@ -1,16 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-import { SharedTestingModule } from '../../testing/shared-testing.module';
-import { AuthenticateGuard } from './auth.guard';
+import { isLoggedGuard } from './auth.guard';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
-describe('AuthenticateGuard', () => {
-  let guard: AuthenticateGuard;
+describe('AuthGuards', () => {
+	beforeEach(() => {
+		TestBed.configureTestingModule({
+			providers: [provideHttpClient(), provideRouter([])]
+		});
+	});
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({ imports: [SharedTestingModule] });
-    guard = TestBed.inject(AuthenticateGuard);
-  });
-
-  it('should be created', () => {
-    expect(guard).toBeTruthy();
-  });
+	it('isLoggedGuard should be defined', () => {
+		expect(isLoggedGuard).toBeDefined();
+	});
 });

@@ -1,6 +1,6 @@
-import { Component, Inject, PLATFORM_ID, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { isPlatformBrowser } from '@angular/common';
+import { NetworkStatusService } from '../../../service/network-status.service';
 
 @Component({
   selector: 'app-outlet',
@@ -8,29 +8,6 @@ import { isPlatformBrowser } from '@angular/common';
   templateUrl: './outlet.component.html',
   styleUrl: './outlet.component.scss'
 })
-export class OutletComponent implements OnInit, OnDestroy {
-  isOffline = false;
-  
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
-
-  ngOnInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.isOffline = !navigator.onLine;
-      
-      // Ouvir mudanças de rede para reatividade dinâmica
-      window.addEventListener('offline', this.updateOfflineStatus);
-      window.addEventListener('online', this.updateOfflineStatus);
-    }
-  }
-
-  ngOnDestroy() {
-    if (isPlatformBrowser(this.platformId)) {
-      window.removeEventListener('offline', this.updateOfflineStatus);
-      window.removeEventListener('online', this.updateOfflineStatus);
-    }
-  }
-
-  private updateOfflineStatus = () => {
-    this.isOffline = !navigator.onLine;
-  };
+export class OutletComponent {
+  readonly networkStatus = inject(NetworkStatusService);
 }

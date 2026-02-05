@@ -1,18 +1,38 @@
 import { Routes } from '@angular/router';
-import { RenderMode, ServerRoute } from '@angular/ssr';
-import { DefaltOutletComponent } from './pages/outlet/defalt-outlet/defalt-outlet.component';
-import { BookComponent } from './pages/book/book.component';
-import { BooksComponent } from './pages/books/books.component';
-import { ChaptersComponent } from './pages/chapters/chapters.component';
-import { HomeComponent } from './pages/home/home.component';
-import { OutletComponent as OutletAuht } from './pages/auth/outlet/outlet.component';
-import { OutletComponent as OutletUser } from './pages/user/outlet/outlet.component';
+import { RenderMode } from '@angular/ssr';
 import { networkGuard } from './guards/network.guard';
+
+/**
+ * Helpers para configuração de SSR e Cache
+ * Melhora a legibilidade e facilita a manutenção dos tempos de cache.
+ */
+const PRE_RENDER_CONFIG = (key: string) => ({
+  ssr: {
+    renderMode: RenderMode.Prerender,
+    cache: {
+      key,
+      ttl: 60 * 60 * 24 // 24 horas
+    }
+  }
+});
+
+const SERVER_RENDER_CONFIG = (key: string) => ({
+  ssr: {
+    renderMode: RenderMode.Server,
+    cache: {
+      key,
+      ttl: 60 * 60 // 1 hora
+    }
+  }
+});
 
 export const routes: Routes = [
   {
     path: '',
-    component: DefaltOutletComponent,
+    loadComponent: () =>
+      import('./pages/outlet/defalt-outlet/defalt-outlet.component').then(
+        (m) => m.DefaltOutletComponent
+      ),
     children: [
       {
         path: '',
@@ -21,77 +41,57 @@ export const routes: Routes = [
       },
       {
         path: 'home',
-        component: HomeComponent,
-        data: {
-          ssr: {
-            renderMode: RenderMode.Prerender,
-            cache: {
-              key: 'home',
-              ttl: 60 * 60 * 24 // 24 hours cache
-            }
-          }
-        }
+        loadComponent: () =>
+          import('./pages/home/home.component').then((m) => m.HomeComponent),
+        data: PRE_RENDER_CONFIG('home')
       },
       {
         path: 'books',
-        component: BooksComponent
+        loadComponent: () =>
+          import('./pages/books/books.component').then((m) => m.BooksComponent)
       },
       {
         path: 'books/:id',
-        component: BookComponent,
-        data: {
-          ssr: {
-            renderMode: RenderMode.Server,
-            cache: {
-              key: 'book',
-              ttl: 60 * 60
-            }
-          }
-        },
+        loadComponent: () =>
+          import('./pages/book/book.component').then((m) => m.BookComponent),
+        data: SERVER_RENDER_CONFIG('book')
       },
       {
         path: 'user',
-        component: OutletUser,
-        data: {
-          ssr: {
-            renderMode: RenderMode.Client,
-          }
-        },
-        loadChildren: () =>
-          import('./pages/user/user.routes').then(
-            (module_) => module_.routes,
+        loadComponent: () =>
+          import('./pages/user/outlet/outlet.component').then(
+            (m) => m.OutletComponent
           ),
+        data: { ssr: { renderMode: RenderMode.Client } },
+        loadChildren: () =>
+          import('./pages/user/user.routes').then((m) => m.routes)
       }
     ]
   },
   {
     path: 'books/:id/:chapter',
-    component: ChaptersComponent,
-    data: {
-      ssr: {
-        renderMode: RenderMode.Server,
-        cache: {
-          key: 'chapter',
-          ttl: 60 * 60
-        }
-      }
-    },
+    loadComponent: () =>
+      import('./pages/chapters/chapters.component').then(
+        (m) => m.ChaptersComponent
+      ),
+    data: SERVER_RENDER_CONFIG('chapter')
   },
   {
     path: 'auth',
-    component: OutletAuht,
-    loadChildren: () =>
-      import('./pages/auth/auth.routes').then(
-        (module_) => module_.routes,
+    loadComponent: () =>
+      import('./pages/auth/outlet/outlet.component').then(
+        (m) => m.OutletComponent
       ),
+    loadChildren: () => import('./pages/auth/auth.routes').then((m) => m.routes)
   },
   {
     path: 'dashboard',
-    component: DefaltOutletComponent,
+    loadComponent: () =>
+      import('./pages/outlet/defalt-outlet/defalt-outlet.component').then(
+        (m) => m.DefaltOutletComponent
+      ),
     canActivate: [networkGuard],
     loadChildren: () =>
-      import('./pages/dashboard/dashboard.routes').then(
-        (module_) => module_.routes,
-      ),
+      import('./pages/dashboard/dashboard.routes').then((m) => m.routes)
   }
 ];

@@ -6,7 +6,7 @@ import {
 	HttpRequest
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { Observable, catchError, filter, switchMap, take, throwError, EMPTY } from 'rxjs';
 import { UserTokenService } from '../service/user-token.service';
 import { AuthQueueService } from '../service/auth-queue.service';
 
@@ -42,9 +42,7 @@ const handle401Error = (
 
 		return tokenService.refreshTokens().pipe(
 			switchMap((tokens) => {
-				tokenService.setTokens(tokens.accessToken, tokens.refreshToken);
 				authQueue.notifySuccess(tokens.accessToken);
-
 				return next(addToken(req, tokens.accessToken));
 			}),
 			catchError((err) => {
@@ -55,11 +53,14 @@ const handle401Error = (
 		);
 	} else {
 		return authQueue.token$.pipe(
-			filter((token): token is string => token !== null),
+			filter((token): token is string => {
+				if (authQueue.hasFailed) {
+					return false;
+				}
+				return token !== null;
+			}),
 			take(1),
-			switchMap((token) => {
-				return next(addToken(req, token));
-			})
+			switchMap((token) => next(addToken(req, token)))
 		);
 	}
 };

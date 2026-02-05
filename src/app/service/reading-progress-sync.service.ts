@@ -6,6 +6,7 @@ import { BehaviorSubject, Subject, firstValueFrom, Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { UserTokenService } from './user-token.service';
 import { ReadingProgressService, ReadingProgress } from './reading-progress.service';
+import { NetworkStatusService } from './network-status.service';
 
 export interface RemoteReadingProgress {
     id: string;
@@ -43,6 +44,11 @@ interface SyncResponse {
     lastSyncAt: Date;
 }
 
+export interface SyncReadingProgressDto {
+    progress: SaveProgressDto[];
+    lastSyncAt?: Date;
+}
+
 /**
  * Service para sincronização de progresso de leitura com o backend via WebSocket
  *
@@ -61,6 +67,7 @@ export class ReadingProgressSyncService implements OnDestroy {
     private isBrowser: boolean;
     private pendingChanges: Map<string, SaveProgressDto> = new Map();
     private syncSubscription: Subscription | null = null;
+    private networkSubscription: Subscription | null = null;
 
     // Estado da sincronização
     private syncStatusSubject = new BehaviorSubject<SyncStatus>({
@@ -85,19 +92,47 @@ export class ReadingProgressSyncService implements OnDestroy {
         @Inject(PLATFORM_ID) platformId: Object,
         private http: HttpClient,
         private userTokenService: UserTokenService,
-        private localProgressService: ReadingProgressService
+        private localProgressService: ReadingProgressService,
+        private networkStatusService: NetworkStatusService
     ) {
         this.isBrowser = isPlatformBrowser(platformId);
 
         if (this.isBrowser) {
             // Escuta mudanças de autenticação
             this.setupAuthListener();
+            // Escuta mudanças de rede
+            this.setupNetworkListener();
         }
     }
 
     ngOnDestroy(): void {
         this.disconnect();
         this.syncSubscription?.unsubscribe();
+        this.networkSubscription?.unsubscribe();
+    }
+
+    /**
+     * Escuta mudanças de rede para desconectar quando offline
+     */
+    private setupNetworkListener(): void {
+        this.networkSubscription = this.networkStatusService.wentOffline$.subscribe(() => {
+            console.log('📡 Rede offline - desconectando WebSocket de sincronização');
+            this.disconnectForOffline();
+        });
+    }
+
+    /**
+     * Desconecta o WebSocket quando fica offline
+     */
+    private disconnectForOffline(): void {
+        if (this.socket) {
+            // Desabilita reconexão automática antes de desconectar
+            this.socket.io.opts.reconnection = false;
+            this.socket.disconnect();
+            this.socket = null;
+            this.updateSyncStatus({ connected: false });
+            console.log('🔌 WebSocket de sincronização desconectado (modo offline)');
+        }
     }
 
     /**
@@ -272,7 +307,50 @@ export class ReadingProgressSyncService implements OnDestroy {
         this.updateSyncStatus({ pendingChanges: this.pendingChanges.size });
     }
 
+    /**
+     * Sincroniza uma lista de progressos em lote com o servidor
+     */
+    async uploadProgress(progress: SaveProgressDto[]): Promise<void> {
+        if (progress.length === 0) return;
+
+        try {
+            await this.syncBulkViaHttp(progress);
+            // Remove da lista de pendentes os itens que foram sincronizados
+            for (const item of progress) {
+                this.pendingChanges.delete(item.chapterId);
+            }
+            this.updateSyncStatus({
+                pendingChanges: this.pendingChanges.size,
+                lastSyncAt: new Date()
+            });
+        } catch (error) {
+            console.error('❌ Erro ao sincronizar progresso em lote:', error);
+            throw error;
+        }
+    }
+
     // ==================== MÉTODOS PRIVADOS ====================
+
+    private async syncBulkViaHttp(progress: SaveProgressDto[]): Promise<SyncResponse> {
+        const dto: SyncReadingProgressDto = {
+            progress,
+            lastSyncAt: this.syncStatusSubject.value.lastSyncAt || undefined
+        };
+
+        try {
+            const response = await firstValueFrom(
+                this.http.post<SyncResponse>(
+                    `${environment.apiURL}/reading-progress/sync`,
+                    dto
+                )
+            );
+            console.log(`✅ ${progress.length} itens sincronizados em lote via HTTP`);
+            return response;
+        } catch (error) {
+            console.error('❌ Erro na sincronização em lote via HTTP:', error);
+            throw error;
+        }
+    }
 
     private setupSocketListeners(): void {
         if (!this.socket) return;

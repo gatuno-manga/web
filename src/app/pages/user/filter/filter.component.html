@@ -1,9 +1,19 @@
 <div class="filters">
 	<div id="content-filter">
-		<h2>Conteúdo sensível</h2>
+		<div class="title-container">
+			<h2>Conteúdo sensível</h2>
+			@if (isLoading()) {
+				<div class="loader-inline">
+					<span class="dot"></span>
+					<span class="dot"></span>
+					<span class="dot"></span>
+				</div>
+			}
+		</div>
+
 		<app-list-switch
-			[items]="sensitiveContentList"
-			[selectedItems]="allowContent"
+			[items]="sensitiveContentList()"
+			[selectedItems]="allowContent()"
 			(toggleItem)="toggleContentAllow($event)"
 		/>
 	</div>

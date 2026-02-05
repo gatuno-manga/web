@@ -98,9 +98,9 @@ export class TextReaderComponent implements OnInit, OnDestroy {
 
         if (scrollHeight <= 0) return;
 
-        const scrollPercentage = (scrollTop / scrollHeight) * 100;
+        const scrollPercentage = Math.max(0, (scrollTop / scrollHeight) * 100);
         const currentPage = Math.floor((scrollPercentage / 100) * this.virtualPages()) + 1;
-        const clampedPage = Math.min(currentPage, this.virtualPages());
+        const clampedPage = Math.min(Math.max(1, currentPage), this.virtualPages());
 
         // Only emit when page changes
         if (clampedPage > this.lastReportedPage) {
