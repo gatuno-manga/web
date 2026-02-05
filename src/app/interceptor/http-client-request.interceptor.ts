@@ -17,14 +17,17 @@ export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
     origin: isBrowser ? window.location.origin : undefined
   });
 
-  const token = userTokenService.accessToken;
+  const authHeader = userTokenService.authHeaderSignal();
   let headers = req.headers;
 
-  if (token) {
-    headers = headers.set('Authorization', `Bearer ${token}`);
+  if (authHeader) {
+    headers = headers.set('Authorization', authHeader);
 
     if (!isBrowser) {
-      headers = headers.set('cookie', `accessToken=${token}`);
+      const token = userTokenService.accessTokenSignal();
+      if (token) {
+        headers = headers.set('cookie', `accessToken=${token}`);
+      }
     }
   }
 
