@@ -20,7 +20,7 @@ export class AuthService {
     login(data: loginRequest) {
         return this.http
             .post<loginResponse>('/auth/signin', data,
-                { observe: 'response' }
+                { observe: 'response', withCredentials: true }
             )
             .pipe(
                 tap(({ body }) => {
@@ -53,6 +53,7 @@ export class AuthService {
             .post<loginResponse>('/auth/signup', data,
                 {
                     observe: 'response',
+                    withCredentials: true,
                 }
             )
             .pipe(

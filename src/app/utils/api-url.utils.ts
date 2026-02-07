@@ -21,6 +21,10 @@ export function buildApiUrl(path: string, config: UrlConfig): string {
         baseUrl = (config.origin || '') + '/api';
     }
 
+    if (config.isBrowser && baseUrl && !baseUrl.startsWith('http')) {
+        baseUrl = `${window.location.protocol}//${baseUrl}`;
+    }
+
     const cleanBase = baseUrl.replace(/\/+$/, '');
     const cleanPath = path.replace(/^\/+/, '');
 

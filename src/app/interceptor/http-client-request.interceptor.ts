@@ -24,9 +24,14 @@ export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
     headers = headers.set('Authorization', authHeader);
 
     if (!isBrowser) {
-      const token = userTokenService.accessTokenSignal();
-      if (token) {
-        headers = headers.set('cookie', `accessToken=${token}`);
+      // SSR: forward both access and refresh token cookies to the API
+      const cookieParts: string[] = [];
+      const accessToken = userTokenService.accessTokenSignal();
+      const refreshToken = userTokenService.refreshToken;
+      if (accessToken) cookieParts.push(`accessToken=${accessToken}`);
+      if (refreshToken) cookieParts.push(`refreshToken=${refreshToken}`);
+      if (cookieParts.length > 0) {
+        headers = headers.set('cookie', cookieParts.join('; '));
       }
     }
   }
