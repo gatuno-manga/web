@@ -340,7 +340,7 @@ export class ReadingProgressSyncService implements OnDestroy {
         try {
             const response = await firstValueFrom(
                 this.http.post<SyncResponse>(
-                    `${environment.apiURL}/reading-progress/sync`,
+                    'reading-progress/sync',
                     dto
                 )
             );
@@ -446,7 +446,7 @@ export class ReadingProgressSyncService implements OnDestroy {
         try {
             await firstValueFrom(
                 this.http.post<RemoteReadingProgress>(
-                    `${environment.apiURL}/reading-progress`,
+                    'reading-progress',
                     progress
                 )
             );
@@ -460,7 +460,7 @@ export class ReadingProgressSyncService implements OnDestroy {
     private async syncAllViaHttp(): Promise<void> {
         try {
             const remoteProgress = await firstValueFrom(
-                this.http.get<RemoteReadingProgress[]>(`${environment.apiURL}/reading-progress`)
+                this.http.get<RemoteReadingProgress[]>('reading-progress')
             );
 
             for (const progress of remoteProgress) {
