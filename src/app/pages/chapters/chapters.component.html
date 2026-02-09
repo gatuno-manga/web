@@ -3,7 +3,7 @@
 @if (chapter(); as currentChapter) {
 	<div id="header" class="header">
 		<div class="title">
-			<h1>Capitulo {{ currentChapter.index | number }}</h1>
+			<h1>Capítulo {{ currentChapter.index | number }}</h1>
 			@if (currentChapter.title) {
 				<h2>{{ currentChapter.title }}</h2>
 			}
@@ -104,7 +104,7 @@
 	<div class="footer">
 		@if (currentChapter.next) {
 			<a class="next" (click)="nextPage()">
-				Proximo capitulo
+				Proximo capítulo
 				<app-icons name="arrow-right" size="42" />
 			</a>
 		} @else {
@@ -122,7 +122,7 @@
 				<app-icons name="file" size="22" />
 				{{
 					currentChapter.title ||
-						'Capitulo ' + (currentChapter.index | number)
+						'Capítulo ' + (currentChapter.index | number)
 				}}
 			</h1>
 		</div>
@@ -153,7 +153,7 @@
 			<div class="line"></div>
 			<div class="actions">
 				<app-button (click)="resetChapter()" variant="text">
-					Resetar capitulo
+					Resetar capítulo
 				</app-button>
 				<app-button (click)="openOriginalLink()" variant="text">
 					Link original

@@ -1,6 +1,6 @@
 <div id="header">
 	<div class="selector" #selector></div>
-	<span #firstTab (click)="selectTab(tab.chapters, $event)">Capitulos</span>
+	<span #firstTab (click)="selectTab(tab.chapters, $event)">Capítulos</span>
 	<span (click)="selectTab(tab.covers, $event)">Capas</span>
 	<span (click)="selectTab(tab.extraInfo, $event)">Informações extras</span>
 	<span (click)="selectTab(tab.savedPages, $event)">Páginas Salvas</span>
@@ -103,7 +103,7 @@
 									size="16"
 									class="content-type-icon"
 								/>
-								<h2>capitulo {{ chapter.index | number }}</h2>
+								<h2>capítulo {{ chapter.index | number }}</h2>
 							</div>
 							@if (chapter.title) {
 								<h3>{{ chapter.title }}</h3>
@@ -279,7 +279,7 @@
 	>
 		<div class="scrollable">
 			<div class="titles">
-				<h1>Titulos alternativos</h1>
+				<h1>Títulos alternativos</h1>
 				<div>
 					@defer (when modulesLoad[tab.extraInfo].load()) {
 						@for (
