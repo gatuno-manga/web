@@ -7,7 +7,7 @@
 	.search-input {
 		flex: 1;
 		height: 100%;
-		--input-bg: #20142a;
+		--input-bg: var(--secondary-color);
 		--input-border: 1px solid white;
 		--input-radius: 15px;
 		--input-color: white;
@@ -17,7 +17,7 @@
 	app-button {
 		height: 100%;
 		::ng-deep button {
-			background-color: #f18522 !important;
+			background-color: var(--primary-color) !important;
 			border-radius: 15px !important;
 			width: 58px;
 			display: flex;
@@ -45,7 +45,7 @@
 
 		.orange-btn {
 			::ng-deep button {
-				background-color: #f18522 !important;
+				background-color: var(--primary-color) !important;
 				color: white !important;
 				border: none !important;
 				font-family: 'Inknut Antiqua', sans-serif;
@@ -118,7 +118,7 @@
 			width: 180px;
 
 			::ng-deep .select-trigger {
-				background-color: #20142a;
+				background-color: var(--secondary-color);
 				border: 1px solid rgba(255, 255, 255, 0.2);
 				color: white;
 				border-radius: 8px;
@@ -143,9 +143,13 @@
 .advanced-filters {
 	margin-top: 1.5rem;
 	padding: 25px;
-	border: 1px solid #20142a;
+	border: 1px solid var(--secondary-color);
 	border-radius: 15px;
-	background-color: rgba(32, 20, 42, 0.2);
+	background-color: color-mix(
+		in srgb,
+		var(--secondary-color) 20%,
+		transparent
+	);
 	display: flex;
 	flex-direction: column;
 	gap: 30px;
@@ -194,7 +198,6 @@
 	animation: expand-leave 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-
 .filters-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -222,7 +225,7 @@
 			width: 140px;
 
 			::ng-deep .select-trigger {
-				background-color: #20142a;
+				background-color: var(--secondary-color);
 				border: 1px solid rgba(255, 255, 255, 0.2);
 				color: white;
 				border-radius: 8px;
@@ -271,15 +274,15 @@
 		}
 
 		&.selected {
-			background-color: rgba(43, 127, 255, 0.3);
-			border-color: rgba(43, 127, 255, 0.5);
-			color: #bedbff;
+			background-color: var(--badge-default-bg);
+			border-color: var(--badge-default-border);
+			color: var(--badge-default-text);
 		}
 
 		&.excluded {
-			background-color: rgba(255, 67, 67, 0.2);
-			border-color: rgba(255, 67, 67, 0.4);
-			color: #ffcccc;
+			background-color: var(--badge-excluded-bg);
+			border-color: var(--badge-excluded-border);
+			color: var(--badge-excluded-text);
 
 			&::before {
 				content: '✕ ';
@@ -302,7 +305,7 @@
 		max-width: 400px;
 
 		::ng-deep .select-trigger {
-			background-color: #20142a;
+			background-color: var(--secondary-color);
 			border: 1px solid rgba(255, 255, 255, 0.2);
 			color: white;
 			border-radius: 8px;
@@ -334,7 +337,7 @@
 	border-top: 1px solid rgba(255, 255, 255, 0.1);
 
 	::ng-deep button {
-		background-color: #f18522 !important;
+		background-color: var(--primary-color) !important;
 		color: white !important;
 		border: none !important;
 		border-radius: 5px;
@@ -389,54 +392,54 @@
 	cursor: pointer;
 	transition: all 0.2s ease;
 	user-select: none;
-	background-color: rgba(43, 127, 255, 0.2);
-	border: 1px solid rgba(43, 127, 255, 0.4);
-	color: #8ec5ff;
+	background-color: var(--badge-default-bg);
+	border: 1px solid var(--badge-default-border);
+	color: var(--badge-default-text);
 
 	&:hover {
 		filter: brightness(1.2);
 	}
 
 	&.filter-search {
-		background-color: rgba(46, 204, 113, 0.2);
-		border-color: rgba(46, 204, 113, 0.4);
-		color: #a0eebb;
+		background-color: var(--badge-search-bg);
+		border-color: var(--badge-search-border);
+		color: var(--badge-search-text);
 	}
 
 	&.filter-type {
-		background-color: rgba(241, 133, 34, 0.2);
-		border-color: rgba(241, 133, 34, 0.4);
-		color: #ffcc99;
+		background-color: var(--badge-type-bg);
+		border-color: var(--badge-type-border);
+		color: var(--badge-type-text);
 	}
 
 	&.filter-tag {
-		background-color: rgba(43, 127, 255, 0.2);
-		border-color: rgba(43, 127, 255, 0.4);
-		color: #8ec5ff;
+		background-color: var(--badge-default-bg);
+		border-color: var(--badge-default-border);
+		color: var(--badge-default-text);
 	}
 
 	&.filter-excludeTag {
-		background-color: rgba(255, 67, 67, 0.2);
-		border-color: rgba(255, 67, 67, 0.4);
-		color: #ffcccc;
+		background-color: var(--badge-excluded-bg);
+		border-color: var(--badge-excluded-border);
+		color: var(--badge-excluded-text);
 	}
 
 	&.filter-sensitive {
-		background-color: rgba(155, 89, 182, 0.2);
-		border-color: rgba(155, 89, 182, 0.4);
-		color: #d2b4de;
+		background-color: var(--badge-sensitive-bg);
+		border-color: var(--badge-sensitive-border);
+		color: var(--badge-sensitive-text);
 	}
 
 	&.filter-publication {
-		background-color: rgba(241, 196, 15, 0.2);
-		border-color: rgba(241, 196, 15, 0.4);
-		color: #f9e79f;
+		background-color: var(--badge-publication-bg);
+		border-color: var(--badge-publication-border);
+		color: var(--badge-publication-text);
 	}
 
 	&.filter-author {
-		background-color: rgba(26, 188, 156, 0.2);
-		border-color: rgba(26, 188, 156, 0.4);
-		color: #a3e4d7;
+		background-color: var(--badge-author-bg);
+		border-color: var(--badge-author-border);
+		color: var(--badge-author-text);
 	}
 
 	.close-icon {

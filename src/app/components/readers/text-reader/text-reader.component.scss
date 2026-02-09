@@ -60,14 +60,14 @@
 	}
 
 	code {
-		background: rgba(0, 0, 0, 0.1);
+		background: color-mix(in srgb, var(--app-text-color) 10%, transparent);
 		padding: 2px 6px;
 		border-radius: 4px;
 		font-family: monospace;
 	}
 
 	pre {
-		background: rgba(0, 0, 0, 0.1);
+		background: color-mix(in srgb, var(--app-text-color) 10%, transparent);
 		padding: 1em;
 		border-radius: 8px;
 		overflow-x: auto;

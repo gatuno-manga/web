@@ -17,6 +17,39 @@
 		var(--black) 55%,
 		var(--dark-purple) 194%
 	);
+
+	// Overlays & Shadows
+	--overlay-bg: rgba(0, 0, 0, 0.7);
+	--shadow-color: rgba(var(--shadow-base), 0.2);
+
+	// Badge System
+	--badge-default-bg: rgba(43, 127, 255, 0.3);
+	--badge-default-border: rgba(43, 127, 255, 0.5);
+	--badge-default-text: var(--badge-blue-light);
+
+	--badge-search-bg: rgba(46, 204, 113, 0.2);
+	--badge-search-border: rgba(46, 204, 113, 0.4);
+	--badge-search-text: var(--badge-green-light);
+
+	--badge-type-bg: rgba(241, 133, 34, 0.2);
+	--badge-type-border: rgba(241, 133, 34, 0.4);
+	--badge-type-text: var(--badge-orange-light);
+
+	--badge-excluded-bg: rgba(255, 67, 67, 0.2);
+	--badge-excluded-border: rgba(255, 67, 67, 0.4);
+	--badge-excluded-text: var(--badge-red-light);
+
+	--badge-sensitive-bg: rgba(155, 89, 182, 0.2);
+	--badge-sensitive-border: rgba(155, 89, 182, 0.4);
+	--badge-sensitive-text: var(--badge-purple-light);
+
+	--badge-publication-bg: rgba(241, 196, 15, 0.2);
+	--badge-publication-border: rgba(241, 196, 15, 0.4);
+	--badge-publication-text: var(--badge-yellow-light);
+
+	--badge-author-bg: rgba(26, 188, 156, 0.2);
+	--badge-author-border: rgba(26, 188, 156, 0.4);
+	--badge-author-text: var(--badge-turquoise-light);
 }
 @mixin light-definitions() {
 	--app-background-color: var(--white);
@@ -36,4 +69,37 @@
 		var(--white) 50%,
 		var(--beige) 100%
 	);
+
+	// Overlays & Shadows
+	--overlay-bg: rgba(0, 0, 0, 0.3);
+	--shadow-color: rgba(var(--shadow-base), 0.15);
+
+	// Badge System (light theme has slightly different opacity for better contrast)
+	--badge-default-bg: rgba(43, 127, 255, 0.15);
+	--badge-default-border: rgba(43, 127, 255, 0.4);
+	--badge-default-text: #1a5acf;
+
+	--badge-search-bg: rgba(46, 204, 113, 0.15);
+	--badge-search-border: rgba(46, 204, 113, 0.35);
+	--badge-search-text: #1e8449;
+
+	--badge-type-bg: rgba(241, 133, 34, 0.15);
+	--badge-type-border: rgba(241, 133, 34, 0.35);
+	--badge-type-text: #d68910;
+
+	--badge-excluded-bg: rgba(255, 67, 67, 0.15);
+	--badge-excluded-border: rgba(255, 67, 67, 0.35);
+	--badge-excluded-text: #c0392b;
+
+	--badge-sensitive-bg: rgba(155, 89, 182, 0.15);
+	--badge-sensitive-border: rgba(155, 89, 182, 0.35);
+	--badge-sensitive-text: #7d3c98;
+
+	--badge-publication-bg: rgba(241, 196, 15, 0.15);
+	--badge-publication-border: rgba(241, 196, 15, 0.35);
+	--badge-publication-text: #9a7d0a;
+
+	--badge-author-bg: rgba(26, 188, 156, 0.15);
+	--badge-author-border: rgba(26, 188, 156, 0.35);
+	--badge-author-text: #138d75;
 }

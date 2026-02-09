@@ -37,20 +37,20 @@
 	</div>
 	<div class="charts-container">
 		@if (isBrowser) {
-		<div class="chart-card">
-			<div
-				echarts
-				[options]="scrapingStatusChartOption"
-				class="chart"
-			></div>
-		</div>
-		<div class="chart-card">
-			<div
-				echarts
-				[options]="chapterStatusChartOption"
-				class="chart"
-			></div>
-		</div>
+			<div class="chart-card">
+				<div
+					echarts
+					[options]="scrapingStatusChartOption"
+					class="chart"
+				></div>
+			</div>
+			<div class="chart-card">
+				<div
+					echarts
+					[options]="chapterStatusChartOption"
+					class="chart"
+				></div>
+			</div>
 		}
 	</div>
 </div>
@@ -61,20 +61,16 @@
 	</div>
 	<div class="charts-container">
 		@if (isBrowser) {
-		<div class="chart-card full-width">
-			<div
-				echarts
-				[options]="sensitiveContentChartOption"
-				class="chart"
-			></div>
-		</div>
-        <div class="chart-card full-width">
-			<div
-				echarts
-				[options]="tagsChartOption"
-				class="chart"
-			></div>
-		</div>
+			<div class="chart-card full-width">
+				<div
+					echarts
+					[options]="sensitiveContentChartOption"
+					class="chart"
+				></div>
+			</div>
+			<div class="chart-card full-width">
+				<div echarts [options]="tagsChartOption" class="chart"></div>
+			</div>
 		}
 	</div>
 </div>
@@ -86,14 +82,14 @@
 		</div>
 		<div class="content">
 			@for (item of progressBooks.books; track $index) {
-			<div [routerLink]="['/books', item.id]" class="book">
-				<div class="book-image">
-					<img [src]="item.cover" [alt]="item.title" />
+				<div [routerLink]="['/books', item.id]" class="book">
+					<div class="book-image">
+						<img [src]="item.cover" [alt]="item.title" />
+					</div>
+					<div class="book-title">{{ item.title }}</div>
 				</div>
-				<div class="book-title">{{ item.title }}</div>
-			</div>
-			}@empty {
-			<div class="empty-state">Nenhum livro em processamento</div>
+			} @empty {
+				<div class="empty-state">Nenhum livro em processamento</div>
 			}
 		</div>
 	</div>

@@ -3,10 +3,17 @@ import {
 	HttpEvent,
 	HttpHandlerFn,
 	HttpInterceptorFn,
-	HttpRequest
+	HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, catchError, filter, switchMap, take, throwError, EMPTY } from 'rxjs';
+import {
+	Observable,
+	catchError,
+	filter,
+	switchMap,
+	take,
+	throwError,
+} from 'rxjs';
 import { UserTokenService } from '../service/user-token.service';
 import { AuthQueueService } from '../service/auth-queue.service';
 
@@ -26,7 +33,7 @@ export const httpClientResponseInterceptor: HttpInterceptorFn = (req, next) => {
 			}
 
 			return throwError(() => error);
-		})
+		}),
 	);
 };
 
@@ -34,9 +41,8 @@ const handle401Error = (
 	req: HttpRequest<unknown>,
 	next: HttpHandlerFn,
 	tokenService: UserTokenService,
-	authQueue: AuthQueueService
+	authQueue: AuthQueueService,
 ): Observable<HttpEvent<unknown>> => {
-
 	if (!authQueue.isRefreshing) {
 		authQueue.startRefreshing();
 
@@ -49,24 +55,26 @@ const handle401Error = (
 				tokenService.removeTokens();
 				authQueue.notifyFailure(err);
 				return throwError(() => err);
-			})
-		);
-	} else {
-		return authQueue.token$.pipe(
-			filter((token): token is string => {
-				if (authQueue.hasFailed) {
-					return false;
-				}
-				return token !== null;
 			}),
-			take(1),
-			switchMap((token) => next(addToken(req, token)))
 		);
 	}
+	return authQueue.token$.pipe(
+		filter((token): token is string => {
+			if (authQueue.hasFailed) {
+				return false;
+			}
+			return token !== null;
+		}),
+		take(1),
+		switchMap((token) => next(addToken(req, token))),
+	);
 };
 
-const addToken = (req: HttpRequest<unknown>, token: string): HttpRequest<unknown> => {
+const addToken = (
+	req: HttpRequest<unknown>,
+	token: string,
+): HttpRequest<unknown> => {
 	return req.clone({
-		setHeaders: { Authorization: `Bearer ${token}` }
+		setHeaders: { Authorization: `Bearer ${token}` },
 	});
 };
