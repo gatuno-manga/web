@@ -53,6 +53,7 @@ export const routes: Routes = [
 					import('./pages/books/books.component').then(
 						(m) => m.BooksComponent,
 					),
+				data: SERVER_RENDER_CONFIG('books-list'),
 			},
 			{
 				path: 'books/:id',
@@ -61,6 +62,14 @@ export const routes: Routes = [
 						(m) => m.BookComponent,
 					),
 				data: SERVER_RENDER_CONFIG('book'),
+			},
+			{
+				path: 'books/:id/:chapter',
+				loadComponent: () =>
+					import('./pages/chapters/chapters.component').then(
+						(m) => m.ChaptersComponent,
+					),
+				data: SERVER_RENDER_CONFIG('chapter'),
 			},
 			{
 				path: 'user',
@@ -72,15 +81,16 @@ export const routes: Routes = [
 				loadChildren: () =>
 					import('./pages/user/user.routes').then((m) => m.routes),
 			},
+			{
+				path: 'dashboard',
+				canActivate: [networkGuard],
+				data: { ssr: { renderMode: RenderMode.Client } },
+				loadChildren: () =>
+					import('./pages/dashboard/dashboard.routes').then(
+						(m) => m.routes,
+					),
+			},
 		],
-	},
-	{
-		path: 'books/:id/:chapter',
-		loadComponent: () =>
-			import('./pages/chapters/chapters.component').then(
-				(m) => m.ChaptersComponent,
-			),
-		data: SERVER_RENDER_CONFIG('chapter'),
 	},
 	{
 		path: 'auth',
@@ -90,15 +100,5 @@ export const routes: Routes = [
 			),
 		loadChildren: () =>
 			import('./pages/auth/auth.routes').then((m) => m.routes),
-	},
-	{
-		path: 'dashboard',
-		loadComponent: () =>
-			import(
-				'./pages/outlet/default-outlet/default-outlet.component'
-			).then((m) => m.DefaultOutletComponent),
-		canActivate: [networkGuard],
-		loadChildren: () =>
-			import('./pages/dashboard/dashboard.routes').then((m) => m.routes),
 	},
 ];

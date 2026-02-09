@@ -1,134 +1,207 @@
-import { Subject } from 'rxjs';
 import {
-    INotificationStrategy,
-    NotificationConfig,
-    NotificationSeverity
+	NotificationConfig,
+	NotificationComponentData,
+	NotificationSeverity,
+	NotificationResult,
+	NotificationVisualType,
+	NotificationLevel,
+	OverlayNotificationData,
+	NOTIFICATION_CONSTANTS,
 } from './notification-strategy.interface';
-import { ToastNotificationStrategy } from './toast-notification.strategy';
-import { ModalNotificationStrategy } from './modal-notification.strategy';
-import { OverlayNotificationStrategy, OverlayNotification } from './overlay-notification.strategy';
-import { NotificationToast, ModalNotification } from '../../models/notification.models';
+import {
+	NotificationToast,
+	ModalNotification,
+	ModalButton,
+} from '../../models/notification.models';
 
 /**
- * Factory Method para criação de estratégias de notificação
+ * Factory para criação de objetos de notificação.
  *
- * Este padrão permite:
- * - Desacoplar o NotificationService das implementações concretas
- * - Facilitar a adição de novos tipos de notificação
- * - Centralizar a lógica de decisão sobre qual estratégia usar
- * - Seguir o princípio Open/Closed (aberto para extensão, fechado para modificação)
+ * Responsável apenas por:
+ * - Determinar a severidade com base na configuração
+ * - Criar o objeto de dados correto (Toast, Modal ou Overlay)
+ *
+ * Não contém side-effects — a emissão de estado é responsabilidade do NotificationService.
  */
 export class NotificationFactory {
-    constructor(
-        private toastSubject: Subject<NotificationToast>,
-        private modalSubject: Subject<ModalNotification | null>,
-        private overlaySubject: Subject<OverlayNotification>,
-        private overlayDismissSubject: Subject<string>
-    ) {}
+	private static idCounter = 0;
 
-    /**
-     * Factory Method - cria a estratégia apropriada baseada na configuração
-     *
-     * A decisão é baseada em:
-     * 1. Severidade explícita se fornecida
-     * 2. Nível da notificação (critical -> modal)
-     * 3. Contexto adicional (duração, dismissível, etc)
-     *
-     * @param config Configuração da notificação
-     * @returns Estratégia concreta de notificação
-     */
-    createNotificationStrategy(config: NotificationConfig): INotificationStrategy {
-        const severity = config.severity || this.determineSeverity(config);
+	/**
+	 * Cria o objeto de notificação apropriado baseado na configuração.
+	 * Retorna um discriminated union `NotificationResult` com `kind` + `data`.
+	 */
+	create<T extends NotificationComponentData>(
+		config: NotificationConfig<T>,
+	): NotificationResult {
+		const severity = config.severity || this.determineSeverity(config);
 
-        switch (severity) {
-            case NotificationSeverity.CRITICAL:
-                return this.createModalStrategy(config);
+		switch (severity) {
+			case NotificationSeverity.CRITICAL:
+				return this.buildModal(config);
 
-            case NotificationSeverity.HIGH:
-                return this.createOverlayStrategy(config);
+			case NotificationSeverity.HIGH:
+				return this.buildOverlay(config);
 
-            case NotificationSeverity.MEDIUM:
-                // Toast com duração maior ou Overlay se não for dismissível
-                if (config.dismissible === false) {
-                    return this.createOverlayStrategy(config);
-                }
-                return this.createToastStrategy(config);
+			case NotificationSeverity.MEDIUM:
+				if (config.dismissible === false) {
+					return this.buildOverlay(config);
+				}
+				return this.buildToast(config);
 
-            case NotificationSeverity.LOW:
-            default:
-                return this.createToastStrategy(config);
-        }
-    }
+			default:
+				return this.buildToast(config);
+		}
+	}
 
-    /**
-     * Determina a severidade baseada no contexto da notificação
-     */
-    private determineSeverity(config: NotificationConfig): NotificationSeverity {
-        if (config.severity) {
-            return config.severity;
-        }
+	/**
+	 * Criação direta de um Toast (ignora regras de severidade).
+	 */
+	createToast<T extends NotificationComponentData>(
+		config: NotificationConfig<T>,
+	): NotificationResult {
+		return this.buildToast(config);
+	}
 
-        if (config.level === 'critical') {
-            return NotificationSeverity.CRITICAL;
-        }
+	/**
+	 * Criação direta de um Modal (ignora regras de severidade).
+	 */
+	createModal<T extends NotificationComponentData>(
+		config: NotificationConfig<T>,
+	): NotificationResult {
+		return this.buildModal(config);
+	}
 
-        const isError = config.level === 'error';
-        const isWarning = config.level === 'warning';
-        const notDismissible = config.dismissible === false;
+	/**
+	 * Criação direta de um Overlay (ignora regras de severidade).
+	 */
+	createOverlay<T extends NotificationComponentData>(
+		config: NotificationConfig<T>,
+	): NotificationResult {
+		return this.buildOverlay(config);
+	}
 
-        // Regras de Alta Severidade
-        if ((isError && config.title) || (isWarning && notDismissible)) {
-            return NotificationSeverity.HIGH;
-        }
+	// ───────────────────────────────────────────────
+	// Builders privados
+	// ───────────────────────────────────────────────
 
-        // Regras de Média Severidade
-        if (isError || isWarning) {
-            return NotificationSeverity.MEDIUM;
-        }
+	private buildToast<T extends NotificationComponentData>(
+		config: NotificationConfig<T>,
+	): NotificationResult {
+		const toast: NotificationToast = {
+			id: ++NotificationFactory.idCounter,
+			message: config.message,
+			type: this.mapLevelToVisualType(config.level),
+			timeout:
+				config.duration ?? this.getDefaultToastDuration(config.level),
+			image: undefined,
+			link: undefined,
+			component: config.component,
+			componentData: config.componentData as Record<string, unknown>,
+		};
+		return { kind: 'toast', data: toast };
+	}
 
-        // Success e info são de baixa severidade (toast)
-        return NotificationSeverity.LOW;
-    }
+	private buildModal<T extends NotificationComponentData>(
+		config: NotificationConfig<T>,
+	): NotificationResult {
+		const buttons =
+			config.buttons ?? this.createDefaultButtons(config.level);
+		const modal: ModalNotification = {
+			title: config.title ?? this.getDefaultModalTitle(config.level),
+			description: config.message,
+			type: this.mapLevelToVisualType(config.level),
+			buttons,
+			component: config.component,
+			componentData: config.componentData as Record<string, unknown>,
+			useBackdrop: config.useBackdrop,
+			backdropOpacity: config.backdropOpacity,
+		};
+		return { kind: 'modal', data: modal };
+	}
 
-    /**
-     * Cria estratégia de Toast
-     */
-    private createToastStrategy(config: NotificationConfig): INotificationStrategy {
-        return new ToastNotificationStrategy(config, this.toastSubject);
-    }
+	private buildOverlay<T extends NotificationComponentData>(
+		config: NotificationConfig<T>,
+	): NotificationResult {
+		const overlay: OverlayNotificationData = {
+			id: `overlay-${++NotificationFactory.idCounter}`,
+			message: config.message,
+			type: this.mapLevelToVisualType(config.level),
+			title: config.title,
+			dismissible: config.dismissible !== false,
+			component: config.component,
+			componentData: config.componentData as NotificationComponentData,
+		};
+		return { kind: 'overlay', data: overlay };
+	}
 
-    /**
-     * Cria estratégia de Modal
-     */
-    private createModalStrategy(config: NotificationConfig): INotificationStrategy {
-        return new ModalNotificationStrategy(config, this.modalSubject);
-    }
+	// ───────────────────────────────────────────────
+	// Utilitários privados
+	// ───────────────────────────────────────────────
 
-    /**
-     * Cria estratégia de Overlay
-     */
-    private createOverlayStrategy(config: NotificationConfig): INotificationStrategy {
-        return new OverlayNotificationStrategy(
-            config,
-            this.overlaySubject,
-            this.overlayDismissSubject
-        );
-    }
+	private determineSeverity(
+		config: NotificationConfig,
+	): NotificationSeverity {
+		if (config.level === 'critical') {
+			return NotificationSeverity.CRITICAL;
+		}
 
-    /**
-     * Métodos auxiliares para criação direta de tipos específicos
-     * Útil quando o cliente sabe exatamente qual tipo quer criar
-     */
+		const isError = config.level === 'error';
+		const isWarning = config.level === 'warning';
+		const notDismissible = config.dismissible === false;
 
-    createToast(config: NotificationConfig): INotificationStrategy {
-        return this.createToastStrategy(config);
-    }
+		if ((isError && config.title) || (isWarning && notDismissible)) {
+			return NotificationSeverity.HIGH;
+		}
 
-    createModal(config: NotificationConfig): INotificationStrategy {
-        return this.createModalStrategy(config);
-    }
+		if (isError || isWarning) {
+			return NotificationSeverity.MEDIUM;
+		}
 
-    createOverlay(config: NotificationConfig): INotificationStrategy {
-        return this.createOverlayStrategy(config);
-    }
+		return NotificationSeverity.LOW;
+	}
+
+	private mapLevelToVisualType(
+		level: NotificationLevel,
+	): NotificationVisualType {
+		if (level === 'critical') return 'error';
+		if (level === 'custom') return 'info';
+		return level as NotificationVisualType;
+	}
+
+	private getDefaultToastDuration(level: NotificationLevel): number {
+		switch (level) {
+			case 'error':
+			case 'critical':
+			case 'warning':
+				return NOTIFICATION_CONSTANTS.DURATIONS.MEDIUM;
+			default:
+				return NOTIFICATION_CONSTANTS.DURATIONS.SHORT;
+		}
+	}
+
+	private getDefaultModalTitle(level: NotificationLevel): string {
+		switch (level) {
+			case 'critical':
+			case 'error':
+				return 'Erro';
+			case 'warning':
+				return 'Atenção';
+			case 'success':
+				return 'Sucesso';
+			default:
+				return 'Informação';
+		}
+	}
+
+	private createDefaultButtons(level: NotificationLevel): ModalButton[] {
+		return [
+			{
+				label: 'OK',
+				type:
+					level === 'error' || level === 'critical'
+						? 'danger'
+						: 'primary',
+			},
+		];
+	}
 }

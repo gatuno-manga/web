@@ -1,18 +1,38 @@
-import { Injectable } from '@angular/core';
-
-import { Subject } from 'rxjs';
-import { ModalButton, ModalNotification, NotificationType } from '../models/notification.models';
+import { Injectable, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import {
+	ModalButton,
+	ModalNotification,
+	NotificationType,
+} from '../models/notification.models';
+import { NotificationService } from './notification.service';
+import { NotificationSeverity } from './notification/notification-strategy.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ModalNotificationService {
-    private modalSubject = new Subject<ModalNotification | null>();
-    public modal$ = this.modalSubject.asObservable();
+	private notificationService = inject(NotificationService);
 
-    show(title: string, description: string, buttons: ModalButton[], type: NotificationType = 'info') {
-        this.modalSubject.next({ title, description, buttons, type });
-    }
+	/**
+	 * @deprecated Use NotificationService.modal signal instead.
+	 */
+	public modal$ = toObservable(this.notificationService.modal);
 
-    close() {
-        this.modalSubject.next(null);
-    }
+	show(
+		title: string,
+		description: string,
+		buttons: ModalButton[],
+		type: NotificationType = 'info',
+	) {
+		this.notificationService.notify({
+			title,
+			message: description,
+			buttons,
+			level: type,
+			severity: NotificationSeverity.CRITICAL,
+		});
+	}
+
+	close() {
+		this.notificationService.dismissModal();
+	}
 }

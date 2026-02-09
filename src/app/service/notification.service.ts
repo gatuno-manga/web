@@ -1,187 +1,228 @@
-import { Injectable, signal, computed } from "@angular/core";
-import { Subject, Observable } from "rxjs";
-import { NotificationToast, ModalNotification } from "../models/notification.models";
-import { NotificationFactory } from "./notification/notification.factory";
+import { Injectable, signal } from '@angular/core';
 import {
-    NotificationConfig,
-    NotificationLevel,
-    NotificationSeverity,
-    INotificationStrategy
-} from "./notification/notification-strategy.interface";
-import { OverlayNotification } from "./notification/overlay-notification.strategy";
+	NotificationToast,
+	ModalNotification,
+} from '../models/notification.models';
+import { NotificationFactory } from './notification/notification.factory';
+import {
+	NotificationConfig,
+	NotificationLevel,
+	NotificationSeverity,
+	NotificationComponentData,
+	OverlayNotificationData,
+	NOTIFICATION_CONSTANTS,
+} from './notification/notification-strategy.interface';
 
 /**
- * Serviço de notificações usando o padrão Factory Method e Signals
+ * Handle retornado ao criar uma notificação.
+ * Permite que o chamador faça dismiss programático.
+ */
+export interface NotificationHandle {
+	dismiss(): void;
+}
+
+/**
+ * Serviço de notificações usando Factory + Signals.
  *
- * Benefícios:
- * - Desacoplamento: O serviço não precisa conhecer as implementações concretas
- * - Extensibilidade: Novos tipos de notificação podem ser adicionados sem modificar este serviço
- * - Flexibilidade: A decisão de qual tipo usar é delegada ao factory
- * - Manutenibilidade: Lógica de criação centralizada no factory
- * - Reatividade Fina: Uso de Signals para gerenciamento de estado
- *
- * O padrão Factory Method é aplicado através da classe NotificationFactory,
- * que decide qual estratégia concreta de notificação criar baseada no contexto.
+ * Estado 100% baseado em Signals — sem Subjects ou Observables intermediários.
+ * O NotificationFactory cria objetos de dados puros; este serviço gerencia o estado.
  */
 @Injectable({
-    providedIn: 'root'
+	providedIn: 'root',
 })
 export class NotificationService {
-    // Subjects para comunicação com as estratégias (Barramento de eventos internos)
-    private toastSubject = new Subject<NotificationToast>();
-    private modalSubject = new Subject<ModalNotification | null>();
-    private overlaySubject = new Subject<OverlayNotification>();
-    private overlayDismissSubject = new Subject<string>();
+	// ─── State (Signals) ─────────────────────────────
+	private _toasts = signal<NotificationToast[]>([]);
+	private _modal = signal<ModalNotification | null>(null);
+	private _overlays = signal<OverlayNotificationData[]>([]);
 
-    // State Management com Signals
-    private _overlays = signal<OverlayNotification[]>([]);
-    
-    // Signals públicos (Read-only)
-    public readonly overlays = this._overlays.asReadonly();
+	// Signals públicos (Read-only)
+	public readonly toasts = this._toasts.asReadonly();
+	public readonly modal = this._modal.asReadonly();
+	public readonly overlays = this._overlays.asReadonly();
 
-    // Observables legados/compatibilidade (ainda úteis para eventos efêmeros como Toast)
-    public toasts$: Observable<NotificationToast> = this.toastSubject.asObservable();
-    public modals$: Observable<ModalNotification | null> = this.modalSubject.asObservable();
-    
-    // Factory para criar estratégias de notificação
-    private factory: NotificationFactory;
+	// Timer IDs para cancelar auto-dismiss pendentes
+	private toastTimers = new Map<number, ReturnType<typeof setTimeout>>();
+	private overlayTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
-    constructor() {
-        this.factory = new NotificationFactory(
-            this.toastSubject,
-            this.modalSubject,
-            this.overlaySubject,
-            this.overlayDismissSubject
-        );
+	// Factory puro (sem side-effects)
+	private factory = new NotificationFactory();
 
-        // Conecta os Subjects aos Signals (State Management Centralizado)
-        this.overlaySubject.subscribe(overlay => {
-            this._overlays.update(current => [...current, overlay]);
-        });
+	// ─── API principal ───────────────────────────────
 
-        this.overlayDismissSubject.subscribe(id => {
-            this._overlays.update(current => current.filter(o => o.id !== id));
-        });
-    }
+	/**
+	 * Método principal para mostrar notificações.
+	 * O factory decide automaticamente o tipo (toast/modal/overlay) com base na config.
+	 */
+	notify<T extends NotificationComponentData = NotificationComponentData>(
+		config: NotificationConfig<T>,
+	): NotificationHandle {
+		const result = this.factory.create(config);
 
-    /**
-     * Método principal para mostrar notificações
-     * O factory decide automaticamente qual tipo de notificação criar
-     *
-     * @param config Configuração da notificação
-     * @returns A estratégia criada (útil para controle manual se necessário)
-     */
-    notify<T = unknown>(config: NotificationConfig<T>): INotificationStrategy {
-        const strategy = this.factory.createNotificationStrategy(config);
-        strategy.display();
-        return strategy;
-    }
+		switch (result.kind) {
+			case 'toast':
+				return this.pushToast(result.data);
+			case 'modal':
+				return this.pushModal(result.data);
+			case 'overlay':
+				return this.pushOverlay(result.data, config.duration);
+		}
+	}
 
-    /**
-     * Remove a modal atual
-     */
-    dismissModal(): void {
-        this.modalSubject.next(null);
-    }
+	// ─── Dismiss ─────────────────────────────────────
 
-    /**
-     * Remove um overlay manualmente pelo ID
-     */
-    dismissOverlay(id: string): void {
-        this.overlayDismissSubject.next(id);
-    }
+	dismissToast(id: number): void {
+		const timer = this.toastTimers.get(id);
+		if (timer) {
+			clearTimeout(timer);
+			this.toastTimers.delete(id);
+		}
+		this._toasts.update((current) => current.filter((t) => t.id !== id));
+	}
 
-    /**
-     * Métodos de conveniência para casos comuns
-     * Abstraem a criação da configuração para os casos mais frequentes
-     */
+	dismissModal(): void {
+		this._modal.set(null);
+	}
 
-    success(message: string, title?: string, severity?: NotificationSeverity): INotificationStrategy {
-        return this.notify({
-            message,
-            title,
-            level: 'success',
-            severity
-        });
-    }
+	dismissOverlay(id: string): void {
+		const timer = this.overlayTimers.get(id);
+		if (timer) {
+			clearTimeout(timer);
+			this.overlayTimers.delete(id);
+		}
+		this._overlays.update((current) => current.filter((o) => o.id !== id));
+	}
 
-    error(message: string, title?: string, severity?: NotificationSeverity): INotificationStrategy {
-        return this.notify({
-            message,
-            title,
-            level: 'error',
-            severity
-        });
-    }
+	// ─── Métodos de conveniência ─────────────────────
 
-    warning(message: string, title?: string, severity?: NotificationSeverity): INotificationStrategy {
-        return this.notify({
-            message,
-            title,
-            level: 'warning',
-            severity
-        });
-    }
+	success(
+		message: string,
+		title?: string,
+		severity?: NotificationSeverity,
+	): NotificationHandle {
+		return this.notify({ message, title, level: 'success', severity });
+	}
 
-    info(message: string, title?: string, severity?: NotificationSeverity): INotificationStrategy {
-        return this.notify({
-            message,
-            title,
-            level: 'info',
-            severity
-        });
-    }
+	error(
+		message: string,
+		title?: string,
+		severity?: NotificationSeverity,
+	): NotificationHandle {
+		return this.notify({ message, title, level: 'error', severity });
+	}
 
-    critical(message: string, title?: string): INotificationStrategy {
-        return this.notify({
-            message,
-            title,
-            level: 'critical',
-            severity: NotificationSeverity.CRITICAL
-        });
-    }
+	warning(
+		message: string,
+		title?: string,
+		severity?: NotificationSeverity,
+	): NotificationHandle {
+		return this.notify({ message, title, level: 'warning', severity });
+	}
 
-    /**
-     * Métodos para criar tipos específicos de notificação
-     * Útil quando você quer forçar um tipo específico independente do contexto
-     */
+	info(
+		message: string,
+		title?: string,
+		severity?: NotificationSeverity,
+	): NotificationHandle {
+		return this.notify({ message, title, level: 'info', severity });
+	}
 
-    showToast(message: string, level: NotificationLevel, duration?: number): INotificationStrategy {
-        const strategy = this.factory.createToast({
-            message,
-            level,
-            duration
-        });
-        strategy.display();
-        return strategy;
-    }
+	critical(message: string, title?: string): NotificationHandle {
+		return this.notify({
+			message,
+			title,
+			level: 'critical',
+			severity: NotificationSeverity.CRITICAL,
+		});
+	}
 
-    showModal(message: string, level: NotificationLevel, title?: string): INotificationStrategy {
-        const strategy = this.factory.createModal({
-            message,
-            level,
-            title
-        });
-        strategy.display();
-        return strategy;
-    }
+	// ─── Criação direta por tipo ─────────────────────
 
-    showOverlay(message: string, level: NotificationLevel, title?: string, dismissible = true): INotificationStrategy {
-        const strategy = this.factory.createOverlay({
-            message,
-            level,
-            title,
-            dismissible
-        });
-        strategy.display();
-        return strategy;
-    }
+	showToast(
+		message: string,
+		level: NotificationLevel,
+		duration?: number,
+	): NotificationHandle {
+		const result = this.factory.createToast({ message, level, duration });
+		return this.pushToast(result.data as NotificationToast);
+	}
 
-    /**
-     * Método legado para compatibilidade com código existente
-     * @deprecated Use os novos métodos tipados (success, error, etc) ou notify()
-     */
-    show(message: string, type: NotificationLevel = 'info'): void {
-        this.notify({ message, level: type });
-    }
+	showModal(
+		message: string,
+		level: NotificationLevel,
+		title?: string,
+	): NotificationHandle {
+		const result = this.factory.createModal({ message, level, title });
+		return this.pushModal(result.data as ModalNotification);
+	}
+
+	showOverlay(
+		message: string,
+		level: NotificationLevel,
+		title?: string,
+		dismissible = true,
+	): NotificationHandle {
+		const result = this.factory.createOverlay({
+			message,
+			level,
+			title,
+			dismissible,
+		});
+		return this.pushOverlay(result.data as OverlayNotificationData);
+	}
+
+	/**
+	 * @deprecated Use os novos métodos tipados (success, error, etc) ou notify()
+	 */
+	show(message: string, type: NotificationLevel = 'info'): void {
+		this.notify({ message, level: type });
+	}
+
+	// ─── Internos ────────────────────────────────────
+
+	private pushToast(toast: NotificationToast): NotificationHandle {
+		this._toasts.update((current) => [...current, toast]);
+
+		if (toast.timeout > 0) {
+			const timer = setTimeout(
+				() => this.dismissToast(toast.id),
+				toast.timeout,
+			);
+			this.toastTimers.set(toast.id, timer);
+		}
+
+		return { dismiss: () => this.dismissToast(toast.id) };
+	}
+
+	private pushModal(modal: ModalNotification): NotificationHandle {
+		// Injeta callback de dismiss nos botões default que não têm callback
+		const enrichedModal: ModalNotification = {
+			...modal,
+			buttons: modal.buttons.map((btn) =>
+				btn.callback
+					? btn
+					: { ...btn, callback: () => this.dismissModal() },
+			),
+		};
+		this._modal.set(enrichedModal);
+
+		return { dismiss: () => this.dismissModal() };
+	}
+
+	private pushOverlay(
+		overlay: OverlayNotificationData,
+		duration?: number,
+	): NotificationHandle {
+		this._overlays.update((current) => [...current, overlay]);
+
+		if (duration && duration > 0) {
+			const timer = setTimeout(
+				() => this.dismissOverlay(overlay.id),
+				duration,
+			);
+			this.overlayTimers.set(overlay.id, timer);
+		}
+
+		return { dismiss: () => this.dismissOverlay(overlay.id) };
+	}
 }

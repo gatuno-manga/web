@@ -1,32 +1,31 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { Notification, NotificationToast, NotificationType } from '../models/notification.models';
+import { Injectable, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import {
+	NotificationToast,
+	NotificationType,
+} from '../models/notification.models';
+import { NotificationService } from './notification.service';
+import { NotificationSeverity } from './notification/notification-strategy.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ToastNotificationService {
-    private toastNotifications: NotificationToast[] = [];
-    private toastSubject = new BehaviorSubject<NotificationToast[]>([]);
-    public toast$ = this.toastSubject.asObservable();
+	private notificationService = inject(NotificationService);
 
-    private static nextId = 0;
+	/**
+	 * @deprecated Use NotificationService.toasts signal instead.
+	 */
+	public toast$ = toObservable(this.notificationService.toasts);
 
-    show(message: string, timeout: number = 5000, type: NotificationType = 'info') {
-        const id = ToastNotificationService.nextId++;
-        console.log(id);
-        const toast: NotificationToast = { id, message, timeout, type };
+	show(message: string, timeout = 5000, type: NotificationType = 'info') {
+		this.notificationService.notify({
+			message,
+			duration: timeout,
+			level: type,
+			severity: NotificationSeverity.LOW,
+		});
+	}
 
-        this.toastNotifications = [...this.toastNotifications, toast];
-        this.toastSubject.next(this.toastNotifications);
-
-        if (timeout > 0) {
-            setTimeout(() => {
-                this.dismiss(id);
-            }, timeout);
-        }
-    }
-
-    public dismiss(id: number) {
-        this.toastNotifications = this.toastNotifications.filter(n => n.id !== id);
-        this.toastSubject.next(this.toastNotifications);
-    }
+	public dismiss(id: number) {
+		this.notificationService.dismissToast(id);
+	}
 }

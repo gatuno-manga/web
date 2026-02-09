@@ -1,18 +1,18 @@
-import { Component, Input, signal, computed } from '@angular/core';
+import { Component, input, computed } from '@angular/core';
 import { IconsComponent } from '@components/icons/icons.component';
 
 @Component({
-    selector: 'app-progress-notification',
-    standalone: true,
-    imports: [IconsComponent],
-    templateUrl: './progress-notification.component.html',
-    styleUrls: ['./progress-notification.component.scss']
+	selector: 'app-progress-notification',
+	standalone: true,
+	imports: [IconsComponent],
+	templateUrl: './progress-notification.component.html',
+	styleUrls: ['./progress-notification.component.scss'],
 })
 export class ProgressNotificationComponent {
-    @Input() title: string = 'Processando';
-    @Input() progress: number = 0;
-    @Input() statusMessage: string = 'Aguarde...';
-    @Input() currentItem?: string;
+	title = input<string>('Processando');
+	progress = input<number>(0);
+	statusMessage = input<string>('Aguarde...');
+	currentItem = input<string | undefined>();
 
-    hasCurrentItem = computed(() => !!this.currentItem);
+	hasCurrentItem = computed(() => !!this.currentItem());
 }

@@ -1,4 +1,5 @@
-@if (currentModal) {
+@if (modal()) {
+  @let currentModal = modal()!;
   <div class="modal-backdrop" [class.show]="currentModal.useBackdrop" [style.opacity]="currentModal.backdropOpacity"></div>
   <div class="modal-container">
       <div class="modal-content">
@@ -24,6 +25,21 @@
       </div>
   </div>
 }
+
+<div class="toasts-container">
+    @for (toast of toasts(); track toast.id) {
+        <div class="toast-notification slide-in" [class]="toast.type">
+            <div class="toast-content">
+                @if (toast.component) {
+                    <ng-container *ngComponentOutlet="toast.component; inputs: toast.componentData" />
+                } @else {
+                    <p>{{ toast.message }}</p>
+                }
+            </div>
+            <button class="close-btn" (click)="dismissToast(toast.id)">×</button>
+        </div>
+    }
+</div>
 
 <div class="overlays-container">
   @for (overlay of overlays(); track overlay.id) {
