@@ -9,7 +9,6 @@ import {
 	ChangeDetectionStrategy,
 	ChangeDetectorRef,
 	computed,
-	effect,
 	DestroyRef,
 	AfterViewInit,
 	ViewChildren,
@@ -23,7 +22,6 @@ import { isPlatformBrowser } from '@angular/common';
 import { Chapter, ContentType } from '../../models/book.models';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
-import { HeaderComponent } from '../../components/header/header.component';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { ChapterService } from '../../service/chapter.service';
 import { UserTokenService } from '../../service/user-token.service';
@@ -62,7 +60,6 @@ import { HeaderStateService } from '../../service/header-state.service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		IconsComponent,
-		HeaderComponent,
 		RouterModule,
 		NgClass,
 		DecimalPipe,
