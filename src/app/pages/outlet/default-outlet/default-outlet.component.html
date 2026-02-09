@@ -1,4 +1,8 @@
-<app-header />
+<app-header
+	[style.position]="headerState.isFixedSignal() ? 'static' : 'sticky'"
+	[style.top]="headerState.isFixedSignal() ? null : '0'"
+	[style.z-index]="'1000'"
+/>
 <main>
-  <router-outlet />
+	<router-outlet />
 </main>

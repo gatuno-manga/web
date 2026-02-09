@@ -1,170 +1,175 @@
-@defer (when !isLoading()){ @if (book.cover && !coverImageError) {
-<div
-	[style.background-image]="'url(' + book.cover + ')'"
-	[style.width.px]="backgroundWidth"
-	class="book-background"
->
-	<div class="gradient"></div>
-</div>
-} @else {
-<div class="book-background placeholder-background"></div>
-}
-<div class="book">
-	<div class="book-header">
-		<div class="book-cover">
-			@if (book.cover && !coverImageError) {
-			<img [src]="book.cover" (error)="onCoverImageError()" />
-			} @else {
-			<div class="cover-placeholder">
-				<app-icons name="image" />
-			</div>
-			}
+@defer (when !isLoading()) {
+	@if (book.cover && !coverImageError) {
+		<div
+			[style.background-image]="'url(' + book.cover + ')'"
+			[style.width.px]="backgroundWidth"
+			class="book-background"
+		>
+			<div class="gradient"></div>
 		</div>
-		<div class="book-info">
-			<div class="top">
-				<h1
-					[class.long-title]="book.title.length > 90"
-					[class.very-long-title]="book.title.length > 140"
-				>
-					{{ book.title }}
-				</h1>
-				<h6>
-					{{ getAuthorNames() }}
-				</h6>
+	} @else {
+		<div class="book-background placeholder-background"></div>
+	}
+	<div class="book">
+		<div class="book-header">
+			<div class="book-cover">
+				@if (book.cover && !coverImageError) {
+					<img [src]="book.cover" (error)="onCoverImageError()" />
+				} @else {
+					<div class="cover-placeholder">
+						<app-icons name="image" />
+					</div>
+				}
 			</div>
-			<div class="bottom">
-				<div class="caps">{{ book.totalChapters }} Capítulos</div>
-				<div class="release">Lançamento {{ book.publication }}</div>
-				<div class="actions">
-					<app-button
-						class="reading-btn"
-						(click)="continueReading()"
-						variant="primary"
-						rounded="small"
+			<div class="book-info">
+				<div class="top">
+					<h1
+						[class.long-title]="book.title.length > 90"
+						[class.very-long-title]="book.title.length > 140"
 					>
-						{{
-							lastReadChapterId
-								? 'Continue lendo'
-								: 'Começar a ler'
-						}}
-					</app-button>
-					<div class="options-wrapper btn-actions">
+						{{ book.title }}
+					</h1>
+					<h6>
+						{{ getAuthorNames() }}
+					</h6>
+				</div>
+				<div class="bottom">
+					<div class="caps">{{ book.totalChapters }} Capítulos</div>
+					<div class="release">Lançamento {{ book.publication }}</div>
+					<div class="actions">
 						<app-button
+							class="reading-btn"
+							(click)="continueReading()"
+							variant="primary"
+							rounded="small"
+						>
+							{{
+								lastReadChapterId
+									? 'Continue lendo'
+									: 'Começar a ler'
+							}}
+						</app-button>
+						<div class="options-wrapper btn-actions">
+							<app-button
+								radio="square"
+								rounded="small"
+								padding="none"
+								class="options-btn"
+								(click)="
+									toggleOptionsDropdown();
+									$event.stopPropagation()
+								"
+							>
+								<app-icons name="more" />
+							</app-button>
+							@if (showOptionsDropdown()) {
+								<div class="options-dropdown">
+									<button (click)="downloadForApp()">
+										<app-icons name="smartphone" />
+										<span>Salvar no app</span>
+									</button>
+									@if (isBookDownloaded()) {
+										<button
+											(click)="deleteDownloadedBook()"
+											class="danger"
+										>
+											<app-icons name="trash" />
+											<span>Excluir download</span>
+										</button>
+									}
+									<button (click)="shareBook()">
+										<app-icons name="share" />
+										<span>Compartilhar</span>
+									</button>
+									@if (admin) {
+										<button (click)="forceCheckUpdates()">
+											<app-icons name="refresh-ccw-dot" />
+											<span>Forçar atualização</span>
+										</button>
+									}
+									<button (click)="downloadForApp()">
+										<app-icons name="download" />
+										<span>Baixar arquivos</span>
+									</button>
+								</div>
+							}
+						</div>
+						<app-button
+							class="btn-actions"
+							type="primary"
 							radio="square"
 							rounded="small"
 							padding="none"
-							class="options-btn"
-							(click)="
-								toggleOptionsDropdown();
-								$event.stopPropagation()
-							"
+							[disabled]="!admin"
+							(click)="toggleAutoUpdate()"
 						>
-							<app-icons name="more" />
+							<app-icons
+								[name]="
+									book.autoUpdate
+										? 'refresh-ccw'
+										: 'refresh-cw-off'
+								"
+							/>
 						</app-button>
-						@if (showOptionsDropdown()) {
-						<div class="options-dropdown">
-							<button (click)="downloadForApp()">
-								<app-icons name="smartphone" />
-								<span>Salvar no app</span>
-							</button>
-							@if (isBookDownloaded()) {
-							<button
-								(click)="deleteDownloadedBook()"
-								class="danger"
-							>
-								<app-icons name="trash" />
-								<span>Excluir download</span>
-							</button>
-							}
-							<button (click)="shareBook()">
-								<app-icons name="share" />
-								<span>Compartilhar</span>
-							</button>
-							@if (admin) {
-							<button (click)="forceCheckUpdates()">
-								<app-icons name="refresh-ccw-dot" />
-								<span>Forçar atualização</span>
-							</button>
-							}
-							<button (click)="downloadBookFiles()">
-								<app-icons name="download" />
-								<span>Baixar arquivos</span>
-							</button>
-						</div>
-						}
 					</div>
-					<app-button
-						class="btn-actions"
-						type="primary"
-						radio="square"
-						rounded="small"
-						padding="none"
-						[disabled]="!admin"
-						(click)="toggleAutoUpdate()"
-					>
-						<app-icons
-							[name]="
-								book.autoUpdate
-									? 'refresh-ccw'
-									: 'refresh-cw-off'
-							"
-						/>
-					</app-button>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="book-info-plus">
-		<div class="tags">
-			@for(content of book.sensitiveContent; track content) {
-			<span class="sensitive">{{ content.name }}</span>
-			} @for(tag of book.tags; track tag.id) {
-			<span class="tag" (click)="filterByTag(tag.id)">{{
-				tag.name
-			}}</span>
-			}
+		<div class="book-info-plus">
+			<div class="tags">
+				@for (content of book.sensitiveContent; track content) {
+					<span class="sensitive">{{ content.name }}</span>
+				}
+				@for (tag of book.tags; track tag.id) {
+					<span class="tag" (click)="filterByTag(tag.id)">{{
+						tag.name
+					}}</span>
+				}
+			</div>
+			<p class="book-description">{{ book.description }}</p>
 		</div>
-		<p class="book-description">{{ book.description }}</p>
 	</div>
-</div>
-<app-info-book [id]="book.id" [bookBasic]="book" />
+	<app-info-book [id]="book.id" [bookBasic]="book" />
 } @placeholder {
-<div class="book-background placeholder-background"></div>
-<div class="book">
-	<div class="book-header">
-		<div class="book-cover placeholder"></div>
-		<div class="book-info">
-			<div class="top">
-				<h1 class="placeholder"></h1>
-				<h6 class="placeholder"></h6>
-			</div>
-			<div class="bottom">
-				<div class="caps placeholder"></div>
-				<div class="release placeholder"></div>
+	<div class="book-background placeholder-background"></div>
+	<div class="book">
+		<div class="book-header">
+			<div class="book-cover placeholder"></div>
+			<div class="book-info">
+				<div class="top">
+					<h1 class="placeholder"></h1>
+					<h6 class="placeholder"></h6>
+				</div>
+				<div class="bottom">
+					<div class="caps placeholder"></div>
+					<div class="release placeholder"></div>
+				</div>
 			</div>
 		</div>
-	</div>
-	<div class="book-info-plus">
-		<div class="tags">
-			@for (i of [].constructor(5); track $index) {
-			<span class="placeholder"></span>
-			}
+		<div class="book-info-plus">
+			<div class="tags">
+				@for (i of [].constructor(5); track $index) {
+					<span class="placeholder"></span>
+				}
+			</div>
+			<p class="book-description placeholder"></p>
 		</div>
-		<p class="book-description placeholder"></p>
 	</div>
-</div>
-<div class="chapters">
-	@for (i of [].constructor(4); track $index) {
-	<div class="placeholder"></div>
-	}
-</div>
-} @if(admin && book){
-<app-aside>
-	<h1><app-icons name="book" /> {{ book.title }}</h1>
-	<div class="line"></div>
-	<div class="actions">
-		<app-button (click)="resetBook()" variant="text">Resetar</app-button>
-		<app-button (click)="fixBook()" variant="text">Corrigir</app-button>
+	<div class="chapters">
+		@for (i of [].constructor(4); track $index) {
+			<div class="placeholder"></div>
+		}
 	</div>
-</app-aside>
+}
+@if (admin && book) {
+	<app-aside>
+		<h1><app-icons name="book" /> {{ book.title }}</h1>
+		<div class="line"></div>
+		<div class="actions">
+			<app-button (click)="resetBook()" variant="text"
+				>Resetar</app-button
+			>
+			<app-button (click)="fixBook()" variant="text">Corrigir</app-button>
+		</div>
+	</app-aside>
 }

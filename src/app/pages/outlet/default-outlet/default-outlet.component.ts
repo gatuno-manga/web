@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { RouterModule, RouterOutlet } from '@angular/router';
+import { HeaderStateService } from '../../../service/header-state.service';
 
 @Component({
 	selector: 'app-default-outlet',
@@ -9,4 +10,6 @@ import { RouterModule, RouterOutlet } from '@angular/router';
 	templateUrl: './default-outlet.component.html',
 	styleUrl: './default-outlet.component.scss',
 })
-export class DefaultOutletComponent {}
+export class DefaultOutletComponent {
+	protected headerState = inject(HeaderStateService);
+}

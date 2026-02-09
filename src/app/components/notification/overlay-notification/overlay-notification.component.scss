@@ -87,6 +87,7 @@
 			h3 {
 				margin: 0;
 				font-size: 1.5rem;
+				color: var(--app-text-color);
 			}
 
 			&.error h3 {
@@ -97,9 +98,6 @@
 			}
 			&.warning h3 {
 				color: var(--yellow, #ffc107);
-			}
-			&.info h3 {
-				color: var(--cyan, #17a2b8);
 			}
 		}
 
