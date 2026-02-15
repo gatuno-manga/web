@@ -547,7 +547,9 @@ export class ReadingProgressSyncService implements OnDestroy {
 				}
 			}
 
-			this.transitionTo(WebSocketConnectionState.ERROR, error.message);
+			const errorMessage =
+				error instanceof Error ? error.message : String(error);
+			this.transitionTo(WebSocketConnectionState.ERROR, errorMessage);
 			this.updateSyncStatus({ connected: false });
 		});
 

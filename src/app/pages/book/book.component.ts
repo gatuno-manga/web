@@ -247,12 +247,19 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.wsSubscription = this.wsService
 			.watchBook(bookId)
 			.subscribe((event) => {
-				console.log('📡 Evento recebido:', event.type, event.data);
+				const typedEvent = event as { type: string; data: unknown };
+				console.log(
+					'📡 Evento recebido:',
+					typedEvent.type,
+					typedEvent.data,
+				);
 
-				switch (event.type) {
+				switch (typedEvent.type) {
 					case 'book.updated':
 						// Atualiza informações do livro
-						this.book.title = event.data.title;
+						this.book.title = (
+							typedEvent.data as { title: string }
+						).title;
 						console.log('✅ Livro atualizado em tempo real');
 						break;
 
@@ -266,20 +273,25 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 					case 'chapter.scraping.started':
 						console.log(
 							'🔄 Scraping iniciado para capítulo:',
-							event.data.chapterId,
+							(typedEvent.data as { chapterId: string })
+								.chapterId,
 						);
 						break;
 
 					case 'chapter.scraping.completed':
 						console.log(
 							'✅ Scraping completo! Páginas:',
-							event.data.pagesCount,
+							(typedEvent.data as { pagesCount: number })
+								.pagesCount,
 						);
 						this.refreshBook();
 						break;
 
 					case 'chapter.scraping.failed':
-						console.error('❌ Scraping falhou:', event.data.error);
+						console.error(
+							'❌ Scraping falhou:',
+							(typedEvent.data as { error: string }).error,
+						);
 						break;
 
 					case 'cover.selected':

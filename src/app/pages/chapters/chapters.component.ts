@@ -225,10 +225,11 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.bookWebsocketService
 			.watchChapter(chapterId, bookId)
 			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe((event: { type: string; data: unknown }) => {
+			.subscribe((event) => {
+				const typedEvent = event as { type: string; data: unknown };
 				if (
-					event.type === 'chapter.updated' ||
-					event.type === 'chapter.scraping.completed'
+					typedEvent.type === 'chapter.updated' ||
+					typedEvent.type === 'chapter.scraping.completed'
 				) {
 					this.refreshChapter();
 				}
