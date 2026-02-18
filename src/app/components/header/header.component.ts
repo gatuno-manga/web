@@ -33,8 +33,6 @@ export class HeaderComponent {
 	}
 
 	isDarkTheme = computed(() => this.themeService.currentTheme() === 'dark');
-
 	isLoggedIn = this.userTokenService.hasValidAccessTokenSignal;
-
 	isAdmin = this.userTokenService.isAdminSignal;
 }

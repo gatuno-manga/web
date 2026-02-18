@@ -4,7 +4,12 @@
 			<app-icons name="close" size="24" />
 		</button>
 		<div class="brand">
-			<app-icons name="logo" size="48" />
+			<app-icons
+				id="logo"
+				name="logo"
+				size="48"
+				[class.dark-theme]="isDarkTheme()"
+			/>
 			<h1 class="title">Gatuno</h1>
 		</div>
 	</div>
