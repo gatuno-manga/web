@@ -8,6 +8,7 @@ import {
 	NgZone,
 	AfterViewInit,
 	ChangeDetectorRef,
+	ElementRef,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
@@ -83,6 +84,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	private userTokenService = inject(UserTokenService);
 	private ngZone = inject(NgZone);
 	private cdr = inject(ChangeDetectorRef);
+	private elRef = inject(ElementRef);
 
 	constructor(
 		private bookService: BookService,
@@ -102,20 +104,16 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	@HostListener('window:resize')
-	@HostListener('window:scroll')
 	updateBackgroundSize() {
-		if (typeof document !== 'undefined') {
-			const bodyHeight = document.body.scrollHeight;
-			const htmlHeight = document.documentElement.scrollHeight;
-			const viewportHeight = window.innerHeight;
+		const hostHeight = (this.elRef.nativeElement as HTMLElement)
+			.offsetHeight;
+		const viewportHeight =
+			typeof window !== 'undefined' ? window.innerHeight : 0;
+		const newWidth = Math.max(hostHeight, viewportHeight);
 
-			// Calcula a largura necessária (que será a altura após rotação)
-			const newWidth = Math.max(bodyHeight, htmlHeight, viewportHeight);
-
-			if (this.backgroundWidth !== newWidth) {
-				this.backgroundWidth = newWidth;
-				this.cdr.detectChanges();
-			}
+		if (this.backgroundWidth !== newWidth) {
+			this.backgroundWidth = newWidth;
+			this.cdr.detectChanges();
 		}
 	}
 
@@ -211,15 +209,13 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	private setupObservers() {
 		if (typeof window === 'undefined') return;
 
-		// ResizeObserver para body e html
+		// ResizeObserver no próprio host para capturar crescimento do conteúdo
+		// independente de qual elemento pai faz o scroll
 		if (window.ResizeObserver) {
 			this.resizeObserver = new ResizeObserver(() => {
 				this.ngZone.run(() => this.updateBackgroundSize());
 			});
-
-			if (document.body) this.resizeObserver.observe(document.body);
-			if (document.documentElement)
-				this.resizeObserver.observe(document.documentElement);
+			this.resizeObserver.observe(this.elRef.nativeElement);
 		}
 
 		// MutationObserver para detectar mudanças no DOM (ex: @defer carregando)
@@ -227,14 +223,12 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.ngZone.run(() => this.updateBackgroundSize());
 		});
 
-		if (document.body) {
-			this.mutationObserver.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: ['style', 'class'],
-			});
-		}
+		this.mutationObserver.observe(this.elRef.nativeElement, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['style', 'class'],
+		});
 	}
 
 	private setupWebSocket(bookId: string) {

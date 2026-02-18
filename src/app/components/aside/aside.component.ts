@@ -1,199 +1,244 @@
-import { Component, HostListener, OnInit, OnDestroy, Input, PLATFORM_ID, Inject, OnChanges, SimpleChanges } from '@angular/core';
+import {
+	Component,
+	HostListener,
+	OnInit,
+	OnDestroy,
+	Input,
+	PLATFORM_ID,
+	Inject,
+	OnChanges,
+	SimpleChanges,
+	output,
+} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
 
-
 @Component({
-  selector: 'app-aside',
-  imports: [IconsComponent],
-  templateUrl: './aside.component.html',
-  styleUrl: './aside.component.scss'
+	selector: 'app-aside',
+	imports: [IconsComponent],
+	templateUrl: './aside.component.html',
+	styleUrl: './aside.component.scss',
 })
 export class AsideComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() position: 'left' | 'right' = 'right';
-  @Input() topOffset: number = 80;
-  @Input() readonly SWIPE_THRESHOLD = 300;
-  @Input() readonly EDGE_THRESHOLD = 150;
-  @Input() readonly ASIDE_WIDTH = 300;
-  isOpen = false;
-  private touchStartX = 0;
-  private touchStartY = 0;
-  private isDragging = false;
-  public dragOffset = 0;
-  private isBrowser: boolean;
+	@Input() position: 'left' | 'right' = 'right';
+	@Input() topOffset = 60;
+	@Input() readonly SWIPE_THRESHOLD = 300;
+	@Input() readonly EDGE_THRESHOLD = 150;
+	@Input() readonly ASIDE_WIDTH = 300;
 
-  constructor(@Inject(PLATFORM_ID) platformId: object) {
-    this.isBrowser = isPlatformBrowser(platformId);
-  }
+	closed = output<void>();
 
-  ngOnInit() {
-    if (this.isBrowser) {
-      this.addTouchListeners();
-    }
-  }
+	isOpen = false;
+	private touchStartX = 0;
+	private touchStartY = 0;
+	private isDragging = false;
+	public dragOffset = 0;
+	private isBrowser: boolean;
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['position'] && !changes['position'].firstChange) {
-      // Reset state when position changes
-      this.isOpen = false;
-      this.isDragging = false;
-      this.dragOffset = 0;
-    }
-  }
+	constructor(@Inject(PLATFORM_ID) platformId: object) {
+		this.isBrowser = isPlatformBrowser(platformId);
+	}
 
-  ngOnDestroy() {
-    if (this.isBrowser) {
-      this.removeTouchListeners();
-    }
-  }
+	ngOnInit() {
+		if (this.isBrowser) {
+			this.addTouchListeners();
+		}
+	}
 
-  @HostListener('window:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
-      event.preventDefault();
-      this.toggle();
-    }
-  }
+	ngOnChanges(changes: SimpleChanges) {
+		// biome-ignore lint/complexity/useLiteralKeys: noPropertyAccessFromIndexSignature obriga uso de bracket notation
+		if (changes['position'] && !changes['position'].firstChange) {
+			// Reset state when position changes
+			this.isOpen = false;
+			this.isDragging = false;
+			this.dragOffset = 0;
+		}
+	}
 
-  private addTouchListeners() {
-    if (this.isBrowser && typeof document !== 'undefined') {
-      document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
-      document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: true });
-      document.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
-    }
-  }
+	ngOnDestroy() {
+		if (this.isBrowser) {
+			this.removeTouchListeners();
+		}
+	}
 
-  private removeTouchListeners() {
-    if (this.isBrowser && typeof document !== 'undefined') {
-      document.removeEventListener('touchstart', this.handleTouchStart.bind(this));
-      document.removeEventListener('touchmove', this.handleTouchMove.bind(this));
-      document.removeEventListener('touchend', this.handleTouchEnd.bind(this));
-    }
-  }
+	@HostListener('window:keydown', ['$event'])
+	handleKeyboardEvent(event: KeyboardEvent) {
+		if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
+			event.preventDefault();
+			this.toggle();
+		}
+	}
 
-  private handleTouchStart(event: TouchEvent) {
-    if (!this.isBrowser) return;
+	private addTouchListeners() {
+		if (this.isBrowser && typeof document !== 'undefined') {
+			document.addEventListener(
+				'touchstart',
+				this.handleTouchStart.bind(this),
+				{ passive: true },
+			);
+			document.addEventListener(
+				'touchmove',
+				this.handleTouchMove.bind(this),
+				{ passive: true },
+			);
+			document.addEventListener(
+				'touchend',
+				this.handleTouchEnd.bind(this),
+				{ passive: true },
+			);
+		}
+	}
 
-    this.touchStartX = event.touches[0].clientX;
-    this.touchStartY = event.touches[0].clientY;
-    const screenWidth = window.innerWidth;
+	private removeTouchListeners() {
+		if (this.isBrowser && typeof document !== 'undefined') {
+			document.removeEventListener(
+				'touchstart',
+				this.handleTouchStart.bind(this),
+			);
+			document.removeEventListener(
+				'touchmove',
+				this.handleTouchMove.bind(this),
+			);
+			document.removeEventListener(
+				'touchend',
+				this.handleTouchEnd.bind(this),
+			);
+		}
+	}
 
-    const isNearEdge = this.position === 'right'
-      ? this.touchStartX > (screenWidth - this.EDGE_THRESHOLD)
-      : this.touchStartX < this.EDGE_THRESHOLD;
+	private handleTouchStart(event: TouchEvent) {
+		if (!this.isBrowser) return;
 
-    if (isNearEdge || this.isOpen) {
-      this.isDragging = true;
-    }
-  }
+		this.touchStartX = event.touches[0].clientX;
+		this.touchStartY = event.touches[0].clientY;
+		const screenWidth = window.innerWidth;
 
-  private handleTouchMove(event: TouchEvent) {
-    if (!this.isDragging) return;
+		const isNearEdge =
+			this.position === 'right'
+				? this.touchStartX > screenWidth - this.EDGE_THRESHOLD
+				: this.touchStartX < this.EDGE_THRESHOLD;
 
-    const currentX = event.touches[0].clientX;
-    const deltaX = currentX - this.touchStartX;
+		if (isNearEdge || this.isOpen) {
+			this.isDragging = true;
+		}
+	}
 
-    if (!this.isOpen) {
-      if (this.position === 'right') {
-        this.dragOffset = Math.max(-this.ASIDE_WIDTH, Math.min(0, deltaX));
-      } else {
-        this.dragOffset = Math.max(0, Math.min(this.ASIDE_WIDTH, deltaX));
-      }
-    } else {
-      if (this.position === 'right') {
-        this.dragOffset = Math.max(0, Math.min(this.ASIDE_WIDTH, deltaX));
-      } else {
-        this.dragOffset = Math.max(-this.ASIDE_WIDTH, Math.min(0, deltaX));
-      }
-    }
-  }
+	private handleTouchMove(event: TouchEvent) {
+		if (!this.isDragging) return;
 
-  private handleTouchEnd(event: TouchEvent) {
-    if (!this.isDragging) return;
+		const currentX = event.touches[0].clientX;
+		const deltaX = currentX - this.touchStartX;
 
-    const touchEndX = event.changedTouches[0].clientX;
-    const touchEndY = event.changedTouches[0].clientY;
-    const deltaX = touchEndX - this.touchStartX;
-    const deltaY = Math.abs(touchEndY - this.touchStartY);
-    const screenWidth = window.innerWidth;
+		if (!this.isOpen) {
+			if (this.position === 'right') {
+				this.dragOffset = Math.max(
+					-this.ASIDE_WIDTH,
+					Math.min(0, deltaX),
+				);
+			} else {
+				this.dragOffset = Math.max(
+					0,
+					Math.min(this.ASIDE_WIDTH, deltaX),
+				);
+			}
+		} else {
+			if (this.position === 'right') {
+				this.dragOffset = Math.max(
+					0,
+					Math.min(this.ASIDE_WIDTH, deltaX),
+				);
+			} else {
+				this.dragOffset = Math.max(
+					-this.ASIDE_WIDTH,
+					Math.min(0, deltaX),
+				);
+			}
+		}
+	}
 
-    this.isDragging = false;
-    this.dragOffset = 0;
+	private handleTouchEnd(event: TouchEvent) {
+		if (!this.isDragging) return;
 
-    if (this.position === 'right') {
-      if (
-        !this.isOpen &&
-        this.touchStartX > (screenWidth - this.EDGE_THRESHOLD) &&
-        deltaX < -this.SWIPE_THRESHOLD &&
-        deltaY < this.SWIPE_THRESHOLD
-      ) {
-        this.open();
-        return;
-      }
+		const touchEndX = event.changedTouches[0].clientX;
+		const touchEndY = event.changedTouches[0].clientY;
+		const deltaX = touchEndX - this.touchStartX;
+		const deltaY = Math.abs(touchEndY - this.touchStartY);
+		const screenWidth = window.innerWidth;
 
-      if (
-        this.isOpen &&
-        deltaX > this.SWIPE_THRESHOLD &&
-        deltaY < this.SWIPE_THRESHOLD
-      ) {
-        this.close();
-        return;
-      }
-    } else {
-      if (
-        !this.isOpen &&
-        this.touchStartX < this.EDGE_THRESHOLD &&
-        deltaX > this.SWIPE_THRESHOLD &&
-        deltaY < this.SWIPE_THRESHOLD
-      ) {
-        this.open();
-        return;
-      }
+		this.isDragging = false;
+		this.dragOffset = 0;
 
-      if (
-        this.isOpen &&
-        deltaX < -this.SWIPE_THRESHOLD &&
-        deltaY < this.SWIPE_THRESHOLD
-      ) {
-        this.close();
-        return;
-      }
-    }
-  }
+		if (this.position === 'right') {
+			if (
+				!this.isOpen &&
+				this.touchStartX > screenWidth - this.EDGE_THRESHOLD &&
+				deltaX < -this.SWIPE_THRESHOLD &&
+				deltaY < this.SWIPE_THRESHOLD
+			) {
+				this.open();
+				return;
+			}
 
-  toggle() {
-    this.isOpen = !this.isOpen;
-  }
+			if (
+				this.isOpen &&
+				deltaX > this.SWIPE_THRESHOLD &&
+				deltaY < this.SWIPE_THRESHOLD
+			) {
+				this.close();
+				return;
+			}
+		} else {
+			if (
+				!this.isOpen &&
+				this.touchStartX < this.EDGE_THRESHOLD &&
+				deltaX > this.SWIPE_THRESHOLD &&
+				deltaY < this.SWIPE_THRESHOLD
+			) {
+				this.open();
+				return;
+			}
 
-  open() {
-    this.isOpen = true;
-  }
+			if (
+				this.isOpen &&
+				deltaX < -this.SWIPE_THRESHOLD &&
+				deltaY < this.SWIPE_THRESHOLD
+			) {
+				this.close();
+				return;
+			}
+		}
+	}
 
-  close() {
-    this.isOpen = false;
-  }
+	toggle() {
+		this.isOpen = !this.isOpen;
+	}
 
-  getDragTransform(): string {
-    if (this.isDragging) {
-      if (this.position === 'right') {
-        if (!this.isOpen) {
-          return `translateX(calc(100% + ${this.dragOffset}px))`;
-        } else {
-          return `translateX(${this.dragOffset}px)`;
-        }
-      } else {
-        if (!this.isOpen) {
-          return `translateX(calc(-100% + ${this.dragOffset}px))`;
-        } else {
-          return `translateX(${this.dragOffset}px)`;
-        }
-      }
-    }
+	open() {
+		this.isOpen = true;
+	}
 
-    if (this.position === 'right') {
-      return this.isOpen ? 'translateX(0)' : 'translateX(100%)';
-    } else {
-      return this.isOpen ? 'translateX(0)' : 'translateX(-100%)';
-    }
-  }
+	close() {
+		this.isOpen = false;
+		this.closed.emit();
+	}
+
+	getDragTransform(): string {
+		if (this.isDragging) {
+			if (this.position === 'right') {
+				if (!this.isOpen) {
+					return `translateX(calc(100% + ${this.dragOffset}px))`;
+				}
+				return `translateX(${this.dragOffset}px)`;
+			}
+			if (!this.isOpen) {
+				return `translateX(calc(-100% + ${this.dragOffset}px))`;
+			}
+			return `translateX(${this.dragOffset}px)`;
+		}
+
+		if (this.position === 'right') {
+			return this.isOpen ? 'translateX(0)' : 'translateX(100%)';
+		}
+		return this.isOpen ? 'translateX(0)' : 'translateX(-100%)';
+	}
 }

@@ -1,27 +1,32 @@
 <header>
 	<nav>
-		<a
-			id="logo"
-			[routerLink]="['/']"
-			[ngClass]="{ 'dark-theme': isDarkTheme() }"
-		>
-			<app-icons name="logo" size="72" />
-		</a>
+		@if (!hideLogo()) {
+			<button
+				class="menu-btn"
+				(click)="toggleMenu.emit()"
+				aria-label="Abrir menu"
+			>
+				<app-icons name="list" size="36" />
+			</button>
+			<a
+				id="logo"
+				[routerLink]="['/']"
+				[class.dark-theme]="isDarkTheme()"
+			>
+				<app-icons name="logo" size="48" />
+			</a>
+		}
 	</nav>
 	<nav>
-		@if (isAdmin()) {
-		<a [routerLink]="['/dashboard']">Dashboard</a>
-		}
-		<a [routerLink]="['/books']">Mangas</a>
 		@if (!isLoggedIn()) {
-		<a [routerLink]="['/auth/login']">Login</a>
+			<a [routerLink]="['/auth/login']">Login</a>
 		}
 		<div class="icons">
 			<app-theme-toggle />
 			@if (isLoggedIn()) {
-			<a [routerLink]="['/user']" class="user">
-				<app-icons name="user" size="32" />
-			</a>
+				<a [routerLink]="['/user']" class="user">
+					<app-icons name="user" size="32" />
+				</a>
 			}
 		</div>
 	</nav>

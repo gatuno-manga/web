@@ -1,8 +1,28 @@
-<app-header
-	[style.position]="headerState.isFixedSignal() ? 'static' : 'sticky'"
-	[style.top]="headerState.isFixedSignal() ? null : '0'"
-	[style.z-index]="'1000'"
-/>
-<main>
-	<router-outlet />
-</main>
+<div
+	class="layout-container"
+	[class.large-screen]="isLargeScreen()"
+	[class.sidebar-open]="sidebarOpen()"
+>
+	<div class="sidebar">
+		@if (sidebarOpen() && !isLargeScreen()) {
+			<div class="sidebar-overlay" (click)="closeSideNav()"></div>
+		}
+		<div class="sidebar-content">
+			<app-side-nav (close)="closeSideNav()" />
+		</div>
+	</div>
+
+	<div class="content-wrapper">
+		<app-header
+			[style.position]="headerState.isFixedSignal() ? 'static' : 'sticky'"
+			[style.top]="headerState.isFixedSignal() ? null : '0'"
+			[style.z-index]="'100'"
+			(toggleMenu)="toggleSideNav()"
+			[hideLogo]="sidebarOpen()"
+		/>
+
+		<main>
+			<router-outlet />
+		</main>
+	</div>
+</div>

@@ -1,0 +1,31 @@
+<aside class="side-nav">
+	<div class="nav-header">
+		<button class="close-btn" (click)="onClose()" aria-label="Fechar menu">
+			<app-icons name="close" size="36" />
+		</button>
+		<div class="brand">
+			<app-icons name="logo" size="48" />
+			<h1 class="title">Gatuno</h1>
+		</div>
+	</div>
+
+	<div class="nav-groups">
+		@for (group of navGroups; track $index) {
+			<nav class="group">
+				@for (item of group.items; track item.label) {
+					<a
+						[routerLink]="item.route"
+						class="nav-item"
+						(click)="onClose()"
+					>
+						<app-icons [name]="item.icon" size="24" />
+						<span class="label">{{ item.label }}</span>
+					</a>
+				}
+			</nav>
+			@if (!$last) {
+				<div class="divider"></div>
+			}
+		}
+	</div>
+</aside>
