@@ -24,6 +24,7 @@ import { ModalNotificationService } from '../../service/modal-notification.servi
 import { InfoBookComponent } from '../../components/info-book/info-book.component';
 import { AsideComponent } from '../../components/aside/aside.component';
 import { ButtonComponent } from '../../components/inputs/button/button.component';
+import { MarkdownComponent } from 'ngx-markdown';
 import { BookWebsocketService } from '../../service/book-websocket.service';
 import { DownloadService } from '../../service/download.service';
 import { DownloadManagerService } from '../../service/download-manager.service';
@@ -46,6 +47,7 @@ import {
 		InfoBookComponent,
 		AsideComponent,
 		ButtonComponent,
+		MarkdownComponent,
 	],
 	templateUrl: './book.component.html',
 	styleUrl: './book.component.scss',
@@ -149,8 +151,10 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 				// Carrega o primeiro capítulo para "Começar a ler"
 				this.loadFirstChapter();
 
-				// Conecta ao WebSocket e inscreve no livro
-				this.setupWebSocket(book.id);
+				// Conecta ao WebSocket apenas se autenticado
+				if (this.userTokenService.hasValidAccessTokenSignal()) {
+					this.setupWebSocket(book.id);
+				}
 			},
 			error: async () => {
 				try {

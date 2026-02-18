@@ -126,7 +126,10 @@
 					}}</span>
 				}
 			</div>
-			<p class="book-description">{{ book.description }}</p>
+			<markdown
+				[data]="book.description"
+				class="book-description"
+			></markdown>
 		</div>
 	</div>
 	<app-info-book [id]="book.id" [bookBasic]="book" />
