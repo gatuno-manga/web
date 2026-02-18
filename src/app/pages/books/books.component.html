@@ -1,73 +1,73 @@
-@defer (when !isLoading()){
-<div class="filter">
-	<app-book-filter
-		[initialFilters]="filterOptions"
-		(filtersChange)="onFiltersChange($event)"
-	/>
-</div>
-<div class="controller">
-	<div class="mode-switch">
-		<app-select
-			[items]="viewModeList"
-			[select]="getViewModeIndex()"
-			[disabled]="isOfflineMode"
+@defer (when !isLoading()) {
+	<div class="filter">
+		<app-book-filter
+			[initialFilters]="filterOptions"
+			(filtersChange)="onFiltersChange($event)"
 		/>
 	</div>
-	<div class="pages">
-		@for(page of pagesToShow; track page) {
-		<div
-			class="page"
-			[class.active]="page === currentPage"
-			(click)="goToPage(page)"
-		>
-			{{ page }}
+	<div class="controller">
+		<div class="mode-switch">
+			<app-select
+				[items]="viewModeList"
+				[select]="getViewModeIndex()"
+				[disabled]="isOfflineMode"
+			/>
 		</div>
+		<div class="pages">
+			@for (page of pagesToShow; track page) {
+				<div
+					class="page"
+					[class.active]="page === currentPage"
+					(click)="goToPage(page)"
+				>
+					{{ page }}
+				</div>
+			}
+		</div>
+		<div>
+			<app-select [items]="selectList" [select]="selectListItem()" />
+		</div>
+	</div>
+	<div id="books" [class]="bookOptions">
+		@for (book of books; track book.id) {
+			<app-item-book [book]="book" [type]="bookOptions" />
+		} @empty {
+			<div class="no-books">
+				<p>Nenhum livro disponível.</p>
+			</div>
 		}
 	</div>
-	<div>
-		<app-select [items]="selectList" [select]="selectListItem()" />
-	</div>
-</div>
-<div id="books">
-	@for (book of books; track book.id) {
-	<app-item-book [book]="book" [type]="bookOptions" />
-	}@empty {
-	<div class="no-books">
-		<p>Nenhum livro disponível.</p>
-	</div>
-	}
-</div>
-<div class="controller">
-	<div class="pages">
-		@for(page of pagesToShow; track page) {
-		<div
-			class="page"
-			[class.active]="page === currentPage"
-			(click)="goToPage(page)"
-		>
-			{{ page }}
+	<div class="controller">
+		<div class="pages">
+			@for (page of pagesToShow; track page) {
+				<div
+					class="page"
+					[class.active]="page === currentPage"
+					(click)="goToPage(page)"
+				>
+					{{ page }}
+				</div>
+			}
 		</div>
-		}
 	</div>
-</div>
 } @placeholder {
-<div class="controller">
-	<div class="pages">
-		@for (i of [].constructor(5); track $index) {
-		<div class="placeholder"></div>
+	<div class="controller">
+		<div class="pages">
+			@for (i of [].constructor(5); track $index) {
+				<div class="placeholder"></div>
+			}
+		</div>
+	</div>
+	<div id="books" [class]="bookOptions">
+		@for (i of [].constructor(10); track $index) {
+			<div class="placeholder"></div>
 		}
 	</div>
-</div>
-<div id="books">
-	@for (i of [].constructor(10); track $index) {
-	<div class="placeholder"></div>
-	}
-</div>
-<div class="controller">
-	<div class="pages">
-		@for (i of [].constructor(5); track $index) {
-		<div class="placeholder"></div>
-		}
+	<div class="controller">
+		<div class="pages">
+			@for (i of [].constructor(5); track $index) {
+				<div class="placeholder"></div>
+			}
+		</div>
 	</div>
-</div>
 }

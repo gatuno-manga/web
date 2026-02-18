@@ -1,17 +1,51 @@
 #books {
 	display: flex;
-	align-items: start;
 	flex-wrap: wrap;
-	justify-content: center;
+	align-items: start;
 	padding: 20px;
 	gap: 20px;
 	max-width: calc(300px * 5);
-	margin: auto auto;
+	margin: auto;
+
+	// --- grid (padrão) ---
+	&.grid {
+		justify-content: center;
+	}
+
+	// --- cover: igual ao grid mas sem borda de info ---
+	&.cover {
+		justify-content: center;
+	}
+
+	// --- list: 2 por linha, alinhado à esquerda ---
+	&.list {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		justify-items: start;
+		app-item-book {
+			width: 100%;
+		}
+	}
+	@media (max-width: 768px) {
+		&.list {
+			grid-template-columns: 1fr;
+		}
+	}
 
 	.placeholder {
+		border-radius: 12px;
+	}
+
+	&.grid .placeholder,
+	&.cover .placeholder {
 		width: 250px;
 		height: 355px;
-		border-radius: 15px;
+	}
+
+	&.list .placeholder {
+		width: calc(50% - 10px);
+		height: 90px;
+		border-radius: 8px;
 	}
 }
 
