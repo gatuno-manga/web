@@ -42,7 +42,7 @@ export class SideNavComponent {
 			{
 				items: [
 					{ label: 'Home', icon: 'grid', route: '/' },
-					{ label: 'Livros', icon: 'file-text', route: '/books' },
+					{ label: 'Livros', icon: 'book', route: '/books' },
 					this.isLoggedIn()
 						? { label: 'Perfil', icon: 'user', route: '/user' }
 						: {
