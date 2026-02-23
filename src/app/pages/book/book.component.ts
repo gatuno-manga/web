@@ -178,6 +178,9 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 						};
 						this.isLoading.set(false);
 						this.setMetaData();
+
+						// Tenta carregar capítulos offline para habilitar "Começar a ler"
+						this.loadOfflineChapters();
 					} else {
 						this.router.navigate(['../'], {
 							relativeTo: this.activatedRoute,
@@ -190,6 +193,30 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 				}
 			},
 		});
+	}
+
+	private async loadOfflineChapters() {
+		try {
+			const offlineChapters =
+				await this.downloadService.getChaptersByBook(this.book.id);
+			if (offlineChapters && offlineChapters.length > 0) {
+				const chapters: Chapterlist[] = offlineChapters.map((oc) => ({
+					id: oc.id,
+					title: oc.title,
+					index: oc.index,
+					originalUrl: '',
+					scrapingStatus: ScrapingStatus.READY,
+					read: false,
+				}));
+
+				this.sortedChapters = [...chapters].sort(
+					(a, b) => a.index - b.index,
+				);
+				this.firstChapterId = this.sortedChapters[0].id;
+			}
+		} catch (error) {
+			console.error('Erro ao carregar capítulos offline:', error);
+		}
 	}
 
 	ngAfterViewInit() {
@@ -869,39 +896,54 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		let downloadedCount = 0;
 		let skippedCount = 0;
 
-		for (const chapterInfo of chapters) {
+		// Filtra capítulos que já foram baixados
+		const chaptersToDownload: Chapterlist[] = [];
+		for (const ch of chapters) {
+			const isDownloaded = await this.downloadService.isChapterDownloaded(
+				ch.id,
+			);
+			if (isDownloaded) {
+				skippedCount++;
+			} else {
+				chaptersToDownload.push(ch);
+			}
+		}
+
+		if (chaptersToDownload.length === 0) {
+			this.isBookDownloaded.set(true);
+			this.notificationService.success(
+				`Todos os ${skippedCount} capítulos já estavam salvos offline.`,
+				'Download concluído',
+			);
+			return;
+		}
+
+		const batchSize = 20;
+		for (let i = 0; i < chaptersToDownload.length; i += batchSize) {
+			const batch = chaptersToDownload.slice(i, i + batchSize);
+			const batchIds = batch.map((ch) => ch.id);
+
 			try {
-				// Verificar se já foi baixado
-				const isDownloaded =
-					await this.downloadService.isChapterDownloaded(
-						chapterInfo.id,
+				// Busca dados de múltiplos capítulos de uma vez (otimizado)
+				const fullChapters = await firstValueFrom(
+					this.chapterService.getChaptersBatch(batchIds),
+				);
+
+				for (const fullChapter of fullChapters) {
+					// Baixar capítulo individualmente para salvar no banco local
+					await this.downloadService.downloadChapter(
+						this.book,
+						fullChapter,
 					);
-				if (isDownloaded) {
-					skippedCount++;
-					continue;
+					downloadedCount++;
 				}
 
-				// Buscar detalhes do capítulo com as páginas
-				const fullChapter = await firstValueFrom(
-					this.chapterService.getChapter(chapterInfo.id),
-				);
-				if (!fullChapter) continue;
-
-				// Baixar capítulo
-				await this.downloadService.downloadChapter(
-					this.book,
-					fullChapter,
-				);
-				downloadedCount++;
-
-				// Aguardar 1 segundo antes do próximo para não sobrecarregar o servidor
-				await delay(1000);
+				// Pequeno delay entre lotes para não sobrecarregar
+				if (i + batchSize < chaptersToDownload.length) {
+					await delay(500);
+				}
 			} catch (error) {
-				console.error(
-					`Erro ao baixar capítulo ${chapterInfo.id}:`,
-					error,
-				);
-				// Continua para o próximo capítulo mesmo se houver erro
+				console.error('Erro ao baixar lote de capítulos:', error);
 			}
 		}
 
