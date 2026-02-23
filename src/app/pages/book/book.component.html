@@ -64,7 +64,7 @@
 							</app-button>
 							@if (showOptionsDropdown()) {
 								<div class="options-dropdown">
-									<button (click)="downloadForApp()">
+									<button (click)="saveOffline()">
 										<app-icons name="smartphone" />
 										<span>Salvar no app</span>
 									</button>
@@ -87,7 +87,7 @@
 											<span>Forçar atualização</span>
 										</button>
 									}
-									<button (click)="downloadForApp()">
+									<button (click)="downloadFiles()">
 										<app-icons name="download" />
 										<span>Baixar arquivos</span>
 									</button>

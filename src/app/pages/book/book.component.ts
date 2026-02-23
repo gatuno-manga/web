@@ -648,7 +648,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.isBookDownloaded.set(isDownloaded);
 	}
 
-	async downloadForApp() {
+	async saveOffline() {
 		this.closeOptionsDropdown();
 
 		if (!this.book) return;
@@ -663,6 +663,73 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 				},
 				{
 					label: 'Salvar',
+					type: 'primary',
+					callback: async () => {
+						this.modalService.close();
+						await this.startOfflineSaveProcess();
+					},
+				},
+			],
+			'info',
+		);
+	}
+
+	private async startOfflineSaveProcess() {
+		if (!this.book) return;
+
+		try {
+			// Buscar lista de capítulos
+			const chapters = await firstValueFrom(
+				this.bookService.getChapters(this.book.id),
+			);
+
+			if (chapters.length === 0) {
+				this.modalService.show(
+					'Sem capítulos',
+					'Este livro não possui capítulos para salvar.',
+					[{ label: 'Ok', type: 'primary' }],
+					'info',
+				);
+				return;
+			}
+
+			this.notificationService.info(
+				`Salvando ${chapters.length} capítulos para leitura offline. Você pode continuar navegando.`,
+				'Salvando no app',
+			);
+
+			// Função auxiliar para delay
+			const delay = (ms: number) =>
+				new Promise((resolve) => setTimeout(resolve, ms));
+
+			// Baixar capítulos sequencialmente em segundo plano com intervalo de 1s
+			await this.downloadChaptersInBackground(chapters, delay);
+		} catch (error) {
+			console.error('Erro ao buscar capítulos:', error);
+			this.modalService.show(
+				'Erro',
+				'Não foi possível buscar os capítulos do livro.',
+				[{ label: 'Ok', type: 'primary' }],
+				'error',
+			);
+		}
+	}
+
+	async downloadFiles() {
+		this.closeOptionsDropdown();
+
+		if (!this.book) return;
+
+		this.modalService.show(
+			'Baixar Arquivos',
+			`Deseja baixar os capítulos do livro "${this.book.title}" em formato ZIP (Imagens ou PDF)?`,
+			[
+				{
+					label: 'Cancelar',
+					type: 'secondary',
+				},
+				{
+					label: 'Continuar',
 					type: 'primary',
 					callback: async () => {
 						this.modalService.close();
@@ -795,47 +862,6 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		);
 	}
 
-	private confirmDownloadBook = async () => {
-		if (!this.book) return;
-
-		try {
-			// Buscar lista de capítulos
-			const chapters = await firstValueFrom(
-				this.bookService.getChapters(this.book.id),
-			);
-
-			if (chapters.length === 0) {
-				this.modalService.show(
-					'Sem capítulos',
-					'Este livro não possui capítulos para baixar.',
-					[{ label: 'Ok', type: 'primary' }],
-					'info',
-				);
-				return;
-			}
-
-			this.notificationService.info(
-				`Baixando ${chapters.length} capítulos em segundo plano. Você pode continuar navegando.`,
-				'Download iniciado',
-			);
-
-			// Função auxiliar para delay
-			const delay = (ms: number) =>
-				new Promise((resolve) => setTimeout(resolve, ms));
-
-			// Baixar capítulos sequencialmente em segundo plano com intervalo de 1s
-			this.downloadChaptersInBackground(chapters, delay);
-		} catch (error) {
-			console.error('Erro ao buscar capítulos:', error);
-			this.modalService.show(
-				'Erro',
-				'Não foi possível buscar os capítulos do livro.',
-				[{ label: 'Ok', type: 'primary' }],
-				'error',
-			);
-		}
-	};
-
 	private async downloadChaptersInBackground(
 		chapters: Chapterlist[],
 		delay: (ms: number) => Promise<unknown>,
@@ -881,7 +907,6 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		// Notificar conclusão e atualizar status
 		this.isBookDownloaded.set(true);
-		this.modalService.close();
 		this.notificationService.success(
 			`${downloadedCount} capítulos baixados de "${this.book.title}"${skippedCount > 0 ? `, ${skippedCount} já estavam salvos` : ''}.`,
 			'Download concluído',
