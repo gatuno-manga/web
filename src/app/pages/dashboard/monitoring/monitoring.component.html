@@ -20,14 +20,12 @@
 		<p>Carregando estatísticas...</p>
 	</div>
 	} @else {
-	<!-- Cards de Estatísticas -->
+	<!-- Cards de Estatísticas Agregadas -->
 	<div class="stats-grid">
 		<div class="stat-card waiting">
 			<app-icons name="clock" />
 			<div class="stat-content">
-				<span class="stat-value">{{
-					queueStats().counts.waiting
-				}}</span>
+				<span class="stat-value">{{ aggregateCounts().waiting }}</span>
 				<span class="stat-label">Aguardando</span>
 			</div>
 		</div>
@@ -35,7 +33,7 @@
 		<div class="stat-card active">
 			<app-icons name="loader" class="spin" />
 			<div class="stat-content">
-				<span class="stat-value">{{ queueStats().counts.active }}</span>
+				<span class="stat-value">{{ aggregateCounts().active }}</span>
 				<span class="stat-label">Em Execução</span>
 			</div>
 		</div>
@@ -43,9 +41,7 @@
 		<div class="stat-card completed">
 			<app-icons name="check-circle" />
 			<div class="stat-content">
-				<span class="stat-value">{{
-					queueStats().counts.completed
-				}}</span>
+				<span class="stat-value">{{ aggregateCounts().completed }}</span>
 				<span class="stat-label">Concluídos</span>
 			</div>
 		</div>
@@ -53,80 +49,124 @@
 		<div class="stat-card failed">
 			<app-icons name="x-circle" />
 			<div class="stat-content">
-				<span class="stat-value">{{ queueStats().counts.failed }}</span>
+				<span class="stat-value">{{ aggregateCounts().failed }}</span>
 				<span class="stat-label">Falhados</span>
 			</div>
 		</div>
+
+		<div class="stat-card delayed">
+			<app-icons name="alert-circle" />
+			<div class="stat-content">
+				<span class="stat-value">{{ aggregateCounts().delayed }}</span>
+				<span class="stat-label">Atrasados</span>
+			</div>
+		</div>
 	</div>
 
-	<!-- Jobs Ativos -->
-	<div class="section">
-		<h3>
-			<app-icons name="loader" />
-			Jobs em Execução ({{ queueStats().activeJobs.length }})
-		</h3>
-		@if (queueStats().activeJobs.length === 0) {
+	<!-- Filas -->
+	@for (queue of queueStats().queues; track queue.name) {
+	<div class="queue-section">
+		<div class="queue-header">
+			<h3>
+				<app-icons name="layers" />
+				{{ queueLabel(queue.name) }}
+			</h3>
+			<div class="queue-badges">
+				@if (queue.counts.active > 0) {
+				<span class="badge badge-active">{{ queue.counts.active }} ativo(s)</span>
+				}
+				@if (queue.counts.waiting > 0) {
+				<span class="badge badge-waiting">{{ queue.counts.waiting }} aguardando</span>
+				}
+				@if (queue.counts.failed > 0) {
+				<span class="badge badge-failed">{{ queue.counts.failed }} falhou</span>
+				}
+			</div>
+		</div>
+
+		<!-- Jobs Ativos da Fila -->
+		@if (queue.activeJobs.length > 0) {
+		<div class="section">
+			<h4>
+				<app-icons name="loader" />
+				Em Execução ({{ queue.activeJobs.length }})
+			</h4>
+			<div class="jobs-list">
+				@for (job of queue.activeJobs; track job.id) {
+				<div class="job-card active">
+					<div class="job-icon">
+						<app-icons name="loader" class="spin" />
+					</div>
+					<div class="job-info">
+						<a [routerLink]="['/books', job.bookId]" class="job-title">
+							{{ job.bookTitle }}
+						</a>
+						@if (job.chapterTitle) {
+						<span class="job-subtitle">{{ job.chapterTitle }}</span>
+						}
+						<span class="job-time">{{ formatTimestamp(job.timestamp) }}</span>
+					</div>
+					<div class="job-status status-active">
+						<span>Processando</span>
+					</div>
+				</div>
+				}
+			</div>
+		</div>
+		}
+
+		<!-- Jobs Pendentes da Fila -->
+		@if (queue.pendingJobs.length > 0) {
+		<div class="section">
+			<h4>
+				<app-icons name="clock" />
+				Próximos na Fila ({{ queue.pendingJobs.length }})
+			</h4>
+			<div class="jobs-list">
+				@for (job of queue.pendingJobs; track job.id) {
+				<div class="job-card" [class.waiting]="!job.delayed" [class.delayed]="job.delayed">
+					<div class="job-icon">
+						<app-icons [name]="job.delayed ? 'alert-circle' : 'clock'" />
+					</div>
+					<div class="job-info">
+						<a [routerLink]="['/books', job.bookId]" class="job-title">
+							{{ job.bookTitle }}
+						</a>
+						@if (job.chapterTitle) {
+						<span class="job-subtitle">{{ job.chapterTitle }}</span>
+						}
+						@if (job.processAt) {
+						<span class="job-time">Agendado: {{ job.processAt | date:'short' }}</span>
+						}
+					</div>
+					<div class="job-status" [class.status-waiting]="!job.delayed" [class.status-delayed]="job.delayed">
+						<span>{{ job.delayed ? 'Atrasado' : 'Aguardando' }}</span>
+					</div>
+				</div>
+				}
+			</div>
+		</div>
+		}
+
+		<!-- Fila vazia -->
+		@if (queue.activeJobs.length === 0 && queue.pendingJobs.length === 0) {
 		<div class="empty-state">
 			<app-icons name="check-circle" />
-			<p>Nenhum job em execução no momento</p>
-		</div>
-		} @else {
-		<div class="jobs-list">
-			@for (job of queueStats().activeJobs; track job.id) {
-			<div class="job-card active">
-				<div class="job-icon">
-					<app-icons name="loader" class="spin" />
-				</div>
-				<div class="job-info">
-					<a [routerLink]="['/books', job.bookId]" class="job-title">
-						{{ job.bookTitle }}
-					</a>
-					<span class="job-time">{{
-						formatTimestamp(job.timestamp)
-					}}</span>
-				</div>
-				<div class="job-status status-active">
-					<span>Processando</span>
-				</div>
-			</div>
-			}
+			<p>Nenhum job nesta fila</p>
 		</div>
 		}
 	</div>
+	}
 
-	<!-- Fila de Espera -->
-	<div class="section">
-		<h3>
-			<app-icons name="clock" />
-			Próximos na Fila ({{ queueStats().waitingJobs.length }})
-		</h3>
-		@if (queueStats().waitingJobs.length === 0) {
-		<div class="empty-state">
-			<app-icons name="inbox" />
-			<p>Fila vazia</p>
-		</div>
-		} @else {
-		<div class="jobs-list">
-			@for (job of queueStats().waitingJobs; track job.id) {
-			<div class="job-card waiting">
-				<div class="job-icon">
-					<app-icons name="clock" />
-				</div>
-				<div class="job-info">
-					<a [routerLink]="['/books', job.bookId]" class="job-title">
-						{{ job.bookTitle }}
-					</a>
-				</div>
-				<div class="job-status status-waiting">
-					<span>Aguardando</span>
-				</div>
-			</div>
-			}
-		</div>
-		}
+	<!-- Sem filas -->
+	@if (queueStats().queues.length === 0) {
+	<div class="empty-state">
+		<app-icons name="inbox" />
+		<p>Nenhuma fila disponível</p>
 	</div>
+	}
 
-	<!-- Eventos Recentes -->
+	<!-- Eventos Recentes (WebSocket) -->
 	<div class="section">
 		<h3>
 			<app-icons name="activity" />

@@ -93,4 +93,70 @@
 			}
 		</div>
 	</div>
+
+	<!-- Fila de jobs -->
+	<div id="queue-jobs" class="book-item item">
+		<div class="section-title">
+			<h4>
+				Fila de Processamento
+				@if (allActiveJobs.length > 0 || allPendingJobs.length > 0) {
+				<span class="queue-count">{{ allActiveJobs.length + allPendingJobs.length }}</span>
+				}
+			</h4>
+		</div>
+
+		<!-- Em execução -->
+		@if (allActiveJobs.length > 0) {
+		<div class="queue-group">
+			<span class="queue-group-label active">
+				<app-icons name="loader" class="spin" />
+				Em execução ({{ allActiveJobs.length }})
+			</span>
+			<div class="queue-list">
+				@for (job of allActiveJobs; track job.id) {
+				<a class="queue-job active" [routerLink]="job.bookId ? ['/books', job.bookId] : null">
+					<app-icons name="loader" class="spin" />
+					<div class="queue-job-info">
+						<span class="queue-job-title">{{ job.bookTitle }}</span>
+						@if (job.chapterTitle) {
+						<span class="queue-job-sub">{{ job.chapterTitle }}</span>
+						}
+					</div>
+					<span class="queue-job-badge active">Processando</span>
+				</a>
+				}
+			</div>
+		</div>
+		}
+
+		<!-- Aguardando -->
+		@if (allPendingJobs.length > 0) {
+		<div class="queue-group">
+			<span class="queue-group-label waiting">
+				<app-icons name="clock" />
+				Aguardando ({{ allPendingJobs.length }})
+			</span>
+			<div class="queue-list">
+				@for (job of allPendingJobs; track job.id) {
+				<a class="queue-job waiting" [routerLink]="job.bookId ? ['/books', job.bookId] : null">
+					<app-icons name="clock" />
+					<div class="queue-job-info">
+						<span class="queue-job-title">{{ job.bookTitle }}</span>
+						@if (job.chapterTitle) {
+						<span class="queue-job-sub">{{ job.chapterTitle }}</span>
+						}
+					</div>
+					<span class="queue-job-badge waiting">
+						{{ job.delayed ? 'Agendado' : 'Aguardando' }}
+					</span>
+				</a>
+				}
+			</div>
+		</div>
+		}
+
+		@if (allActiveJobs.length === 0 && allPendingJobs.length === 0) {
+		<div class="empty-state">Fila vazia</div>
+		}
+	</div>
 </div>

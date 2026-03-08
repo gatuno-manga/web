@@ -98,8 +98,8 @@
 			}
 
 			&.waiting {
-				border-color: var(--secondary-color);
-				color: var(--secondary-color);
+				border-color: #f59e0b;
+				color: #f59e0b;
 			}
 
 			&.active {
@@ -115,6 +115,99 @@
 			&.failed {
 				border-color: var(--red);
 				color: var(--red);
+			}
+
+			&.delayed {
+				border-color: var(--orange, #f97316);
+				color: var(--orange, #f97316);
+			}
+		}
+	}
+
+	// ── Seção por fila ──────────────────────────────────────
+	.queue-section {
+		margin-bottom: 2.5rem;
+		padding: 1.5rem;
+		border-radius: 12px;
+		background: color-mix(in srgb, var(--app-bg-color) 30%, transparent);
+		border: 1px solid color-mix(in srgb, var(--app-text-color) 10%, transparent);
+
+		.queue-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			flex-wrap: wrap;
+			gap: 0.8rem;
+			margin-bottom: 1.2rem;
+
+			h3 {
+				display: flex;
+				align-items: center;
+				gap: 0.6rem;
+				font-size: 1.2rem;
+				color: var(--app-text-color);
+				margin: 0;
+
+				app-icons {
+					width: 1.3rem;
+					height: 1.3rem;
+					color: var(--primary-color);
+				}
+			}
+
+			.queue-badges {
+				display: flex;
+				gap: 0.5rem;
+				flex-wrap: wrap;
+
+				.badge-active {
+					background-color: color-mix(in srgb, var(--primary-color) 20%, transparent);
+					color: var(--primary-color);
+					border: 1px solid var(--primary-color);
+					padding: 0.25rem 0.6rem;
+					border-radius: 6px;
+					font-size: 0.8rem;
+					font-weight: 500;
+				}
+
+				.badge-waiting {
+					background-color: color-mix(in srgb, #f59e0b 20%, transparent);
+					color: #f59e0b;
+					border: 1px solid #f59e0b;
+					padding: 0.25rem 0.6rem;
+					border-radius: 6px;
+					font-size: 0.8rem;
+					font-weight: 500;
+				}
+
+				.badge-failed {
+					background-color: color-mix(in srgb, var(--red) 20%, transparent);
+					color: var(--red);
+					border: 1px solid var(--red);
+					padding: 0.25rem 0.6rem;
+					border-radius: 6px;
+					font-size: 0.8rem;
+					font-weight: 500;
+				}
+			}
+		}
+
+		.section {
+			margin-bottom: 1rem;
+
+			h4 {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 1rem;
+				color: var(--app-text-color);
+				margin-bottom: 0.8rem;
+				opacity: 0.8;
+
+				app-icons {
+					width: 1rem;
+					height: 1rem;
+				}
 			}
 		}
 	}
@@ -224,6 +317,12 @@
 				font-size: 0.9rem;
 				opacity: 0.6;
 			}
+
+			.job-subtitle {
+				font-size: 0.85rem;
+				opacity: 0.7;
+				color: var(--app-text-color);
+			}
 		}
 
 		.job-status,
@@ -254,6 +353,12 @@
 				background-color: var(--red);
 				color: var(--white);
 			}
+
+			.badge-waiting {
+				background-color: color-mix(in srgb, #f59e0b 20%, transparent);
+				color: #f59e0b;
+				border: 1px solid #f59e0b;
+			}
 		}
 
 		&.active {
@@ -275,20 +380,16 @@
 		}
 
 		&.waiting {
-			border-left-color: var(--secondary-color);
+			border-left-color: #f59e0b;
 
 			.job-icon,
 			.event-icon {
-				color: var(--secondary-color);
+				color: #f59e0b;
 			}
 
 			.status-waiting {
-				background-color: color-mix(
-					in srgb,
-					var(--secondary-color) 20%,
-					transparent
-				);
-				color: var(--secondary-color);
+				background-color: color-mix(in srgb, #f59e0b 20%, transparent);
+				color: #f59e0b;
 			}
 		}
 
@@ -305,6 +406,19 @@
 
 			.event-icon {
 				color: var(--red);
+			}
+		}
+
+		&.delayed {
+			border-left-color: var(--orange, #f97316);
+
+			.job-icon {
+				color: var(--orange, #f97316);
+			}
+
+			.status-delayed {
+				background-color: color-mix(in srgb, var(--orange, #f97316) 20%, transparent);
+				color: var(--orange, #f97316);
 			}
 		}
 	}

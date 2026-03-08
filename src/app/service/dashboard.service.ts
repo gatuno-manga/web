@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import {
 	DashboardOverview,
 	DashboardProgress,
+	QueueStats,
 } from '../models/dashboard.models';
 
 @Injectable({
@@ -25,15 +26,14 @@ export class DashboardService {
 	}
 
 	getProgressBooks(): Observable<DashboardProgress> {
-		// TODO: Implement backend endpoint for this or return dummy/empty for now to fix build
-		// Returning empty structure as placeholder
-		return new Observable((observer) => {
-			observer.next({
-				totalChapters: 0,
-				processingChapters: 0,
-				books: [],
-			});
-			observer.complete();
-		});
+		return this.http.get<DashboardProgress>('books/dashboard/process-book');
+	}
+
+	getQueueStats(): Observable<QueueStats> {
+		return this.http.get<QueueStats>('books/dashboard/queue-stats');
+	}
+
+	forceUpdateAll(): Observable<void> {
+		return this.http.post<void>('books/check-all-updates', {});
 	}
 }

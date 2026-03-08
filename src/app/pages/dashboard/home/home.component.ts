@@ -13,6 +13,8 @@ import { DashboardService } from '../../../service/dashboard.service';
 import {
 	DashboardOverview,
 	DashboardProgress,
+	QueueStats,
+	QueueJobInfo,
 } from '../../../models/dashboard.models';
 import { RouterModule } from '@angular/router';
 import { MetaDataService } from '../../../service/meta-data.service';
@@ -54,6 +56,16 @@ export class HomeComponent implements OnInit, OnDestroy {
 		processingChapters: 0,
 		books: [],
 	};
+
+	queueStats: QueueStats = { queues: [] };
+
+	get allActiveJobs(): QueueJobInfo[] {
+		return this.queueStats.queues.flatMap((q) => q.activeJobs);
+	}
+
+	get allPendingJobs(): QueueJobInfo[] {
+		return this.queueStats.queues.flatMap((q) => q.pendingJobs);
+	}
 
 	scrapingStatusChartOption: EChartsOption = {};
 	chapterStatusChartOption: EChartsOption = {};
@@ -160,6 +172,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 					'❌ Erro ao carregar livros em processamento:',
 					error,
 				);
+			},
+		});
+
+		this.dashboardService.getQueueStats().subscribe({
+			next: (stats: QueueStats) => {
+				this.ngZone.run(() => {
+					this.queueStats = stats;
+					this.cdr.detectChanges();
+				});
+			},
+			error: (error: Error) => {
+				console.error('❌ Erro ao carregar fila:', error);
 			},
 		});
 	}
