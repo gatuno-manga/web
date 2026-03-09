@@ -74,10 +74,14 @@ export class BookFilterComponent implements OnInit {
 	availableSensitiveContent = signal<SensitiveContentResponse[]>([]);
 
 	sortOptions = [
-		{ value: 'createdAt', label: 'Mais Recente' },
-		{ value: 'title', label: 'Título' },
-		{ value: 'updatedAt', label: 'Atualização' },
-		{ value: 'publication', label: 'Publicação' },
+		{ value: 'createdAt|DESC', label: 'Mais Recente' },
+		{ value: 'createdAt|ASC', label: 'Mais Antigo' },
+		{ value: 'title|ASC', label: 'Título (A → Z)' },
+		{ value: 'title|DESC', label: 'Título (Z → A)' },
+		{ value: 'updatedAt|DESC', label: 'Atualização (Recente)' },
+		{ value: 'updatedAt|ASC', label: 'Atualização (Antiga)' },
+		{ value: 'publication|DESC', label: 'Publicação (Recente)' },
+		{ value: 'publication|ASC', label: 'Publicação (Antiga)' },
 	];
 
 	publicationOperators = [
@@ -123,6 +127,9 @@ export class BookFilterComponent implements OnInit {
 		'createdAt',
 	);
 	order = signal<'ASC' | 'DESC'>('DESC');
+
+	// Valor composto para o select de ordenação (campo|direção)
+	currentSort = signal<string>('createdAt|DESC');
 
 	// UI state
 	showAdvancedFilters = signal<boolean>(false);
@@ -309,6 +316,11 @@ export class BookFilterComponent implements OnInit {
 			this.publicationOperator.set(filters.publicationOperator);
 		if (filters.orderBy) this.orderBy.set(filters.orderBy);
 		if (filters.order) this.order.set(filters.order);
+		if (filters.orderBy || filters.order) {
+			const field = filters.orderBy ?? this.orderBy();
+			const dir = filters.order ?? this.order();
+			this.currentSort.set(`${field}|${dir}`);
+		}
 		if (filters.sensitiveContent) {
 			this.pendingSensitiveNames.set(filters.sensitiveContent);
 		}
@@ -421,9 +433,14 @@ export class BookFilterComponent implements OnInit {
 	}
 
 	onSortChange(value: string) {
-		this.orderBy.set(
-			value as 'title' | 'createdAt' | 'updatedAt' | 'publication',
-		);
+		const [field, direction] = value.split('|') as [
+			'title' | 'createdAt' | 'updatedAt' | 'publication',
+			'ASC' | 'DESC',
+		];
+		this.orderBy.set(field);
+		this.order.set(direction);
+		this.currentSort.set(value);
+		this.emitFilters();
 	}
 
 	onTagsLogicChange(value: string) {
@@ -447,6 +464,9 @@ export class BookFilterComponent implements OnInit {
 		this.selectedSensitiveContent.set([]);
 		this.selectedAuthors.set([]);
 		this.publicationYear.set(undefined);
+		this.orderBy.set('createdAt');
+		this.order.set('DESC');
+		this.currentSort.set('createdAt|DESC');
 		this.emitFilters();
 		this.fetchTags(); // Reset tags to default
 	}

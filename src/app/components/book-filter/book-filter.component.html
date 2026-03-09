@@ -55,7 +55,7 @@
 			<span class="sort-label">Ordenar por:</span>
 			<app-select
 				[options]="sortOptions"
-				[ngModel]="orderBy()"
+				[ngModel]="currentSort()"
 				(valueChange)="onSortChange($event)"
 				class="sort-select"
 			></app-select>
