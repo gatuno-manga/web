@@ -121,6 +121,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		},
 	];
 	chapters: Chapterlist[] = [];
+	nextChaptersCursor: string | null = null;
+	hasMoreChapters = false;
+	isLoadingMoreChapters = false;
+	readonly chaptersPageLimit = 200;
 	covers: Cover[] = [];
 	originalCovers: Cover[] = [];
 	isReorderingCovers = false;
@@ -422,46 +426,120 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		);
 	}
 
+	get isInitialChaptersLoading() {
+		return this.isLoadingMoreChapters && this.chapters.length === 0;
+	}
+
+	get isAppendingChapters() {
+		return this.isLoadingMoreChapters && this.chapters.length > 0;
+	}
+
 	loadChapters() {
-		this.bookService.getChapters(this.id).subscribe({
-			next: (chapters) => {
-				this.chapters = chapters;
-				this.sortChapters();
-				this.checkDownloadedChapters();
-				this.cdr.detectChanges();
-				this.scheduleHeightUpdate();
-			},
-			error: async (error) => {
-				console.error(
-					'Error loading chapters from API, trying offline:',
-					error,
-				);
-				try {
-					const offlineChapters =
-						await this.downloadService.getChaptersByBook(this.id);
-					if (offlineChapters && offlineChapters.length > 0) {
-						this.chapters = offlineChapters.map((oc) => ({
-							id: oc.id,
-							title: oc.title,
-							index: oc.index,
-							originalUrl: '',
-							scrapingStatus: ScrapingStatus.READY,
-							read: false,
-						}));
+		this.nextChaptersCursor = null;
+		this.hasMoreChapters = false;
+		this.loadChaptersPage();
+	}
 
-						this.sortChapters();
+	loadMoreChapters() {
+		if (!this.nextChaptersCursor || !this.hasMoreChapters) {
+			return;
+		}
 
-						for (const c of this.chapters) {
-							this.chaptersDownloadStatus.set(c.id, 'downloaded');
-						}
-						this.cdr.detectChanges();
-						this.scheduleHeightUpdate();
+		this.loadChaptersPage(this.nextChaptersCursor, true);
+	}
+
+	onChaptersScroll(event: Event) {
+		if (
+			this.selectedTab !== tab.chapters ||
+			!this.hasMoreChapters ||
+			this.isLoadingMoreChapters
+		) {
+			return;
+		}
+
+		const target = event.target as HTMLElement;
+		const thresholdPx = 120;
+		const reachedBottom =
+			target.scrollTop + target.clientHeight >=
+			target.scrollHeight - thresholdPx;
+
+		if (reachedBottom) {
+			this.loadMoreChapters();
+		}
+	}
+
+	private loadChaptersPage(cursor?: string, append = false) {
+		if (this.isLoadingMoreChapters) {
+			return;
+		}
+
+		this.isLoadingMoreChapters = true;
+
+		this.bookService
+			.getChapters(this.id, {
+				cursor,
+				limit: this.chaptersPageLimit,
+			})
+			.subscribe({
+				next: (chapters) => {
+					const updatedChapters = append
+						? [...this.chapters, ...chapters.data]
+						: chapters.data;
+
+					this.chapters = updatedChapters;
+					this.nextChaptersCursor = chapters.nextCursor;
+					this.hasMoreChapters = chapters.hasNextPage;
+					this.sortChapters();
+					this.checkDownloadedChapters();
+					this.cdr.detectChanges();
+					this.scheduleHeightUpdate();
+					this.isLoadingMoreChapters = false;
+				},
+				error: async (error) => {
+					this.isLoadingMoreChapters = false;
+
+					if (append) {
+						console.error('Error loading chapters page:', error);
+						return;
 					}
-				} catch (e) {
-					console.error('Error loading offline chapters', e);
-				}
-			},
-		});
+
+					console.error(
+						'Error loading chapters from API, trying offline:',
+						error,
+					);
+					try {
+						const offlineChapters =
+							await this.downloadService.getChaptersByBook(
+								this.id,
+							);
+						if (offlineChapters && offlineChapters.length > 0) {
+							this.chapters = offlineChapters.map((oc) => ({
+								id: oc.id,
+								title: oc.title,
+								index: oc.index,
+								originalUrl: '',
+								scrapingStatus: ScrapingStatus.READY,
+								read: false,
+							}));
+
+							this.sortChapters();
+							this.hasMoreChapters = false;
+							this.nextChaptersCursor = null;
+
+							for (const c of this.chapters) {
+								this.chaptersDownloadStatus.set(
+									c.id,
+									'downloaded',
+								);
+							}
+							this.cdr.detectChanges();
+							this.scheduleHeightUpdate();
+						}
+					} catch (e) {
+						console.error('Error loading offline chapters', e);
+					}
+				},
+			});
 	}
 
 	async checkDownloadedChapters() {

@@ -87,112 +87,143 @@
 					/>
 				</app-button>
 			</div>
-			<div class="scrollable">
-				@for (chapter of chapters; track chapter.id) {
-					<a
-						[routerLink]="[chapter.id]"
-						class="chapter"
-						[class.selected]="isChapterSelected(chapter.id)"
-						(click)="onChapterClick($event, chapter)"
-						(contextmenu)="onChapterContextMenu($event, chapter)"
-					>
-						<div class="title">
-							<div class="title-with-icon">
-								<app-icons
-									[name]="getContentTypeIcon(chapter)"
-									size="16"
-									class="content-type-icon"
-								/>
-								<h2>capítulo {{ chapter.index | number }}</h2>
+			<div class="scrollable" (scroll)="onChaptersScroll($event)">
+				@if (isInitialChaptersLoading) {
+					@for (i of [].constructor(8); track $index) {
+						<div class="chapter-skeleton">
+							<div class="chapter-skeleton-left">
+								<div class="placeholder skeleton-line skeleton-title"></div>
+								<div class="placeholder skeleton-line skeleton-subtitle"></div>
 							</div>
-							@if (chapter.title) {
-								<h3>{{ chapter.title }}</h3>
-							}
+							<div class="chapter-skeleton-right">
+								<div class="placeholder skeleton-dot"></div>
+								<div class="placeholder skeleton-dot"></div>
+								<div class="placeholder skeleton-badge"></div>
+							</div>
 						</div>
-						<div class="metadata">
-							<div class="read">
-								<app-icons
-									[name]="chapter.read ? 'eye' : 'eye-close'"
-									[class.read]="chapter.read"
-								/>
-							</div>
-							<div
-								class="download-container"
-								(click)="
-									$event.preventDefault();
-									$event.stopPropagation()
-								"
-							>
-								@if (
-									chaptersDownloadStatus.get(chapter.id) ===
-									'downloaded'
-								) {
+					}
+				} @else {
+					@for (chapter of chapters; track chapter.id) {
+						<a
+							[routerLink]="[chapter.id]"
+							class="chapter"
+							[class.selected]="isChapterSelected(chapter.id)"
+							(click)="onChapterClick($event, chapter)"
+							(contextmenu)="onChapterContextMenu($event, chapter)"
+						>
+							<div class="title">
+								<div class="title-with-icon">
 									<app-icons
-										name="check"
-										class="icon-downloaded"
-										(click)="
-											deleteChapterDownload(
-												chapter,
-												$event
-											)
-										"
-										title="Clique para excluir download"
+										[name]="getContentTypeIcon(chapter)"
+										size="16"
+										class="content-type-icon"
 									/>
-								} @else if (
-									chaptersDownloadStatus.get(chapter.id) ===
-									'downloading'
-								) {
-									<span class="download-progress"
-										>{{
-											chaptersDownloadProgress.get(
-												chapter.id
-											) | number: '1.0-0'
-										}}%</span
-									>
-								} @else if (
-									chaptersDownloadStatus.get(chapter.id) ===
-									'pending'
-								) {
-									<app-icons
-										name="clock"
-										class="icon-pending"
-										title="Aguardando download"
-									/>
-								} @else {
-									<app-icons
-										name="download"
-										class="icon-download"
-										(click)="
-											downloadChapter(chapter, $event)
-										"
-									/>
+									<h2>capítulo {{ chapter.index | number }}</h2>
+								</div>
+								@if (chapter.title) {
+									<h3>{{ chapter.title }}</h3>
 								}
 							</div>
-							@if (chapter.scrapingStatus) {
+							<div class="metadata">
+								<div class="read">
+									<app-icons
+										[name]="chapter.read ? 'eye' : 'eye-close'"
+										[class.read]="chapter.read"
+									/>
+								</div>
 								<div
-									class="scraping-status"
-									[class.scrapingStatusReady]="
-										chapter.scrapingStatus ===
-										ScrapingStatus.READY
-									"
-									[class.scrapingStatusProcessing]="
-										chapter.scrapingStatus ===
-										ScrapingStatus.PROCESSING
-									"
-									[class.scrapingStatusError]="
-										chapter.scrapingStatus ===
-										ScrapingStatus.ERROR
+									class="download-container"
+									(click)="
+										$event.preventDefault();
+										$event.stopPropagation()
 									"
 								>
-									{{
-										getScrapingStatusClass(
-											chapter.scrapingStatus
-										)
-									}}
+									@if (
+										chaptersDownloadStatus.get(chapter.id) ===
+										'downloaded'
+									) {
+										<app-icons
+											name="check"
+											class="icon-downloaded"
+											(click)="
+												deleteChapterDownload(
+													chapter,
+													$event
+												)
+											"
+											title="Clique para excluir download"
+										/>
+									} @else if (
+										chaptersDownloadStatus.get(chapter.id) ===
+										'downloading'
+									) {
+										<span class="download-progress"
+											>{{
+												chaptersDownloadProgress.get(
+													chapter.id
+												) | number: '1.0-0'
+											}}%</span
+										>
+									} @else if (
+										chaptersDownloadStatus.get(chapter.id) ===
+										'pending'
+									) {
+										<app-icons
+											name="clock"
+											class="icon-pending"
+											title="Aguardando download"
+										/>
+									} @else {
+										<app-icons
+											name="download"
+											class="icon-download"
+											(click)="
+												downloadChapter(chapter, $event)
+											"
+										/>
+									}
 								</div>
-							}
-						</div>
-					</a>
+								@if (chapter.scrapingStatus) {
+									<div
+										class="scraping-status"
+										[class.scrapingStatusReady]="
+											chapter.scrapingStatus ===
+											ScrapingStatus.READY
+										"
+										[class.scrapingStatusProcessing]="
+											chapter.scrapingStatus ===
+											ScrapingStatus.PROCESSING
+										"
+										[class.scrapingStatusError]="
+											chapter.scrapingStatus ===
+											ScrapingStatus.ERROR
+										"
+									>
+										{{
+											getScrapingStatusClass(
+												chapter.scrapingStatus
+											)
+										}}
+									</div>
+								}
+							</div>
+						</a>
+					}
+
+					@if (isAppendingChapters) {
+						@for (i of [].constructor(3); track $index) {
+							<div class="chapter-skeleton chapter-skeleton-compact">
+								<div class="chapter-skeleton-left">
+									<div class="placeholder skeleton-line skeleton-title"></div>
+									<div class="placeholder skeleton-line skeleton-subtitle"></div>
+								</div>
+								<div class="chapter-skeleton-right">
+									<div class="placeholder skeleton-dot"></div>
+									<div class="placeholder skeleton-dot"></div>
+								</div>
+							</div>
+						}
+					}
 				}
 			</div>
 		} @placeholder {

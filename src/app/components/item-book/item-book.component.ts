@@ -102,7 +102,7 @@ export class ItemBookComponent {
 			// BookList doesn't have chapters.
 			// So we fetch chapters.
 			const chapters = await firstValueFrom(
-				this.bookService.getChapters(this.book.id),
+				this.bookService.getAllChapters(this.book.id),
 			);
 
 			if (chapters.length === 0) {

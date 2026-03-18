@@ -148,9 +148,6 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 				// Carrega o último progresso de leitura
 				this.loadLastReadingProgress();
 
-				// Carrega o primeiro capítulo para "Começar a ler"
-				this.loadFirstChapter();
-
 				// Conecta ao WebSocket apenas se autenticado
 				if (this.userTokenService.hasValidAccessTokenSignal()) {
 					this.setupWebSocket(book.id);
@@ -543,7 +540,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	private loadFirstChapter() {
 		if (!this.book) return;
 
-		this.bookService.getChapters(this.book.id).subscribe({
+		this.bookService.getAllChapters(this.book.id).subscribe({
 			next: (chapters: Chapterlist[]) => {
 				if (chapters && chapters.length > 0) {
 					// Ordena por índice e guarda a lista
@@ -582,19 +579,43 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 					queryParams: { page: this.lastReadPage },
 				});
 			}
-		} else if (this.firstChapterId) {
-			// Se não há progresso, vai para o primeiro capítulo
-			this.router.navigate([this.firstChapterId], {
-				relativeTo: this.activatedRoute,
-			});
 		} else {
-			// Se ainda não carregou os capítulos, mostra mensagem
+			await this.ensureFirstChapterLoaded();
+
+			if (this.firstChapterId) {
+				this.router.navigate([this.firstChapterId], {
+					relativeTo: this.activatedRoute,
+				});
+				return;
+			}
+
 			this.modalService.show(
-				'Aguarde',
-				'Os capítulos ainda estão sendo carregados. Tente novamente em alguns segundos.',
+				'Aviso',
+				'Este livro ainda não possui capítulos disponíveis.',
 				[{ label: 'Ok', type: 'primary' }],
 				'info',
 			);
+		}
+	}
+
+	private async ensureFirstChapterLoaded() {
+		if (this.firstChapterId || !this.book) {
+			return;
+		}
+
+		try {
+			const chapters = await firstValueFrom(
+				this.bookService.getAllChapters(this.book.id),
+			);
+
+			if (chapters.length > 0) {
+				this.sortedChapters = [...chapters].sort(
+					(a, b) => a.index - b.index,
+				);
+				this.firstChapterId = this.sortedChapters[0].id;
+			}
+		} catch (error) {
+			console.error('Erro ao carregar primeiro capítulo:', error);
 		}
 	}
 
@@ -707,7 +728,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		try {
 			// Buscar lista de capítulos
 			const chapters = await firstValueFrom(
-				this.bookService.getChapters(this.book.id),
+				this.bookService.getAllChapters(this.book.id),
 			);
 
 			if (chapters.length === 0) {
@@ -772,7 +793,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		try {
 			// Buscar lista de capítulos
 			const chapters = await firstValueFrom(
-				this.bookService.getChapters(this.book.id),
+				this.bookService.getAllChapters(this.book.id),
 			);
 
 			if (chapters.length === 0) {
