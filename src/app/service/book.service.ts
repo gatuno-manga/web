@@ -172,7 +172,7 @@ export class BookService {
 	}
 
 	getChapters(bookId: string, options?: ChapterCursorOptions) {
-		const params: Record<string, string | number> = {};
+		const params: { cursor?: string; limit?: number } = {};
 
 		if (options?.cursor) {
 			params.cursor = options.cursor;
