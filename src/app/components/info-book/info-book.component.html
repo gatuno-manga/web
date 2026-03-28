@@ -87,7 +87,7 @@
 					/>
 				</app-button>
 			</div>
-			<div class="scrollable" (scroll)="onChaptersScroll($event)">
+			<div class="scrollable">
 				@if (isInitialChaptersLoading()) {
 					@for (i of [].constructor(8); track $index) {
 						<div class="chapter-skeleton">
@@ -282,12 +282,9 @@
 						<div class="drag-placeholder" *cdkDragPlaceholder></div>
 						@if (cover.url && !coverImageErrors().has(cover.id)) {
 							<img
-								[ngSrc]="cover.url"
+								[src]="cover.url"
 								[alt]="'Cover ' + cover.id"
 								(error)="onCoverImageError(cover.id)"
-								width="150"
-								height="225"
-								priority
 							/>
 						} @else {
 							<div class="cover-placeholder">
@@ -386,11 +383,9 @@
 					>
 						@if (savedPage.page.path) {
 							<img
-								[ngSrc]="savedPage.page.path"
+								[src]="savedPage.page.path"
 								[alt]="'Page ' + savedPage.page.index"
 								loading="lazy"
-								width="150"
-								height="225"
 							/>
 						} @else {
 							<div class="cover-placeholder">

@@ -13,11 +13,7 @@ import {
 	input,
 	ChangeDetectionStrategy,
 } from '@angular/core';
-import {
-	isPlatformBrowser,
-	DecimalPipe,
-	NgOptimizedImage,
-} from '@angular/common';
+import { isPlatformBrowser, DecimalPipe } from '@angular/common';
 import { BookService } from '../../service/book.service';
 import {
 	Book,
@@ -78,7 +74,6 @@ interface ModulesLoad {
 	imports: [
 		RouterModule,
 		DecimalPipe,
-		NgOptimizedImage,
 		IconsComponent,
 		ButtonComponent,
 		ImageViewerComponent,
@@ -87,6 +82,10 @@ interface ModulesLoad {
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
+	host: {
+		'(window:scroll)': 'onWindowScroll()',
+		'(window:resize)': 'updateContainerHeight()',
+	},
 })
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	private bookService = inject(BookService);
@@ -355,7 +354,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		});
 	}
 
-	private updateContainerHeight() {
+	public updateContainerHeight() {
 		if (!this.containerElement?.nativeElement) {
 			return;
 		}
@@ -456,22 +455,30 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		this.loadChaptersPage(cursor, true);
 	}
 
-	onChaptersScroll(event: Event) {
+	onWindowScroll() {
 		if (
 			this.selectedTab() !== tab.chapters ||
 			!this.hasMoreChapters() ||
-			this.isLoadingMoreChapters()
+			this.isLoadingMoreChapters() ||
+			!this.containerElement?.nativeElement
 		) {
 			return;
 		}
 
-		const target = event.target as HTMLElement;
-		const thresholdPx = 120;
-		const reachedBottom =
-			target.scrollTop + target.clientHeight >=
-			target.scrollHeight - thresholdPx;
+		// Usar o bounding rect do container ATIVO (o que tem o conteúdo)
+		const container = this.containerElement.nativeElement;
+		const tabs = container.querySelectorAll('.container');
+		const activeTab = tabs[this.selectedTab()] as HTMLElement;
 
-		if (reachedBottom) {
+		if (!activeTab) {
+			return;
+		}
+
+		const rect = activeTab.getBoundingClientRect();
+		const viewportHeight = window.innerHeight;
+		const thresholdPx = 1000;
+
+		if (rect.bottom <= viewportHeight + thresholdPx) {
 			this.loadMoreChapters();
 		}
 	}
