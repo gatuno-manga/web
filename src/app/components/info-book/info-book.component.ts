@@ -1,7 +1,6 @@
 import {
 	Component,
 	ElementRef,
-	Input,
 	ViewChild,
 	AfterViewInit,
 	signal,
@@ -10,8 +9,15 @@ import {
 	PLATFORM_ID,
 	NgZone,
 	ChangeDetectorRef,
+	computed,
+	input,
+	ChangeDetectionStrategy,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import {
+	isPlatformBrowser,
+	DecimalPipe,
+	NgOptimizedImage,
+} from '@angular/common';
 import { BookService } from '../../service/book.service';
 import {
 	Book,
@@ -25,7 +31,6 @@ import {
 	ContentTypes,
 } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
 import { IconsComponent } from '../icons/icons.component';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { Subscription, firstValueFrom } from 'rxjs';
@@ -73,6 +78,7 @@ interface ModulesLoad {
 	imports: [
 		RouterModule,
 		DecimalPipe,
+		NgOptimizedImage,
 		IconsComponent,
 		ButtonComponent,
 		ImageViewerComponent,
@@ -80,9 +86,16 @@ interface ModulesLoad {
 	],
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
-	userTokenService = inject(UserTokenService);
+	private bookService = inject(BookService);
+	private modalService = inject(ModalNotificationService);
+	private downloadService = inject(DownloadService);
+	private chapterService = inject(ChapterService);
+	private contextMenuService = inject(ContextMenuService);
+	private savedPagesService = inject(SavedPagesService);
+	public userTokenService = inject(UserTokenService);
 	private notificationService = inject(NotificationService);
 	private platformId = inject(PLATFORM_ID);
 	private ngZone = inject(NgZone);
@@ -93,10 +106,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	tab = tab;
 	ScrapingStatus = ScrapingStatus;
 
-	@Input() id!: string;
-	@Input() bookBasic?: BookBasic;
+	id = input.required<string>();
+	bookBasic = input<BookBasic | undefined>();
 
-	selectedTab: tab = tab.chapters;
+	selectedTab = signal<tab>(tab.chapters);
 	sortAscending = signal(true);
 
 	private websocketSubscription?: Subscription;
@@ -120,57 +133,50 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			function: async () => this.loadSavedPages(),
 		},
 	];
-	chapters: Chapterlist[] = [];
-	nextChaptersCursor: string | null = null;
-	hasMoreChapters = false;
-	isLoadingMoreChapters = false;
+	chapters = signal<Chapterlist[]>([]);
+	nextChaptersCursor = signal<string | null>(null);
+	hasMoreChapters = signal(false);
+	isLoadingMoreChapters = signal(false);
 	readonly chaptersPageLimit = 200;
-	covers: Cover[] = [];
-	originalCovers: Cover[] = [];
-	isReorderingCovers = false;
-	hasCoversChanged = false;
+	covers = signal<Cover[]>([]);
+	originalCovers = signal<Cover[]>([]);
+	isReorderingCovers = signal(false);
+	hasCoversChanged = signal(false);
 
-	savedPages: SavedPage[] = [];
-	extraInfo: BookDetail = {
+	savedPages = signal<SavedPage[]>([]);
+	extraInfo = signal<BookDetail>({
 		alternativeTitle: [],
 		originalUrl: [],
 		scrapingStatus: ScrapingStatus.PROCESSING,
 		createdAt: new Date(),
 		updatedAt: new Date(),
-	};
+	});
 
-	chaptersDownloadStatus = new Map<string, DownloadStatus | 'downloaded'>();
-	chaptersDownloadProgress = new Map<string, number>();
+	chaptersDownloadStatus = signal<Map<string, DownloadStatus | 'downloaded'>>(
+		new Map(),
+	);
+	chaptersDownloadProgress = signal<Map<string, number>>(new Map());
 
 	// Multi-selection state
 	selectedChapters = signal<Set<string>>(new Set());
 
 	// Image viewer state
-	showImageViewer = false;
-	viewerImageUrl = '';
-	viewerImageTitle = '';
-	viewerImageDescription = '';
+	showImageViewer = signal(false);
+	viewerImageUrl = signal('');
+	viewerImageTitle = signal('');
+	viewerImageDescription = signal('');
 
 	// Cover edit modal state
-	editingCover: Cover | null = null;
+	editingCover = signal<Cover | null>(null);
 
 	// Track cover image loading errors
-	coverImageErrors = new Set<string>();
+	coverImageErrors = signal<Set<string>>(new Set());
 
 	@ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
 	@ViewChild('firstTab') firstTab!: ElementRef<HTMLSpanElement>;
 	@ViewChild('container') containerElement!: ElementRef<HTMLDivElement>;
 
-	containerHeight = 'auto';
-
-	constructor(
-		private bookService: BookService,
-		private modalService: ModalNotificationService,
-		private downloadService: DownloadService,
-		private chapterService: ChapterService,
-		private contextMenuService: ContextMenuService,
-		private savedPagesService: SavedPagesService,
-	) {}
+	containerHeight = signal('auto');
 
 	ngAfterViewInit() {
 		if (this.firstTab) {
@@ -185,29 +191,27 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 		this.downloadSubscription =
 			this.downloadService.downloadProgress$.subscribe((progressMap) => {
+				const statusMap = new Map(this.chaptersDownloadStatus());
+				const progressValueMap = new Map(
+					this.chaptersDownloadProgress(),
+				);
+
 				progressMap.forEach((progress, chapterId) => {
-					this.chaptersDownloadStatus.set(chapterId, progress.status);
+					statusMap.set(chapterId, progress.status);
 					if (progress.total > 0) {
-						this.chaptersDownloadProgress.set(
+						progressValueMap.set(
 							chapterId,
 							(progress.current / progress.total) * 100,
 						);
 					}
 
 					if (progress.status === 'completed') {
-						this.chaptersDownloadStatus.set(
-							chapterId,
-							'downloaded',
-						);
+						statusMap.set(chapterId, 'downloaded');
 					}
 				});
-				// Force view update by creating new Map references
-				this.chaptersDownloadStatus = new Map(
-					this.chaptersDownloadStatus,
-				);
-				this.chaptersDownloadProgress = new Map(
-					this.chaptersDownloadProgress,
-				);
+
+				this.chaptersDownloadStatus.set(statusMap);
+				this.chaptersDownloadProgress.set(progressValueMap);
 			});
 	}
 
@@ -223,10 +227,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	private subscribeToWebSocketEvents() {
-		if (!this.id) return;
+		const bookId = this.id();
+		if (!bookId) return;
 
 		this.websocketSubscription = this.bookService
-			.watchBook(this.id)
+			.watchBook(bookId)
 			.subscribe({
 				next: (event) => {
 					const typedEvent = event as { type: string; data: unknown };
@@ -235,7 +240,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					switch (typedEvent.type) {
 						case 'chapters.updated':
 							if (
-								this.selectedTab === tab.chapters &&
+								this.selectedTab() === tab.chapters &&
 								this.modulesLoad[tab.chapters].load()
 							) {
 								this.loadChapters();
@@ -247,7 +252,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 						case 'cover.processed':
 						case 'cover.selected':
 							if (
-								this.selectedTab === tab.covers &&
+								this.selectedTab() === tab.covers &&
 								this.modulesLoad[tab.covers].load()
 							) {
 								this.loadCovers();
@@ -258,7 +263,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 						case 'book.updated':
 							if (
-								this.selectedTab === tab.extraInfo &&
+								this.selectedTab() === tab.extraInfo &&
 								this.modulesLoad[tab.extraInfo].load()
 							) {
 								this.loadExtraInfo();
@@ -275,7 +280,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	selectTab(tabName: tab, event?: Event) {
-		this.selectedTab = tabName;
+		this.selectedTab.set(tabName);
 		this.loadResults(tabName);
 
 		if (event && this.selector) {
@@ -329,7 +334,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				this.containerElement.nativeElement.querySelectorAll(
 					'.container',
 				);
-			const activeTab = tabs[this.selectedTab] as HTMLElement;
+			const activeTab = tabs[this.selectedTab()] as HTMLElement;
 
 			if (activeTab) {
 				this.resizeObserver?.observe(activeTab);
@@ -362,12 +367,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			return;
 		}
 
-		const activeTab = tabs[this.selectedTab] as HTMLElement;
+		const activeTab = tabs[this.selectedTab()] as HTMLElement;
 
 		if (activeTab) {
 			const newHeight = `${activeTab.scrollHeight}px`;
-			if (this.containerHeight !== newHeight) {
-				this.containerHeight = newHeight;
+			if (this.containerHeight() !== newHeight) {
+				this.containerHeight.set(newHeight);
 			}
 		}
 	}
@@ -416,43 +421,46 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	toggleSort() {
 		this.sortAscending.update((v) => !v);
-		this.sortChapters();
+		this.loadChapters();
 	}
 
 	sortChapters() {
 		const asc = this.sortAscending();
-		this.chapters.sort((a, b) =>
-			asc ? a.index - b.index : b.index - a.index,
-		);
+		this.chapters.update((currentChapters) => {
+			return [...currentChapters].sort((a, b) =>
+				asc ? a.index - b.index : b.index - a.index,
+			);
+		});
 	}
 
-	get isInitialChaptersLoading() {
-		return this.isLoadingMoreChapters && this.chapters.length === 0;
-	}
+	isInitialChaptersLoading = computed(() => {
+		return this.isLoadingMoreChapters() && this.chapters().length === 0;
+	});
 
-	get isAppendingChapters() {
-		return this.isLoadingMoreChapters && this.chapters.length > 0;
-	}
+	isAppendingChapters = computed(() => {
+		return this.isLoadingMoreChapters() && this.chapters().length > 0;
+	});
 
 	loadChapters() {
-		this.nextChaptersCursor = null;
-		this.hasMoreChapters = false;
+		this.nextChaptersCursor.set(null);
+		this.hasMoreChapters.set(false);
 		this.loadChaptersPage();
 	}
 
 	loadMoreChapters() {
-		if (!this.nextChaptersCursor || !this.hasMoreChapters) {
+		const cursor = this.nextChaptersCursor();
+		if (!cursor || !this.hasMoreChapters()) {
 			return;
 		}
 
-		this.loadChaptersPage(this.nextChaptersCursor, true);
+		this.loadChaptersPage(cursor, true);
 	}
 
 	onChaptersScroll(event: Event) {
 		if (
-			this.selectedTab !== tab.chapters ||
-			!this.hasMoreChapters ||
-			this.isLoadingMoreChapters
+			this.selectedTab() !== tab.chapters ||
+			!this.hasMoreChapters() ||
+			this.isLoadingMoreChapters()
 		) {
 			return;
 		}
@@ -469,34 +477,34 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	private loadChaptersPage(cursor?: string, append = false) {
-		if (this.isLoadingMoreChapters) {
+		if (this.isLoadingMoreChapters()) {
 			return;
 		}
 
-		this.isLoadingMoreChapters = true;
+		this.isLoadingMoreChapters.set(true);
 
 		this.bookService
-			.getChapters(this.id, {
+			.getChapters(this.id(), {
 				cursor,
 				limit: this.chaptersPageLimit,
+				order: this.sortAscending() ? 'ASC' : 'DESC',
 			})
 			.subscribe({
 				next: (chapters) => {
 					const updatedChapters = append
-						? [...this.chapters, ...chapters.data]
+						? [...this.chapters(), ...chapters.data]
 						: chapters.data;
 
-					this.chapters = updatedChapters;
-					this.nextChaptersCursor = chapters.nextCursor;
-					this.hasMoreChapters = chapters.hasNextPage;
+					this.chapters.set(updatedChapters);
+					this.nextChaptersCursor.set(chapters.nextCursor);
+					this.hasMoreChapters.set(chapters.hasNextPage);
 					this.sortChapters();
 					this.checkDownloadedChapters();
-					this.cdr.detectChanges();
 					this.scheduleHeightUpdate();
-					this.isLoadingMoreChapters = false;
+					this.isLoadingMoreChapters.set(false);
 				},
 				error: async (error) => {
-					this.isLoadingMoreChapters = false;
+					this.isLoadingMoreChapters.set(false);
 
 					if (append) {
 						console.error('Error loading chapters page:', error);
@@ -510,29 +518,32 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					try {
 						const offlineChapters =
 							await this.downloadService.getChaptersByBook(
-								this.id,
+								this.id(),
 							);
 						if (offlineChapters && offlineChapters.length > 0) {
-							this.chapters = offlineChapters.map((oc) => ({
-								id: oc.id,
-								title: oc.title,
-								index: oc.index,
-								originalUrl: '',
-								scrapingStatus: ScrapingStatus.READY,
-								read: false,
-							}));
+							const mappedChapters = offlineChapters.map(
+								(oc) => ({
+									id: oc.id,
+									title: oc.title,
+									index: oc.index,
+									originalUrl: '',
+									scrapingStatus: ScrapingStatus.READY,
+									read: false,
+								}),
+							);
 
+							this.chapters.set(mappedChapters);
 							this.sortChapters();
-							this.hasMoreChapters = false;
-							this.nextChaptersCursor = null;
+							this.hasMoreChapters.set(false);
+							this.nextChaptersCursor.set(null);
 
-							for (const c of this.chapters) {
-								this.chaptersDownloadStatus.set(
-									c.id,
-									'downloaded',
-								);
+							const statusMap = new Map(
+								this.chaptersDownloadStatus(),
+							);
+							for (const c of mappedChapters) {
+								statusMap.set(c.id, 'downloaded');
 							}
-							this.cdr.detectChanges();
+							this.chaptersDownloadStatus.set(statusMap);
 							this.scheduleHeightUpdate();
 						}
 					} catch (e) {
@@ -543,16 +554,16 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	async checkDownloadedChapters() {
-		for (const chapter of this.chapters) {
+		const statusMap = new Map(this.chaptersDownloadStatus());
+		for (const chapter of this.chapters()) {
 			const isDownloaded = await this.downloadService.isChapterDownloaded(
 				chapter.id,
 			);
 			if (isDownloaded) {
-				this.chaptersDownloadStatus.set(chapter.id, 'downloaded');
+				statusMap.set(chapter.id, 'downloaded');
 			}
 		}
-		// Force view update
-		this.chaptersDownloadStatus = new Map(this.chaptersDownloadStatus);
+		this.chaptersDownloadStatus.set(statusMap);
 	}
 
 	async downloadChapter(
@@ -565,13 +576,15 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 
 		if (
-			this.chaptersDownloadStatus.get(chapterList.id) === 'downloaded' ||
-			this.chaptersDownloadStatus.get(chapterList.id) === 'downloading'
+			this.chaptersDownloadStatus().get(chapterList.id) ===
+				'downloaded' ||
+			this.chaptersDownloadStatus().get(chapterList.id) === 'downloading'
 		) {
 			return;
 		}
 
-		if (!this.bookBasic) {
+		const basicInfo = this.bookBasic();
+		if (!basicInfo) {
 			console.error('Book basic info not available');
 			return;
 		}
@@ -584,7 +597,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 			// Fetch full book details
 			const fullBookBasic = await firstValueFrom(
-				this.bookService.getBook(this.id),
+				this.bookService.getBook(this.id()),
 			);
 
 			const bookToSave = fullBookBasic as unknown as Book;
@@ -613,11 +626,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					type: 'danger',
 					callback: async () => {
 						await this.downloadService.deleteChapter(chapter.id);
-						this.chaptersDownloadStatus.delete(chapter.id);
-						// Força atualização da view
-						this.chaptersDownloadStatus = new Map(
-							this.chaptersDownloadStatus,
-						);
+						this.chaptersDownloadStatus.update((map) => {
+							const newMap = new Map(map);
+							newMap.delete(chapter.id);
+							return newMap;
+						});
 					},
 				},
 			],
@@ -628,7 +641,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	markChapterAsRead(chapter: Chapterlist) {
 		this.chapterService.markAsRead(chapter.id).subscribe({
 			next: () => {
-				chapter.read = true;
+				this.chapters.update((current) => {
+					return current.map((c) =>
+						c.id === chapter.id ? { ...c, read: true } : c,
+					);
+				});
 			},
 			error: (error) => {
 				console.error('Error marking chapter as read:', error);
@@ -639,7 +656,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	markChapterAsUnread(chapter: Chapterlist) {
 		this.chapterService.markAsUnread(chapter.id).subscribe({
 			next: () => {
-				chapter.read = false;
+				this.chapters.update((current) => {
+					return current.map((c) =>
+						c.id === chapter.id ? { ...c, read: false } : c,
+					);
+				});
 			},
 			error: (error) => {
 				console.error('Error marking chapter as unread:', error);
@@ -648,12 +669,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	loadCovers() {
-		this.bookService.getCovers(this.id).subscribe({
+		this.bookService.getCovers(this.id()).subscribe({
 			next: (covers) => {
-				this.covers = covers;
-				this.originalCovers = JSON.parse(JSON.stringify(covers));
-				this.hasCoversChanged = false;
-				this.cdr.detectChanges();
+				this.covers.set(covers);
+				this.originalCovers.set(JSON.parse(JSON.stringify(covers)));
+				this.hasCoversChanged.set(false);
 				this.scheduleHeightUpdate();
 			},
 			error: (error) => {
@@ -665,22 +685,29 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	onCoverDrop(event: CdkDragDrop<Cover[]>) {
 		if (!this.userTokenService.isAdminSignal()) return;
 
-		moveItemInArray(this.covers, event.previousIndex, event.currentIndex);
-		this.hasCoversChanged = true;
+		this.covers.update((current) => {
+			const newCovers = [...current];
+			moveItemInArray(newCovers, event.previousIndex, event.currentIndex);
+			return newCovers;
+		});
+		this.hasCoversChanged.set(true);
 	}
 
 	saveCoversOrder() {
-		if (!this.id) return;
+		const bookId = this.id();
+		if (!bookId) return;
 
-		const coversOrder = this.covers.map((cover, index) => ({
+		const coversOrder = this.covers().map((cover, index) => ({
 			id: cover.id,
 			index: index,
 		}));
 
-		this.bookService.orderCovers(this.id, coversOrder).subscribe({
+		this.bookService.orderCovers(bookId, coversOrder).subscribe({
 			next: () => {
-				this.originalCovers = JSON.parse(JSON.stringify(this.covers));
-				this.hasCoversChanged = false;
+				this.originalCovers.set(
+					JSON.parse(JSON.stringify(this.covers())),
+				);
+				this.hasCoversChanged.set(false);
 				this.notificationService.success(
 					'Ordem das capas salva com sucesso!',
 				);
@@ -695,15 +722,14 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	cancelCoversReorder() {
-		this.covers = JSON.parse(JSON.stringify(this.originalCovers));
-		this.hasCoversChanged = false;
+		this.covers.set(JSON.parse(JSON.stringify(this.originalCovers())));
+		this.hasCoversChanged.set(false);
 	}
 
 	loadExtraInfo() {
-		this.bookService.getInfo(this.id).subscribe({
+		this.bookService.getInfo(this.id()).subscribe({
 			next: (info) => {
-				this.extraInfo = info;
-				this.cdr.detectChanges();
+				this.extraInfo.set(info);
 				this.scheduleHeightUpdate();
 			},
 			error: (error) => {
@@ -713,10 +739,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	loadSavedPages() {
-		this.savedPagesService.getSavedPagesByBook(this.id).subscribe({
+		this.savedPagesService.getSavedPagesByBook(this.id()).subscribe({
 			next: (pages) => {
-				this.savedPages = pages;
-				this.cdr.detectChanges();
+				this.savedPages.set(pages);
 				this.scheduleHeightUpdate();
 			},
 			error: (error) => {
@@ -726,12 +751,19 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	urlTransform(url: string): string {
-		return new URL(url).hostname;
+		try {
+			return new URL(url).hostname;
+		} catch (e) {
+			return url;
+		}
 	}
 
 	onCoverImageError(coverId: string) {
-		this.coverImageErrors.add(coverId);
-		this.coverImageErrors = new Set(this.coverImageErrors);
+		this.coverImageErrors.update((set) => {
+			const newSet = new Set(set);
+			newSet.add(coverId);
+			return newSet;
+		});
 	}
 
 	onSavedPageClick(savedPage: SavedPage) {
@@ -786,20 +818,21 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 										.subscribe({
 											next: (updatedPage) => {
 												// Update local state
-												const index =
-													this.savedPages.findIndex(
-														(p) =>
-															p.id ===
-															savedPage.id,
-													);
-												if (index !== -1) {
-													this.savedPages[index] = {
-														...this.savedPages[
-															index
-														],
-														comment: newComment,
-													};
-												}
+												this.savedPages.update(
+													(current) => {
+														return current.map(
+															(p) =>
+																p.id ===
+																savedPage.id
+																	? {
+																			...p,
+																			comment:
+																				newComment,
+																		}
+																	: p,
+														);
+													},
+												);
 												this.notificationService.success(
 													'Comentário atualizado!',
 												);
@@ -851,8 +884,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 							.unsavePage(savedPage.id)
 							.subscribe({
 								next: () => {
-									this.savedPages = this.savedPages.filter(
-										(p) => p.id !== savedPage.id,
+									this.savedPages.update((current) =>
+										current.filter(
+											(p) => p.id !== savedPage.id,
+										),
 									);
 								},
 								error: (err) =>
@@ -876,13 +911,15 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	toggleChapterSelection(chapterId: string) {
-		const current = new Set(this.selectedChapters());
-		if (current.has(chapterId)) {
-			current.delete(chapterId);
-		} else {
-			current.add(chapterId);
-		}
-		this.selectedChapters.set(current);
+		this.selectedChapters.update((current) => {
+			const next = new Set(current);
+			if (next.has(chapterId)) {
+				next.delete(chapterId);
+			} else {
+				next.add(chapterId);
+			}
+			return next;
+		});
 	}
 
 	clearSelection() {
@@ -890,7 +927,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	selectAllChapters() {
-		const allIds = new Set(this.chapters.map((c) => c.id));
+		const allIds = new Set(this.chapters().map((c) => c.id));
 		this.selectedChapters.set(allIds);
 	}
 
@@ -898,18 +935,19 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		return this.selectedChapters().has(chapterId);
 	}
 
-	hasDownloadedInSelection(): boolean {
+	hasDownloadedInSelection = computed(() => {
+		const status = this.chaptersDownloadStatus();
 		return Array.from(this.selectedChapters()).some(
-			(id) => this.chaptersDownloadStatus.get(id) === 'downloaded',
+			(id) => status.get(id) === 'downloaded',
 		);
-	}
+	});
 
 	async downloadSelectedChapters() {
 		const selectedIds = Array.from(this.selectedChapters());
 
 		// Filtrar apenas capítulos que não estão baixados ou em download
 		const chaptersToDownload = selectedIds.filter((id) => {
-			const status = this.chaptersDownloadStatus.get(id);
+			const status = this.chaptersDownloadStatus().get(id);
 			return !status || status === 'error';
 		});
 
@@ -919,13 +957,16 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 
 		// Marcar todos como "pending" antes de iniciar
-		for (const chapterId of chaptersToDownload) {
-			this.chaptersDownloadStatus.set(chapterId, 'pending');
-		}
-		this.chaptersDownloadStatus = new Map(this.chaptersDownloadStatus);
+		this.chaptersDownloadStatus.update((map) => {
+			const newMap = new Map(map);
+			for (const chapterId of chaptersToDownload) {
+				newMap.set(chapterId, 'pending');
+			}
+			return newMap;
+		});
 
 		for (const chapterId of chaptersToDownload) {
-			const chapter = this.chapters.find((c) => c.id === chapterId);
+			const chapter = this.chapters().find((c) => c.id === chapterId);
 			if (chapter) {
 				try {
 					await this.downloadChapter(chapter);
@@ -945,7 +986,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 		// Filtrar apenas os que estão baixados
 		const downloadedIds = selectedIds.filter(
-			(id) => this.chaptersDownloadStatus.get(id) === 'downloaded',
+			(id) => this.chaptersDownloadStatus().get(id) === 'downloaded',
 		);
 
 		if (downloadedIds.length === 0) {
@@ -967,11 +1008,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					callback: async () => {
 						for (const chapterId of downloadedIds) {
 							await this.downloadService.deleteChapter(chapterId);
-							this.chaptersDownloadStatus.delete(chapterId);
+							this.chaptersDownloadStatus.update((map) => {
+								const newMap = new Map(map);
+								newMap.delete(chapterId);
+								return newMap;
+							});
 						}
-						this.chaptersDownloadStatus = new Map(
-							this.chaptersDownloadStatus,
-						);
 						this.clearSelection();
 					},
 				},
@@ -982,7 +1024,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	async toggleSelectedReadStatus() {
 		const selectedIds = Array.from(this.selectedChapters());
-		const selectedChapters = this.chapters.filter((c) =>
+		const selectedChapters = this.chapters().filter((c) =>
 			selectedIds.includes(c.id),
 		);
 
@@ -995,27 +1037,35 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					this.chapterService.markManyAsUnread(selectedIds),
 				);
 				// Atualizar estado local para os que foram marcados com sucesso
-				for (const result of results) {
-					if (result.success) {
-						const chapter = this.chapters.find(
-							(c) => c.id === result.chapterId,
-						);
-						if (chapter) chapter.read = false;
+				this.chapters.update((current) => {
+					const next = [...current];
+					for (const result of results) {
+						if (result.success) {
+							const chapter = next.find(
+								(c) => c.id === result.chapterId,
+							);
+							if (chapter) chapter.read = false;
+						}
 					}
-				}
+					return next;
+				});
 			} else {
 				const results = await firstValueFrom(
 					this.chapterService.markManyAsRead(selectedIds),
 				);
 				// Atualizar estado local para os que foram marcados com sucesso
-				for (const result of results) {
-					if (result.success) {
-						const chapter = this.chapters.find(
-							(c) => c.id === result.chapterId,
-						);
-						if (chapter) chapter.read = true;
+				this.chapters.update((current) => {
+					const next = [...current];
+					for (const result of results) {
+						if (result.success) {
+							const chapter = next.find(
+								(c) => c.id === result.chapterId,
+							);
+							if (chapter) chapter.read = true;
+						}
 					}
-				}
+					return next;
+				});
 			}
 		} catch (error) {
 			console.error('Error toggling chapters read status:', error);
@@ -1033,13 +1083,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 		// Se houver múltiplos capítulos selecionados, mostrar opções em lote
 		if (selectedCount > 1) {
+			const status = this.chaptersDownloadStatus();
 			const hasDownloaded = Array.from(this.selectedChapters()).some(
-				(id) => this.chaptersDownloadStatus.get(id) === 'downloaded',
+				(id) => status.get(id) === 'downloaded',
 			);
 			const hasNotDownloaded = Array.from(this.selectedChapters()).some(
-				(id) =>
-					!this.chaptersDownloadStatus.get(id) ||
-					this.chaptersDownloadStatus.get(id) === 'error',
+				(id) => !status.get(id) || status.get(id) === 'error',
 			);
 
 			if (hasNotDownloaded) {
@@ -1060,7 +1109,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			}
 
 			// Verificar se algum capítulo está lido
-			const selectedChapters = this.chapters.filter((c) =>
+			const selectedChapters = this.chapters().filter((c) =>
 				Array.from(this.selectedChapters()).includes(c.id),
 			);
 			const hasReadChapter = selectedChapters.some((c) => c.read);
@@ -1087,7 +1136,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 
 		// Menu para capítulo único
-		const downloadStatus = this.chaptersDownloadStatus.get(chapter.id);
+		const downloadStatus = this.chaptersDownloadStatus().get(chapter.id);
 
 		if (downloadStatus === 'downloaded') {
 			items.push({
@@ -1125,7 +1174,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		const items: ContextMenuItem[] = [];
 
 		// Only show image-related options if cover has a URL and no error
-		if (cover.url && !this.coverImageErrors.has(cover.id)) {
+		if (cover.url && !this.coverImageErrors().has(cover.id)) {
 			items.push(
 				{
 					label: 'Copiar Imagem',
@@ -1177,7 +1226,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	onCoverClick(cover: Cover) {
-		if (cover.url && !this.coverImageErrors.has(cover.id)) {
+		if (cover.url && !this.coverImageErrors().has(cover.id)) {
 			this.openImageViewer(cover.url, cover.title);
 		} else {
 			// Open edit modal for covers without image or with loading error
@@ -1186,18 +1235,18 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	openImageViewer(url: string, title: string, description = '') {
-		this.viewerImageUrl = url;
-		this.viewerImageTitle = title;
-		this.viewerImageDescription = description;
-		this.showImageViewer = true;
+		this.viewerImageUrl.set(url);
+		this.viewerImageTitle.set(title);
+		this.viewerImageDescription.set(description);
+		this.showImageViewer.set(true);
 		this.lockScroll();
 	}
 
 	closeImageViewer() {
-		this.showImageViewer = false;
-		this.viewerImageUrl = '';
-		this.viewerImageTitle = '';
-		this.viewerImageDescription = '';
+		this.showImageViewer.set(false);
+		this.viewerImageUrl.set('');
+		this.viewerImageTitle.set('');
+		this.viewerImageDescription.set('');
 		this.unlockScroll();
 	}
 
@@ -1214,7 +1263,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	openCoverEditModal(cover: Cover) {
-		this.editingCover = cover;
+		this.editingCover.set(cover);
 		this.notificationService.notify({
 			message: '',
 			level: 'custom',
@@ -1236,7 +1285,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	closeCoverEditModal() {
 		this.modalService.close();
-		this.editingCover = null;
+		this.editingCover.set(null);
 	}
 
 	handleCoverEditClose = (result: CoverEditSaveEvent | null): void => {
@@ -1253,7 +1302,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			severity: NotificationSeverity.CRITICAL,
 			component: SourceAddModalComponent,
 			componentData: {
-				existingUrls: this.extraInfo.originalUrl,
+				existingUrls: this.extraInfo().originalUrl,
 				close: (result: SourceAddSaveEvent | null) => {
 					this.modalService.close();
 					if (result) {
@@ -1279,15 +1328,18 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	onSourceAddSave(data: SourceAddSaveEvent) {
 		// Adicionar nova URL ao array existente
-		const updatedUrls = [...this.extraInfo.originalUrl, data.url];
+		const updatedUrls = [...this.extraInfo().originalUrl, data.url];
 
 		// Chamar API para atualizar o livro
 		this.bookService
-			.updateBook(this.id, { originalUrl: updatedUrls })
+			.updateBook(this.id(), { originalUrl: updatedUrls })
 			.subscribe({
 				next: () => {
 					// Atualizar estado local
-					this.extraInfo.originalUrl = updatedUrls;
+					this.extraInfo.update((info) => ({
+						...info,
+						originalUrl: updatedUrls,
+					}));
 					this.closeSourceAddModal();
 					this.notificationService.success(
 						'Fonte adicionada com sucesso!',
@@ -1329,7 +1381,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	confirmRemoveSource(index: number) {
-		const source = this.extraInfo.originalUrl[index];
+		const source = this.extraInfo().originalUrl[index];
 		this.modalService.show(
 			'Remover Fonte',
 			`Tem certeza que deseja remover a fonte "${this.urlTransform(source)}"?`,
@@ -1346,15 +1398,18 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	removeSource(index: number) {
-		const updatedUrls = this.extraInfo.originalUrl.filter(
+		const updatedUrls = this.extraInfo().originalUrl.filter(
 			(_, i) => i !== index,
 		);
 
 		this.bookService
-			.updateBook(this.id, { originalUrl: updatedUrls })
+			.updateBook(this.id(), { originalUrl: updatedUrls })
 			.subscribe({
 				next: () => {
-					this.extraInfo.originalUrl = updatedUrls;
+					this.extraInfo.update((info) => ({
+						...info,
+						originalUrl: updatedUrls,
+					}));
 					this.notificationService.success(
 						'Fonte removida com sucesso!',
 					);
@@ -1370,27 +1425,30 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		if (data.file) {
 			// Replace existing cover image
 			this.bookService
-				.replaceCoverImage(this.id, data.id, data.file, data.title)
+				.replaceCoverImage(this.id(), data.id, data.file, data.title)
 				.subscribe({
 					next: (updatedCover) => {
-						const coverIndex = this.covers.findIndex(
-							(c) => c.id === data.id,
-						);
-						if (coverIndex !== -1) {
-							// Add cache-busting parameter to force image reload
-							if (
-								updatedCover.url &&
-								!updatedCover.url.includes('?')
-							) {
-								updatedCover.url = `${updatedCover.url}?t=${Date.now()}`;
-							}
-							this.covers[coverIndex] = updatedCover;
-							// Clear any previous image error for this cover
-							this.coverImageErrors.delete(data.id);
-							this.coverImageErrors = new Set(
-								this.coverImageErrors,
+						this.covers.update((current) => {
+							const next = [...current];
+							const coverIndex = next.findIndex(
+								(c) => c.id === data.id,
 							);
-						}
+							if (coverIndex !== -1) {
+								if (
+									updatedCover.url &&
+									!updatedCover.url.includes('?')
+								) {
+									updatedCover.url = `${updatedCover.url}?t=${Date.now()}`;
+								}
+								next[coverIndex] = updatedCover;
+							}
+							return next;
+						});
+						this.coverImageErrors.update((set) => {
+							const next = new Set(set);
+							next.delete(data.id);
+							return next;
+						});
 						this.closeCoverEditModal();
 					},
 					error: (error: Error) => {
@@ -1400,15 +1458,22 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		} else {
 			// Just update the title
 			this.bookService
-				.updateCover(this.id, data.id, { title: data.title })
+				.updateCover(this.id(), data.id, { title: data.title })
 				.subscribe({
 					next: () => {
-						const coverIndex = this.covers.findIndex(
-							(c) => c.id === data.id,
-						);
-						if (coverIndex !== -1) {
-							this.covers[coverIndex].title = data.title;
-						}
+						this.covers.update((current) => {
+							const next = [...current];
+							const coverIndex = next.findIndex(
+								(c) => c.id === data.id,
+							);
+							if (coverIndex !== -1) {
+								next[coverIndex] = {
+									...next[coverIndex],
+									title: data.title,
+								};
+							}
+							return next;
+						});
 						this.closeCoverEditModal();
 					},
 					error: (error: Error) => {
@@ -1437,9 +1502,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	deleteCover(cover: Cover) {
-		this.bookService.deleteCover(this.id, cover.id).subscribe({
+		this.bookService.deleteCover(this.id(), cover.id).subscribe({
 			next: () => {
-				this.covers = this.covers.filter((c) => c.id !== cover.id);
+				this.covers.update((current) =>
+					current.filter((c) => c.id !== cover.id),
+				);
 			},
 			error: (error: Error) => {
 				console.error('Error deleting cover:', error);
@@ -1489,7 +1556,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					type: 'danger',
 					callback: () => {
 						this.bookService
-							.selectCover(this.id, cover.id)
+							.selectCover(this.id(), cover.id)
 							.subscribe({
 								next: (book) => {
 									window.location.reload();

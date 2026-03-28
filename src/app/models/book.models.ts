@@ -107,6 +107,7 @@ export interface ChapterCursorPage {
 export interface ChapterCursorOptions {
 	cursor?: string;
 	limit?: number;
+	order?: 'ASC' | 'DESC';
 }
 
 export interface Chapter {

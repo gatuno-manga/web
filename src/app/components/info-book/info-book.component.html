@@ -8,12 +8,12 @@
 <div
 	id="container"
 	#container
-	[style.--current-tab-index]="selectedTab"
-	[style.height]="containerHeight"
+	[style.--current-tab-index]="selectedTab()"
+	[style.height]="containerHeight()"
 >
 	<div
 		id="chapters"
-		[class.selected]="selectedTab === tab.chapters"
+		[class.selected]="selectedTab() === tab.chapters"
 		class="container"
 	>
 		@defer (when modulesLoad[tab.chapters].load()) {
@@ -88,7 +88,7 @@
 				</app-button>
 			</div>
 			<div class="scrollable" (scroll)="onChaptersScroll($event)">
-				@if (isInitialChaptersLoading) {
+				@if (isInitialChaptersLoading()) {
 					@for (i of [].constructor(8); track $index) {
 						<div class="chapter-skeleton">
 							<div class="chapter-skeleton-left">
@@ -103,7 +103,7 @@
 						</div>
 					}
 				} @else {
-					@for (chapter of chapters; track chapter.id) {
+					@for (chapter of chapters(); track chapter.id) {
 						<a
 							[routerLink]="[chapter.id]"
 							class="chapter"
@@ -139,7 +139,7 @@
 									"
 								>
 									@if (
-										chaptersDownloadStatus.get(chapter.id) ===
+										chaptersDownloadStatus().get(chapter.id) ===
 										'downloaded'
 									) {
 										<app-icons
@@ -154,18 +154,18 @@
 											title="Clique para excluir download"
 										/>
 									} @else if (
-										chaptersDownloadStatus.get(chapter.id) ===
+										chaptersDownloadStatus().get(chapter.id) ===
 										'downloading'
 									) {
 										<span class="download-progress"
 											>{{
-												chaptersDownloadProgress.get(
+												chaptersDownloadProgress().get(
 													chapter.id
 												) | number: '1.0-0'
 											}}%</span
 										>
 									} @else if (
-										chaptersDownloadStatus.get(chapter.id) ===
+										chaptersDownloadStatus().get(chapter.id) ===
 										'pending'
 									) {
 										<app-icons
@@ -210,7 +210,7 @@
 						</a>
 					}
 
-					@if (isAppendingChapters) {
+					@if (isAppendingChapters()) {
 						@for (i of [].constructor(3); track $index) {
 							<div class="chapter-skeleton chapter-skeleton-compact">
 								<div class="chapter-skeleton-left">
@@ -234,7 +234,7 @@
 	</div>
 	<div
 		id="covers"
-		[class.selected]="selectedTab === tab.covers"
+		[class.selected]="selectedTab() === tab.covers"
 		class="container"
 	>
 		@defer (when modulesLoad[tab.covers].load()) {
@@ -242,7 +242,7 @@
 				<div class="covers-toolbar">
 					<div class="toolbar-info"></div>
 					<div class="toolbar-actions">
-						@if (hasCoversChanged) {
+						@if (hasCoversChanged()) {
 							<app-button
 								(click)="cancelCoversReorder()"
 								variant="text"
@@ -270,7 +270,7 @@
 				(cdkDropListDropped)="onCoverDrop($event)"
 				[cdkDropListDisabled]="!userTokenService.isAdminSignal()"
 			>
-				@for (cover of covers; track cover.id) {
+				@for (cover of covers(); track cover.id) {
 					<div
 						class="cover"
 						[class.selected]="cover.selected"
@@ -280,11 +280,14 @@
 						[cdkDragDisabled]="!userTokenService.isAdminSignal()"
 					>
 						<div class="drag-placeholder" *cdkDragPlaceholder></div>
-						@if (cover.url && !coverImageErrors.has(cover.id)) {
+						@if (cover.url && !coverImageErrors().has(cover.id)) {
 							<img
-								[src]="cover.url"
+								[ngSrc]="cover.url"
 								[alt]="'Cover ' + cover.id"
 								(error)="onCoverImageError(cover.id)"
+								width="150"
+								height="225"
+								priority
 							/>
 						} @else {
 							<div class="cover-placeholder">
@@ -305,7 +308,7 @@
 	</div>
 	<div
 		id="extra-info"
-		[class.selected]="selectedTab === tab.extraInfo"
+		[class.selected]="selectedTab() === tab.extraInfo"
 		class="container"
 	>
 		<div class="scrollable">
@@ -314,7 +317,7 @@
 				<div>
 					@defer (when modulesLoad[tab.extraInfo].load()) {
 						@for (
-							title of extraInfo.alternativeTitle;
+							title of extraInfo().alternativeTitle;
 							track $index
 						) {
 							<p class="item">{{ title }}</p>
@@ -344,7 +347,7 @@
 				</div>
 				<div class="sources-list">
 					@defer (when modulesLoad[tab.extraInfo].load()) {
-						@for (source of extraInfo.originalUrl; track $index) {
+						@for (source of extraInfo().originalUrl; track $index) {
 							<a
 								class="item"
 								[href]="source"
@@ -368,12 +371,12 @@
 	</div>
 	<div
 		id="saved-pages"
-		[class.selected]="selectedTab === tab.savedPages"
+		[class.selected]="selectedTab() === tab.savedPages"
 		class="container"
 	>
 		@defer (when modulesLoad[tab.savedPages].load()) {
 			<div class="scrollable">
-				@for (savedPage of savedPages; track savedPage.id) {
+				@for (savedPage of savedPages(); track savedPage.id) {
 					<div
 						class="cover"
 						(click)="onSavedPageClick(savedPage)"
@@ -383,9 +386,11 @@
 					>
 						@if (savedPage.page.path) {
 							<img
-								[src]="savedPage.page.path"
+								[ngSrc]="savedPage.page.path"
 								[alt]="'Page ' + savedPage.page.index"
 								loading="lazy"
+								width="150"
+								height="225"
 							/>
 						} @else {
 							<div class="cover-placeholder">
@@ -418,11 +423,11 @@
 	</div>
 </div>
 
-@if (showImageViewer) {
+@if (showImageViewer()) {
 	<app-image-viewer
-		[imageUrl]="viewerImageUrl"
-		[imageTitle]="viewerImageTitle"
-		[imageDescription]="viewerImageDescription"
+		[imageUrl]="viewerImageUrl()"
+		[imageTitle]="viewerImageTitle()"
+		[imageDescription]="viewerImageDescription()"
 		(close)="closeImageViewer()"
 	/>
 }

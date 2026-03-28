@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subject, of, EMPTY } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
 import { provideRouter } from '@angular/router';
+import { signal, WritableSignal } from '@angular/core';
 
 import { InfoBookComponent } from './info-book.component';
 import { BookService } from '../../service/book.service';
@@ -9,6 +9,10 @@ import { ModalNotificationService } from '../../service/modal-notification.servi
 import { ScrapingStatus } from '../../models/book.models';
 import { ContextMenuService } from '../../service/context-menu.service';
 import { UserTokenService } from '../../service/user-token.service';
+import { DownloadService } from '../../service/download.service';
+import { ChapterService } from '../../service/chapter.service';
+import { SavedPagesService } from '../../service/saved-pages.service';
+import { NotificationService } from '../../service/notification.service';
 
 describe('InfoBookComponent', () => {
 	let component: InfoBookComponent;
@@ -18,7 +22,11 @@ describe('InfoBookComponent', () => {
 	let mockBookService: any;
 	let mockModalService: any;
 	let mockContextMenuService: any;
-	let mockUserTokenService: any;
+	let mockUserTokenService: { isAdminSignal: WritableSignal<boolean> };
+	let mockDownloadService: any;
+	let mockChapterService: any;
+	let mockSavedPagesService: any;
+	let mockNotificationService: any;
 
 	beforeEach(async () => {
 		watchSubject = new Subject<any>();
@@ -54,6 +62,7 @@ describe('InfoBookComponent', () => {
 
 		mockModalService = {
 			show: jasmine.createSpy('show'),
+			close: jasmine.createSpy('close'),
 		};
 
 		mockContextMenuService = {
@@ -61,9 +70,40 @@ describe('InfoBookComponent', () => {
 		};
 
 		mockUserTokenService = {
-			isAdminSignal: jasmine
-				.createSpy('isAdminSignal')
-				.and.returnValue(false),
+			isAdminSignal: signal(false),
+		};
+
+		mockDownloadService = {
+			downloadProgress$: of(new Map()),
+			isChapterDownloaded: jasmine
+				.createSpy('isChapterDownloaded')
+				.and.returnValue(Promise.resolve(false)),
+		};
+
+		mockChapterService = {
+			markAsRead: jasmine.createSpy('markAsRead').and.returnValue(of({})),
+			markAsUnread: jasmine
+				.createSpy('markAsUnread')
+				.and.returnValue(of({})),
+			getChapter: jasmine.createSpy('getChapter').and.returnValue(of({})),
+			markManyAsRead: jasmine
+				.createSpy('markManyAsRead')
+				.and.returnValue(of([])),
+			markManyAsUnread: jasmine
+				.createSpy('markManyAsUnread')
+				.and.returnValue(of([])),
+		};
+
+		mockSavedPagesService = {
+			getSavedPagesByBook: jasmine
+				.createSpy('getSavedPagesByBook')
+				.and.returnValue(of([])),
+		};
+
+		mockNotificationService = {
+			success: jasmine.createSpy('success'),
+			error: jasmine.createSpy('error'),
+			notify: jasmine.createSpy('notify'),
 		};
 
 		await TestBed.configureTestingModule({
@@ -80,13 +120,20 @@ describe('InfoBookComponent', () => {
 					useValue: mockContextMenuService,
 				},
 				{ provide: UserTokenService, useValue: mockUserTokenService },
+				{ provide: DownloadService, useValue: mockDownloadService },
+				{ provide: ChapterService, useValue: mockChapterService },
+				{ provide: SavedPagesService, useValue: mockSavedPagesService },
+				{
+					provide: NotificationService,
+					useValue: mockNotificationService,
+				},
 			],
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(InfoBookComponent);
 		component = fixture.componentInstance;
 		// provide an id so ngAfterViewInit can subscribe (watchBook is mocked)
-		component.id = 'book-1';
+		fixture.componentRef.setInput('id', 'book-1');
 		fixture.detectChanges();
 	});
 
@@ -116,22 +163,23 @@ describe('InfoBookComponent', () => {
 		expect(mockBookService.getChapters).toHaveBeenCalledWith('book-1', {
 			cursor: undefined,
 			limit: 200,
+			order: 'ASC',
 		});
-		expect(component.chapters.length).toBeGreaterThan(0);
-		expect(component.chapters[0].title).toBe('Chapter 1');
+		expect(component.chapters().length).toBeGreaterThan(0);
+		expect(component.chapters()[0].title).toBe('Chapter 1');
 	});
 
 	it('loadCovers should set covers from service', () => {
 		component.loadCovers();
 		expect(mockBookService.getCovers).toHaveBeenCalledWith('book-1');
-		expect(component.covers.length).toBeGreaterThan(0);
-		expect(component.covers[0].id).toBe('cv1');
+		expect(component.covers().length).toBeGreaterThan(0);
+		expect(component.covers()[0].id).toBe('cv1');
 	});
 
 	it('loadExtraInfo should set extraInfo from service', () => {
 		component.loadExtraInfo();
 		expect(mockBookService.getInfo).toHaveBeenCalledWith('book-1');
-		expect(component.extraInfo.originalUrl?.[0]).toContain('example.com');
+		expect(component.extraInfo().originalUrl?.[0]).toContain('example.com');
 	});
 
 	it('selectTab triggers module load function when not loaded', async () => {
@@ -145,7 +193,7 @@ describe('InfoBookComponent', () => {
 		component.modulesLoad[index].load.set(false);
 		component.selectTab(index);
 
-		expect(component.selectedTab).toBe(index);
+		expect(component.selectedTab()).toBe(index);
 		expect(component.modulesLoad[index].function).toHaveBeenCalled();
 		expect(component.modulesLoad[index].load()).toBeTrue();
 	});
@@ -181,7 +229,7 @@ describe('InfoBookComponent', () => {
 		spyOn(component, 'loadChapters').and.callThrough();
 
 		// ensure selected tab and module load flag
-		component.selectedTab = component.tab.chapters;
+		component.selectedTab.set(component.tab.chapters);
 		component.modulesLoad[component.tab.chapters].load.set(true);
 
 		// emit an event via the subject
@@ -190,22 +238,18 @@ describe('InfoBookComponent', () => {
 		expect(component.loadChapters).toHaveBeenCalled();
 	});
 
-	it('should toggle sort order and resort chapters', () => {
-		component.chapters = [
-			{ id: 'c1', title: 'C1', index: 1 } as any,
-			{ id: 'c2', title: 'C2', index: 2 } as any,
-		];
+	it('should reload chapters when toggling sort order', () => {
+		spyOn(component, 'loadChapters').and.callThrough();
 
-		// Set to Ascending manually first to verify toggle to Descending
-		component.sortAscending.set(true);
-		component.sortChapters();
-		expect(component.chapters[0].index).toBe(1);
-		expect(component.chapters[1].index).toBe(2);
+		component.toggleSort(); // Should switch to Descending (false) and call loadChapters
 
-		component.toggleSort(); // Should switch to Descending (false)
 		expect(component.sortAscending()).toBeFalse();
-		expect(component.chapters[0].index).toBe(2);
-		expect(component.chapters[1].index).toBe(1);
+		expect(component.loadChapters).toHaveBeenCalled();
+		expect(mockBookService.getChapters).toHaveBeenCalledWith('book-1', {
+			cursor: undefined,
+			limit: 200,
+			order: 'DESC',
+		});
 	});
 
 	it('onCoverContextMenu should show Copy and Download Image for non-admin', () => {
@@ -224,7 +268,7 @@ describe('InfoBookComponent', () => {
 	});
 
 	it('onCoverContextMenu should show Select Cover, Edit and Remove options for admin', () => {
-		mockUserTokenService.isAdminSignal.and.returnValue(true);
+		mockUserTokenService.isAdminSignal.set(true);
 		const event = new MouseEvent('contextmenu');
 		const cover = { id: 'cv1', url: 'http://img' } as any;
 
