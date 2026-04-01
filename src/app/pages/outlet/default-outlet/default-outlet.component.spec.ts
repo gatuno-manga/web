@@ -31,8 +31,7 @@ describe('DefaultOutletComponent', () => {
 	});
 
 	it('should open side nav', () => {
-		spyOn((component as any).aside(), 'open');
 		component.openSideNav();
-		expect((component as any).aside().open).toHaveBeenCalled();
+		expect(component.sidebarOpen()).toBeTrue();
 	});
 });
