@@ -78,6 +78,7 @@
 					[pages]="currentChapter.pages"
 					[showPageNumbers]="settings().showPageNumbers"
 					(progressChange)="onImageProgress($event)"
+					(contextMenu)="onContextMenu($event.event, $event.page, $event.index)"
 				/>
 			}
 		}

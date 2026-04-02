@@ -2,6 +2,7 @@ import { Injectable, Inject, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Subject, firstValueFrom, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ENVIRONMENT, Environment } from '../tokens/environment.token';
 import { WINDOW } from '../tokens/window.token';
 import { UserTokenService } from './user-token.service';
@@ -62,6 +63,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private syncSubscription: Subscription | null = null;
 	private networkSubscription: Subscription | null = null;
 	private readonly serviceName = 'ReadingProgressSync';
+	private readonly baseUrl = 'users/me/reading-progress';
 
 	// Estado da conexão
 	private connectionStateSubject =
@@ -234,7 +236,10 @@ export class ReadingProgressSyncService implements OnDestroy {
 			apiUrlServer: this.env.apiURLServer,
 			origin: this.window.location?.origin,
 		};
-		const namespaceUrl = buildWebSocketUrl('reading-progress', urlConfig);
+		const namespaceUrl = buildWebSocketUrl(
+			'users/me/reading-progress',
+			urlConfig,
+		);
 
 		logConnectionEvent(
 			this.serviceName,
@@ -463,7 +468,9 @@ export class ReadingProgressSyncService implements OnDestroy {
 
 		try {
 			const response = await firstValueFrom(
-				this.http.post<SyncResponse>('reading-progress/sync', dto),
+				this.http
+					.post<{ data: SyncResponse }>(`${this.baseUrl}/sync`, dto)
+					.pipe(map((res) => res.data)),
 			);
 			logConnectionEvent(
 				this.serviceName,
@@ -696,10 +703,12 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private async syncViaHttp(progress: SaveProgressDto): Promise<void> {
 		try {
 			await firstValueFrom(
-				this.http.post<RemoteReadingProgress>(
-					'reading-progress',
-					progress,
-				),
+				this.http
+					.post<{ data: RemoteReadingProgress }>(
+						this.baseUrl,
+						progress,
+					)
+					.pipe(map((res) => res.data)),
 			);
 			logConnectionEvent(
 				this.serviceName,
@@ -720,7 +729,9 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private async syncAllViaHttp(): Promise<void> {
 		try {
 			const remoteProgress = await firstValueFrom(
-				this.http.get<RemoteReadingProgress[]>('reading-progress'),
+				this.http
+					.get<{ data: RemoteReadingProgress[] }>(this.baseUrl)
+					.pipe(map((res) => res.data)),
 			);
 
 			for (const progress of remoteProgress) {

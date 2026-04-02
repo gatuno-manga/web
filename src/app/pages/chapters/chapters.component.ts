@@ -42,6 +42,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { fromEvent, lastValueFrom } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 import { ContextMenuService } from '../../service/context-menu.service';
+import { ContextMenuItem } from '../../models/context-menu.models';
 import { SavedPagesService } from '../../service/saved-pages.service';
 import { Page } from '../../models/book.models';
 import {
@@ -610,7 +611,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		const currentChapter = this.chapter();
 		if (!currentChapter) return;
 
-		this.contextMenuService.open(event, [
+		const items: ContextMenuItem[] = [
 			{
 				label: 'Baixar Página',
 				icon: 'download',
@@ -645,7 +646,42 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 					this.savePage(page, currentChapter);
 				},
 			},
-		]);
+		];
+
+		if (this.admin()) {
+			items.push({ type: 'separator' });
+			items.push({
+				label: 'Caminho no Sistema',
+				icon: 'file',
+				action: () => {
+					// Extrair o caminho real da URL (ex: /api/data/shard/file.ext -> /data/shard/file.ext)
+					let systemPath = page.path;
+					try {
+						const url = new URL(page.path);
+						systemPath = url.pathname;
+					} catch (e) {
+						// Se não for uma URL válida, tenta remover o prefixo da API manualmente
+						const apiIndex = systemPath.indexOf('/api/');
+						if (apiIndex !== -1) {
+							systemPath = systemPath.substring(apiIndex + 4);
+						}
+					}
+
+					// Remove o prefixo /api se ainda estiver presente no pathname
+					if (systemPath.startsWith('/api')) {
+						systemPath = systemPath.substring(4);
+					}
+
+					navigator.clipboard.writeText(systemPath).then(() => {
+						this.notificationService.success(
+							'Caminho copiado para a área de transferência!',
+						);
+					});
+				},
+			});
+		}
+
+		this.contextMenuService.open(event, items);
 	}
 
 	private lastTapTime = 0;
