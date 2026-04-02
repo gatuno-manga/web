@@ -72,6 +72,14 @@ export const routes: Routes = [
 				data: SERVER_RENDER_CONFIG('chapter'),
 			},
 			{
+				path: 'users/:userId',
+				loadComponent: () =>
+					import('./pages/public-user/public-user.component').then(
+						(m) => m.PublicUserComponent,
+					),
+				data: SERVER_RENDER_CONFIG('public-user'),
+			},
+			{
 				path: 'user',
 				loadComponent: () =>
 					import('./pages/user/outlet/outlet.component').then(

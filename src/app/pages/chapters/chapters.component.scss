@@ -322,7 +322,6 @@ app-aside {
 	}
 }
 
-
 .chapter-comments {
 	position: relative;
 	z-index: 30;
@@ -333,12 +332,11 @@ app-aside {
 	padding: 1.25rem;
 	border: 1px solid rgb(from var(--app-text-color) r g b / 0.16);
 	border-radius: 16px;
-	background:
-		linear-gradient(
-			180deg,
-			rgb(from var(--app-background-color) r g b / 0.92) 0%,
-			rgb(from var(--app-background-color) r g b / 0.72) 100%
-		);
+	background: linear-gradient(
+		180deg,
+		rgb(from var(--app-background-color) r g b / 0.92) 0%,
+		rgb(from var(--app-background-color) r g b / 0.72) 100%
+	);
 	box-shadow:
 		0 10px 30px rgb(from var(--black) r g b / 0.08),
 		inset 0 1px 0 rgb(from var(--white) r g b / 0.06);
@@ -388,7 +386,9 @@ app-aside {
 		select {
 			border: 1px solid rgb(from var(--app-text-color) r g b / 0.2);
 			border-radius: 8px;
-			background-color: rgb(from var(--app-background-color) r g b / 0.85);
+			background-color: rgb(
+				from var(--app-background-color) r g b / 0.85
+			);
 			color: var(--app-text-color);
 			padding: 0.45rem 0.55rem;
 			font-size: 0.88rem;
@@ -498,6 +498,30 @@ app-aside {
 		display: flex;
 		align-items: center;
 		gap: 0.45rem;
+	}
+
+	&__author-trigger {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		border: none;
+		background: transparent;
+		padding: 0;
+		margin: 0;
+		cursor: pointer;
+		color: inherit;
+	}
+
+	&__author-link {
+		font-size: 0.92rem;
+		font-weight: 600;
+		color: inherit;
+		text-decoration: underline;
+		text-decoration-color: rgb(from var(--app-text-color) r g b / 0.4);
+
+		&:hover {
+			text-decoration-color: rgb(from var(--primary-color) r g b / 0.7);
+		}
 	}
 
 	&__avatar {
@@ -637,7 +661,9 @@ app-aside {
 	border-radius: 5px;
 	padding: 0.05rem 0.3rem;
 	filter: blur(4px);
-	transition: filter 0.2s ease, color 0.2s ease;
+	transition:
+		filter 0.2s ease,
+		color 0.2s ease;
 	cursor: help;
 }
 

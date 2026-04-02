@@ -479,6 +479,17 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		return updated - created > 1000;
 	}
 
+	openCommentAuthor(userId: string, event?: Event): void {
+		event?.preventDefault();
+		event?.stopPropagation();
+
+		if (!userId) {
+			return;
+		}
+
+		void this.router.navigate(['/users', userId]);
+	}
+
 	formatCommentContent(content: string): string {
 		if (!content) {
 			return '';

@@ -1,0 +1,66 @@
+<section class="public-user-page">
+	@if (isLoading()) {
+		<div class="public-user-page__state">Carregando perfil...</div>
+	} @else if (errorMessage()) {
+		<div class="public-user-page__state public-user-page__state--error">
+			{{ errorMessage() }}
+		</div>
+	} @else if (profile(); as user) {
+		<header class="public-user-page__header">
+			<div class="public-user-page__avatar">
+				@if (user.profileImageUrl) {
+					<img [src]="user.profileImageUrl" [alt]="'Avatar de ' + user.userName" />
+				} @else {
+					<span>{{ user.userName.slice(0, 2).toUpperCase() }}</span>
+				}
+			</div>
+			<div class="public-user-page__identity">
+				<h1>{{ user.userName }}</h1>
+				@if (user.name) {
+					<p>{{ user.name }}</p>
+				}
+				<small>Membro desde {{ user.createdAt | date: 'mediumDate':'':'pt-BR' }}</small>
+			</div>
+		</header>
+
+		<div class="public-user-page__grid">
+			<article class="public-user-card">
+				<h2>Colecoes publicas</h2>
+				@if (collections().length === 0) {
+					<p>Nenhuma colecao publica.</p>
+				} @else {
+					<ul>
+						@for (collection of collections(); track collection.id) {
+							<li>
+								<strong>{{ collection.title }}</strong>
+								@if (collection.description) {
+									<span>{{ collection.description }}</span>
+								}
+								<small>{{ collection.books?.length || 0 }} livro(s)</small>
+							</li>
+						}
+					</ul>
+				}
+			</article>
+
+			<article class="public-user-card">
+				<h2>Paginas salvas publicas</h2>
+				@if (savedPages().length === 0) {
+					<p>Nenhuma pagina publica salva.</p>
+				} @else {
+					<ul>
+						@for (item of savedPages(); track item.id) {
+							<li>
+								<strong>{{ item.book?.title || 'Livro sem titulo' }}</strong>
+								<span>Capitulo {{ item.chapter?.index }}</span>
+								@if (item.comment) {
+									<p>{{ item.comment }}</p>
+								}
+							</li>
+						}
+					</ul>
+				}
+			</article>
+		</div>
+	}
+</section>

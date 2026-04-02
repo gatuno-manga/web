@@ -79,15 +79,14 @@
 					[pages]="currentChapter.pages"
 					[showPageNumbers]="settings().showPageNumbers"
 					(progressChange)="onImageProgress($event)"
-					(contextMenu)="onContextMenu($event.event, $event.page, $event.index)"
+					(contextMenu)="
+						onContextMenu($event.event, $event.page, $event.index)
+					"
 				/>
 			}
 		}
 
-		<div
-			class="next-chapter-zone"
-			(touchend)="onZoneTouch($event)"
-		></div>
+		<div class="next-chapter-zone" (touchend)="onZoneTouch($event)"></div>
 	</div>
 
 	<div
@@ -115,9 +114,7 @@
 		<div class="chapter-comments__header">
 			<h3>Comentarios do capitulo</h3>
 			@if (commentsPage(); as pageInfo) {
-				<span>
-					{{ pageInfo.metadata.total }} comentario(s)
-				</span>
+				<span> {{ pageInfo.metadata.total }} comentario(s) </span>
 			}
 		</div>
 
@@ -125,30 +122,69 @@
 			<label>
 				Raizes por pagina
 				<select (change)="onRootLimitChange($event)">
-					<option [selected]="commentsRootLimit() === 5" value="5">5</option>
-					<option [selected]="commentsRootLimit() === 10" value="10">10</option>
-					<option [selected]="commentsRootLimit() === 20" value="20">20</option>
+					<option [selected]="commentsRootLimit() === 5" value="5">
+						5
+					</option>
+					<option [selected]="commentsRootLimit() === 10" value="10">
+						10
+					</option>
+					<option [selected]="commentsRootLimit() === 20" value="20">
+						20
+					</option>
 				</select>
 			</label>
 
 			<label>
 				Profundidade de respostas
 				<select (change)="onRepliesDepthChange($event)">
-					<option [selected]="repliesMaxDepth() === 2" value="2">2 niveis</option>
-					<option [selected]="repliesMaxDepth() === 4" value="4">4 niveis</option>
-					<option [selected]="repliesMaxDepth() === 8" value="8">8 niveis</option>
-					<option [selected]="repliesMaxDepth() === 12" value="12">12 niveis</option>
+					<option [selected]="repliesMaxDepth() === 2" value="2">
+						2 niveis
+					</option>
+					<option [selected]="repliesMaxDepth() === 4" value="4">
+						4 niveis
+					</option>
+					<option [selected]="repliesMaxDepth() === 8" value="8">
+						8 niveis
+					</option>
+					<option [selected]="repliesMaxDepth() === 12" value="12">
+						12 niveis
+					</option>
 				</select>
 			</label>
 		</div>
 
 		<div class="chapter-comments__new">
 			<div class="chapter-comments__toolbar">
-				<button type="button" (click)="applyBold('new-comment-textarea')">B</button>
-				<button type="button" (click)="applyItalic('new-comment-textarea')">I</button>
-				<button type="button" (click)="applySpoiler('new-comment-textarea')">Spoiler</button>
-				<button type="button" (click)="insertLink('new-comment-textarea')">Link</button>
-				<button type="button" (click)="insertImage('new-comment-textarea')">Imagem</button>
+				<button
+					type="button"
+					(click)="applyBold('new-comment-textarea')"
+				>
+					B
+				</button>
+				<button
+					type="button"
+					(click)="applyItalic('new-comment-textarea')"
+				>
+					I
+				</button>
+				<button
+					type="button"
+					(click)="applySpoiler('new-comment-textarea')"
+				>
+					Spoiler
+				</button>
+				<button
+					type="button"
+					(click)="insertLink('new-comment-textarea')"
+				>
+					Link
+				</button>
+				<button
+					type="button"
+					(click)="insertImage('new-comment-textarea')"
+				>
+					Imagem
+				</button>
 			</div>
 			<textarea
 				id="new-comment-textarea"
@@ -177,7 +213,12 @@
 					>
 						<header>
 							<div class="chapter-comments__author">
-								<div class="chapter-comments__avatar">
+								<button
+									type="button"
+									class="chapter-comments__author-trigger"
+									(click)="openCommentAuthor(item.comment.userId, $event)"
+								>
+									<div class="chapter-comments__avatar">
 									@if (item.comment.profileImageUrl) {
 										<img
 											[src]="item.comment.profileImageUrl"
@@ -188,17 +229,31 @@
 											{{ getCommentInitials(item.comment.userName) }}
 										</span>
 									}
-								</div>
-								<strong>{{ item.comment.userName }}</strong>
+									</div>
+									<span class="chapter-comments__author-link">
+										{{ item.comment.userName }}
+									</span>
+								</button>
 								<span class="chapter-comments__badge">
-									{{ item.comment.isPublic ? 'Publico' : 'Privado' }}
+									{{
+										item.comment.isPublic
+											? 'Publico'
+											: 'Privado'
+									}}
 								</span>
 							</div>
 							<small>
-								{{ item.comment.createdAt | date: 'short':'':'pt-BR' }}
+								{{
+									item.comment.createdAt
+										| date: 'short' : '' : 'pt-BR'
+								}}
 								@if (wasCommentEdited(item.comment)) {
 									<span class="chapter-comments__edited">
-										(editado: {{ item.comment.updatedAt | date: 'short':'':'pt-BR' }})
+										(editado:
+										{{
+											item.comment.updatedAt
+												| date: 'short' : '' : 'pt-BR'
+										}})
 									</span>
 								}
 							</small>
@@ -207,11 +262,48 @@
 						@if (editingCommentId() === item.comment.id) {
 							<div class="chapter-comments__edit">
 								<div class="chapter-comments__toolbar">
-									<button type="button" (click)="applyBold('edit-comment-textarea')">B</button>
-									<button type="button" (click)="applyItalic('edit-comment-textarea')">I</button>
-									<button type="button" (click)="applySpoiler('edit-comment-textarea')">Spoiler</button>
-									<button type="button" (click)="insertLink('edit-comment-textarea')">Link</button>
-									<button type="button" (click)="insertImage('edit-comment-textarea')">Imagem</button>
+									<button
+										type="button"
+										(click)="
+											applyBold('edit-comment-textarea')
+										"
+									>
+										B
+									</button>
+									<button
+										type="button"
+										(click)="
+											applyItalic('edit-comment-textarea')
+										"
+									>
+										I
+									</button>
+									<button
+										type="button"
+										(click)="
+											applySpoiler(
+												'edit-comment-textarea'
+											)
+										"
+									>
+										Spoiler
+									</button>
+									<button
+										type="button"
+										(click)="
+											insertLink('edit-comment-textarea')
+										"
+									>
+										Link
+									</button>
+									<button
+										type="button"
+										(click)="
+											insertImage('edit-comment-textarea')
+										"
+									>
+										Imagem
+									</button>
 								</div>
 								<textarea
 									id="edit-comment-textarea"
@@ -223,13 +315,17 @@
 									<button (click)="saveEdit(item.comment.id)">
 										Salvar
 									</button>
-									<button (click)="cancelEdit()">Cancelar</button>
+									<button (click)="cancelEdit()">
+										Cancelar
+									</button>
 								</div>
 							</div>
 						} @else {
 							<markdown
 								class="chapter-comments__markdown"
-								[data]="formatCommentContent(item.comment.content)"
+								[data]="
+									formatCommentContent(item.comment.content)
+								"
 							/>
 						}
 
@@ -237,11 +333,16 @@
 							<button (click)="setReplyParent(item.comment.id)">
 								Responder
 							</button>
-							@if (canEditComment(item.comment) && !item.comment.isDeleted) {
+							@if (
+								canEditComment(item.comment) &&
+								!item.comment.isDeleted
+							) {
 								<button (click)="startEdit(item.comment)">
 									Editar
 								</button>
-								<button (click)="deleteComment(item.comment.id)">
+								<button
+									(click)="deleteComment(item.comment.id)"
+								>
 									Excluir
 								</button>
 							}
@@ -250,21 +351,80 @@
 						@if (activeReplyParentId() === item.comment.id) {
 							<div class="chapter-comments__reply-box">
 								<div class="chapter-comments__toolbar">
-									<button type="button" (click)="applyBold('reply-comment-' + item.comment.id)">B</button>
-									<button type="button" (click)="applyItalic('reply-comment-' + item.comment.id)">I</button>
-									<button type="button" (click)="applySpoiler('reply-comment-' + item.comment.id)">Spoiler</button>
-									<button type="button" (click)="insertLink('reply-comment-' + item.comment.id)">Link</button>
-									<button type="button" (click)="insertImage('reply-comment-' + item.comment.id)">Imagem</button>
+									<button
+										type="button"
+										(click)="
+											applyBold(
+												'reply-comment-' +
+													item.comment.id
+											)
+										"
+									>
+										B
+									</button>
+									<button
+										type="button"
+										(click)="
+											applyItalic(
+												'reply-comment-' +
+													item.comment.id
+											)
+										"
+									>
+										I
+									</button>
+									<button
+										type="button"
+										(click)="
+											applySpoiler(
+												'reply-comment-' +
+													item.comment.id
+											)
+										"
+									>
+										Spoiler
+									</button>
+									<button
+										type="button"
+										(click)="
+											insertLink(
+												'reply-comment-' +
+													item.comment.id
+											)
+										"
+									>
+										Link
+									</button>
+									<button
+										type="button"
+										(click)="
+											insertImage(
+												'reply-comment-' +
+													item.comment.id
+											)
+										"
+									>
+										Imagem
+									</button>
 								</div>
 								<textarea
 									[id]="'reply-comment-' + item.comment.id"
 									placeholder="Escreva uma resposta..."
-									[value]="replyDrafts()[item.comment.id] || ''"
-									(input)="onReplyDraftInput(item.comment.id, $event)"
+									[value]="
+										replyDrafts()[item.comment.id] || ''
+									"
+									(input)="
+										onReplyDraftInput(
+											item.comment.id,
+											$event
+										)
+									"
 									maxlength="2000"
 								></textarea>
 								<div class="chapter-comments__actions">
-									<button (click)="submitReply(item.comment.id)">
+									<button
+										(click)="submitReply(item.comment.id)"
+									>
 										Enviar resposta
 									</button>
 									<button (click)="setReplyParent(null)">
@@ -286,11 +446,14 @@
 						Anterior
 					</button>
 					<span>
-						Pagina {{ pageInfo.metadata.page }} de {{ pageInfo.metadata.lastPage }}
+						Pagina {{ pageInfo.metadata.page }} de
+						{{ pageInfo.metadata.lastPage }}
 					</span>
 					<button
 						(click)="goToNextCommentsPage()"
-						[disabled]="pageInfo.metadata.page >= pageInfo.metadata.lastPage"
+						[disabled]="
+							pageInfo.metadata.page >= pageInfo.metadata.lastPage
+						"
 					>
 						Proxima
 					</button>
