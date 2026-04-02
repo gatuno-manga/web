@@ -129,6 +129,27 @@ export interface Chapter {
 	documentFormat?: DocumentFormat;
 }
 
+export interface ChapterCommentNode {
+	id: string;
+	chapterId: string;
+	userId: string;
+	userName: string;
+	profileImageUrl: string;
+	parentId: string | null;
+	content: string;
+	isPublic: boolean;
+	isDeleted: boolean;
+	createdAt: string;
+	updatedAt: string;
+	replies: ChapterCommentNode[];
+}
+
+export interface ChapterCommentsPageOptions {
+	page: number;
+	limit: number;
+	maxDepth: number;
+}
+
 export interface Cover {
 	id: string;
 	url: string;

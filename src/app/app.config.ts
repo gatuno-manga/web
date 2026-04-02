@@ -1,5 +1,6 @@
 import {
 	ApplicationConfig,
+	LOCALE_ID,
 	provideZoneChangeDetection,
 	isDevMode,
 } from '@angular/core';
@@ -48,6 +49,7 @@ export const appConfig: ApplicationConfig = {
 				echarts: () => import('echarts'),
 			}),
 		),
+		{ provide: LOCALE_ID, useValue: 'pt-BR' },
 		provideMarkdown(),
 	],
 };

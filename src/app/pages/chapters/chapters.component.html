@@ -30,6 +30,7 @@
 		[style.filter]="filterStyle()"
 		[class.aside-left]="settings().asidePosition === 'left'"
 		[class.aside-right]="settings().asidePosition === 'right'"
+		(dblclick)="onPagesDoubleClick($event)"
 	>
 		<!-- Progress bar for all content types -->
 		<div
@@ -85,7 +86,6 @@
 
 		<div
 			class="next-chapter-zone"
-			(dblclick)="nextPage()"
 			(touchend)="onZoneTouch($event)"
 		></div>
 	</div>
@@ -110,6 +110,194 @@
 			<a class="next" (click)="backPage()">Voltar a pagina inicial</a>
 		}
 	</div>
+
+	<section class="chapter-comments">
+		<div class="chapter-comments__header">
+			<h3>Comentarios do capitulo</h3>
+			@if (commentsPage(); as pageInfo) {
+				<span>
+					{{ pageInfo.metadata.total }} comentario(s)
+				</span>
+			}
+		</div>
+
+		<div class="chapter-comments__filters">
+			<label>
+				Raizes por pagina
+				<select (change)="onRootLimitChange($event)">
+					<option [selected]="commentsRootLimit() === 5" value="5">5</option>
+					<option [selected]="commentsRootLimit() === 10" value="10">10</option>
+					<option [selected]="commentsRootLimit() === 20" value="20">20</option>
+				</select>
+			</label>
+
+			<label>
+				Profundidade de respostas
+				<select (change)="onRepliesDepthChange($event)">
+					<option [selected]="repliesMaxDepth() === 2" value="2">2 niveis</option>
+					<option [selected]="repliesMaxDepth() === 4" value="4">4 niveis</option>
+					<option [selected]="repliesMaxDepth() === 8" value="8">8 niveis</option>
+					<option [selected]="repliesMaxDepth() === 12" value="12">12 niveis</option>
+				</select>
+			</label>
+		</div>
+
+		<div class="chapter-comments__new">
+			<div class="chapter-comments__toolbar">
+				<button type="button" (click)="applyBold('new-comment-textarea')">B</button>
+				<button type="button" (click)="applyItalic('new-comment-textarea')">I</button>
+				<button type="button" (click)="applySpoiler('new-comment-textarea')">Spoiler</button>
+				<button type="button" (click)="insertLink('new-comment-textarea')">Link</button>
+				<button type="button" (click)="insertImage('new-comment-textarea')">Imagem</button>
+			</div>
+			<textarea
+				id="new-comment-textarea"
+				placeholder="Escreva um comentario..."
+				[value]="newCommentContent()"
+				(input)="onNewCommentInput($event)"
+				maxlength="2000"
+			></textarea>
+			<app-button variant="primary" (click)="submitComment()">
+				Comentar
+			</app-button>
+		</div>
+
+		@if (commentsLoading()) {
+			<div class="chapter-comments__empty">Carregando comentarios...</div>
+		} @else if (flatComments().length === 0) {
+			<div class="chapter-comments__empty">
+				Seja o primeiro a comentar neste capitulo.
+			</div>
+		} @else {
+			<div class="chapter-comments__list">
+				@for (item of flatComments(); track item.comment.id) {
+					<article
+						class="chapter-comments__item"
+						[style.margin-left.px]="item.depth * 20"
+					>
+						<header>
+							<div class="chapter-comments__author">
+								<div class="chapter-comments__avatar">
+									@if (item.comment.profileImageUrl) {
+										<img
+											[src]="item.comment.profileImageUrl"
+											[alt]="'Avatar de ' + item.comment.userName"
+										/>
+									} @else {
+										<span>
+											{{ getCommentInitials(item.comment.userName) }}
+										</span>
+									}
+								</div>
+								<strong>{{ item.comment.userName }}</strong>
+								<span class="chapter-comments__badge">
+									{{ item.comment.isPublic ? 'Publico' : 'Privado' }}
+								</span>
+							</div>
+							<small>
+								{{ item.comment.createdAt | date: 'short':'':'pt-BR' }}
+								@if (wasCommentEdited(item.comment)) {
+									<span class="chapter-comments__edited">
+										(editado: {{ item.comment.updatedAt | date: 'short':'':'pt-BR' }})
+									</span>
+								}
+							</small>
+						</header>
+
+						@if (editingCommentId() === item.comment.id) {
+							<div class="chapter-comments__edit">
+								<div class="chapter-comments__toolbar">
+									<button type="button" (click)="applyBold('edit-comment-textarea')">B</button>
+									<button type="button" (click)="applyItalic('edit-comment-textarea')">I</button>
+									<button type="button" (click)="applySpoiler('edit-comment-textarea')">Spoiler</button>
+									<button type="button" (click)="insertLink('edit-comment-textarea')">Link</button>
+									<button type="button" (click)="insertImage('edit-comment-textarea')">Imagem</button>
+								</div>
+								<textarea
+									id="edit-comment-textarea"
+									[value]="editingDraft()"
+									(input)="onEditDraftInput($event)"
+									maxlength="2000"
+								></textarea>
+								<div class="chapter-comments__actions">
+									<button (click)="saveEdit(item.comment.id)">
+										Salvar
+									</button>
+									<button (click)="cancelEdit()">Cancelar</button>
+								</div>
+							</div>
+						} @else {
+							<markdown
+								class="chapter-comments__markdown"
+								[data]="formatCommentContent(item.comment.content)"
+							/>
+						}
+
+						<div class="chapter-comments__actions">
+							<button (click)="setReplyParent(item.comment.id)">
+								Responder
+							</button>
+							@if (canEditComment(item.comment) && !item.comment.isDeleted) {
+								<button (click)="startEdit(item.comment)">
+									Editar
+								</button>
+								<button (click)="deleteComment(item.comment.id)">
+									Excluir
+								</button>
+							}
+						</div>
+
+						@if (activeReplyParentId() === item.comment.id) {
+							<div class="chapter-comments__reply-box">
+								<div class="chapter-comments__toolbar">
+									<button type="button" (click)="applyBold('reply-comment-' + item.comment.id)">B</button>
+									<button type="button" (click)="applyItalic('reply-comment-' + item.comment.id)">I</button>
+									<button type="button" (click)="applySpoiler('reply-comment-' + item.comment.id)">Spoiler</button>
+									<button type="button" (click)="insertLink('reply-comment-' + item.comment.id)">Link</button>
+									<button type="button" (click)="insertImage('reply-comment-' + item.comment.id)">Imagem</button>
+								</div>
+								<textarea
+									[id]="'reply-comment-' + item.comment.id"
+									placeholder="Escreva uma resposta..."
+									[value]="replyDrafts()[item.comment.id] || ''"
+									(input)="onReplyDraftInput(item.comment.id, $event)"
+									maxlength="2000"
+								></textarea>
+								<div class="chapter-comments__actions">
+									<button (click)="submitReply(item.comment.id)">
+										Enviar resposta
+									</button>
+									<button (click)="setReplyParent(null)">
+										Cancelar
+									</button>
+								</div>
+							</div>
+						}
+					</article>
+				}
+			</div>
+
+			@if (commentsPage(); as pageInfo) {
+				<div class="chapter-comments__pagination">
+					<button
+						(click)="goToPreviousCommentsPage()"
+						[disabled]="pageInfo.metadata.page <= 1"
+					>
+						Anterior
+					</button>
+					<span>
+						Pagina {{ pageInfo.metadata.page }} de {{ pageInfo.metadata.lastPage }}
+					</span>
+					<button
+						(click)="goToNextCommentsPage()"
+						[disabled]="pageInfo.metadata.page >= pageInfo.metadata.lastPage"
+					>
+						Proxima
+					</button>
+				</div>
+			}
+		}
+	</section>
 
 	<app-aside [topOffset]="0" [position]="settings().asidePosition">
 		<div class="title">

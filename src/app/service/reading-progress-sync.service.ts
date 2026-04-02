@@ -701,12 +701,20 @@ export class ReadingProgressSyncService implements OnDestroy {
 	}
 
 	private async syncViaHttp(progress: SaveProgressDto): Promise<void> {
+		const payload = {
+			chapterId: progress.chapterId,
+			bookId: progress.bookId,
+			pageIndex: progress.pageIndex,
+			totalPages: progress.totalPages,
+			completed: progress.completed,
+		};
+
 		try {
 			await firstValueFrom(
 				this.http
 					.post<{ data: RemoteReadingProgress }>(
 						this.baseUrl,
-						progress,
+						payload,
 					)
 					.pipe(map((res) => res.data)),
 			);
