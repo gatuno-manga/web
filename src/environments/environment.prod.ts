@@ -1,5 +1,6 @@
+// This file was generated automatically by the generate-env.ts script
 export const environment = {
 	production: true,
-	apiURL: 'https://api-gatuno.canto.internal/api',
-	apiURLServer: 'https://api:3000/api',
+	apiURL: 'http://localhost:3001/api',
+	apiURLServer: 'http://api:3000/api',
 };

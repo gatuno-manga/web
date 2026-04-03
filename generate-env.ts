@@ -11,8 +11,8 @@ if (!fs.existsSync(envDirectory)) {
 const envConfigFile = `// This file was generated automatically by the generate-env.ts script
 export const environment = {
 	production: true,
-	apiUrl: '${process.env.API_URL || 'http://localhost:3001/api'}',
-	apiUrlServer: '${process.env.API_URL_SERVER || 'http://api:3000/api'}'
+	apiURL: '${process.env.API_URL || 'http://localhost:3001/api'}',
+	apiURLServer: '${process.env.API_URL_SERVER || 'http://api:3000/api'}'
 };
 `;
 

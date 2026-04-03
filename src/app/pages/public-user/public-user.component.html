@@ -36,7 +36,7 @@
 								@if (collection.description) {
 									<span>{{ collection.description }}</span>
 								}
-								<small>{{ collection.books?.length || 0 }} livro(s)</small>
+								<small>{{ collection.books.length || 0 }} livro(s)</small>
 							</li>
 						}
 					</ul>
@@ -51,8 +51,8 @@
 					<ul>
 						@for (item of savedPages(); track item.id) {
 							<li>
-								<strong>{{ item.book?.title || 'Livro sem titulo' }}</strong>
-								<span>Capitulo {{ item.chapter?.index }}</span>
+								<strong>{{ item.book.title || 'Livro sem titulo' }}</strong>
+								<span>Capitulo {{ item.chapter.index }}</span>
 								@if (item.comment) {
 									<p>{{ item.comment }}</p>
 								}
