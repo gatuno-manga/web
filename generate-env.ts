@@ -12,7 +12,7 @@ const envConfigFile = `// This file was generated automatically by the generate-
 export const environment = {
 	production: true,
 	apiURL: '${process.env.API_URL || 'http://localhost:3001'}/api',
-	apiURLServer: '${process.env.API_URL_SERVER || 'http://api:3000'}/api'
+	apiURLServer: '${process.env.API_URL_SERVER || process.env.API_URL || 'http://localhost:3001'}/api'
 };
 `;
 
