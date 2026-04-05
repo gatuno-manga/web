@@ -1,7 +1,7 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
+const fs = require('node:fs');
+const path = require('node:path');
 
-const envDirectory = path.join(import.meta.dirname, 'src/environments');
+const envDirectory = path.join(__dirname, 'src/environments');
 const targetPath = path.join(envDirectory, 'environment.prod.ts');
 
 if (!fs.existsSync(envDirectory)) {
