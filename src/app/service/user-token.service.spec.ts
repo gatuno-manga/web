@@ -129,7 +129,7 @@ describe('UserTokenService', () => {
 			const validToken = createValidToken([Role.ADMIN]);
 
 			// Simula setTokens
-			service.setTokens(validToken, 'refresh-token');
+			service.setTokens(validToken);
 
 			// Cancela requisições de auto-refresh
 			for (const req of httpMock.match('/auth/refresh')) {
@@ -151,7 +151,7 @@ describe('UserTokenService', () => {
 			const userToken = createValidToken([Role.USER]);
 			const adminToken = createValidToken([Role.ADMIN]);
 
-			service.setTokens(userToken, 'refresh-token');
+			service.setTokens(userToken);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({
 					accessToken: userToken,
@@ -161,7 +161,7 @@ describe('UserTokenService', () => {
 			tick();
 			expect(service.isAdminSignal()).toBeFalse();
 
-			service.setTokens(adminToken, 'refresh-token');
+			service.setTokens(adminToken);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({
 					accessToken: adminToken,
@@ -177,7 +177,7 @@ describe('UserTokenService', () => {
 		it('deve retornar authHeaderSignal pré-formatado', fakeAsync(() => {
 			const validToken = createValidToken();
 
-			service.setTokens(validToken, 'refresh-token');
+			service.setTokens(validToken);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({
 					accessToken: validToken,
@@ -197,13 +197,12 @@ describe('UserTokenService', () => {
 	});
 
 	describe('setTokens e removeTokens', () => {
-		it('deve salvar tokens no cookie e signal', fakeAsync(() => {
+		it('deve salvar token de acesso no cookie e signal', fakeAsync(() => {
 			const accessToken = createValidToken();
-			const refreshToken = 'refresh-token-123';
 
-			service.setTokens(accessToken, refreshToken);
+			service.setTokens(accessToken);
 			for (const req of httpMock.match('/auth/refresh')) {
-				req.flush({ accessToken, refreshToken });
+				req.flush({ accessToken });
 			}
 			tick();
 			discardPeriodicTasks();
@@ -213,18 +212,13 @@ describe('UserTokenService', () => {
 				accessToken,
 				false,
 			);
-			expect(cookieServiceSpy.set).toHaveBeenCalledWith(
-				'refreshToken',
-				refreshToken,
-				false,
-			);
 			expect(service.accessTokenSignal()).toBe(accessToken);
 		}));
 
 		it('deve notificar outras abas ao definir tokens', fakeAsync(() => {
 			const accessToken = createValidToken();
 
-			service.setTokens(accessToken, 'refresh-token');
+			service.setTokens(accessToken);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({ accessToken, refreshToken: 'refresh' });
 			}
@@ -238,7 +232,7 @@ describe('UserTokenService', () => {
 
 		it('deve remover tokens e limpar signal', fakeAsync(() => {
 			const accessToken = createValidToken();
-			service.setTokens(accessToken, 'refresh-token');
+			service.setTokens(accessToken);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({ accessToken, refreshToken: 'refresh' });
 			}
@@ -250,10 +244,6 @@ describe('UserTokenService', () => {
 
 			expect(cookieServiceSpy.delete).toHaveBeenCalledWith(
 				'accessToken',
-				false,
-			);
-			expect(cookieServiceSpy.delete).toHaveBeenCalledWith(
-				'refreshToken',
 				false,
 			);
 			expect(service.accessTokenSignal()).toBeNull();
@@ -311,7 +301,7 @@ describe('UserTokenService', () => {
 
 		it('deve limpar token quando outra aba envia TOKEN_REMOVE', fakeAsync(() => {
 			const accessToken = createValidToken();
-			service.setTokens(accessToken, 'refresh-token');
+			service.setTokens(accessToken);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({ accessToken, refreshToken: 'refresh' });
 			}
@@ -345,7 +335,7 @@ describe('UserTokenService', () => {
 	describe('validação de token', () => {
 		it('deve identificar token válido', fakeAsync(() => {
 			const validToken = createValidToken();
-			service.setTokens(validToken, 'refresh-token');
+			service.setTokens(validToken);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({
 					accessToken: validToken,
@@ -381,7 +371,7 @@ describe('UserTokenService', () => {
 	describe('roles e informações do usuário', () => {
 		it('deve retornar roles do usuário', fakeAsync(() => {
 			const token = createValidToken([Role.USER, Role.ADMIN]);
-			service.setTokens(token, 'refresh-token');
+			service.setTokens(token);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({ accessToken: token, refreshToken: 'refresh' });
 			}
@@ -397,7 +387,7 @@ describe('UserTokenService', () => {
 			const adminToken = createValidToken([Role.ADMIN]);
 			const userToken = createValidToken([Role.USER]);
 
-			service.setTokens(adminToken, 'refresh');
+			service.setTokens(adminToken);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({
 					accessToken: adminToken,
@@ -408,7 +398,7 @@ describe('UserTokenService', () => {
 			expect(service.isAdmin).toBeTrue();
 			expect(service.isAdminSignal()).toBeTrue();
 
-			service.setTokens(userToken, 'refresh');
+			service.setTokens(userToken);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({
 					accessToken: userToken,
@@ -424,7 +414,7 @@ describe('UserTokenService', () => {
 
 		it('deve retornar email do usuário', fakeAsync(() => {
 			const token = createValidToken();
-			service.setTokens(token, 'refresh-token');
+			service.setTokens(token);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({ accessToken: token, refreshToken: 'refresh' });
 			}
@@ -436,7 +426,7 @@ describe('UserTokenService', () => {
 
 		it('deve retornar ID do usuário', fakeAsync(() => {
 			const token = createValidToken();
-			service.setTokens(token, 'refresh-token');
+			service.setTokens(token);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({ accessToken: token, refreshToken: 'refresh' });
 			}
@@ -450,16 +440,14 @@ describe('UserTokenService', () => {
 	describe('refreshTokens', () => {
 		it('deve fazer refresh e atualizar tokens', fakeAsync(() => {
 			const newAccessToken = createValidToken([Role.ADMIN]);
-			const newRefreshToken = 'new-refresh-token';
 
 			service.refreshTokens().subscribe();
 
 			const req = httpMock.expectOne('/auth/refresh');
-			expect(req.request.method).toBe('GET');
+			expect(req.request.method).toBe('POST');
 
 			req.flush({
 				accessToken: newAccessToken,
-				refreshToken: newRefreshToken,
 			});
 			tick();
 			discardPeriodicTasks();
@@ -467,11 +455,6 @@ describe('UserTokenService', () => {
 			expect(cookieServiceSpy.set).toHaveBeenCalledWith(
 				'accessToken',
 				newAccessToken,
-				false,
-			);
-			expect(cookieServiceSpy.set).toHaveBeenCalledWith(
-				'refreshToken',
-				newRefreshToken,
 				false,
 			);
 		}));
@@ -504,7 +487,7 @@ describe('UserTokenService', () => {
 	describe('getters legados (compatibilidade)', () => {
 		it('deve retornar accessToken via getter', fakeAsync(() => {
 			const token = createValidToken();
-			service.setTokens(token, 'refresh');
+			service.setTokens(token);
 			for (const req of httpMock.match('/auth/refresh')) {
 				req.flush({ accessToken: token, refreshToken: 'refresh' });
 			}
@@ -515,9 +498,8 @@ describe('UserTokenService', () => {
 			expect(service.accessToken).toBe(token);
 		}));
 
-		it('deve retornar refreshToken via cookie', () => {
-			cookieServiceSpy.get.and.returnValue('refresh-token-from-cookie');
-			expect(service.refreshToken).toBe('refresh-token-from-cookie');
+		it('deve manter getter refreshToken nulo no cliente web', () => {
+			expect(service.refreshToken).toBeNull();
 		});
 	});
 });
