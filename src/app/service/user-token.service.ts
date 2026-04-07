@@ -34,12 +34,12 @@ export class UserTokenService {
 	private notificationService = inject(NotificationService);
 
 	private readonly ACCESSKEY = 'accessToken';
-	private readonly REFRESHKEY = 'refreshToken';
 	private readonly REFRESH_MARGIN_SEC = 60;
+	private sessionMayExist = isPlatformBrowser(this.platformId);
 
 	private refreshObservable: Observable<{
 		accessToken: string;
-		refreshToken: string;
+		refreshToken?: string;
 	}> | null = null;
 	private refreshSubscription?: Subscription;
 
@@ -103,20 +103,22 @@ export class UserTokenService {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((message: AuthSyncMessage) => {
 				if (message.type === 'TOKEN_UPDATE') {
+					this.sessionMayExist = true;
 					this._accessToken.set(message.accessToken ?? null);
 					if (message.accessToken) {
 						this.scheduleAutoRefresh();
 					}
 				} else if (message.type === 'TOKEN_REMOVE') {
 					this.stopAutoRefresh();
+					this.sessionMayExist = false;
 					this._accessToken.set(null);
 				}
 			});
 	}
 
-	setTokens(accessToken: string, refreshToken: string) {
+	setTokens(accessToken: string) {
 		this.cookieService.set(this.ACCESSKEY, accessToken, false);
-		this.cookieService.set(this.REFRESHKEY, refreshToken, false);
+		this.sessionMayExist = true;
 		this._accessToken.set(accessToken);
 		this.scheduleAutoRefresh();
 		this.crossTabSync.notifyTokenUpdate(accessToken);
@@ -125,7 +127,7 @@ export class UserTokenService {
 	removeTokens(notifyUser = false): void {
 		this.stopAutoRefresh();
 		this.cookieService.delete(this.ACCESSKEY, false);
-		this.cookieService.delete(this.REFRESHKEY, false);
+		this.sessionMayExist = false;
 		this._accessToken.set(null);
 		this.crossTabSync.notifyTokenRemove();
 
@@ -152,7 +154,11 @@ export class UserTokenService {
 	}
 
 	get refreshToken(): string | null {
-		return this.cookieService.get(this.REFRESHKEY, false);
+		return null;
+	}
+
+	get csrfToken(): string | null {
+		return this.cookieService.get('csrfToken', false);
 	}
 
 	get hasValidAccessToken(): boolean {
@@ -160,8 +166,7 @@ export class UserTokenService {
 	}
 
 	get hasValidRefreshToken(): boolean {
-		const token = this.refreshToken;
-		return !!token && this.isTokenValid(token);
+		return this.sessionMayExist;
 	}
 
 	private isTokenValid(token: string): boolean {
@@ -228,14 +233,21 @@ export class UserTokenService {
 
 	refreshTokens() {
 		if (!this.refreshObservable) {
+			const csrfToken = this.csrfToken;
 			this.refreshObservable = this.http
-				.get<{ accessToken: string; refreshToken: string }>(
+				.post<{ accessToken: string; refreshToken?: string }>(
 					'/auth/refresh',
-					{ withCredentials: true },
+					null,
+					{
+						withCredentials: true,
+						headers: csrfToken
+							? { 'x-csrf-token': csrfToken }
+							: undefined,
+					},
 				)
 				.pipe(
-					tap(({ accessToken, refreshToken }) => {
-						this.setTokens(accessToken, refreshToken);
+					tap(({ accessToken }) => {
+						this.setTokens(accessToken);
 					}),
 					shareReplay(1),
 					finalize(() => {

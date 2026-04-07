@@ -20,7 +20,7 @@ import { AuthQueueService } from '../service/auth-queue.service';
 export const httpClientResponseInterceptor: HttpInterceptorFn = (req, next) => {
 	const userTokenService = inject(UserTokenService);
 	const authQueue = inject(AuthQueueService);
-	const excludedUrls = ['/auth/refresh', '/auth/signup', '/auth/login'];
+	const excludedUrls = ['/auth/refresh', '/auth/signup', '/auth/signin'];
 
 	return next(req).pipe(
 		catchError((error) => {
