@@ -9,6 +9,8 @@
 		[errors]="this.form.get('email')?.errors"
 		[touched]="this.form.get('email')?.touched ?? false"
 	/>
+
+	@if(!isMfaStep){
 	<app-input
 		formControlName="password"
 		placeholder="Senha"
@@ -18,12 +20,54 @@
 		[errors]="this.form.get('password')?.errors"
 		[touched]="this.form.get('password')?.touched ?? false"
 	/>
+	}
+
+	@if(isMfaStep){
+	<app-input
+		formControlName="mfaCode"
+		placeholder="Código MFA / Backup"
+		id="mfaCode"
+		type="text"
+		leftIcon="shield"
+		[errors]="this.form.get('mfaCode')?.errors"
+		[touched]="this.form.get('mfaCode')?.touched ?? false"
+	/>
+	}
+
 	@if(form.errors?.['loginFailed']){
 	<div class="error">
 		{{ form.errors?.['loginFailed'] }}
 	</div>
 	}
-	<app-button type="submit">Entrar</app-button>
+
+	@if(form.errors?.['mfaRequired']){
+	<div class="warning">
+		{{ form.errors?.['mfaRequired'] }}
+	</div>
+	}
+
+	@if(form.errors?.['mfaFailed']){
+	<div class="error">
+		{{ form.errors?.['mfaFailed'] }}
+	</div>
+	}
+
+	@if(form.errors?.['passkeyFailed']){
+	<div class="error">
+		{{ form.errors?.['passkeyFailed'] }}
+	</div>
+	}
+
+	<app-button type="submit">{{
+		isMfaStep ? 'Verificar MFA' : 'Entrar'
+	}}</app-button>
+
+	@if(!isMfaStep){
+	<app-button type="button" variant="outline" (click)="signInWithPasskey()">
+		Entrar com Passkey
+	</app-button>
+	}
+
 	<div class="link">
 		<a [routerLink]="['../', 'register']">Não tem uma conta? Crie uma</a>
 	</div>

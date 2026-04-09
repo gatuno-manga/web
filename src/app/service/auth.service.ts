@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
+	authTokensResponse,
+	isAuthTokensResponse,
 	loginRequest,
 	loginResponse,
 	registerRequest,
@@ -28,9 +30,59 @@ export class AuthService {
 			})
 			.pipe(
 				tap(({ body }) => {
-					if (body) {
+					if (body && isAuthTokensResponse(body)) {
 						this.userTokenService.setTokens(body.accessToken);
 						// Sincroniza o histórico de leitura após o login
+						this.readingProgressService.onUserLogin();
+					}
+				}),
+			);
+	}
+
+	verifyMfaLogin(mfaToken: string, code: string) {
+		return this.http
+			.post<authTokensResponse>(
+				'/auth/mfa/verify-login',
+				{ mfaToken, code },
+				{
+					observe: 'response',
+					withCredentials: true,
+				},
+			)
+			.pipe(
+				tap(({ body }) => {
+					if (body?.accessToken) {
+						this.userTokenService.setTokens(body.accessToken);
+						this.readingProgressService.onUserLogin();
+					}
+				}),
+			);
+	}
+
+	beginPasskeyAuthentication(email: string) {
+		return this.http.post<Record<string, unknown>>(
+			'/auth/passkeys/authenticate/options',
+			{ email },
+		);
+	}
+
+	verifyPasskeyAuthentication(
+		email: string,
+		response: Record<string, unknown>,
+	) {
+		return this.http
+			.post<loginResponse>(
+				'/auth/passkeys/authenticate/verify',
+				{ email, response },
+				{
+					observe: 'response',
+					withCredentials: true,
+				},
+			)
+			.pipe(
+				tap(({ body }) => {
+					if (body && isAuthTokensResponse(body)) {
+						this.userTokenService.setTokens(body.accessToken);
 						this.readingProgressService.onUserLogin();
 					}
 				}),
@@ -55,7 +107,7 @@ export class AuthService {
 
 	register(data: registerRequest) {
 		return this.http
-			.post<loginResponse>('/auth/signup', data, {
+			.post<authTokensResponse>('/auth/signup', data, {
 				observe: 'response',
 				withCredentials: true,
 			})

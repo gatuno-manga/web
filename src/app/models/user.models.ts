@@ -3,10 +3,33 @@ export interface loginRequest {
 	password: string;
 }
 
-export interface loginResponse {
+export interface authTokensResponse {
 	accessToken: string;
 	refreshToken?: string;
+	sessionId?: string;
 }
+
+export interface mfaChallengeResponse {
+	mfaRequired: true;
+	mfaType: 'totp';
+	mfaToken: string;
+}
+
+export type loginResponse = authTokensResponse | mfaChallengeResponse;
+
+export const isMfaChallengeResponse = (
+	response: loginResponse,
+): response is mfaChallengeResponse => {
+	return 'mfaRequired' in response && response.mfaRequired === true;
+};
+
+export const isAuthTokensResponse = (
+	response: loginResponse,
+): response is authTokensResponse => {
+	return (
+		'accessToken' in response && typeof response.accessToken === 'string'
+	);
+};
 
 export interface payloadToken {
 	email: string;
@@ -15,6 +38,7 @@ export interface payloadToken {
 	iss: string;
 	iat: number;
 	exp: number;
+	sessionId?: string;
 }
 
 export enum Role {

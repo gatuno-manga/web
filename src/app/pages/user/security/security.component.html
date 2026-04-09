@@ -1,0 +1,174 @@
+<section class="security-page">
+	<h1>Segurança da conta</h1>
+
+	@if(feedbackMessage){
+	<p class="feedback">{{ feedbackMessage }}</p>
+	}
+	@if(errorMessage){
+	<p class="error">{{ errorMessage }}</p>
+	}
+
+	<div class="card">
+		<h2>MFA / 2FA (TOTP)</h2>
+		<p>
+			Status:
+			<strong>{{ mfaStatus?.totpEnabled ? 'Ativado' : 'Desativado' }}</strong>
+		</p>
+		<p>
+			Códigos backup restantes:
+			<strong>{{ mfaStatus?.backupCodesRemaining ?? 0 }}</strong>
+		</p>
+
+		@if(!mfaStatus?.totpEnabled){
+		<app-button type="button" (click)="beginTotpSetup()">
+			Ativar MFA com app autenticador
+		</app-button>
+
+		@if(mfaSetup){
+		<div class="inline-form">
+			<p><strong>Secret:</strong> <code>{{ mfaSetup.secret }}</code></p>
+			<p>
+				<strong>URI:</strong>
+				<code class="uri">{{ mfaSetup.otpauthUri }}</code>
+			</p>
+			<input
+				type="text"
+				[(ngModel)]="mfaSetupCode"
+				placeholder="Código MFA para confirmar"
+			/>
+			<app-button type="button" (click)="confirmTotpSetup()">
+				Confirmar ativação
+			</app-button>
+		</div>
+		}
+		}
+
+		@if(mfaStatus?.totpEnabled){
+		<div class="inline-form">
+			<input
+				type="text"
+				[(ngModel)]="mfaDisableCode"
+				placeholder="Código MFA ou backup para desativar"
+			/>
+			<app-button type="button" variant="outline" (click)="disableTotp()">
+				Desativar MFA
+			</app-button>
+		</div>
+		}
+
+		@if(backupCodes.length > 0){
+		<div class="backup-codes">
+			<h3>Guarde seus códigos de backup</h3>
+			<p>Estes códigos são exibidos apenas uma vez.</p>
+			<div class="codes">
+				@for(code of backupCodes; track code){
+				<code>{{ code }}</code>
+				}
+			</div>
+		</div>
+		}
+	</div>
+
+	<div class="card">
+		<h2>Passkeys</h2>
+		<app-button type="button" (click)="registerPasskey()">
+			Registrar nova passkey
+		</app-button>
+
+		@if(passkeys.length === 0){
+		<p>Nenhuma passkey registrada.</p>
+		}
+
+		@if(passkeys.length > 0){
+		<div class="list">
+			@for(passkey of passkeys; track passkey.id){
+			<div class="list-item">
+				<div>
+					<strong>{{ passkey.name || 'Passkey sem nome' }}</strong>
+					<p>
+						Criada em: {{ passkey.createdAt | date: 'short' }} · Último uso:
+						{{ passkey.lastUsedAt ? (passkey.lastUsedAt | date: 'short') : 'nunca' }}
+					</p>
+				</div>
+				<app-button
+					type="button"
+					variant="outline"
+					(click)="removePasskey(passkey.id)"
+				>
+					Remover
+				</app-button>
+			</div>
+			}
+		</div>
+		}
+	</div>
+
+	<div class="card">
+		<h2>Dispositivos conectados</h2>
+		<app-button type="button" variant="outline" (click)="revokeOtherSessions()">
+			Encerrar outras sessões
+		</app-button>
+
+		@if(sessions.length === 0){
+		<p>Nenhuma sessão ativa encontrada.</p>
+		}
+
+		@if(sessions.length > 0){
+		<div class="list">
+			@for(session of sessions; track session.id){
+			<div class="list-item">
+				<div>
+					<strong>
+						{{ session.deviceLabel || session.clientPlatform || 'Dispositivo' }}
+					</strong>
+					@if(session.isCurrent){
+					<span class="badge">Sessão atual</span>
+					}
+					<p>
+						IP: {{ session.ipAddress || 'n/a' }} · Método:
+						{{ session.authMethod }} · MFA:
+						{{ session.mfaVerified ? 'sim' : 'não' }}
+					</p>
+					<p>Última atividade: {{ session.lastSeenAt | date: 'short' }}</p>
+				</div>
+				@if(!session.isCurrent){
+				<app-button
+					type="button"
+					variant="outline"
+					(click)="revokeSession(session.id)"
+				>
+					Encerrar
+				</app-button>
+				}
+			</div>
+			}
+		</div>
+		}
+	</div>
+
+	<div class="card">
+		<h2>Histórico de acessos</h2>
+		@if(auditItems.length === 0){
+		<p>Nenhum evento registrado.</p>
+		}
+		@if(auditItems.length > 0){
+		<div class="list">
+			@for(item of auditItems; track item.id){
+			<div class="list-item">
+				<div>
+					<strong>{{ item.event }}</strong>
+					@if(!item.success){
+					<span class="badge danger">falha</span>
+					}
+					<p>
+						{{ item.createdAt | date: 'short' }} ·
+						{{ item.ipAddress || 'IP n/a' }} ·
+						{{ item.clientPlatform || 'plataforma n/a' }}
+					</p>
+				</div>
+			</div>
+			}
+		</div>
+		}
+	</div>
+</section>
