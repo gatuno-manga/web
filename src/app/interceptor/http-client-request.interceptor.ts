@@ -5,6 +5,29 @@ import { environment } from '../../environments/environment';
 import { UserTokenService } from '../service/user-token.service';
 import { buildApiUrl } from '../utils/api-url.utils';
 
+const DEVICE_ID_STORAGE_KEY = 'gatuno-device-id';
+
+const resolveBrowserDeviceId = (): string => {
+	const existing = window.localStorage.getItem(DEVICE_ID_STORAGE_KEY);
+	if (existing && existing.trim().length > 0) {
+		return existing;
+	}
+
+	const generated =
+		window.crypto?.randomUUID?.() ??
+		`web-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+
+	window.localStorage.setItem(DEVICE_ID_STORAGE_KEY, generated);
+	return generated;
+};
+
+const resolveBrowserDeviceName = (): string => {
+	const nav = window.navigator as Navigator & {
+		userAgentData?: { platform?: string };
+	};
+	return nav.userAgentData?.platform || nav.platform || 'web';
+};
+
 export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
 	const userTokenService = inject(UserTokenService);
 	const platformId = inject(PLATFORM_ID);
@@ -32,6 +55,13 @@ export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
 				headers = headers.set('cookie', cookieParts.join('; '));
 			}
 		}
+	}
+
+	if (isBrowser) {
+		headers = headers
+			.set('x-client-platform', 'web')
+			.set('x-device-id', resolveBrowserDeviceId())
+			.set('x-device-name', resolveBrowserDeviceName());
 	}
 
 	const clonedRequest = req.clone({

@@ -1,0 +1,84 @@
+.security-page {
+	display: grid;
+	gap: 1rem;
+}
+
+.card {
+	background: var(--surface-secondary, rgba(255, 255, 255, 0.04));
+	border: 1px solid var(--surface-border, rgba(255, 255, 255, 0.08));
+	border-radius: 12px;
+	padding: 1rem;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.list {
+	display: grid;
+	gap: 0.5rem;
+}
+
+.list-item {
+	display: flex;
+	gap: 0.75rem;
+	justify-content: space-between;
+	align-items: center;
+	border: 1px solid var(--surface-border, rgba(255, 255, 255, 0.08));
+	border-radius: 8px;
+	padding: 0.75rem;
+}
+
+.badge {
+	margin-left: 0.5rem;
+	font-size: 0.75rem;
+	padding: 0.1rem 0.4rem;
+	border-radius: 999px;
+	background: #1565c0;
+	color: #fff;
+}
+
+.badge.danger {
+	background: #c62828;
+}
+
+.card .description {
+	font-size: 0.85rem;
+	color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+}
+
+.inline-form {
+	display: flex;
+	gap: 0.5rem;
+	align-items: flex-end;
+}
+
+.inline-form app-input {
+	flex: 1;
+}
+
+.inline-form input {
+	border: 1px solid var(--surface-border, rgba(255, 255, 255, 0.2));
+	border-radius: 8px;
+	padding: 0.6rem 0.75rem;
+	background: transparent;
+	color: inherit;
+}
+
+.backup-codes .codes {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	gap: 0.4rem;
+}
+
+.backup-codes code,
+.uri {
+	word-break: break-all;
+	white-space: normal;
+}
+
+.feedback {
+	color: #2e7d32;
+}
+
+.error {
+	color: #c62828;
+}
