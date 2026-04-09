@@ -16,12 +16,13 @@ import {
 	PasskeySummary,
 } from '../../../models/account-security.models';
 import { ButtonComponent } from '../../../components/inputs/button/button.component';
+import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
 import { AccountSecurityService } from '../../../service/account-security.service';
 
 @Component({
 	selector: 'app-security',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonComponent],
+	imports: [CommonModule, FormsModule, ButtonComponent, TextInputComponent],
 	templateUrl: './security.component.html',
 	styleUrl: './security.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +37,7 @@ export class SecurityComponent implements OnInit {
 
 	mfaSetupCode = '';
 	mfaDisableCode = '';
+	passkeyName = '';
 	feedbackMessage = '';
 	errorMessage = '';
 	isLoading = false;
@@ -226,9 +228,11 @@ export class SecurityComponent implements OnInit {
 			await firstValueFrom(
 				this.securityService.verifyPasskeyRegistration(
 					registration as unknown as Record<string, unknown>,
+					this.passkeyName.trim() || undefined,
 				),
 			);
 			this.setFeedback('Passkey registrada com sucesso.');
+			this.passkeyName = '';
 			this.loadPasskeys();
 		} catch (error) {
 			console.error('Passkey registration failed', error);
