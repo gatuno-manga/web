@@ -46,6 +46,18 @@ export enum Role {
 	ADMIN = 'admin',
 }
 
+export interface UserProfile {
+	id: string;
+	email: string;
+	userName: string;
+	name?: string;
+	profileImageUrl?: string;
+	bannerImageUrl?: string;
+	roles: Role[];
+	createdAt: string;
+	updatedAt: string;
+}
+
 export interface registerRequest {
 	email: string;
 	password: string;
