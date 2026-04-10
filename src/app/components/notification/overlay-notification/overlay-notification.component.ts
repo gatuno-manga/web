@@ -39,6 +39,11 @@ export class OverlayNotificationComponent {
 		this.notificationService.dismissOverlay(overlayId);
 	}
 
+	onModalButtonClick(callback?: () => void): void {
+		this.closeModal();
+		callback?.();
+	}
+
 	closeModal() {
 		this.notificationService.dismissModal();
 	}

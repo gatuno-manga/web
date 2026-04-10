@@ -10,6 +10,7 @@ import {
 	ChangeDetectorRef,
 	computed,
 	DestroyRef,
+	effect,
 	AfterViewInit,
 	ViewChildren,
 	QueryList,
@@ -136,6 +137,14 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	userEmail = this.userTokenService.emailSignal;
 	showFilters = false;
 
+	private readonly chapterLoadErrorModalTitle = 'Erro ao carregar capítulo';
+	private readonly chapterLoadErrorModalMessage =
+		'Erro ao carregar o capítulo.';
+	private activeChapterLoadErrorModalId: string | null = null;
+	private dismissedChapterLoadErrorModalId: string | null = null;
+	private suppressChapterLoadErrorOnClose = true;
+	private currentChapterRouteId: string | null = null;
+
 	private pageObjectUrls: string[] = [];
 	private destroyRef = inject(DestroyRef);
 	private maxReadPageIndex = 0;
@@ -161,6 +170,25 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	admin = this.userTokenService.isAdminSignal;
 
 	constructor() {
+		effect(() => {
+			const currentModal = this.notificationService.modal();
+			const isChapterLoadErrorModal =
+				currentModal?.title === this.chapterLoadErrorModalTitle &&
+				currentModal.description === this.chapterLoadErrorModalMessage;
+
+			if (
+				!isChapterLoadErrorModal &&
+				this.activeChapterLoadErrorModalId
+			) {
+				if (this.suppressChapterLoadErrorOnClose) {
+					this.dismissedChapterLoadErrorModalId =
+						this.activeChapterLoadErrorModalId;
+				}
+				this.activeChapterLoadErrorModalId = null;
+				this.suppressChapterLoadErrorOnClose = true;
+			}
+		});
+
 		this.activatedRoute.paramMap
 			.pipe(takeUntilDestroyed())
 			.subscribe((params) => {
@@ -168,6 +196,10 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 				const bookId = params.get('id');
 
 				if (chapterId) {
+					if (this.currentChapterRouteId !== chapterId) {
+						this.currentChapterRouteId = chapterId;
+						this.dismissedChapterLoadErrorModalId = null;
+					}
 					this.loadChapter(chapterId);
 					if (bookId) {
 						this.setupWebSocket(chapterId, bookId);
@@ -250,19 +282,19 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.maxReadPageIndex = 0;
 		try {
 			const chapter = await this.resolveChapterData(id, forceOnline);
-			if (chapter) {
-				this.chapter.set(chapter);
-				this.updateMetadata(chapter);
-				this.loadComments(chapter.id);
-				await this.restoreReadingProgress();
+			if (!chapter) {
+				this.showChapterLoadErrorModal(id);
+				return;
 			}
+
+			this.chapter.set(chapter);
+			this.dismissedChapterLoadErrorModalId = null;
+			this.updateMetadata(chapter);
+			this.loadComments(chapter.id);
+			await this.restoreReadingProgress();
 		} catch (e) {
 			console.error('Erro ao carregar capítulo', e);
-			this.notificationService.notify({
-				message: 'Erro ao carregar o capítulo.',
-				level: 'custom',
-				severity: NotificationSeverity.CRITICAL,
-			});
+			this.showChapterLoadErrorModal(id);
 		}
 	}
 
@@ -670,6 +702,44 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			}
 		}
 		return lastValueFrom(this.chapterService.getChapter(id));
+	}
+
+	private showChapterLoadErrorModal(chapterId: string): void {
+		if (
+			this.activeChapterLoadErrorModalId === chapterId ||
+			this.dismissedChapterLoadErrorModalId === chapterId
+		) {
+			return;
+		}
+
+		this.activeChapterLoadErrorModalId = chapterId;
+		this.suppressChapterLoadErrorOnClose = true;
+
+		this.modalNotificationService.show(
+			this.chapterLoadErrorModalTitle,
+			this.chapterLoadErrorModalMessage,
+			[
+				{
+					label: 'Tentar novamente',
+					type: 'primary',
+					callback: () => {
+						this.activeChapterLoadErrorModalId = null;
+						this.suppressChapterLoadErrorOnClose = false;
+						this.dismissedChapterLoadErrorModalId = null;
+						void this.loadChapter(chapterId, true);
+					},
+				},
+				{
+					label: 'Voltar',
+					type: 'secondary',
+					callback: () => {
+						this.activeChapterLoadErrorModalId = null;
+						this.backPage();
+					},
+				},
+			],
+			'error',
+		);
 	}
 
 	private async loadOfflineChapter(id: string): Promise<Chapter | null> {
