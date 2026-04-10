@@ -1,18 +1,18 @@
 import {
-    Component,
-    Input,
-    Output,
-    EventEmitter,
-    ElementRef,
-    OnInit,
-    OnDestroy,
-    inject,
-    PLATFORM_ID,
-    DestroyRef,
-    ChangeDetectionStrategy,
-    HostListener,
-    signal,
-    viewChild
+	Component,
+	Input,
+	Output,
+	EventEmitter,
+	ElementRef,
+	OnInit,
+	OnDestroy,
+	inject,
+	PLATFORM_ID,
+	DestroyRef,
+	ChangeDetectionStrategy,
+	HostListener,
+	signal,
+	viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -22,115 +22,159 @@ import { ContentFormat } from '../../../models/book.models';
 import { MarkdownComponent } from 'ngx-markdown';
 
 export interface TextProgressEvent {
-    pageIndex: number;
-    totalPages: number;
-    scrollPercentage: number;
+	pageIndex: number;
+	totalPages: number;
+	scrollPercentage: number;
 }
 
 // Constants for virtual page calculation
 const WORDS_PER_PAGE = 300;
 
 @Component({
-    selector: 'app-text-reader',
-    standalone: true,
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MarkdownComponent],
-    templateUrl: './text-reader.component.html',
-    styleUrl: './text-reader.component.scss'
+	selector: 'app-text-reader',
+	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
+	imports: [MarkdownComponent],
+	templateUrl: './text-reader.component.html',
+	styleUrl: './text-reader.component.scss',
 })
 export class TextReaderComponent implements OnInit, OnDestroy {
-    @Input() content: string = '';
-    @Input() format: ContentFormat = 'markdown';
-    @Input() initialScrollPercentage: number = 0;
-    @Output() progressChange = new EventEmitter<TextProgressEvent>();
+	@Input() content = '';
+	@Input() format: ContentFormat = 'markdown';
+	@Input() initialScrollPercentage = 0;
+	@Output() progressChange = new EventEmitter<TextProgressEvent>();
 
-    contentRef = viewChild<ElementRef>('contentRef');
+	contentRef = viewChild<ElementRef>('contentRef');
 
-    private platformId = inject(PLATFORM_ID);
-    private destroyRef = inject(DestroyRef);
+	private platformId = inject(PLATFORM_ID);
+	private destroyRef = inject(DestroyRef);
 
-    private wordCount = signal(0);
-    private virtualPages = signal(1);
-    private lastReportedPage = 0;
+	private wordCount = signal(0);
+	private virtualPages = signal(1);
+	private lastReportedPage = 0;
 
-    ngOnInit() {
-        this.calculateWordCount();
+	ngOnInit() {
+		this.calculateWordCount();
 
-        if (isPlatformBrowser(this.platformId)) {
-            this.setupScrollListener();
+		if (isPlatformBrowser(this.platformId)) {
+			this.setupScrollListener();
 
-            // Restore initial position after render
-            if (this.initialScrollPercentage > 0) {
-                setTimeout(() => this.scrollToPercentage(this.initialScrollPercentage), 100);
-            }
-        }
-    }
+			// Restore initial position after render
+			if (this.initialScrollPercentage > 0) {
+				setTimeout(
+					() => this.scrollToPercentage(this.initialScrollPercentage),
+					100,
+				);
+			}
+		}
+	}
 
-    ngOnDestroy() {
-        // Cleanup handled by takeUntilDestroyed
-    }
+	ngOnDestroy() {
+		// Cleanup handled by takeUntilDestroyed
+	}
 
-    private calculateWordCount() {
-        // Strip HTML/markdown and count words
-        const plainText = this.content
-            .replace(/<[^>]*>/g, ' ')  // Remove HTML tags
-            .replace(/[#*_~`]/g, '')   // Remove markdown symbols
-            .replace(/\s+/g, ' ')      // Normalize whitespace
-            .trim();
+	private calculateWordCount() {
+		// Strip HTML/markdown and count words
+		const plainText = this.content
+			.replace(/<[^>]*>/g, ' ') // Remove HTML tags
+			.replace(/[#*_~`]/g, '') // Remove markdown symbols
+			.replace(/\s+/g, ' ') // Normalize whitespace
+			.trim();
 
-        const words = plainText.split(' ').filter(w => w.length > 0).length;
-        this.wordCount.set(words);
-        this.virtualPages.set(Math.max(1, Math.ceil(words / WORDS_PER_PAGE)));
-    }
+		const words = plainText.split(' ').filter((w) => w.length > 0).length;
+		this.wordCount.set(words);
+		this.virtualPages.set(Math.max(1, Math.ceil(words / WORDS_PER_PAGE)));
+	}
 
-    private setupScrollListener() {
-        fromEvent(window, 'scroll')
-            .pipe(
-                throttleTime(100, undefined, { leading: true, trailing: true }),
-                takeUntilDestroyed(this.destroyRef)
-            )
-            .subscribe(() => this.onScroll());
-    }
+	private setupScrollListener() {
+		fromEvent(window, 'scroll', { capture: true })
+			.pipe(
+				throttleTime(20, undefined, { leading: true, trailing: true }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe(() => this.onScroll());
+	}
 
-    private onScroll() {
-        const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
-        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+	private onScroll() {
+		const container = this.contentRef()?.nativeElement;
+		if (!container || !isPlatformBrowser(this.platformId)) return;
 
-        if (scrollHeight <= 0) return;
+		const rect = container.getBoundingClientRect();
+		const containerHeight = rect.height;
+		const windowHeight = window.innerHeight;
 
-        const scrollPercentage = Math.max(0, (scrollTop / scrollHeight) * 100);
-        const currentPage = Math.floor((scrollPercentage / 100) * this.virtualPages()) + 1;
-        const clampedPage = Math.min(Math.max(1, currentPage), this.virtualPages());
+		const scrollOffset = -rect.top;
+		const maxScroll = containerHeight - windowHeight;
 
-        // Only emit when page changes
-        if (clampedPage > this.lastReportedPage) {
-            this.lastReportedPage = clampedPage;
-            this.progressChange.emit({
-                pageIndex: clampedPage - 1, // 0-indexed for backend compatibility
-                totalPages: this.virtualPages(),
-                scrollPercentage
-            });
-        }
-    }
+		if (maxScroll <= 0) {
+			this.emitProgress(100);
+			return;
+		}
 
-    scrollToPercentage(percentage: number) {
-        if (!isPlatformBrowser(this.platformId)) return;
+		const scrollPercentage = Math.max(
+			0,
+			Math.min(100, (scrollOffset / maxScroll) * 100),
+		);
+		this.emitProgress(scrollPercentage);
+	}
 
-        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const targetScroll = (percentage / 100) * scrollHeight;
-        window.scrollTo({ top: targetScroll, behavior: 'auto' });
-    }
+	private emitProgress(scrollPercentage: number) {
+		const currentPage =
+			Math.floor((scrollPercentage / 100) * this.virtualPages()) + 1;
+		const clampedPage = Math.min(
+			Math.max(1, currentPage),
+			this.virtualPages(),
+		);
 
-    scrollToPage(pageIndex: number) {
-        const percentage = (pageIndex / this.virtualPages()) * 100;
-        this.scrollToPercentage(percentage);
-    }
+		// Emit when page changes (any direction) or progress significantly changes (for visual smoothness)
+		if (
+			clampedPage !== this.lastReportedPage ||
+			Math.abs(
+				scrollPercentage -
+					(this.lastReportedPage / this.virtualPages()) * 100,
+			) > 1
+		) {
+			this.lastReportedPage = clampedPage;
+			this.progressChange.emit({
+				pageIndex: clampedPage - 1, // 0-indexed for backend compatibility
+				totalPages: this.virtualPages(),
+				scrollPercentage,
+			});
+		}
+	}
 
-    getVirtualPages(): number {
-        return this.virtualPages();
-    }
+	scrollToPercentage(percentage: number) {
+		if (!isPlatformBrowser(this.platformId)) return;
 
-    resetProgress() {
-        this.lastReportedPage = 0;
-    }
+		const container = this.contentRef()?.nativeElement;
+		if (!container) return;
+
+		const rect = container.getBoundingClientRect();
+		const scrollTop =
+			window.scrollY || document.documentElement.scrollTop || 0;
+		const containerTop = rect.top + scrollTop;
+		const containerHeight = rect.height;
+		const windowHeight = window.innerHeight;
+
+		const maxScroll = containerHeight - windowHeight;
+		const targetScrollInside = (percentage / 100) * maxScroll;
+
+		window.scrollTo({
+			top: containerTop + targetScrollInside,
+			behavior: 'auto',
+		});
+	}
+
+	scrollToPage(pageIndex: number) {
+		const percentage = (pageIndex / this.virtualPages()) * 100;
+		this.scrollToPercentage(percentage);
+	}
+
+	getVirtualPages(): number {
+		return this.virtualPages();
+	}
+
+	resetProgress() {
+		this.lastReportedPage = 0;
+	}
 }

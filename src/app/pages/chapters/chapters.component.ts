@@ -10,6 +10,7 @@ import {
 	ChangeDetectorRef,
 	computed,
 	DestroyRef,
+	effect,
 	AfterViewInit,
 	ViewChildren,
 	QueryList,
@@ -62,6 +63,7 @@ import {
 import { HeaderStateService } from '../../service/header-state.service';
 import { Page as PaginatedResponse } from '../../models/miscellaneous.models';
 import { MarkdownComponent } from 'ngx-markdown';
+import { UserService } from '../../service/user.service';
 
 type FlattenedComment = {
 	comment: ChapterCommentNode;
@@ -108,9 +110,9 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private cdr = inject(ChangeDetectorRef);
 	private injector = inject(Injector);
 	private headerStateService = inject(HeaderStateService);
+	private userService = inject(UserService);
 
 	progressBarRef = viewChild<ElementRef>('progressBarRef');
-	@ViewChildren('pageRef') pageRefs!: QueryList<ElementRef>;
 	@ViewChild(ImageReaderComponent) imageReader?: ImageReaderComponent;
 	@ViewChild(TextReaderComponent) textReader?: TextReaderComponent;
 	@ViewChild(DocumentReaderComponent)
@@ -131,12 +133,23 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	replyDrafts: WritableSignal<Record<string, string>> = signal({});
 	editingCommentId = signal<string | null>(null);
 	editingDraft = signal<string>('');
+	userProfile = this.userService.profileSignal;
+	userEmail = this.userTokenService.emailSignal;
+	showFilters = false;
+
+	private readonly chapterLoadErrorModalTitle = 'Erro ao carregar capítulo';
+	private readonly chapterLoadErrorModalMessage =
+		'Erro ao carregar o capítulo.';
+	private activeChapterLoadErrorModalId: string | null = null;
+	private dismissedChapterLoadErrorModalId: string | null = null;
+	private suppressChapterLoadErrorOnClose = true;
+	private currentChapterRouteId: string | null = null;
 
 	private pageObjectUrls: string[] = [];
-	private intersectionObserver: IntersectionObserver | null = null;
 	private destroyRef = inject(DestroyRef);
 	private maxReadPageIndex = 0;
 	private isNavigating = false;
+	private isDragging = false;
 	private lastScrollPosition = 0;
 
 	settings = toSignal(this.settingsService.settings$, {
@@ -157,6 +170,25 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	admin = this.userTokenService.isAdminSignal;
 
 	constructor() {
+		effect(() => {
+			const currentModal = this.notificationService.modal();
+			const isChapterLoadErrorModal =
+				currentModal?.title === this.chapterLoadErrorModalTitle &&
+				currentModal.description === this.chapterLoadErrorModalMessage;
+
+			if (
+				!isChapterLoadErrorModal &&
+				this.activeChapterLoadErrorModalId
+			) {
+				if (this.suppressChapterLoadErrorOnClose) {
+					this.dismissedChapterLoadErrorModalId =
+						this.activeChapterLoadErrorModalId;
+				}
+				this.activeChapterLoadErrorModalId = null;
+				this.suppressChapterLoadErrorOnClose = true;
+			}
+		});
+
 		this.activatedRoute.paramMap
 			.pipe(takeUntilDestroyed())
 			.subscribe((params) => {
@@ -164,6 +196,10 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 				const bookId = params.get('id');
 
 				if (chapterId) {
+					if (this.currentChapterRouteId !== chapterId) {
+						this.currentChapterRouteId = chapterId;
+						this.dismissedChapterLoadErrorModalId = null;
+					}
 					this.loadChapter(chapterId);
 					if (bookId) {
 						this.setupWebSocket(chapterId, bookId);
@@ -187,17 +223,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	ngAfterViewInit() {
 		if (!isPlatformBrowser(this.platformId)) return;
-
-		this.pageRefs.changes
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe((refs: QueryList<ElementRef>) => {
-				if (refs.length > 0) {
-					setTimeout(() => {
-						this.setupIntersectionObserver();
-						this.restoreReadingProgress();
-					}, 100);
-				}
-			});
 	}
 
 	private setupScrollListener() {
@@ -212,14 +237,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			.subscribe(() => {
 				const currentScroll =
 					window.scrollY || document.documentElement.scrollTop || 0;
-				const windowHeight =
-					document.documentElement.scrollHeight -
-					document.documentElement.clientHeight;
-
-				if (windowHeight > 0) {
-					const progress = (currentScroll / windowHeight) * 100;
-					this.readingProgress.set(progress);
-				}
 
 				const isScrolledDown = currentScroll > 400;
 				const isScrollingUp = currentScroll < this.lastScrollPosition;
@@ -239,9 +256,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.headerStateService.setFixed(false);
 		for (const url of this.pageObjectUrls) {
 			URL.revokeObjectURL(url);
-		}
-		if (this.intersectionObserver) {
-			this.intersectionObserver.disconnect();
 		}
 	}
 
@@ -268,18 +282,19 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.maxReadPageIndex = 0;
 		try {
 			const chapter = await this.resolveChapterData(id, forceOnline);
-			if (chapter) {
-				this.chapter.set(chapter);
-				this.updateMetadata(chapter);
-				this.loadComments(chapter.id);
+			if (!chapter) {
+				this.showChapterLoadErrorModal(id);
+				return;
 			}
+
+			this.chapter.set(chapter);
+			this.dismissedChapterLoadErrorModalId = null;
+			this.updateMetadata(chapter);
+			this.loadComments(chapter.id);
+			await this.restoreReadingProgress();
 		} catch (e) {
 			console.error('Erro ao carregar capítulo', e);
-			this.notificationService.notify({
-				message: 'Erro ao carregar o capítulo.',
-				level: 'custom',
-				severity: NotificationSeverity.CRITICAL,
-			});
+			this.showChapterLoadErrorModal(id);
 		}
 	}
 
@@ -689,6 +704,44 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		return lastValueFrom(this.chapterService.getChapter(id));
 	}
 
+	private showChapterLoadErrorModal(chapterId: string): void {
+		if (
+			this.activeChapterLoadErrorModalId === chapterId ||
+			this.dismissedChapterLoadErrorModalId === chapterId
+		) {
+			return;
+		}
+
+		this.activeChapterLoadErrorModalId = chapterId;
+		this.suppressChapterLoadErrorOnClose = true;
+
+		this.modalNotificationService.show(
+			this.chapterLoadErrorModalTitle,
+			this.chapterLoadErrorModalMessage,
+			[
+				{
+					label: 'Tentar novamente',
+					type: 'primary',
+					callback: () => {
+						this.activeChapterLoadErrorModalId = null;
+						this.suppressChapterLoadErrorOnClose = false;
+						this.dismissedChapterLoadErrorModalId = null;
+						void this.loadChapter(chapterId, true);
+					},
+				},
+				{
+					label: 'Voltar',
+					type: 'secondary',
+					callback: () => {
+						this.activeChapterLoadErrorModalId = null;
+						this.backPage();
+					},
+				},
+			],
+			'error',
+		);
+	}
+
 	private async loadOfflineChapter(id: string): Promise<Chapter | null> {
 		try {
 			const offlineChapter = await this.downloadService.getChapter(id);
@@ -740,7 +793,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		pageIndex: number,
 		visualProgressPercentage: number,
 	) {
-		if (this.isNavigating) return;
+		if (this.isNavigating || this.isDragging) return;
 
 		const currentChapter = this.chapter();
 		if (!currentChapter) return;
@@ -760,7 +813,10 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	onImageProgress(event: ReadingProgressEvent) {
-		const percent = ((event.pageIndex + 1) / event.totalPages) * 100;
+		const percent =
+			event.scrollPercentage !== undefined
+				? event.scrollPercentage
+				: ((event.pageIndex + 1) / event.totalPages) * 100;
 		this.updateProgressState(event.pageIndex, percent);
 	}
 
@@ -769,7 +825,10 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	onDocumentProgress(event: DocumentProgressEvent) {
-		const percent = ((event.pageIndex + 1) / event.totalPages) * 100;
+		const percent =
+			event.scrollPercentage !== undefined
+				? event.scrollPercentage
+				: ((event.pageIndex + 1) / event.totalPages) * 100;
 		this.updateProgressState(event.pageIndex, percent);
 	}
 
@@ -801,6 +860,8 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		const progressBar = this.progressBarRef()?.nativeElement;
 		if (!progressBar) return;
 
+		this.isDragging = true;
+
 		const calculateProgress = (clientX: number) => {
 			const rect = progressBar.getBoundingClientRect();
 			const offsetX = clientX - rect.left;
@@ -809,11 +870,31 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
 			this.readingProgress.set(percentage);
 
-			const windowHeight =
-				document.documentElement.scrollHeight -
-				document.documentElement.clientHeight;
-			const scrollTo = (percentage / 100) * windowHeight;
-			window.scrollTo({ top: scrollTo, behavior: 'auto' });
+			const chapter = this.chapter();
+			if (!chapter) return;
+
+			if (chapter.contentType === 'text' && this.textReader) {
+				this.textReader.scrollToPercentage(percentage);
+			} else if (
+				chapter.contentType === 'document' &&
+				this.documentReader
+			) {
+				const total = this.documentReader.getTotalPages();
+				const pageIndex = Math.min(
+					Math.floor((percentage / 100) * total),
+					total - 1,
+				);
+				this.documentReader.scrollToPage(pageIndex);
+			} else if (this.imageReader) {
+				const total = chapter.pages?.length || 0;
+				if (total > 0) {
+					const pageIndex = Math.min(
+						Math.floor((percentage / 100) * total),
+						total - 1,
+					);
+					this.imageReader.scrollToPage(pageIndex);
+				}
+			}
 		};
 
 		const onMove = (moveEvent: MouseEvent | TouchEvent) => {
@@ -826,6 +907,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		};
 
 		const onUp = () => {
+			this.isDragging = false;
 			document.removeEventListener('mousemove', onMove);
 			document.removeEventListener('mouseup', onUp);
 			document.removeEventListener('touchmove', onMove);
@@ -844,49 +926,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		calculateProgress(clientX);
 	}
 
-	private setupIntersectionObserver() {
-		if (this.intersectionObserver) {
-			this.intersectionObserver.disconnect();
-		}
-
-		if (!isPlatformBrowser(this.platformId)) return;
-
-		const options = {
-			root: null,
-			rootMargin: '0px',
-			threshold: 0.1,
-		};
-
-		this.intersectionObserver = new IntersectionObserver((entries) => {
-			if (this.isNavigating) return;
-
-			for (const entry of entries) {
-				if (entry.isIntersecting) {
-					const index = Number.parseInt(
-						entry.target.getAttribute('data-index') || '0',
-						10,
-					);
-
-					if (index > this.maxReadPageIndex) {
-						this.maxReadPageIndex = index;
-						const currentChapter = this.chapter();
-						if (currentChapter) {
-							this.readingProgressService.saveProgress(
-								currentChapter.id,
-								currentChapter.bookId,
-								index,
-							);
-						}
-					}
-				}
-			}
-		}, options);
-
-		for (const el of this.pageRefs) {
-			this.intersectionObserver?.observe(el.nativeElement);
-		}
-	}
-
 	private async restoreReadingProgress() {
 		const currentChapter = this.chapter();
 		if (!currentChapter) return;
@@ -901,15 +940,19 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		const targetPageIndex = isLastPage ? 0 : savedPageIndex;
 
 		this.maxReadPageIndex = targetPageIndex;
+		this.savedPageIndex.set(targetPageIndex);
 
 		if (targetPageIndex > 0) {
-			const targetElement = this.pageRefs.get(targetPageIndex);
-			if (targetElement) {
-				targetElement.nativeElement.scrollIntoView({
-					behavior: 'auto',
-					block: 'start',
-				});
-			}
+			// Delay to ensure readers are rendered and ready
+			setTimeout(() => {
+				if (this.imageReader) {
+					this.imageReader.scrollToPage(targetPageIndex);
+				} else if (this.documentReader) {
+					this.documentReader.scrollToPage(targetPageIndex);
+				} else if (this.textReader) {
+					this.textReader.scrollToPage(targetPageIndex);
+				}
+			}, 200);
 		}
 	}
 
