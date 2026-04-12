@@ -1,13 +1,20 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+	FormBuilder,
+	FormGroup,
+	ReactiveFormsModule,
+	Validators,
+} from '@angular/forms';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { AuthService } from '../../../service/auth.service';
 import {
 	PasswordInputComponent,
 	TextInputComponent,
 } from '../../../components/inputs/text-input/text-input.component';
+import { MfaInputComponent } from '../../../components/inputs/mfa-input/mfa-input.component';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ButtonComponent } from '../../../components/inputs/button/button.component';
+import { IconsComponent } from '../../../components/icons/icons.component';
 import { MetaDataService } from '../../../service/meta-data.service';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -24,6 +31,8 @@ import {
 		ReactiveFormsModule,
 		RouterModule,
 		PasswordInputComponent,
+		MfaInputComponent,
+		IconsComponent,
 	],
 	templateUrl: './login.component.html',
 	styleUrl: './login.component.scss',
@@ -31,7 +40,7 @@ import {
 export class LoginComponent {
 	form: FormGroup;
 	private returnUrl = '/books';
-	isMfaStep = false;
+	step: 'email' | 'password' | 'mfa' = 'email';
 	private mfaToken: string | null = null;
 	isLoading = false;
 
@@ -43,8 +52,8 @@ export class LoginComponent {
 		private readonly metaService: MetaDataService,
 	) {
 		this.form = this.fb.group({
-			email: [''],
-			password: [''],
+			email: ['', [Validators.required, Validators.email]],
+			password: ['', [Validators.required]],
 			mfaCode: [''],
 		});
 		this.returnUrl =
@@ -57,6 +66,14 @@ export class LoginComponent {
 			title: 'Login',
 			description: 'Acesse sua conta.',
 		});
+	}
+
+	nextStep() {
+		if (this.form.get('email')?.invalid) {
+			this.form.get('email')?.markAsTouched();
+			return;
+		}
+		this.step = 'password';
 	}
 
 	private clearFormError(errorKey: string): void {
@@ -73,7 +90,7 @@ export class LoginComponent {
 
 	private handleAuthResult(response: loginResponse): void {
 		if (isMfaChallengeResponse(response)) {
-			this.isMfaStep = true;
+			this.step = 'mfa';
 			this.mfaToken = response.mfaToken;
 			this.form.get('password')?.reset();
 			this.form.setErrors({
@@ -100,7 +117,7 @@ export class LoginComponent {
 		if (this.form.invalid || this.isLoading) return;
 		this.isLoading = true;
 
-		if (this.isMfaStep) {
+		if (this.step === 'mfa') {
 			const code = this.form.get('mfaCode')?.value;
 			if (!this.mfaToken || !code) {
 				this.isLoading = false;
@@ -148,6 +165,7 @@ export class LoginComponent {
 					this.form.setErrors({
 						...(this.form.errors ?? {}),
 						loginFailed: 'Resposta de autenticação inválida',
+						mfaRequired: null,
 					});
 					return;
 				}

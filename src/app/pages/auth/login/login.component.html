@@ -1,74 +1,85 @@
-<h1>Entre na sua conta</h1>
-<form [formGroup]="form" (ngSubmit)="submit()">
-	<app-input
-		formControlName="email"
-		placeholder="Email"
-		id="email"
-		type="email"
-		leftIcon="email"
-		[errors]="this.form.get('email')?.errors"
-		[touched]="this.form.get('email')?.touched ?? false"
-	/>
+@switch (step) {
+	@case ('email') {
+		<h1>Entre na sua conta</h1>
+		<form [formGroup]="form" (ngSubmit)="nextStep()">
+			<app-input
+				formControlName="email"
+				placeholder="Email"
+				id="email"
+				type="email"
+				leftIcon="email"
+				[errors]="this.form.get('email')?.errors"
+				[touched]="this.form.get('email')?.touched ?? false"
+			/>
+			<app-button type="submit" rounded="large">Continuar</app-button>
 
-	@if(!isMfaStep){
-	<app-input
-		formControlName="password"
-		placeholder="Senha"
-		id="password"
-		type="password"
-		leftIcon="lock"
-		[errors]="this.form.get('password')?.errors"
-		[touched]="this.form.get('password')?.touched ?? false"
-	/>
+			<div class="link">
+				Não tem uma conta? <a [routerLink]="['../', 'register']">crie uma</a>
+			</div>
+		</form>
 	}
 
-	@if(isMfaStep){
-	<app-input
-		formControlName="mfaCode"
-		placeholder="Código MFA / Backup"
-		id="mfaCode"
-		type="text"
-		leftIcon="shield"
-		[errors]="this.form.get('mfaCode')?.errors"
-		[touched]="this.form.get('mfaCode')?.touched ?? false"
-	/>
+	@case ('password') {
+		<h1>Entre na sua conta</h1>
+		<form [formGroup]="form" (ngSubmit)="submit()">
+			<app-input
+				formControlName="password"
+				placeholder="Senha"
+				id="password"
+				type="password"
+				leftIcon="lock"
+				[errors]="this.form.get('password')?.errors"
+				[touched]="this.form.get('password')?.touched ?? false"
+			/>
+
+			@if(form.errors?.['loginFailed']){
+			<div class="error">
+				{{ form.errors?.['loginFailed'] }}
+			</div>
+			}
+
+			<app-button type="submit" rounded="large">Entrar</app-button>
+
+			<div class="divider">
+				<span>OU</span>
+			</div>
+
+			<app-button type="button" rounded="large" (click)="signInWithPasskey()">
+				<app-icons name="fingerprint" />
+				Utilize uma chave de acesso
+			</app-button>
+
+			@if(form.errors?.['passkeyFailed']){
+			<div class="error">
+				{{ form.errors?.['passkeyFailed'] }}
+			</div>
+			}
+		</form>
 	}
 
-	@if(form.errors?.['loginFailed']){
-	<div class="error">
-		{{ form.errors?.['loginFailed'] }}
-	</div>
+	@case ('mfa') {
+		<div class="mfa-header">
+			<h1>Verifique sua conta</h1>
+			<p>Insira o codigo de 6 digitos MFA / 2FA (TOTP)</p>
+		</div>
+
+		<form [formGroup]="form" (ngSubmit)="submit()">
+			<app-mfa-input formControlName="mfaCode" />
+
+			@if(form.errors?.['mfaRequired']){
+			<div class="warning">
+				{{ form.errors?.['mfaRequired'] }}
+			</div>
+			}
+
+			@if(form.errors?.['mfaFailed']){
+			<div class="error">
+				{{ form.errors?.['mfaFailed'] }}
+			</div>
+			}
+
+			<app-button type="submit" rounded="large">Verificar</app-button>
+		</form>
 	}
+}
 
-	@if(form.errors?.['mfaRequired']){
-	<div class="warning">
-		{{ form.errors?.['mfaRequired'] }}
-	</div>
-	}
-
-	@if(form.errors?.['mfaFailed']){
-	<div class="error">
-		{{ form.errors?.['mfaFailed'] }}
-	</div>
-	}
-
-	@if(form.errors?.['passkeyFailed']){
-	<div class="error">
-		{{ form.errors?.['passkeyFailed'] }}
-	</div>
-	}
-
-	<app-button type="submit">{{
-		isMfaStep ? 'Verificar MFA' : 'Entrar'
-	}}</app-button>
-
-	@if(!isMfaStep){
-	<app-button type="button" variant="outline" (click)="signInWithPasskey()">
-		Entrar com Passkey
-	</app-button>
-	}
-
-	<div class="link">
-		<a [routerLink]="['../', 'register']">Não tem uma conta? Crie uma</a>
-	</div>
-</form>
