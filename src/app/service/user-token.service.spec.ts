@@ -78,6 +78,12 @@ describe('UserTokenService', () => {
 
 		// Configuração padrão: sem token inicial
 		cookieServiceSpy.get.and.returnValue(null);
+		cookieServiceSpy.get
+			.withArgs('accessToken', false)
+			.and.returnValue(null);
+		cookieServiceSpy.get
+			.withArgs('csrfToken', false)
+			.and.returnValue('csrf-token');
 
 		TestBed.configureTestingModule({
 			imports: [HttpClientTestingModule],
@@ -445,6 +451,7 @@ describe('UserTokenService', () => {
 
 			const req = httpMock.expectOne('/auth/refresh');
 			expect(req.request.method).toBe('POST');
+			expect(req.request.headers.get('x-csrf-token')).toBe('csrf-token');
 
 			req.flush({
 				accessToken: newAccessToken,
@@ -481,6 +488,25 @@ describe('UserTokenService', () => {
 
 			// Todos os subscribers recebem o resultado
 			expect(callCount).toBe(3);
+		}));
+
+		it('deve falhar sem fazer requisição quando csrfToken não estiver disponível', fakeAsync(() => {
+			cookieServiceSpy.get
+				.withArgs('csrfToken', false)
+				.and.returnValue(null);
+			let capturedError: Error | undefined;
+
+			service.refreshTokens().subscribe({
+				next: () => fail('não deveria emitir sucesso sem csrfToken'),
+				error: (error: Error) => {
+					capturedError = error;
+				},
+			});
+			tick();
+			discardPeriodicTasks();
+
+			expect(httpMock.match('/auth/refresh').length).toBe(0);
+			expect(capturedError?.message).toContain('Missing CSRF token');
 		}));
 	});
 

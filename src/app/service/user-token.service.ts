@@ -14,7 +14,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { payloadToken, Role } from '../models/user.models';
-import { Observable, Subscription, timer } from 'rxjs';
+import { Observable, Subscription, throwError, timer } from 'rxjs';
 import { shareReplay, tap, finalize } from 'rxjs/operators';
 import { NotificationService } from './notification.service';
 import { CrossTabSyncService, AuthSyncMessage } from './cross-tab-sync.service';
@@ -233,16 +233,19 @@ export class UserTokenService {
 
 	refreshTokens() {
 		if (!this.refreshObservable) {
-			const csrfToken = this.csrfToken;
+			const csrfToken = this.csrfToken?.trim();
+			if (!csrfToken) {
+				return throwError(
+					() => new Error('Missing CSRF token for refresh request'),
+				);
+			}
 			this.refreshObservable = this.http
 				.post<{ accessToken: string; refreshToken?: string }>(
 					'/auth/refresh',
 					null,
 					{
 						withCredentials: true,
-						headers: csrfToken
-							? { 'x-csrf-token': csrfToken }
-							: undefined,
+						headers: { 'x-csrf-token': csrfToken },
 					},
 				)
 				.pipe(

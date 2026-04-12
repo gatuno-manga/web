@@ -5,6 +5,36 @@ export interface UrlConfig {
 	origin?: string;
 }
 
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
+
+const normalizeLoopbackHost = (baseUrl: string, origin?: string): string => {
+	if (!origin) {
+		return baseUrl;
+	}
+
+	try {
+		const base = new URL(baseUrl);
+		const browserOrigin = new URL(origin);
+		const isBaseLoopback = LOOPBACK_HOSTS.has(base.hostname.toLowerCase());
+		const isOriginLoopback = LOOPBACK_HOSTS.has(
+			browserOrigin.hostname.toLowerCase(),
+		);
+
+		if (
+			isBaseLoopback &&
+			isOriginLoopback &&
+			base.hostname !== browserOrigin.hostname
+		) {
+			base.hostname = browserOrigin.hostname;
+			return base.toString();
+		}
+	} catch {
+		return baseUrl;
+	}
+
+	return baseUrl;
+};
+
 export function buildApiUrl(path: string, config: UrlConfig): string {
 	const isAbsoluteUrl = /^https?:\/\//i.test(path);
 	const requestExclude = ['/assets/', '/data/'];
@@ -33,6 +63,13 @@ export function buildApiUrl(path: string, config: UrlConfig): string {
 		} else {
 			baseUrl = `${protocol}//${baseUrl}`;
 		}
+	}
+
+	if (config.isBrowser && baseUrl.startsWith('http')) {
+		baseUrl = normalizeLoopbackHost(
+			baseUrl,
+			config.origin || window.location.origin,
+		);
 	}
 
 	const cleanBase = baseUrl.replace(/\/+$/, '');
