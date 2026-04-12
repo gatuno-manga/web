@@ -35,6 +35,60 @@ const normalizeLoopbackHost = (baseUrl: string, origin?: string): string => {
 	return baseUrl;
 };
 
+type RuntimeProcess = {
+	env?: {
+		API_URL_SERVER?: string;
+		API_URL?: string;
+		HOSTNAME?: string;
+		[key: string]: string | undefined;
+	};
+};
+
+const isLikelyDockerContainerRuntime = (): boolean => {
+	const runtimeProcess = (globalThis as { process?: RuntimeProcess }).process;
+	const hostName = runtimeProcess?.env?.HOSTNAME;
+	return typeof hostName === 'string' && /^[a-f0-9]{12,}$/i.test(hostName);
+};
+
+const normalizeLoopbackHostForDockerSsr = (baseUrl: string): string => {
+	if (!isLikelyDockerContainerRuntime()) {
+		return baseUrl;
+	}
+
+	try {
+		const parsedBaseUrl = new URL(baseUrl);
+		const isLoopback = LOOPBACK_HOSTS.has(
+			parsedBaseUrl.hostname.toLowerCase(),
+		);
+
+		if (!isLoopback) {
+			return baseUrl;
+		}
+
+		parsedBaseUrl.hostname = 'api';
+		if (!parsedBaseUrl.port) {
+			parsedBaseUrl.port = '3000';
+		}
+
+		return parsedBaseUrl.toString();
+	} catch {
+		return baseUrl;
+	}
+};
+
+const resolveServerApiBaseUrlFromRuntime = (): string | null => {
+	const runtimeProcess = (globalThis as { process?: RuntimeProcess }).process;
+	const env = runtimeProcess?.env;
+	const rawBaseUrl = env?.API_URL_SERVER || env?.API_URL;
+
+	if (!rawBaseUrl?.trim()) {
+		return null;
+	}
+
+	const cleanBaseUrl = rawBaseUrl.replace(/\/+$/, '');
+	return cleanBaseUrl.endsWith('/api') ? cleanBaseUrl : `${cleanBaseUrl}/api`;
+};
+
 export function buildApiUrl(path: string, config: UrlConfig): string {
 	const isAbsoluteUrl = /^https?:\/\//i.test(path);
 	const requestExclude = ['/assets/', '/data/'];
@@ -49,8 +103,13 @@ export function buildApiUrl(path: string, config: UrlConfig): string {
 	let baseUrl = config.apiUrl;
 
 	if (!config.isBrowser) {
+		const runtimeServerApiBaseUrl = resolveServerApiBaseUrlFromRuntime();
 		baseUrl =
-			config.apiUrlServer || config.apiUrl || 'http://localhost:3000/api';
+			runtimeServerApiBaseUrl ||
+			config.apiUrlServer ||
+			config.apiUrl ||
+			'http://localhost:3000/api';
+		baseUrl = normalizeLoopbackHostForDockerSsr(baseUrl);
 	} else if (!baseUrl) {
 		baseUrl = `${config.origin || ''}/api`;
 	}
@@ -118,8 +177,13 @@ export function buildWebSocketUrl(
 
 	// Em SSR, usar apiUrlServer se disponível
 	if (!config.isBrowser) {
+		const runtimeServerApiBaseUrl = resolveServerApiBaseUrlFromRuntime();
 		baseUrl =
-			config.apiUrlServer || config.apiUrl || 'http://localhost:3000/api';
+			runtimeServerApiBaseUrl ||
+			config.apiUrlServer ||
+			config.apiUrl ||
+			'http://localhost:3000/api';
+		baseUrl = normalizeLoopbackHostForDockerSsr(baseUrl);
 	} else if (!baseUrl) {
 		// Fallback para origem do browser se apiUrl não estiver definida
 		baseUrl = `${config.origin || ''}/api`;
