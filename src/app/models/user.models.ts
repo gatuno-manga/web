@@ -52,7 +52,7 @@ export interface UserProfile {
 	userName: string;
 	name?: string;
 	profileImageUrl?: string;
-	bannerImageUrl?: string;
+	profileBannerUrl?: string;
 	roles: Role[];
 	createdAt: string;
 	updatedAt: string;

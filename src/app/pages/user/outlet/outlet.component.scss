@@ -1,13 +1,15 @@
 :host {
 	display: flex;
-	height: 100vh;
-	background-color: #000212;
+	height: 100%;
+	width: 100%;
+	background-color: var(--app-background-color);
+	overflow: hidden;
 }
 
 aside {
-	border-right: 1px solid var(--white);
+	border-right: 1px solid rgb(from var(--app-text-color) r g b / 0.1);
 	width: 250px;
-	height: 100vh;
+	height: 100%;
 	position: sticky;
 	top: 0;
 	display: flex;
@@ -31,7 +33,7 @@ aside {
 			gap: 12px;
 			padding: 8px 48px; // Increased padding
 			text-decoration: none;
-			color: var(--white);
+			color: var(--app-text-color);
 			font-family: 'Inknut Antiqua', serif;
 			font-weight: 300; // Light
 			font-size: 1.125rem; // 18px
@@ -51,7 +53,7 @@ aside {
 
 		hr {
 			border: none;
-			border-top: 1px solid var(--white);
+			border-top: 1px solid rgb(from var(--app-text-color) r g b / 0.2);
 			margin: 12px 0;
 			width: 80%;
 		}

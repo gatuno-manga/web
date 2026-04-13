@@ -17,6 +17,13 @@ h1 {
 	opacity: 0.6;
 }
 
+.settings-container {
+	padding: 1.5rem;
+	background: rgba(255, 255, 255, 0.05);
+	border-radius: 12px;
+	margin-top: 1rem;
+}
+
 :host-context(.list-view) {
 	padding: 2rem 0;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);

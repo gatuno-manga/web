@@ -5,11 +5,12 @@ import {
 	input,
 } from '@angular/core';
 import { MetaDataService } from '../../../service/meta-data.service';
+import { ReaderSettingsFormComponent } from '../../../components/readers';
 
 @Component({
 	selector: 'app-readings',
 	standalone: true,
-	imports: [],
+	imports: [ReaderSettingsFormComponent],
 	templateUrl: './readings.component.html',
 	styleUrl: './readings.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
