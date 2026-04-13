@@ -90,18 +90,18 @@ export interface NotificationConfig<
 export type NotificationResult =
 	| {
 			kind: 'toast';
-			data: import('../../models/notification.models').NotificationToast;
+			data: import('../../models/notification.models').ToastNotification;
 	  }
 	| {
 			kind: 'modal';
 			data: import('../../models/notification.models').ModalNotification;
 	  }
-	| { kind: 'overlay'; data: OverlayNotificationData };
+	| { kind: 'overlay'; data: OverlayNotification };
 
 /**
  * Dados de uma notificação overlay
  */
-export interface OverlayNotificationData {
+export interface OverlayNotification {
 	id: string;
 	message: string;
 	type: NotificationVisualType;

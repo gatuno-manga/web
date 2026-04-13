@@ -11,7 +11,7 @@ import { NgComponentOutlet } from '@angular/common';
 	styleUrl: './overlay-notification.component.scss',
 })
 export class OverlayNotificationComponent {
-	private notificationService = inject(NotificationService);
+	public notificationService = inject(NotificationService);
 	private bodyScrollService = inject(BodyScrollService);
 
 	// Consumindo dados reativos (Signals) do serviço unificado
@@ -31,20 +31,8 @@ export class OverlayNotificationComponent {
 		});
 	}
 
-	dismissToast(id: number) {
-		this.notificationService.dismissToast(id);
-	}
-
-	dismissOverlay(overlayId: string) {
-		this.notificationService.dismissOverlay(overlayId);
-	}
-
 	onModalButtonClick(callback?: () => void): void {
-		this.closeModal();
-		callback?.();
-	}
-
-	closeModal() {
 		this.notificationService.dismissModal();
+		callback?.();
 	}
 }

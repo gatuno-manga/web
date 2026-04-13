@@ -88,6 +88,11 @@
 	max-width: 1200px;
 	flex-direction: column;
 	position: relative;
+	padding: 0 2.5rem; // Aumentado de 1rem para 2.5rem
+
+	@media (max-width: 768px) {
+		padding: 0 1rem; // Aumentado de 0.5rem para 1rem
+	}
 
 	.reading-progress-bar {
 		$space: 10px;

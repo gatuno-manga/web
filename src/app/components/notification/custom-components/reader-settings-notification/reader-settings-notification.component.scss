@@ -1,27 +1,18 @@
 .reader-settings-content {
 	width: 100%;
-	// max-width: 600px; // Deixar o wrapper controlar a largura
-	padding: 0;
 	display: flex;
 	flex-direction: column;
-	max-height: 80vh;
+	max-height: 85vh;
 }
 
 .settings-header {
-	padding-bottom: 1rem;
-	border-bottom: 1px solid var(--app-text-color);
+	padding: 24px 24px 16px;
+	border-bottom: 1px solid color-mix(in srgb, var(--app-text-color) 15%, transparent);
 	text-align: center;
-	padding-right: 24px; // Espaço para o X
-
-	.icon-container {
-		display: flex;
-		justify-content: center;
-		margin-bottom: 12px;
-	}
 
 	h2 {
-		margin: 0 0 8px 0;
-		font-size: 24px;
+		margin: 0 0 4px 0;
+		font-size: 22px;
 		font-weight: 600;
 		color: var(--app-text-color);
 	}
@@ -30,144 +21,27 @@
 		margin: 0;
 		font-size: 14px;
 		color: var(--app-text-color);
+		opacity: 0.7;
 	}
 }
 
-@keyframes rotate {
-	from {
-		transform: rotate(0deg);
-	}
-	to {
-		transform: rotate(360deg);
-	}
-}
-
-.settings-body {
-	padding: 16px 24px;
-	max-height: 60vh;
-	overflow-y: auto;
-}
-
-.view-selector {
-	margin-bottom: 16px;
+.settings-body-wrapper {
+	flex: 1;
+	overflow: hidden;
 	display: flex;
-	gap: 8px;
-}
-
-.setting-item {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 20px 0;
-	border-bottom: 1px solid var(--border-color, var(--gray-100));
-
-	&.column {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 12px;
-
-		app-select {
-			width: 100%;
-		}
-	}
-
-	&:last-child {
-		border-bottom: none;
-	}
-
-	.setting-info {
-		display: flex;
-		align-items: flex-start;
-		gap: 16px;
-		flex: 1;
-	}
-
-	.setting-icon {
-		background-color: var(--primary-color);
-		width: 40px;
-		height: 40px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		border-radius: 10px;
-	}
-
-	.setting-text {
-		flex: 1;
-
-		h3 {
-			margin: 0 0 4px 0;
-			font-size: 16px;
-			font-weight: 500;
-			color: var(--app-text-color, var(--gray-900));
-		}
-
-		p {
-			margin: 0;
-			font-size: 14px;
-			color: var(--app-text-color);
-			line-height: 1.4;
-		}
-	}
-}
-
-.settings-footer {
-	padding: 16px 24px;
-	border-top: 1px solid var(--app-text-color);
-	display: flex;
-	justify-content: center;
+	flex-direction: column;
 }
 
 @media (max-width: 768px) {
-	.reader-settings-content {
-		max-width: 100%;
-	}
-
 	.settings-header {
 		padding: 20px 16px 12px;
 
 		h2 {
-			font-size: 20px;
+			font-size: 18px;
 		}
 
 		.subtitle {
 			font-size: 13px;
-		}
-	}
-
-	.settings-body {
-		padding: 12px 16px;
-	}
-
-	.setting-item {
-		padding: 16px 0;
-
-		.setting-info {
-			gap: 12px;
-		}
-
-		.setting-icon {
-			width: 36px;
-			height: 36px;
-		}
-
-		.setting-text {
-			h3 {
-				font-size: 15px;
-			}
-
-			p {
-				font-size: 13px;
-			}
-		}
-	}
-
-	.settings-footer {
-		padding: 12px 16px;
-
-		.btn-reset {
-			width: 100%;
-			justify-content: center;
 		}
 	}
 }

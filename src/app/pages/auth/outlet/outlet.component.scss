@@ -1,7 +1,7 @@
 :host {
 	display: flex;
 	flex-direction: column;
-	height: 100vh;
+	height: 100dvh;
 }
 
 header {
@@ -24,9 +24,9 @@ main {
 
 	.forms {
 		border: solid 4px var(--primary-color);
-		border-radius: 0.5rem;
-		padding: 2rem;
+		border-radius: 0.625rem; // 10px
+		padding: 1.5rem;
 		width: 100%;
-		max-width: 700px;
+		max-width: 420px;
 	}
 }

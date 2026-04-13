@@ -45,4 +45,35 @@ export class UserService {
 			}),
 		);
 	}
+
+	updateProfile(data: { userName?: string; name?: string }) {
+		return this.http.patch<{ data: UserProfile }>('/users', data).pipe(
+			map((res) => res.data),
+			tap((profile) => this._profile.set(profile)),
+		);
+	}
+
+	uploadAvatar(file: File) {
+		const formData = new FormData();
+		formData.append('file', file);
+
+		return this.http
+			.patch<{ data: UserProfile }>('/users/me/avatar', formData)
+			.pipe(
+				map((res) => res.data),
+				tap((profile) => this._profile.set(profile)),
+			);
+	}
+
+	uploadBanner(file: File) {
+		const formData = new FormData();
+		formData.append('file', file);
+
+		return this.http
+			.patch<{ data: UserProfile }>('/users/me/banner', formData)
+			.pipe(
+				map((res) => res.data),
+				tap((profile) => this._profile.set(profile)),
+			);
+	}
 }

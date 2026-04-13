@@ -1,19 +1,28 @@
-@defer (when !isLoading()) {
+@defer (on timer(0)) {
 	<div class="filter">
 		<app-book-filter
 			[initialFilters]="filterOptions"
 			(filtersChange)="onFiltersChange($event)"
 		/>
 	</div>
-	<div class="controller">
-		<div class="mode-switch">
-			<app-select
-				[items]="viewModeList"
-				[select]="getViewModeIndex()"
-				[disabled]="isOfflineMode"
-			/>
-		</div>
-		<div class="pages">
+} @placeholder {
+	<div class="filter" style="height: 100px;"></div>
+}
+
+<div class="controller">
+	<div class="mode-switch">
+		<app-select
+			[items]="viewModeList"
+			[select]="getViewModeIndex()"
+			[disabled]="isOfflineMode"
+		/>
+	</div>
+	<div class="pages">
+		@if (isLoading()) {
+			@for (i of [].constructor(5); track $index) {
+				<div class="placeholder"></div>
+			}
+		} @else {
 			@for (page of pagesToShow; track page) {
 				<div
 					class="page"
@@ -23,20 +32,30 @@
 					{{ page }}
 				</div>
 			}
-		</div>
-		<div>
-			<app-select [items]="selectList" [select]="selectListItem()" />
-		</div>
+		}
 	</div>
-	<div id="books" [class]="bookOptions">
-		@for (book of books; track book.id) {
-			<app-item-book [book]="book" [type]="bookOptions" />
+	<div>
+		<app-select [items]="selectList" [select]="selectListItem()" />
+	</div>
+</div>
+
+<div id="books" [class]="bookOptions">
+	@if (isLoading()) {
+		@for (i of [].constructor(10); track $index) {
+			<div class="placeholder"></div>
+		}
+	} @else {
+		@for (book of books; track book.id; let i = $index) {
+			<app-item-book [book]="book" [type]="bookOptions" [priority]="i < 8" />
 		} @empty {
 			<div class="no-books">
 				<p>Nenhum livro disponível.</p>
 			</div>
 		}
-	</div>
+	}
+</div>
+
+@defer (on idle) {
 	<div class="controller">
 		<div class="pages">
 			@for (page of pagesToShow; track page) {
@@ -51,23 +70,5 @@
 		</div>
 	</div>
 } @placeholder {
-	<div class="controller">
-		<div class="pages">
-			@for (i of [].constructor(5); track $index) {
-				<div class="placeholder"></div>
-			}
-		</div>
-	</div>
-	<div id="books" [class]="bookOptions">
-		@for (i of [].constructor(10); track $index) {
-			<div class="placeholder"></div>
-		}
-	</div>
-	<div class="controller">
-		<div class="pages">
-			@for (i of [].constructor(5); track $index) {
-				<div class="placeholder"></div>
-			}
-		</div>
-	</div>
+	<div class="controller" style="height: 100px;"></div>
 }

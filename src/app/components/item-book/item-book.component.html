@@ -4,7 +4,15 @@
 	(contextmenu)="onContextMenu($event)"
 >
 	@if (book.cover && !imageError) {
-		<img [src]="book.cover" alt="" (error)="onImageError()" />
+		<div class="cover-image-container">
+			<img
+				[ngSrc]="book.cover"
+				[alt]="'Capa do livro ' + book.title"
+				fill
+				[priority]="priority"
+				(error)="onImageError()"
+			/>
+		</div>
 	} @else {
 		<div class="cover-placeholder">
 			<app-icons name="image" />

@@ -14,7 +14,14 @@
 		<div class="book-header">
 			<div class="book-cover">
 				@if (book.cover && !coverImageError) {
-					<img [src]="book.cover" (error)="onCoverImageError()" />
+					<img
+						[ngSrc]="book.cover"
+						[alt]="'Capa do livro ' + book.title"
+						width="200"
+						height="350"
+						priority
+						(error)="onCoverImageError()"
+					/>
 				} @else {
 					<div class="cover-placeholder">
 						<app-icons name="image" />
@@ -55,6 +62,7 @@
 								rounded="small"
 								padding="none"
 								class="options-btn"
+								aria-label="Mais opções"
 								(click)="
 									toggleOptionsDropdown();
 									$event.stopPropagation()
@@ -101,6 +109,11 @@
 							rounded="small"
 							padding="none"
 							[disabled]="!admin"
+							[aria-label]="
+								book.autoUpdate
+									? 'Desativar atualizações automáticas'
+									: 'Ativar atualizações automáticas'
+							"
 							(click)="toggleAutoUpdate()"
 						>
 							<app-icons

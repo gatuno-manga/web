@@ -1,24 +1,24 @@
 @if (chapter(); as currentChapter) {
 	<div id="header" class="header">
 		<div class="title">
-			<h1>Capítulo {{ currentChapter.index | number }}</h1>
+			<h1>Capítulo {{ currentChapter.index | number: '1.0-0' : 'pt-BR' }}</h1>
 			@if (currentChapter.title) {
 				<h2>{{ currentChapter.title }}</h2>
 			}
 		</div>
 		<div class="controls">
 			@if (currentChapter.previous) {
-				<a class="arrow" (click)="previousPage()">
+				<a class="arrow" (click)="previousPage()" aria-label="Capítulo anterior">
 					<app-icons name="arrow-left" size="42" />
 				</a>
 			}
-			<a class="index" (click)="backPage()">
-				{{ currentChapter.index | number }}/{{
-					currentChapter.totalChapters
+			<a class="index" (click)="backPage()" aria-label="Ir para a página do livro">
+				{{ currentChapter.index | number: '1.0-0' : 'pt-BR' }}/{{
+					currentChapter.totalChapters | number: '1.0-0' : 'pt-BR'
 				}}
 			</a>
 			@if (currentChapter.next) {
-				<a class="arrow" (click)="nextPage()">
+				<a class="arrow" (click)="nextPage()" aria-label="Próximo capítulo">
 					<app-icons name="arrow-right" size="42" />
 				</a>
 			}
@@ -94,6 +94,7 @@
 		[ngClass]="{
 			show: showScrollToTopButton(),
 		}"
+		aria-label="Voltar ao topo"
 		(click)="scrollToTop()"
 	>
 		<app-icons name="arrow-up" size="42" />
@@ -114,7 +115,7 @@
 		<div class="chapter-comments__header">
 			<h3>Comunidade</h3>
 			@if (commentsPage(); as pageInfo) {
-				<span>{{ pageInfo.metadata.total | number }} COMENTÁRIO{{ pageInfo.metadata.total !== 1 ? 'S' : '' }}</span>
+				<span>{{ pageInfo.metadata.total | number: '1.0-0' : 'pt-BR' }} COMENTÁRIO{{ pageInfo.metadata.total !== 1 ? 'S' : '' }}</span>
 			}
 		</div>
 

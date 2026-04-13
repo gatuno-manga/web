@@ -1,0 +1,146 @@
+h1 {
+	font-size: 2.5rem; // 40px
+	font-weight: 300; // Light
+	margin-bottom: 0.5rem;
+	color: var(--white);
+}
+
+.subtitle {
+	font-size: 1rem; // 16px
+	font-weight: 300; // Light
+	margin-bottom: 2rem;
+	color: var(--white);
+	opacity: 0.8;
+}
+
+.profile-editor {
+	color: var(--white);
+	max-width: 600px;
+
+	h3 {
+		font-size: 1.25rem;
+		font-weight: 400;
+		margin: 2rem 0 1rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		padding-bottom: 0.5rem;
+	}
+
+	.form-section:first-child h3 {
+		margin-top: 0;
+	}
+
+	.image-preview {
+		margin-bottom: 1rem;
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 8px;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.placeholder-box {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: rgba(255, 255, 255, 0.3);
+			font-size: 0.875rem;
+		}
+	}
+
+	.banner-preview {
+		height: 150px;
+		width: 100%;
+	}
+
+	.avatar-preview {
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+
+		.avatar-placeholder {
+			background: var(--primary);
+			color: var(--white);
+			font-size: 1.5rem;
+			font-weight: 500;
+		}
+	}
+
+	.form-group {
+		margin-bottom: 1.5rem;
+		display: flex;
+		flex-direction: column;
+
+		label {
+			font-size: 0.875rem;
+			font-weight: 400;
+			margin-bottom: 0.5rem;
+			color: rgba(255, 255, 255, 0.7);
+		}
+
+		input[type="text"] {
+			background: rgba(255, 255, 255, 0.05);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 4px;
+			padding: 0.75rem 1rem;
+			color: var(--white);
+			font-family: inherit;
+			transition: border-color 0.2s;
+
+			&:focus {
+				outline: none;
+				border-color: var(--primary);
+			}
+
+			&::placeholder {
+				color: rgba(255, 255, 255, 0.3);
+			}
+		}
+
+		input[type="file"] {
+			font-size: 0.875rem;
+			color: rgba(255, 255, 255, 0.7);
+
+			&::file-selector-button {
+				background: rgba(255, 255, 255, 0.1);
+				border: none;
+				border-radius: 4px;
+				color: var(--white);
+				padding: 0.5rem 1rem;
+				cursor: pointer;
+				margin-right: 1rem;
+				transition: background 0.2s;
+
+				&:hover {
+					background: rgba(255, 255, 255, 0.2);
+				}
+			}
+		}
+
+		.error {
+			font-size: 0.75rem;
+			color: #ff4d4f;
+			margin-top: 0.25rem;
+		}
+	}
+
+	.form-actions {
+		display: flex;
+		gap: 1rem;
+		margin-top: 3rem;
+		align-items: center;
+	}
+}
+
+:host-context(.list-view) {
+	padding: 2rem 0;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}

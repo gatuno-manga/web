@@ -1,0 +1,14 @@
+.all-settings-container {
+	color: var(--white);
+
+	h1 {
+		font-size: 2rem; // 32px
+		font-weight: 300; // Light
+		margin-bottom: 2rem;
+	}
+}
+
+.settings-list {
+	display: flex;
+	flex-direction: column;
+}

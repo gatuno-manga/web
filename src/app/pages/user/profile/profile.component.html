@@ -1,4 +1,69 @@
-<h1>Profile</h1>
-<div class="options">
-	<app-button (click)="logout()">Sair da sua conta</app-button>
-</div>
+@if (showPage()) {
+	<section [class.list-view]="isListView()">
+		@if (!isListView()) {
+			<h1>Perfil</h1>
+			<p class="subtitle">Gerencie suas informações pessoais e configurações de visualização do seu perfil.</p>
+		}
+
+		<div class="profile-editor">
+			<form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+				
+				<div class="form-section">
+					<h3>Banner</h3>
+					<div class="image-preview banner-preview">
+						@if (profileSignal()?.profileBannerUrl) {
+							<img [src]="profileSignal()?.profileBannerUrl" alt="Banner Preview">
+						} @else {
+							<div class="placeholder-box banner-placeholder">Sem Banner</div>
+						}
+					</div>
+					<div class="form-group">
+						<label for="banner">Alterar Banner</label>
+						<input type="file" id="banner" (change)="onBannerSelected($event)" accept="image/*">
+					</div>
+				</div>
+
+				<div class="form-section">
+					<h3>Avatar</h3>
+					<div class="image-preview avatar-preview">
+						@if (profileSignal()?.profileImageUrl) {
+							<img [src]="profileSignal()?.profileImageUrl" alt="Avatar Preview">
+						} @else {
+							<div class="placeholder-box avatar-placeholder">
+								{{ profileSignal()?.userName?.substring(0, 2)?.toUpperCase() }}
+							</div>
+						}
+					</div>
+					<div class="form-group">
+						<label for="avatar">Alterar Foto de Perfil</label>
+						<input type="file" id="avatar" (change)="onAvatarSelected($event)" accept="image/*">
+					</div>
+				</div>
+
+				<div class="form-section">
+					<h3>Informações Básicas</h3>
+					<div class="form-group">
+						<label for="userName">Nome de Usuário</label>
+						<input type="text" id="userName" formControlName="userName" placeholder="Ex: john_doe">
+						@if (profileForm.get('userName')?.invalid && profileForm.get('userName')?.touched) {
+							<span class="error">Nome de usuário deve ter entre 3 e 50 caracteres.</span>
+						}
+					</div>
+
+					<div class="form-group">
+						<label for="name">Nome Completo</label>
+						<input type="text" id="name" formControlName="name" placeholder="Ex: John Doe">
+					</div>
+				</div>
+
+				<div class="form-actions">
+					<app-button type="submit" [disabled]="profileForm.invalid || profileForm.pristine || isLoading">
+						{{ isLoading ? 'Salvando...' : 'Salvar Alterações' }}
+					</app-button>
+					
+					<app-button variant="outline" (click)="logout()">Sair</app-button>
+				</div>
+			</form>
+		</div>
+	</section>
+}

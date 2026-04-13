@@ -1,4 +1,4 @@
-<h1>Crie uma conta</h1>
+<h1>Crie Uma conta</h1>
 <form [formGroup]="form" (ngSubmit)="submit()">
 	<app-input
 		formControlName="email"
@@ -20,7 +20,7 @@
 	/>
 	<app-input
 		formControlName="confirmPassword"
-		placeholder="Confirme a sua senha"
+		placeholder="Confirmar senha"
 		id="confirmPassword"
 		type="password"
 		leftIcon="lock"
@@ -32,8 +32,8 @@
 		{{ form.errors?.['registrationFailed'] }}
 	</div>
 	}
-	<app-button type="submit">Criar conta</app-button>
+	<app-button type="submit" rounded="large">Criar Conta</app-button>
 	<div class="link">
-		<a [routerLink]="['../', 'login']">Já tem uma conta? Faça login</a>
+		Ja tem uma conta? <a [routerLink]="['../', 'login']">Entre</a>
 	</div>
 </form>

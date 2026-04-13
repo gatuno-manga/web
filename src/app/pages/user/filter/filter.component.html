@@ -1,20 +1,56 @@
-<div class="filters">
-	<div id="content-filter">
-		<div class="title-container">
-			<h2>Conteúdo sensível</h2>
-			@if (isLoading()) {
-				<div class="loader-inline">
-					<span class="dot"></span>
-					<span class="dot"></span>
-					<span class="dot"></span>
+<section [class.list-view]="isListView()">
+	@if (!isListView()) {
+		<h1>Filtros</h1>
+		<p class="subtitle">Filtre os resultados que voce gostaria que aparesseesm ou nao na sua listegem de livros</p>
+	}
+
+	@if (filteredTags().length > 0) {
+		<div class="filter-section">
+			<h2>Tags</h2>
+			@if (!isListView()) {
+				<div class="search-box">
+					<app-input type="text" placeholder="Pesquisa" leftIcon="lock" [showLabel]="false" />
 				</div>
 			}
+			<div class="grid">
+				@for (tag of filteredTags(); track tag.id) {
+					<div class="card">
+						<app-switch [value]="isTagSelected(tag.id)" (valueChange)="toggleTag(tag.id)">
+							{{ tag.name }}
+						</app-switch>
+					</div>
+				}
+			</div>
 		</div>
+	}
 
-		<app-list-switch
-			[items]="sensitiveContentList()"
-			[selectedItems]="allowContent()"
-			(toggleItem)="toggleContentAllow($event)"
-		/>
-	</div>
-</div>
+	@if (filteredBookTypes().length > 0) {
+		<div class="filter-section">
+			<h2>Tipos de livros</h2>
+			<div class="grid">
+				@for (type of filteredBookTypes(); track type.id) {
+					<div class="card">
+						<app-switch [value]="isBookTypeSelected(type.id)" (valueChange)="toggleBookType(type.id)">
+							{{ type.name }}
+						</app-switch>
+					</div>
+				}
+			</div>
+		</div>
+	}
+
+	@if (filteredSensitiveContent().length > 0) {
+		<div class="filter-section">
+			<h2>Conteudos sensiveis</h2>
+			<div class="grid">
+				@for (content of filteredSensitiveContent(); track content.id) {
+					<div class="card">
+						<app-switch [value]="allowContent().includes(content.name)" (valueChange)="toggleContentAllow(content)">
+							{{ content.name }}
+						</app-switch>
+					</div>
+				}
+			</div>
+		</div>
+	}
+</section>

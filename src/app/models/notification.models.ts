@@ -28,8 +28,8 @@ interface NotificationText extends NotificationBase {
 	link?: string;
 }
 
-export interface NotificationToast extends NotificationText {
-	id: number;
+export interface ToastNotification extends NotificationText {
+	id: string;
 	timeout: number;
 }
 

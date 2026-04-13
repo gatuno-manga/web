@@ -18,6 +18,7 @@ import {
 } from '../../models/book.models';
 import { BookService } from '../../service/book.service';
 import { IconsComponent } from '../../components/icons/icons.component';
+import { NgOptimizedImage } from '@angular/common';
 import { MetaDataService } from '../../service/meta-data.service';
 import { UserTokenService } from '../../service/user-token.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
@@ -48,6 +49,7 @@ import {
 		AsideComponent,
 		ButtonComponent,
 		MarkdownComponent,
+		NgOptimizedImage,
 	],
 	templateUrl: './book.component.html',
 	styleUrl: './book.component.scss',

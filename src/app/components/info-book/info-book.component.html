@@ -118,7 +118,7 @@
 										size="16"
 										class="content-type-icon"
 									/>
-									<h2>capítulo {{ chapter.index | number }}</h2>
+									<h2>capítulo {{ chapter.index | number: '1.0-0' : 'pt-BR' }}</h2>
 								</div>
 								@if (chapter.title) {
 									<h3>{{ chapter.title }}</h3>
@@ -161,7 +161,7 @@
 											>{{
 												chaptersDownloadProgress().get(
 													chapter.id
-												) | number: '1.0-0'
+												) | number: '1.0-0' : 'pt-BR'
 											}}%</span
 										>
 									} @else if (
@@ -393,8 +393,8 @@
 							</div>
 						}
 						<div class="metadata">
-							Cap. {{ savedPage.chapter.index }} - Pág.
-							{{ savedPage.page.index }}
+							Cap. {{ savedPage.chapter.index | number: '1.0-0' : 'pt-BR' }} - Pág.
+							{{ savedPage.page.index | number: '1.0-0' : 'pt-BR' }}
 							@if (savedPage.comment) {
 								<div class="comment">
 									"{{ savedPage.comment }}"

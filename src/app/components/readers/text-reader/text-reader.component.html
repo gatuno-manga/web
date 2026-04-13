@@ -1,10 +1,19 @@
-<div class="text-reader-container" #contentRef>
+<div
+	class="text-reader-container"
+	#contentRef
+	[style.font-size.px]="settings().fontSize"
+	[style.font-family]="settings().fontFamily"
+	[style.line-height]="settings().lineHeight"
+	[style.letter-spacing.px]="settings().letterSpacing"
+	[style.text-align]="settings().textAlign"
+	[class.night-mode]="settings().nightMode"
+>
 	@switch (format) {
 		@case ('markdown') {
 			<markdown [data]="content" class="markdown-content" />
 		}
 		@case ('html') {
-			<div class="html-content" [innerHTML]="content"></div>
+			<div class="html-content" [innerHTML]="safeContent()"></div>
 		}
 		@default {
 			<div class="plain-content">{{ content }}</div>

@@ -1,9 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subject, of, EMPTY } from 'rxjs';
 import { provideRouter } from '@angular/router';
-import { signal, WritableSignal } from '@angular/core';
+import { signal, WritableSignal, LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
 
 import { InfoBookComponent } from './info-book.component';
+
+registerLocaleData(localePt, 'pt-BR');
 import { BookService } from '../../service/book.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { ScrapingStatus } from '../../models/book.models';
@@ -110,6 +114,7 @@ describe('InfoBookComponent', () => {
 			imports: [InfoBookComponent],
 			providers: [
 				provideRouter([]),
+				{ provide: LOCALE_ID, useValue: 'pt-BR' },
 				{ provide: BookService, useValue: mockBookService },
 				{
 					provide: ModalNotificationService,
@@ -250,6 +255,47 @@ describe('InfoBookComponent', () => {
 			limit: 200,
 			order: 'DESC',
 		});
+	});
+
+	it('loadMoreChapters should request next page when cursor exists', () => {
+		const loadChaptersPageSpy = spyOn<any>(component, 'loadChaptersPage');
+		component.nextChaptersCursor.set('cursor-123');
+		component.hasMoreChapters.set(true);
+
+		component.loadMoreChapters();
+
+		expect(loadChaptersPageSpy).toHaveBeenCalledWith('cursor-123', true);
+	});
+
+	it('onWindowScroll should request more chapters when near bottom', () => {
+		spyOn(component, 'loadMoreChapters');
+		component.selectedTab.set(component.tab.chapters);
+		component.hasMoreChapters.set(true);
+		component.isLoadingMoreChapters.set(false);
+
+		const tabs =
+			component.containerElement.nativeElement.querySelectorAll(
+				'.container',
+			);
+		const activeTab = tabs[component.tab.chapters] as HTMLElement;
+		spyOn(activeTab, 'getBoundingClientRect').and.returnValue({
+			bottom: window.innerHeight + 500,
+		} as DOMRect);
+
+		component.onWindowScroll();
+
+		expect(component.loadMoreChapters).toHaveBeenCalled();
+	});
+
+	it('onWindowScroll should not request more chapters while loading', () => {
+		spyOn(component, 'loadMoreChapters');
+		component.selectedTab.set(component.tab.chapters);
+		component.hasMoreChapters.set(true);
+		component.isLoadingMoreChapters.set(true);
+
+		component.onWindowScroll();
+
+		expect(component.loadMoreChapters).not.toHaveBeenCalled();
 	});
 
 	it('onCoverContextMenu should show Copy and Download Image for non-admin', () => {

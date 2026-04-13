@@ -220,7 +220,7 @@ export class BookWebsocketService implements OnDestroy {
 				'Não é possível conectar ao WebSocket',
 			);
 			this.transitionTo(
-				WebSocketConnectionState.ERROR,
+				WebSocketConnectionState.DISCONNECTED,
 				'Token não encontrado',
 			);
 			return;

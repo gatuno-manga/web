@@ -19,8 +19,10 @@ import {
 	Injector,
 	ViewChild,
 	WritableSignal,
+	NgZone,
 } from '@angular/core';
 import { DatePipe, isPlatformBrowser } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
 	Chapter,
 	ChapterCommentNode,
@@ -70,6 +72,32 @@ type FlattenedComment = {
 	depth: number;
 };
 
+type ChapterLoadOrigin =
+	| 'route'
+	| 'retry-modal'
+	| 'refresh'
+	| 'context-menu'
+	| 'unknown';
+
+type ChapterLoadFailureReason =
+	| 'network'
+	| 'not-found'
+	| 'auth'
+	| 'offline-cache-failure'
+	| 'unknown';
+
+type ChapterLoadSource = 'online' | 'offline' | 'unknown';
+
+type ChapterLoadFailureDiagnostic = {
+	chapterId: string;
+	origin: ChapterLoadOrigin;
+	reason: ChapterLoadFailureReason;
+	source: ChapterLoadSource;
+	forceOnline: boolean;
+	silent: boolean;
+	statusCode?: number;
+};
+
 @Component({
 	selector: 'app-chapters',
 	standalone: true,
@@ -111,6 +139,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private injector = inject(Injector);
 	private headerStateService = inject(HeaderStateService);
 	private userService = inject(UserService);
+	private ngZone = inject(NgZone);
 
 	progressBarRef = viewChild<ElementRef>('progressBarRef');
 	@ViewChild(ImageReaderComponent) imageReader?: ImageReaderComponent;
@@ -144,6 +173,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private dismissedChapterLoadErrorModalId: string | null = null;
 	private suppressChapterLoadErrorOnClose = true;
 	private currentChapterRouteId: string | null = null;
+	private currentLoadRequestId = 0;
 
 	private pageObjectUrls: string[] = [];
 	private destroyRef = inject(DestroyRef);
@@ -200,8 +230,12 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 						this.currentChapterRouteId = chapterId;
 						this.dismissedChapterLoadErrorModalId = null;
 					}
-					this.loadChapter(chapterId);
-					if (bookId) {
+					this.loadChapter(chapterId, false, false, 'route');
+					if (
+						bookId &&
+						isPlatformBrowser(this.platformId) &&
+						this.userTokenService.hasValidAccessTokenSignal()
+					) {
 						this.setupWebSocket(chapterId, bookId);
 					}
 				} else {
@@ -260,30 +294,60 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	private setupWebSocket(chapterId: string, bookId: string) {
-		if (!this.bookWebsocketService.isConnected()) {
-			this.bookWebsocketService.connect();
+		if (
+			!isPlatformBrowser(this.platformId) ||
+			!this.userTokenService.hasValidAccessTokenSignal()
+		) {
+			return;
 		}
 
-		this.bookWebsocketService
-			.watchChapter(chapterId, bookId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe((event) => {
-				const typedEvent = event as { type: string; data: unknown };
-				if (
-					typedEvent.type === 'chapter.updated' ||
-					typedEvent.type === 'chapter.scraping.completed'
-				) {
-					this.refreshChapter();
-				}
-			});
+		this.ngZone.runOutsideAngular(() => {
+			if (!this.bookWebsocketService.isConnected()) {
+				this.bookWebsocketService.connect();
+			}
+
+			this.bookWebsocketService
+				.watchChapter(chapterId, bookId)
+				.pipe(takeUntilDestroyed(this.destroyRef))
+				.subscribe((event) => {
+					const typedEvent = event as { type: string; data: unknown };
+					if (
+						typedEvent.type === 'chapter.updated' ||
+						typedEvent.type === 'chapter.scraping.completed'
+					) {
+						this.ngZone.run(() => this.refreshChapter());
+					}
+				});
+		});
 	}
 
-	async loadChapter(id: string, forceOnline = false) {
+	async loadChapter(
+		id: string,
+		forceOnline = false,
+		silent = false,
+		origin: ChapterLoadOrigin = 'unknown',
+	) {
+		const requestId = ++this.currentLoadRequestId;
 		this.maxReadPageIndex = 0;
 		try {
 			const chapter = await this.resolveChapterData(id, forceOnline);
+			if (this.currentLoadRequestId !== requestId) return;
+
 			if (!chapter) {
-				this.showChapterLoadErrorModal(id);
+				const nullFailure = await this.classifyChapterLoadFailureOnNull(
+					id,
+					forceOnline,
+				);
+				if (this.currentLoadRequestId !== requestId) return;
+				this.reportChapterLoadFailure({
+					chapterId: id,
+					origin,
+					reason: nullFailure.reason,
+					source: nullFailure.source,
+					forceOnline,
+					silent,
+				});
+				if (!silent) this.showChapterLoadErrorModal(id);
 				return;
 			}
 
@@ -291,10 +355,27 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.dismissedChapterLoadErrorModalId = null;
 			this.updateMetadata(chapter);
 			this.loadComments(chapter.id);
-			await this.restoreReadingProgress();
+			try {
+				await this.restoreReadingProgress();
+			} catch (e) {
+				console.warn('Erro ao restaurar progresso:', e);
+			}
 		} catch (e) {
-			console.error('Erro ao carregar capítulo', e);
-			this.showChapterLoadErrorModal(id);
+			if (this.currentLoadRequestId !== requestId) return;
+			const failedRequest = this.classifyChapterLoadFailureFromError(e);
+			this.reportChapterLoadFailure(
+				{
+					chapterId: id,
+					origin,
+					reason: failedRequest.reason,
+					source: failedRequest.source,
+					forceOnline,
+					silent,
+					statusCode: failedRequest.statusCode,
+				},
+				e,
+			);
+			if (!silent) this.showChapterLoadErrorModal(id);
 		}
 	}
 
@@ -704,6 +785,110 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		return lastValueFrom(this.chapterService.getChapter(id));
 	}
 
+	private async classifyChapterLoadFailureOnNull(
+		chapterId: string,
+		forceOnline: boolean,
+	): Promise<{
+		reason: ChapterLoadFailureReason;
+		source: ChapterLoadSource;
+	}> {
+		if (!forceOnline) {
+			const isDownloaded =
+				await this.downloadService.isChapterDownloaded(chapterId);
+			if (isDownloaded) {
+				return {
+					reason: 'offline-cache-failure',
+					source: 'offline',
+				};
+			}
+		}
+
+		if (this.networkStatus.isOffline()) {
+			return {
+				reason: 'network',
+				source: 'online',
+			};
+		}
+
+		return {
+			reason: 'unknown',
+			source: forceOnline ? 'online' : 'unknown',
+		};
+	}
+
+	private classifyChapterLoadFailureFromError(error: unknown): {
+		reason: ChapterLoadFailureReason;
+		source: ChapterLoadSource;
+		statusCode?: number;
+	} {
+		if (error instanceof HttpErrorResponse) {
+			if (error.status === 404) {
+				return {
+					reason: 'not-found',
+					source: 'online',
+					statusCode: error.status,
+				};
+			}
+
+			if (error.status === 401 || error.status === 403) {
+				return {
+					reason: 'auth',
+					source: 'online',
+					statusCode: error.status,
+				};
+			}
+
+			if (error.status === 0) {
+				return {
+					reason: 'network',
+					source: 'online',
+					statusCode: error.status,
+				};
+			}
+
+			return {
+				reason: 'unknown',
+				source: 'online',
+				statusCode: error.status,
+			};
+		}
+
+		if (this.networkStatus.isOffline()) {
+			return {
+				reason: 'network',
+				source: 'unknown',
+			};
+		}
+
+		return {
+			reason: 'unknown',
+			source: 'unknown',
+		};
+	}
+
+	private reportChapterLoadFailure(
+		diagnostic: ChapterLoadFailureDiagnostic,
+		error?: unknown,
+	): void {
+		const summary = `[chapter=${diagnostic.chapterId}] reason=${diagnostic.reason} source=${diagnostic.source} origin=${diagnostic.origin} forceOnline=${diagnostic.forceOnline} silent=${diagnostic.silent}${
+			diagnostic.statusCode !== undefined
+				? ` status=${diagnostic.statusCode}`
+				: ''
+		}`;
+
+		if (error !== undefined) {
+			console.error(
+				'Erro ao carregar capítulo',
+				summary,
+				diagnostic,
+				error,
+			);
+			return;
+		}
+
+		console.error('Erro ao carregar capítulo', summary, diagnostic);
+	}
+
 	private showChapterLoadErrorModal(chapterId: string): void {
 		if (
 			this.activeChapterLoadErrorModalId === chapterId ||
@@ -726,7 +911,12 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 						this.activeChapterLoadErrorModalId = null;
 						this.suppressChapterLoadErrorOnClose = false;
 						this.dismissedChapterLoadErrorModalId = null;
-						void this.loadChapter(chapterId, true);
+						void this.loadChapter(
+							chapterId,
+							true,
+							false,
+							'retry-modal',
+						);
 					},
 				},
 				{
@@ -847,7 +1037,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	refreshChapter() {
 		const current = this.chapter();
-		if (current) this.loadChapter(current.id);
+		if (current) this.loadChapter(current.id, false, true, 'refresh');
 	}
 
 	scrollToTop() {
@@ -1057,6 +1247,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			componentData: {
 				title: 'Configurações do Leitor',
 				subtitle: 'Personalize sua experiência de leitura',
+				contentType: this.chapter()?.contentType || 'image',
 			},
 			useBackdrop: true,
 			backdropOpacity: 0.8,
@@ -1088,7 +1279,12 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 				icon: 'bookmark',
 				action: () => {
 					if (!page.id) {
-						this.loadChapter(currentChapter.id, true).then(() => {
+						this.loadChapter(
+							currentChapter.id,
+							true,
+							false,
+							'context-menu',
+						).then(() => {
 							const updatedChapter = this.chapter();
 							if (updatedChapter) {
 								const updatedPage = updatedChapter.pages.find(

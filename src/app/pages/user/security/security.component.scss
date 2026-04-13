@@ -1,84 +1,165 @@
 .security-page {
-	display: grid;
-	gap: 1rem;
+	color: var(--white);
+
+	h1 {
+		font-size: 1.5rem; // 24px
+		font-weight: 300; // Light
+		margin-bottom: 0.5rem;
+	}
+
+	.subtitle {
+		font-size: 0.75rem; // 12px
+		font-weight: 300; // Light
+		margin-bottom: 1.5rem;
+		max-width: 700px;
+	}
 }
 
-.card {
-	background: var(--surface-secondary, rgba(255, 255, 255, 0.04));
-	border: 1px solid var(--surface-border, rgba(255, 255, 255, 0.08));
+.main-card {
+	background-color: var(--secondary-color); // #20142a
+	padding: 12px 16px;
 	border-radius: 12px;
-	padding: 1rem;
-	display: grid;
-	gap: 0.75rem;
+	width: 100%;
+	max-width: 700px;
+	margin-bottom: 1.5rem;
+
+	.card-content {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		.text {
+			flex: 1;
+			margin-right: 1rem;
+
+			h2 {
+				font-size: 1.125rem; // 18px
+				font-weight: 300; // Light
+				margin-bottom: 0.25rem;
+			}
+
+			p {
+				font-size: 0.75rem; // 12px
+				font-weight: 300;
+				opacity: 0.8;
+			}
+		}
+	}
 }
 
-.list {
-	display: grid;
-	gap: 0.5rem;
-}
+.security-section {
+	margin-bottom: 1.5rem;
 
-.list-item {
-	display: flex;
-	gap: 0.75rem;
-	justify-content: space-between;
-	align-items: center;
-	border: 1px solid var(--surface-border, rgba(255, 255, 255, 0.08));
-	border-radius: 8px;
-	padding: 0.75rem;
-}
+	h2 {
+		font-size: 1.125rem; // 18px
+		font-weight: 300; // Light
+		margin-bottom: 1rem;
+	}
 
-.badge {
-	margin-left: 0.5rem;
-	font-size: 0.75rem;
-	padding: 0.1rem 0.4rem;
-	border-radius: 999px;
-	background: #1565c0;
-	color: #fff;
-}
-
-.badge.danger {
-	background: #c62828;
-}
-
-.card .description {
-	font-size: 0.85rem;
-	color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+	.section-actions {
+		margin-bottom: 1rem;
+	}
 }
 
 .inline-form {
 	display: flex;
 	gap: 0.5rem;
-	align-items: flex-end;
+	margin-bottom: 1rem;
+	width: 100%;
+	max-width: 700px;
+
+	app-input {
+		flex: 1;
+	}
+
+	app-button {
+		width: auto;
+		min-width: 140px;
+	}
 }
 
-.inline-form app-input {
-	flex: 1;
+.list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	width: 100%;
+	max-width: 700px;
+
+	.list-item {
+		background-color: var(--secondary-color);
+		padding: 1rem;
+		border-radius: 12px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		.item-header {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.item-info {
+			strong {
+				display: block;
+				font-size: 0.875rem;
+				margin-bottom: 0.1rem;
+			}
+			p {
+				font-size: 0.75rem;
+				opacity: 0.7;
+			}
+		}
+
+		.badge {
+			background-color: var(--primary-color);
+			color: var(--white);
+			padding: 1px 6px;
+			border-radius: 4px;
+			font-size: 0.625rem;
+			margin-left: 0.4rem;
+		}
+
+		app-button {
+			width: auto;
+			min-width: 100px;
+		}
+	}
 }
 
-.inline-form input {
-	border: 1px solid var(--surface-border, rgba(255, 255, 255, 0.2));
-	border-radius: 8px;
-	padding: 0.6rem 0.75rem;
-	background: transparent;
-	color: inherit;
+:host-context(.list-view) {
+	.main-card, .security-section {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		padding-bottom: 2rem;
+		margin-bottom: 2rem;
+		max-width: 100%;
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	.main-card, .list-item {
+		background: transparent;
+		padding: 1rem 0;
+		border-radius: 0;
+	}
+
+	.list-item {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		&:last-child {
+			border-bottom: none;
+		}
+	}
 }
 
-.backup-codes .codes {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-	gap: 0.4rem;
+.mfa-setup, .mfa-disable {
+	margin-top: 1.5rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.backup-codes code,
-.uri {
-	word-break: break-all;
-	white-space: normal;
-}
-
-.feedback {
-	color: #2e7d32;
-}
-
-.error {
-	color: #c62828;
-}
+.feedback { color: var(--primary-color); margin-bottom: 1rem; }
+.error { color: var(--danger); margin-bottom: 1rem; }
+code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; }
+.uri { display: block; overflow-wrap: break-word; font-size: 0.8rem; margin: 0.5rem 0; }

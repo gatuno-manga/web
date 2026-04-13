@@ -29,7 +29,7 @@ import {
 import { RouterModule } from '@angular/router';
 import { IconsComponent } from '../icons/icons.component';
 import { ModalNotificationService } from '../../service/modal-notification.service';
-import { Subscription, firstValueFrom } from 'rxjs';
+import { Subscription, firstValueFrom, fromEvent, throttleTime } from 'rxjs';
 import { DownloadService } from '../../service/download.service';
 import { ChapterService } from '../../service/chapter.service';
 import { DownloadStatus } from '../../models/offline.models';
@@ -83,7 +83,6 @@ interface ModulesLoad {
 	styleUrl: './info-book.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	host: {
-		'(window:scroll)': 'onWindowScroll()',
 		'(window:resize)': 'updateContainerHeight()',
 	},
 })
@@ -113,6 +112,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	private websocketSubscription?: Subscription;
 	private downloadSubscription?: Subscription;
+	private scrollSubscription?: Subscription;
 
 	modulesLoad: ModulesLoad[] = [
 		{
@@ -184,6 +184,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 		if (isPlatformBrowser(this.platformId)) {
 			this.setupResizeObserver();
+			this.setupScrollListener();
 		}
 
 		this.subscribeToWebSocketEvents();
@@ -222,6 +223,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 		if (this.downloadSubscription) {
 			this.downloadSubscription.unsubscribe();
+		}
+		if (this.scrollSubscription) {
+			this.scrollSubscription.unsubscribe();
 		}
 	}
 
@@ -319,6 +323,19 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		});
 	}
 
+	private setupScrollListener() {
+		this.scrollSubscription = fromEvent(window, 'scroll', {
+			capture: true,
+		})
+			.pipe(
+				throttleTime(100, undefined, {
+					leading: true,
+					trailing: true,
+				}),
+			)
+			.subscribe(() => this.onWindowScroll());
+	}
+
 	private observeActiveTab() {
 		if (!this.resizeObserver || !this.mutationObserver) return;
 
@@ -383,6 +400,14 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			setTimeout(() => this.updateContainerHeight(), 50);
 			setTimeout(() => this.updateContainerHeight(), 150);
 			setTimeout(() => this.updateContainerHeight(), 500);
+		});
+	}
+
+	private scheduleLoadMoreCheck() {
+		requestAnimationFrame(() => {
+			this.onWindowScroll();
+			setTimeout(() => this.onWindowScroll(), 50);
+			setTimeout(() => this.onWindowScroll(), 150);
 		});
 	}
 
@@ -507,8 +532,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					this.hasMoreChapters.set(chapters.hasNextPage);
 					this.sortChapters();
 					this.checkDownloadedChapters();
-					this.scheduleHeightUpdate();
 					this.isLoadingMoreChapters.set(false);
+					this.scheduleHeightUpdate();
+					this.scheduleLoadMoreCheck();
 				},
 				error: async (error) => {
 					this.isLoadingMoreChapters.set(false);

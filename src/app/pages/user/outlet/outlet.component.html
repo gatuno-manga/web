@@ -8,16 +8,50 @@
 }
 
 <aside>
-	<div id="header">
-		<div class="user-image">
-			<!-- <img src="assets/user.svg" alt="User" /> -->
-		</div>
-		<h1>Usuario</h1>
-	</div>
 	<nav>
-		<a routerLink="filter" routerLinkActive="active">Filtros</a>
-		<a routerLink="profile" routerLinkActive="active">Perfil</a>
-		<a routerLink="security" routerLinkActive="active">Segurança</a>
+		<a routerLink="all" routerLinkActive="active">
+			<app-icons name="grid" size="24" />
+			<span>Todos</span>
+		</a>
+
+		<hr />
+
+		<a routerLink="filter" routerLinkActive="active">
+			<app-icons name="filter" size="24" />
+			<span>Filtro</span>
+		</a>
+		<a routerLink="appearance" routerLinkActive="active">
+			<app-icons name="image" size="24" />
+			<span>Aparencia</span>
+		</a>
+		<a routerLink="readings" routerLinkActive="active">
+			<app-icons name="book" size="24" />
+			<span>Leituras</span>
+		</a>
+
+		<hr />
+
+		<a routerLink="profile" routerLinkActive="active">
+			<app-icons name="user" size="24" />
+			<span>Perfil</span>
+		</a>
+		<a routerLink="security" routerLinkActive="active">
+			<app-icons name="lock" size="24" />
+			<span>Seguranca</span>
+		</a>
 	</nav>
+
+	<div class="footer">
+		<app-button (click)="logout()" rounded="large">
+			<span>Sair</span>
+			<app-icons name="arrow-right" size="24" />
+		</app-button>
+	</div>
 </aside>
-<router-outlet />
+
+<main>
+	<div class="search-bar">
+		<app-input type="text" placeholder="Pesquisa" leftIcon="lock" [showLabel]="false" (input)="updateSearch($event)" />
+	</div>
+	<router-outlet />
+</main>
