@@ -1,0 +1,15 @@
+<div class="mfa-container" (paste)="onPaste($event)">
+	@for (digit of digits; track $index) {
+		<input
+			#inputBox
+			type="text"
+			maxlength="1"
+			inputmode="numeric"
+			pattern="[0-9]*"
+			[value]="digit"
+			(input)="onInput($index, $event)"
+			(keydown)="onKeyDown($index, $event)"
+			placeholder="_"
+		/>
+	}
+</div>

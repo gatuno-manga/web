@@ -11,7 +11,7 @@
 				[errors]="this.form.get('email')?.errors"
 				[touched]="this.form.get('email')?.touched ?? false"
 			/>
-			<app-button type="submit" rounded="large">Continuar</app-button>
+			<app-button type="submit" rounded="large" [disabled]="form.get('email')?.invalid || isLoading">Continuar</app-button>
 
 			<div class="link">
 				Não tem uma conta? <a [routerLink]="['../', 'register']">crie uma</a>
@@ -38,7 +38,7 @@
 			</div>
 			}
 
-			<app-button type="submit" rounded="large">Entrar</app-button>
+			<app-button type="submit" rounded="large" [disabled]="form.get('password')?.invalid || isLoading">Entrar</app-button>
 
 			<div class="divider">
 				<span>OU</span>
@@ -78,7 +78,7 @@
 			</div>
 			}
 
-			<app-button type="submit" rounded="large">Verificar</app-button>
+			<app-button type="submit" rounded="large" [disabled]="form.get('mfaCode')?.invalid || !form.get('mfaCode')?.value || isLoading">Verificar</app-button>
 		</form>
 	}
 }

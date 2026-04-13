@@ -114,13 +114,11 @@ export class LoginComponent {
 	}
 
 	submit() {
-		if (this.form.invalid || this.isLoading) return;
-		this.isLoading = true;
+		if (this.isLoading) return;
 
 		if (this.step === 'mfa') {
 			const code = this.form.get('mfaCode')?.value;
 			if (!this.mfaToken || !code) {
-				this.isLoading = false;
 				this.form.setErrors({
 					...(this.form.errors ?? {}),
 					mfaFailed: 'Código MFA é obrigatório',
@@ -128,6 +126,7 @@ export class LoginComponent {
 				return;
 			}
 
+			this.isLoading = true;
 			this.authService
 				.verifyMfaLogin(this.mfaToken, String(code))
 				.subscribe({
@@ -153,6 +152,12 @@ export class LoginComponent {
 			return;
 		}
 
+		if (this.form.invalid) {
+			this.form.markAllAsTouched();
+			return;
+		}
+
+		this.isLoading = true;
 		const payload = {
 			email: String(this.form.get('email')?.value ?? ''),
 			password: String(this.form.get('password')?.value ?? ''),

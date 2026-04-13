@@ -1,0 +1,29 @@
+.mfa-container {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+	align-items: center;
+
+	input {
+		width: 40px;
+		height: 56px;
+		background-color: var(--secondary-color); // #20142a
+		border: none;
+		border-radius: 6px;
+		color: var(--white);
+		font-family: 'Inknut Antiqua', serif;
+		font-size: 32px;
+		text-align: center;
+		outline: none;
+		transition: all 0.3s ease-in-out;
+
+		&::placeholder {
+			color: rgba(255, 255, 255, 0.5);
+		}
+
+		&:focus {
+			box-shadow: 0 0 1rem var(--secondary-color);
+			outline: 1px solid var(--primary-color);
+		}
+	}
+}
