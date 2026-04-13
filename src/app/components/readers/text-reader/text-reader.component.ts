@@ -91,7 +91,8 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if (changes.content || changes.format) {
+		// biome-ignore lint/complexity/useLiteralKeys: SimpleChanges has index signature and TS config requires bracket access (noPropertyAccessFromIndexSignature: true)
+		if (changes['content'] || changes['format']) {
 			this.updateSafeContent();
 			this.calculateWordCount();
 		}
