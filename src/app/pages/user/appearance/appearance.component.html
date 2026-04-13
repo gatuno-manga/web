@@ -1,0 +1,11 @@
+@if (showPage()) {
+	<section [class.list-view]="isListView()">
+		@if (!isListView()) {
+			<h1>Aparencia</h1>
+			<p class="subtitle">Mude como as coisas do seu aplicativo se parecem</p>
+		}
+		<div class="placeholder">
+			<p>Opções de aparência estarão disponíveis em breve.</p>
+		</div>
+	</section>
+}

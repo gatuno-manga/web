@@ -1,4 +1,11 @@
-<h1>Profile</h1>
-<div class="options">
-	<app-button (click)="logout()">Sair da sua conta</app-button>
-</div>
+@if (showPage()) {
+	<section [class.list-view]="isListView()">
+		@if (!isListView()) {
+			<h1>Perfil</h1>
+			<p class="subtitle">Gerencie suas informações pessoais e configurações de visualização do seu perfil.</p>
+		}
+		<div class="placeholder">
+			<p>Configurações de perfil estarão disponíveis em breve.</p>
+		</div>
+	</section>
+}

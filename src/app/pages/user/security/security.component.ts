@@ -4,6 +4,9 @@ import {
 	OnInit,
 	ChangeDetectorRef,
 	ChangeDetectionStrategy,
+	input,
+	inject,
+	computed,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { startRegistration } from '@simplewebauthn/browser';
@@ -17,17 +20,46 @@ import {
 } from '../../../models/account-security.models';
 import { ButtonComponent } from '../../../components/inputs/button/button.component';
 import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
+import { SwitchComponent } from '../../../components/inputs/switch/switch.component';
+import { IconsComponent } from '../../../components/icons/icons.component';
 import { AccountSecurityService } from '../../../service/account-security.service';
+import { SearchService } from '../../../service/search.service';
 
 @Component({
 	selector: 'app-security',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonComponent, TextInputComponent],
+	imports: [
+		CommonModule,
+		FormsModule,
+		ButtonComponent,
+		TextInputComponent,
+		SwitchComponent,
+		IconsComponent,
+	],
 	templateUrl: './security.component.html',
 	styleUrl: './security.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SecurityComponent implements OnInit {
+	private readonly searchService = inject(SearchService);
+	isListView = input<boolean>(false);
+	private globalSearchQuery = this.searchService.query;
+
+	showMfa = computed(() => {
+		const q = this.globalSearchQuery().toLowerCase();
+		return 'autenticação de dois fatores 2fa totp mfa'.includes(q);
+	});
+
+	showDevices = computed(() => {
+		const q = this.globalSearchQuery().toLowerCase();
+		return 'dispositivos conectados sessões'.includes(q);
+	});
+
+	showPasskeys = computed(() => {
+		const q = this.globalSearchQuery().toLowerCase();
+		return 'chaves de acessos passkeys'.includes(q);
+	});
+
 	sessions: ActiveSession[] = [];
 	auditItems: AuditLogItem[] = [];
 	passkeys: PasskeySummary[] = [];
@@ -41,6 +73,7 @@ export class SecurityComponent implements OnInit {
 	feedbackMessage = '';
 	errorMessage = '';
 	isLoading = false;
+	isDisablingMfa = false;
 
 	constructor(
 		private readonly securityService: AccountSecurityService,
@@ -152,6 +185,15 @@ export class SecurityComponent implements OnInit {
 		});
 	}
 
+	toggleMfa(): void {
+		if (this.mfaStatus?.totpEnabled) {
+			this.isDisablingMfa = !this.isDisablingMfa;
+		} else {
+			this.beginTotpSetup();
+		}
+		this.cdr.markForCheck();
+	}
+
 	beginTotpSetup(): void {
 		this.clearMessages();
 		this.securityService.beginTotpSetup().subscribe({
@@ -191,7 +233,7 @@ export class SecurityComponent implements OnInit {
 			});
 	}
 
-	disableTotp(): void {
+	confirmDisableTotp(): void {
 		if (!this.mfaDisableCode.trim()) {
 			this.setError('Informe um código para desativar o MFA.');
 			return;
@@ -202,6 +244,7 @@ export class SecurityComponent implements OnInit {
 			next: () => {
 				this.mfaDisableCode = '';
 				this.backupCodes = [];
+				this.isDisablingMfa = false;
 				this.setFeedback('MFA desativado com sucesso.');
 				this.loadMfaStatus();
 			},

@@ -1,5 +1,8 @@
-<section class="security-page">
-	<h1>Segurança da conta</h1>
+<section class="security-page" [class.list-view]="isListView()">
+	@if (!isListView()) {
+		<h1>Segurança</h1>
+		<p class="subtitle">Gerencie as configurações de segurança da sua conta para garantir sua proteção.</p>
+	}
 
 	@if(feedbackMessage){
 	<p class="feedback">{{ feedbackMessage }}</p>
@@ -8,184 +11,95 @@
 	<p class="error">{{ errorMessage }}</p>
 	}
 
-	<div class="card">
-		<h2>MFA / 2FA (TOTP)</h2>
-		<p>
-			Status:
-			<strong>{{ mfaStatus?.totpEnabled ? 'Ativado' : 'Desativado' }}</strong>
-		</p>
-		<p>
-			Códigos backup restantes:
-			<strong>{{ mfaStatus?.backupCodesRemaining ?? 0 }}</strong>
-		</p>
+	@if (showMfa()) {
+		<div class="main-card">
+			<div class="card-content">
+				<div class="text">
+					<h2>Autenticação de Dois fatores(2FA)</h2>
+					<p>A autenticação de dois fatores adiciona uma camada extra de segurança ao exigir um código do seu app autenticador ao entrar.</p>
+				</div>
+				<app-switch [value]="mfaStatus?.totpEnabled ?? false" (valueChange)="toggleMfa()"></app-switch>
+			</div>
 
-		@if(!mfaStatus?.totpEnabled){
-		<app-button type="button" (click)="beginTotpSetup()">
-			Ativar MFA com app autenticador
-		</app-button>
+			@if(mfaSetup && !mfaStatus?.totpEnabled){
+			<div class="mfa-setup">
+				<p><strong>Secret:</strong> <code>{{ mfaSetup.secret }}</code></p>
+				<p><strong>URI:</strong> <code class="uri">{{ mfaSetup.otpauthUri }}</code></p>
+				<div class="inline-form">
+					<app-input type="text" [(ngModel)]="mfaSetupCode" placeholder="Código MFA para confirmar" [showLabel]="false"></app-input>
+					<app-button type="button" (click)="confirmTotpSetup()" rounded="large">Confirmar ativação</app-button>
+				</div>
+			</div>
+			}
 
-		@if(mfaSetup){
-		<div class="inline-form">
-			<p><strong>Secret:</strong> <code>{{ mfaSetup.secret }}</code></p>
-			<p>
-				<strong>URI:</strong>
-				<code class="uri">{{ mfaSetup.otpauthUri }}</code>
-			</p>
-			<app-input
-				type="text"
-				[(ngModel)]="mfaSetupCode"
-				placeholder="Código MFA para confirmar"
-				[showLabel]="false"
-			></app-input>
-			<app-button type="button" (click)="confirmTotpSetup()">
-				Confirmar ativação
-			</app-button>
+			@if(isDisablingMfa){
+			<div class="mfa-disable">
+				<div class="inline-form">
+					<app-input type="text" [(ngModel)]="mfaDisableCode" placeholder="Código MFA ou backup para desativar" [showLabel]="false"></app-input>
+					<app-button type="button" variant="outline" (click)="confirmDisableTotp()" rounded="large">Confirmar desativação</app-button>
+				</div>
+			</div>
+			}
+
+			@if(backupCodes.length > 0){
+			<div class="backup-codes">
+				<h3>Guarde seus códigos de backup</h3>
+				<div class="codes">
+					@for(code of backupCodes; track code){
+					<code>{{ code }}</code>
+					}
+				</div>
+			</div>
+			}
 		</div>
-		}
-		}
+	}
 
-		@if(mfaStatus?.totpEnabled){
-		<div class="inline-form">
-			<app-input
-				type="text"
-				[(ngModel)]="mfaDisableCode"
-				placeholder="Código MFA ou backup para desativar"
-				[showLabel]="false"
-			></app-input>
-			<app-button type="button" variant="outline" (click)="disableTotp()">
-				Desativar MFA
-			</app-button>
-		</div>
-		}
+	@if (showDevices()) {
+		<div class="security-section">
+			<h2>Dispositivos conectados</h2>
+			<div class="section-actions">
+				<app-button type="button" variant="outline" (click)="revokeOtherSessions()" rounded="large">Encerrar outras sessões</app-button>
+			</div>
 
-		@if(backupCodes.length > 0){
-		<div class="backup-codes">
-			<h3>Guarde seus códigos de backup</h3>
-			<p>Estes códigos são exibidos apenas uma vez.</p>
-			<div class="codes">
-				@for(code of backupCodes; track code){
-				<code>{{ code }}</code>
+			<div class="list">
+				@for(session of sessions; track session.id){
+				<div class="list-item">
+					<div class="item-header">
+						<app-icons name="smartphone" size="24" />
+						<div class="item-info">
+							<strong>{{ session.deviceLabel || session.clientPlatform || 'Dispositivo' }}</strong>
+							@if(session.isCurrent){ <span class="badge">Sessão atual</span> }
+							<p>IP: {{ session.ipAddress }} · {{ session.authMethod }}</p>
+						</div>
+					</div>
+					@if(!session.isCurrent){
+					<app-button type="button" variant="outline" (click)="revokeSession(session.id)" rounded="large">Encerrar</app-button>
+					}
+				</div>
 				}
 			</div>
 		</div>
-		}
-	</div>
+	}
 
-	<div class="card">
-		<h2>Passkeys</h2>
-		<p class="description">Escolha um nome para identificar esta chave antes de registrar.</p>
-		<div class="inline-form">
-			<app-input
-				id="passkeyName"
-				type="text"
-				[(ngModel)]="passkeyName"
-				placeholder="Ex: Meu iPhone, Bitwarden, etc."
-				[showLabel]="true"
-			></app-input>
-			<app-button
-				id="registerPasskeyBtn"
-				type="button"
-				[disabled]="isLoading"
-				(click)="registerPasskey()"
-			>
-				Registrar nova passkey
-			</app-button>
-		</div>
-
-		@if(passkeys.length === 0){
-		<p>Nenhuma passkey registrada.</p>
-		}
-
-		@if(passkeys.length > 0){
-		<div class="list">
-			@for(passkey of passkeys; track passkey.id){
-			<div class="list-item">
-				<div>
-					<strong>{{ passkey.name || 'Passkey sem nome' }}</strong>
-					<p>
-						Criada em: {{ passkey.createdAt | date: 'short' }} · Último uso:
-						{{ passkey.lastUsedAt ? (passkey.lastUsedAt | date: 'short') : 'nunca' }}
-					</p>
-				</div>
-				<app-button
-					type="button"
-					variant="outline"
-					(click)="removePasskey(passkey.id)"
-				>
-					Remover
-				</app-button>
+	@if (showPasskeys()) {
+		<div class="security-section">
+			<h2>Chaves de Acessos</h2>
+			<div class="inline-form">
+				<app-input id="passkeyName" type="text" [(ngModel)]="passkeyName" placeholder="Ex: Meu iPhone, Bitwarden, etc." [showLabel]="false"></app-input>
+				<app-button type="button" [disabled]="isLoading" (click)="registerPasskey()" rounded="large">Registrar nova passkey</app-button>
 			</div>
-			}
-		</div>
-		}
-	</div>
 
-	<div class="card">
-		<h2>Dispositivos conectados</h2>
-		<app-button type="button" variant="outline" (click)="revokeOtherSessions()">
-			Encerrar outras sessões
-		</app-button>
-
-		@if(sessions.length === 0){
-		<p>Nenhuma sessão ativa encontrada.</p>
-		}
-
-		@if(sessions.length > 0){
-		<div class="list">
-			@for(session of sessions; track session.id){
-			<div class="list-item">
-				<div>
-					<strong>
-						{{ session.deviceLabel || session.clientPlatform || 'Dispositivo' }}
-					</strong>
-					@if(session.isCurrent){
-					<span class="badge">Sessão atual</span>
-					}
-					<p>
-						IP: {{ session.ipAddress || 'n/a' }} · Método:
-						{{ session.authMethod }} · MFA:
-						{{ session.mfaVerified ? 'sim' : 'não' }}
-					</p>
-					<p>Última atividade: {{ session.lastSeenAt | date: 'short' }}</p>
+			<div class="list">
+				@for(passkey of passkeys; track passkey.id){
+				<div class="list-item">
+					<div class="item-info">
+						<strong>{{ passkey.name || 'Passkey sem nome' }}</strong>
+						<p>Criada em: {{ passkey.createdAt | date: 'short' }}</p>
+					</div>
+					<app-button type="button" variant="outline" (click)="removePasskey(passkey.id)" rounded="large">Remover</app-button>
 				</div>
-				@if(!session.isCurrent){
-				<app-button
-					type="button"
-					variant="outline"
-					(click)="revokeSession(session.id)"
-				>
-					Encerrar
-				</app-button>
 				}
 			</div>
-			}
 		</div>
-		}
-	</div>
-
-	<div class="card">
-		<h2>Histórico de acessos</h2>
-		@if(auditItems.length === 0){
-		<p>Nenhum evento registrado.</p>
-		}
-		@if(auditItems.length > 0){
-		<div class="list">
-			@for(item of auditItems; track item.id){
-			<div class="list-item">
-				<div>
-					<strong>{{ item.event }}</strong>
-					@if(!item.success){
-					<span class="badge danger">falha</span>
-					}
-					<p>
-						{{ item.createdAt | date: 'short' }} ·
-						{{ item.ipAddress || 'IP n/a' }} ·
-						{{ item.clientPlatform || 'plataforma n/a' }}
-					</p>
-				</div>
-			</div>
-			}
-		</div>
-		}
-	</div>
+	}
 </section>
