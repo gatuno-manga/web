@@ -6,7 +6,13 @@
 		[attr.data-index]="$index"
 		(contextmenu)="onContextMenu($event, page, $index)"
 	>
-		<img [src]="page.path" loading="lazy" alt="Page {{ $index + 1 }}" />
+		<img
+			[src]="page.path"
+			[alt]="'Página ' + ($index + 1)"
+			[attr.fetchpriority]="$index < 2 ? 'high' : 'auto'"
+			[attr.loading]="$index < 2 ? 'eager' : 'lazy'"
+			(error)="onImageError()"
+		/>
 		@if (showPageNumbers) {
 			<div class="page-number">{{ $index + 1 }}</div>
 		}

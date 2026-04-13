@@ -68,8 +68,39 @@ $width-mobile: 150px;
 	}
 }
 
+.cover-image-container {
+	position: relative;
+	width: $width;
+	height: 355px;
+	overflow: hidden;
+	border-radius: 12px;
+
+	@media (max-width: 768px) {
+		width: $width-mobile;
+		height: 220px;
+	}
+
+	img {
+		object-fit: cover;
+	}
+}
+
+.book-card.list {
+	.cover-image-container {
+		width: 120px;
+		height: 180px;
+		border-radius: 0;
+
+		@media (max-width: 768px) {
+			width: 100px;
+			height: 150px;
+		}
+	}
+}
+
 .book-card {
 	display: flex;
+	position: relative;
 	background-color: var(--primary-color);
 	border: 4px solid var(--primary-color);
 	border-radius: 5px;
@@ -84,18 +115,6 @@ $width-mobile: 150px;
 
 	@media (max-width: 768px) {
 		width: $width-mobile;
-	}
-
-	img {
-		width: $width;
-		height: 355px;
-		object-fit: cover;
-		border-radius: 15px;
-
-		@media (max-width: 768px) {
-			width: $width-mobile;
-			height: 220px;
-		}
 	}
 
 	.cover-placeholder {
@@ -145,13 +164,6 @@ $width-mobile: 150px;
 	overflow: hidden;
 	height: 180px;
 	width: 100%;
-
-	img {
-		height: 100%;
-		object-fit: cover;
-		flex-shrink: 0;
-		display: block;
-	}
 
 	.cover-placeholder {
 		width: 60px;

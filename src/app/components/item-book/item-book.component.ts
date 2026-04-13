@@ -3,6 +3,7 @@ import { Component, Input, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BookList } from '../../models/book.models';
 import { IconsComponent } from '../icons/icons.component';
+import { NgOptimizedImage } from '@angular/common';
 import { ContextMenuService } from '../../service/context-menu.service';
 import { DownloadService } from '../../service/download.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
@@ -15,13 +16,14 @@ import { ChapterService } from '../../service/chapter.service';
 @Component({
 	selector: 'app-item-book',
 	standalone: true,
-	imports: [RouterModule, IconsComponent],
+	imports: [RouterModule, IconsComponent, NgOptimizedImage],
 	templateUrl: './item-book.component.html',
 	styleUrl: './item-book.component.scss',
 })
 export class ItemBookComponent {
 	@Input() book!: BookList;
 	@Input() type: 'grid' | 'list' | 'cover' = 'grid';
+	@Input() priority = false;
 
 	private contextMenuService = inject(ContextMenuService);
 	private downloadService = inject(DownloadService);

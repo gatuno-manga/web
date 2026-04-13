@@ -38,7 +38,6 @@ export interface ContextMenuEvent {
 	selector: 'app-image-reader',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [],
 	templateUrl: './image-reader.component.html',
 	styleUrl: './image-reader.component.scss',
 })
@@ -62,6 +61,12 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	settings = toSignal(this.settingsService.settings$, {
 		initialValue: this.settingsService.getSettings(),
 	});
+
+	imageError = false;
+
+	onImageError() {
+		this.imageError = true;
+	}
 
 	ngOnInit() {
 		if (isPlatformBrowser(this.platformId)) {
