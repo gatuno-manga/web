@@ -1,111 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
-
-import { FormsModule } from '@angular/forms';
-import { SettingsService } from '@service/settings.service';
-import { ReaderSettings } from '@models/settings.models';
-import { IconsComponent } from '@components/icons/icons.component';
-import { SelectComponent } from '@components/inputs/select/select.component';
-import { ButtonComponent } from '@components/inputs/button/button.component';
-import { SwitchComponent } from '@components/inputs/switch/switch.component';
+import { CommonModule } from '@angular/common';
+import { ReaderSettingsFormComponent } from '../../../readers';
 
 @Component({
-    selector: 'app-reader-settings-notification',
-    standalone: true,
-    imports: [FormsModule, IconsComponent, SelectComponent, ButtonComponent, SwitchComponent],
-    templateUrl: './reader-settings-notification.component.html',
-    styleUrls: ['./reader-settings-notification.component.scss']
+	selector: 'app-reader-settings-notification',
+	standalone: true,
+	imports: [CommonModule, ReaderSettingsFormComponent],
+	templateUrl: './reader-settings-notification.component.html',
+	styleUrls: ['./reader-settings-notification.component.scss'],
 })
-export class ReaderSettingsNotificationComponent implements OnInit {
-    @Input() title: string = 'Configurações do Leitor';
-    @Input() subtitle: string = 'Personalize sua experiência de leitura';
-    @Input() showResetButton: boolean = true;
-
-    settings: ReaderSettings = {
-        grayScale: false,
-        asidePosition: 'right',
-        progressBarPosition: 'top',
-        showPageNumbers: false,
-        brightness: 100,
-        contrast: 100,
-        invert: 0,
-        nightMode: false
-    };
-
-    viewFilter: 'all' | 'pages' | 'filters' | 'sidebar' = 'all';
-
-    get showSidebar() {
-        return this.viewFilter === 'all' || this.viewFilter === 'sidebar';
-    }
-
-    get showPages() {
-        return this.viewFilter === 'all' || this.viewFilter === 'pages';
-    }
-
-    get showFilters() {
-        return this.viewFilter === 'all' || this.viewFilter === 'filters';
-    }
-
-    setView(filter: 'all' | 'pages' | 'filters' | 'sidebar') {
-        this.viewFilter = filter;
-    }
-
-    constructor(private settingsService: SettingsService) {}
-
-    ngOnInit(): void {
-        this.settings = { ...this.settingsService.getSettings() };
-    }
-
-    onGrayScaleChange(): void {
-        this.settings.grayScale = !this.settings.grayScale;
-        this.settingsService.updateSettings({ grayScale: this.settings.grayScale });
-    }
-
-    onAsidePositionChange(eventOrValue: Event | string): void {
-        const value = (typeof eventOrValue === 'string') ? eventOrValue : (eventOrValue?.target as HTMLSelectElement)?.value;
-        this.settings.asidePosition = value as 'left' | 'right';
-        this.settingsService.updateSettings({ asidePosition: this.settings.asidePosition });
-    }
-
-    onShowPageNumbersChange(): void {
-        this.settings.showPageNumbers = !this.settings.showPageNumbers;
-        this.settingsService.updateSettings({ showPageNumbers: this.settings.showPageNumbers });
-    }
-
-    onProgressBarPositionChange(value: string): void {
-        this.settings.progressBarPosition = value as 'top' | 'bottom';
-        this.settingsService.updateSettings({ progressBarPosition: this.settings.progressBarPosition });
-    }
-
-    onBrightnessToggle(eventOrValue: Event | boolean): void {
-        const active = typeof eventOrValue === 'boolean' ? eventOrValue : (eventOrValue?.target as HTMLInputElement)?.checked;
-        this.settingsService.updateSettings({ brightness: active ? 150 : 100 });
-        this.settings.brightness = active ? 150 : 100;
-    }
-
-    onContrastToggle(eventOrValue: Event | boolean): void {
-        const active = typeof eventOrValue === 'boolean' ? eventOrValue : (eventOrValue?.target as HTMLInputElement)?.checked;
-        this.settingsService.updateSettings({ contrast: active ? 150 : 100 });
-        this.settings.contrast = active ? 150 : 100;
-    }
-
-    onInvertToggle(eventOrValue: Event | boolean): void {
-        const active = typeof eventOrValue === 'boolean' ? eventOrValue : (eventOrValue?.target as HTMLInputElement)?.checked;
-        this.settingsService.updateSettings({ invert: active ? 100 : 0 });
-        this.settings.invert = active ? 100 : 0;
-    }
-
-    onNightModeToggle(eventOrValue: Event | boolean): void {
-        const active = typeof eventOrValue === 'boolean' ? eventOrValue : (eventOrValue?.target as HTMLInputElement)?.checked;
-        if (active) {
-            this.settingsService.updateSettings({ nightMode: true, invert: 100, brightness: 80, contrast: 120 });
-        } else {
-            this.settingsService.updateSettings({ nightMode: false, invert: 0, brightness: 100, contrast: 100 });
-        }
-        this.settings = { ...this.settingsService.getSettings() };
-    }
-
-    resetSettings(): void {
-        this.settingsService.resetSettings();
-        this.settings = { ...this.settingsService.getSettings() };
-    }
+export class ReaderSettingsNotificationComponent {
+	@Input() title = 'Configurações do Leitor';
+	@Input() subtitle = 'Personalize sua experiência de leitura';
+	@Input() showResetButton = true;
+	@Input() contentType: 'image' | 'text' | 'document' | 'all' = 'image';
 }

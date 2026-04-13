@@ -1,3 +1,4 @@
+import { Injectable } from '@angular/core';
 import {
 	NotificationConfig,
 	NotificationComponentData,
@@ -5,11 +6,11 @@ import {
 	NotificationResult,
 	NotificationVisualType,
 	NotificationLevel,
-	OverlayNotificationData,
+	OverlayNotification,
 	NOTIFICATION_CONSTANTS,
 } from './notification-strategy.interface';
 import {
-	NotificationToast,
+	ToastNotification,
 	ModalNotification,
 	ModalButton,
 } from '../../models/notification.models';
@@ -23,9 +24,10 @@ import {
  *
  * Não contém side-effects — a emissão de estado é responsabilidade do NotificationService.
  */
+@Injectable({
+	providedIn: 'root',
+})
 export class NotificationFactory {
-	private static idCounter = 0;
-
 	/**
 	 * Cria o objeto de notificação apropriado baseado na configuração.
 	 * Retorna um discriminated union `NotificationResult` com `kind` + `data`.
@@ -87,8 +89,8 @@ export class NotificationFactory {
 	private buildToast<T extends NotificationComponentData>(
 		config: NotificationConfig<T>,
 	): NotificationResult {
-		const toast: NotificationToast = {
-			id: ++NotificationFactory.idCounter,
+		const toast: ToastNotification = {
+			id: crypto.randomUUID(),
 			message: config.message,
 			type: this.mapLevelToVisualType(config.level),
 			timeout:
@@ -122,8 +124,8 @@ export class NotificationFactory {
 	private buildOverlay<T extends NotificationComponentData>(
 		config: NotificationConfig<T>,
 	): NotificationResult {
-		const overlay: OverlayNotificationData = {
-			id: `overlay-${++NotificationFactory.idCounter}`,
+		const overlay: OverlayNotification = {
+			id: `overlay-${crypto.randomUUID()}`,
 			message: config.message,
 			type: this.mapLevelToVisualType(config.level),
 			title: config.title,
@@ -149,10 +151,12 @@ export class NotificationFactory {
 		const isWarning = config.level === 'warning';
 		const notDismissible = config.dismissible === false;
 
+		// Erros com título ou avisos não canceláveis são Alta
 		if ((isError && config.title) || (isWarning && notDismissible)) {
 			return NotificationSeverity.HIGH;
 		}
 
+		// Erros ou Avisos padrão são Média
 		if (isError || isWarning) {
 			return NotificationSeverity.MEDIUM;
 		}

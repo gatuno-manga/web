@@ -1,6 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject, WritableSignal } from '@angular/core';
 import {
-	NotificationToast,
+	ToastNotification,
 	ModalNotification,
 } from '../models/notification.models';
 import { NotificationFactory } from './notification/notification.factory';
@@ -9,8 +9,7 @@ import {
 	NotificationLevel,
 	NotificationSeverity,
 	NotificationComponentData,
-	OverlayNotificationData,
-	NOTIFICATION_CONSTANTS,
+	OverlayNotification,
 } from './notification/notification-strategy.interface';
 
 /**
@@ -32,9 +31,9 @@ export interface NotificationHandle {
 })
 export class NotificationService {
 	// ─── State (Signals) ─────────────────────────────
-	private _toasts = signal<NotificationToast[]>([]);
+	private _toasts = signal<ToastNotification[]>([]);
 	private _modal = signal<ModalNotification | null>(null);
-	private _overlays = signal<OverlayNotificationData[]>([]);
+	private _overlays = signal<OverlayNotification[]>([]);
 
 	// Signals públicos (Read-only)
 	public readonly toasts = this._toasts.asReadonly();
@@ -42,11 +41,10 @@ export class NotificationService {
 	public readonly overlays = this._overlays.asReadonly();
 
 	// Timer IDs para cancelar auto-dismiss pendentes
-	private toastTimers = new Map<number, ReturnType<typeof setTimeout>>();
-	private overlayTimers = new Map<string, ReturnType<typeof setTimeout>>();
+	private timers = new Map<string, ReturnType<typeof setTimeout>>();
 
-	// Factory puro (sem side-effects)
-	private factory = new NotificationFactory();
+	// Factory injetado
+	private factory = inject(NotificationFactory);
 
 	// ─── API principal ───────────────────────────────
 
@@ -71,13 +69,8 @@ export class NotificationService {
 
 	// ─── Dismiss ─────────────────────────────────────
 
-	dismissToast(id: number): void {
-		const timer = this.toastTimers.get(id);
-		if (timer) {
-			clearTimeout(timer);
-			this.toastTimers.delete(id);
-		}
-		this._toasts.update((current) => current.filter((t) => t.id !== id));
+	dismissToast(id: string): void {
+		this.dismissItem(this._toasts, id);
 	}
 
 	dismissModal(): void {
@@ -85,12 +78,7 @@ export class NotificationService {
 	}
 
 	dismissOverlay(id: string): void {
-		const timer = this.overlayTimers.get(id);
-		if (timer) {
-			clearTimeout(timer);
-			this.overlayTimers.delete(id);
-		}
-		this._overlays.update((current) => current.filter((o) => o.id !== id));
+		this.dismissItem(this._overlays, id);
 	}
 
 	// ─── Métodos de conveniência ─────────────────────
@@ -144,7 +132,7 @@ export class NotificationService {
 		duration?: number,
 	): NotificationHandle {
 		const result = this.factory.createToast({ message, level, duration });
-		return this.pushToast(result.data as NotificationToast);
+		return this.pushToast(result.data as ToastNotification);
 	}
 
 	showModal(
@@ -168,7 +156,7 @@ export class NotificationService {
 			title,
 			dismissible,
 		});
-		return this.pushOverlay(result.data as OverlayNotificationData);
+		return this.pushOverlay(result.data as OverlayNotification);
 	}
 
 	/**
@@ -180,18 +168,8 @@ export class NotificationService {
 
 	// ─── Internos ────────────────────────────────────
 
-	private pushToast(toast: NotificationToast): NotificationHandle {
-		this._toasts.update((current) => [...current, toast]);
-
-		if (toast.timeout > 0) {
-			const timer = setTimeout(
-				() => this.dismissToast(toast.id),
-				toast.timeout,
-			);
-			this.toastTimers.set(toast.id, timer);
-		}
-
-		return { dismiss: () => this.dismissToast(toast.id) };
+	private pushToast(toast: ToastNotification): NotificationHandle {
+		return this.pushItem(this._toasts, toast, toast.timeout);
 	}
 
 	private pushModal(modal: ModalNotification): NotificationHandle {
@@ -210,19 +188,39 @@ export class NotificationService {
 	}
 
 	private pushOverlay(
-		overlay: OverlayNotificationData,
+		overlay: OverlayNotification,
 		duration?: number,
 	): NotificationHandle {
-		this._overlays.update((current) => [...current, overlay]);
+		return this.pushItem(this._overlays, overlay, duration);
+	}
+
+	private pushItem<T extends { id: string }>(
+		signal: WritableSignal<T[]>,
+		item: T,
+		duration?: number,
+	): NotificationHandle {
+		signal.update((current) => [...current, item]);
 
 		if (duration && duration > 0) {
 			const timer = setTimeout(
-				() => this.dismissOverlay(overlay.id),
+				() => this.dismissItem(signal, item.id),
 				duration,
 			);
-			this.overlayTimers.set(overlay.id, timer);
+			this.timers.set(item.id, timer);
 		}
 
-		return { dismiss: () => this.dismissOverlay(overlay.id) };
+		return { dismiss: () => this.dismissItem(signal, item.id) };
+	}
+
+	private dismissItem<T extends { id: string }>(
+		signal: WritableSignal<T[]>,
+		id: string,
+	): void {
+		const timer = this.timers.get(id);
+		if (timer) {
+			clearTimeout(timer);
+			this.timers.delete(id);
+		}
+		signal.update((current) => current.filter((t) => t.id !== id));
 	}
 }

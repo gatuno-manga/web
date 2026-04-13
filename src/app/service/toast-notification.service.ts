@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
-	NotificationToast,
+	ToastNotification,
 	NotificationType,
 } from '../models/notification.models';
 import { NotificationService } from './notification.service';
@@ -25,7 +25,7 @@ export class ToastNotificationService {
 		});
 	}
 
-	public dismiss(id: number) {
+	public dismiss(id: string) {
 		this.notificationService.dismissToast(id);
 	}
 }

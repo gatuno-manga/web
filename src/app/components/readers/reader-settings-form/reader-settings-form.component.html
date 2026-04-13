@@ -1,0 +1,371 @@
+<div class="reader-settings-form">
+	<div class="settings-body">
+		<!-- Seletor de Abas Modular -->
+		<div
+			class="view-selector"
+			role="tablist"
+			aria-label="Selecionar grupo de configurações"
+		>
+			<app-button
+				[variant]="viewFilter === 'all' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'all'"
+				class="selector-btn"
+				(click)="setView('all')"
+			>
+				Geral
+			</app-button>
+
+			@if (contentType === 'text' || contentType === 'all') {
+			<app-button
+				[variant]="viewFilter === 'text' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'text'"
+				class="selector-btn"
+				(click)="setView('text')"
+			>
+				Texto
+			</app-button>
+			} @if (contentType === 'image' || contentType === 'document' ||
+			contentType === 'all') {
+			<app-button
+				[variant]="viewFilter === 'pages' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'pages'"
+				class="selector-btn"
+				(click)="setView('pages')"
+			>
+				Páginas
+			</app-button>
+			} @if (contentType === 'image' || contentType === 'all') {
+			<app-button
+				[variant]="viewFilter === 'filters' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'filters'"
+				class="selector-btn"
+				(click)="setView('filters')"
+			>
+				Filtros
+			</app-button>
+			}
+
+			<app-button
+				[variant]="viewFilter === 'sidebar' ? 'primary' : 'outline'"
+				role="tab"
+				[attr.aria-selected]="viewFilter === 'sidebar'"
+				class="selector-btn"
+				(click)="setView('sidebar')"
+			>
+				Interface
+			</app-button>
+		</div>
+
+		<!-- Grupo: Barra Lateral / Interface -->
+		@if(showSidebar) {
+		<section class="settings-group">
+			<h3 class="group-title">Interface</h3>
+			<p class="group-desc">Ajustes da barra lateral e navegação</p>
+
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="panel-right" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Posição da Barra Lateral</h3>
+						<p>Lado onde a barra de navegação aparece</p>
+					</div>
+				</div>
+				<app-select
+					[(ngModel)]="settings.asidePosition"
+					(valueChange)="onAsidePositionChange($event)"
+					[options]="[
+						{ value: 'left', label: 'Esquerda' },
+						{ value: 'right', label: 'Direita' }
+					]"
+					placeholder="Escolha uma posição"
+				/>
+			</div>
+
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="minus" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Barra de Progresso</h3>
+						<p>Posição da barra de leitura (topo ou inferior)</p>
+					</div>
+				</div>
+				<app-select
+					[(ngModel)]="settings.progressBarPosition"
+					(valueChange)="onProgressBarPositionChange($event)"
+					[options]="[
+						{ value: 'top', label: 'Topo' },
+						{ value: 'bottom', label: 'Inferior' }
+					]"
+					placeholder="Escolha a posição"
+				/>
+			</div>
+		</section>
+		}
+
+		<!-- Grupo: Páginas (Imagens/PDF) -->
+		@if(showPages) {
+		<section class="settings-group">
+			<h3 class="group-title">Páginas</h3>
+			<p class="group-desc">Opções de visualização de páginas</p>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="hash" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Números de Página</h3>
+						<p>Exibe o índice no canto de cada conteúdo</p>
+					</div>
+				</div>
+				<app-switch
+					[value]="settings.showPageNumbers"
+					(change)="onShowPageNumbersChange()"
+				/>
+			</div>
+		</section>
+		}
+
+		<!-- Grupo: Texto (Apenas para leitores de texto) -->
+		@if(showTextSettings) {
+		<section class="settings-group">
+			<h3 class="group-title">Estilo de Texto</h3>
+			<p class="group-desc">Personalize a aparência do texto</p>
+
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="type" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Fonte</h3>
+					</div>
+				</div>
+				<app-select
+					[(ngModel)]="settings.fontFamily"
+					(valueChange)="onTextSettingChange('fontFamily', $event)"
+					[options]="fontFamilyOptions"
+				/>
+			</div>
+
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="type" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Tamanho da Fonte ({{ settings.fontSize }}px)</h3>
+					</div>
+				</div>
+				<div class="font-size-controls">
+					<app-button
+						variant="outline"
+						(click)="onTextSettingChange('fontSize', (settings.fontSize || 18) - 1)"
+					>
+						A-
+					</app-button>
+					<app-button
+						variant="outline"
+						(click)="onTextSettingChange('fontSize', (settings.fontSize || 18) + 1)"
+					>
+						A+
+					</app-button>
+				</div>
+			</div>
+
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="align-justify" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Espaçamento de Linhas ({{ settings.lineHeight }})</h3>
+						<p>Controla a distância vertical entre as linhas</p>
+					</div>
+				</div>
+				<div class="spacing-slider-group">
+					<input
+						type="range"
+						class="spacing-slider"
+						min="1"
+						max="3"
+						step="0.1"
+						[ngModel]="settings.lineHeight ?? 1.8"
+						(ngModelChange)="onLineHeightChange($event)"
+					/>
+					<span class="spacing-slider-value">
+						{{ settings.lineHeight ?? 1.8 }}
+					</span>
+				</div>
+				<div class="font-size-controls">
+					<app-button
+						variant="outline"
+						(click)="updateLineHeight(-0.1)"
+					>
+						-
+					</app-button>
+					<app-button
+						variant="outline"
+						(click)="updateLineHeight(0.1)"
+					>
+						+
+					</app-button>
+				</div>
+			</div>
+
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="type" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Espaçamento de Letras ({{ settings.letterSpacing }}px)</h3>
+						<p>Controla a distância horizontal entre os caracteres</p>
+					</div>
+				</div>
+				<div class="spacing-slider-group">
+					<input
+						type="range"
+						class="spacing-slider"
+						min="-2"
+						max="10"
+						step="0.1"
+						[ngModel]="settings.letterSpacing ?? 0"
+						(ngModelChange)="onLetterSpacingChange($event)"
+					/>
+					<span class="spacing-slider-value">
+						{{ settings.letterSpacing ?? 0 }}px
+					</span>
+				</div>
+				<div class="font-size-controls">
+					<app-button
+						variant="outline"
+						(click)="updateLetterSpacing(-0.5)"
+					>
+						-
+					</app-button>
+					<app-button
+						variant="outline"
+						(click)="updateLetterSpacing(0.5)"
+					>
+						+
+					</app-button>
+				</div>
+			</div>
+
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="align-left" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Alinhamento</h3>
+					</div>
+				</div>
+				<app-select
+					[(ngModel)]="settings.textAlign"
+					(valueChange)="onTextSettingChange('textAlign', $event)"
+					[options]="[
+						{ value: 'left', label: 'Esquerda' },
+						{ value: 'center', label: 'Centralizado' },
+						{ value: 'right', label: 'Direita' },
+						{ value: 'justify', label: 'Justificado' }
+					]"
+				/>
+			</div>
+		</section>
+		}
+
+		<!-- Grupo: Filtros (Mais relevante para imagens) -->
+		@if(showFilters) {
+		<section class="settings-group">
+			<h3 class="group-title">Filtros Visuais</h3>
+			<p class="group-desc">Ajustes aplicados ao conteúdo</p>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="image" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Escala de Cinza</h3>
+						<p>Remove as cores do conteúdo</p>
+					</div>
+				</div>
+				<app-switch
+					[value]="settings.grayScale"
+					(change)="onGrayScaleChange()"
+				/>
+			</div>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="sun" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Alto Brilho</h3>
+					</div>
+				</div>
+				<app-switch
+					[value]="(settings.brightness ?? 100) >= 150"
+					(change)="onBrightnessToggle($event)"
+				/>
+			</div>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="contrast" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Alto Contraste</h3>
+					</div>
+				</div>
+				<app-switch
+					[value]="(settings.contrast ?? 100) >= 150"
+					(change)="onContrastToggle($event)"
+				/>
+			</div>
+		</section>
+		}
+
+		<!-- Modo Noturno (Geral) -->
+		@if(viewFilter === 'all' || viewFilter === 'filters' || viewFilter ===
+		'text') {
+		<section class="settings-group">
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="moon" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Modo Noturno</h3>
+						<p>Inverte cores e reduz fadiga ocular</p>
+					</div>
+				</div>
+				<app-switch
+					[value]="settings.nightMode ?? false"
+					(change)="onNightModeToggle($event)"
+				/>
+			</div>
+		</section>
+		}
+	</div>
+
+	@if(showResetButton) {
+	<div class="settings-footer">
+		<app-button (click)="resetSettings()" leftIcon="refresh-ccw">
+			<span>Restaurar Padrões</span>
+		</app-button>
+	</div>
+	}
+</div>

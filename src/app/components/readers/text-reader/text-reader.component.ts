@@ -10,16 +10,20 @@ import {
 	PLATFORM_ID,
 	DestroyRef,
 	ChangeDetectionStrategy,
-	HostListener,
 	signal,
 	viewChild,
+	computed,
+	OnChanges,
+	SimpleChanges,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { fromEvent } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 import { ContentFormat } from '../../../models/book.models';
 import { MarkdownComponent } from 'ngx-markdown';
+import { SettingsService } from '../../../service/settings.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 export interface TextProgressEvent {
 	pageIndex: number;
@@ -38,7 +42,7 @@ const WORDS_PER_PAGE = 300;
 	templateUrl: './text-reader.component.html',
 	styleUrl: './text-reader.component.scss',
 })
-export class TextReaderComponent implements OnInit, OnDestroy {
+export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() content = '';
 	@Input() format: ContentFormat = 'markdown';
 	@Input() initialScrollPercentage = 0;
@@ -48,12 +52,53 @@ export class TextReaderComponent implements OnInit, OnDestroy {
 
 	private platformId = inject(PLATFORM_ID);
 	private destroyRef = inject(DestroyRef);
+	private settingsService = inject(SettingsService);
+	private sanitizer = inject(DomSanitizer);
+
+	settings = toSignal(this.settingsService.settings$, {
+		initialValue: this.settingsService.getSettings(),
+	});
+
+	safeContent = signal<SafeHtml>('');
+
+	private styleSnapshot = computed(() => {
+		const currentSettings = this.settings();
+		return {
+			'font-size':
+				currentSettings.fontSize != null
+					? `${currentSettings.fontSize}px`
+					: null,
+			'font-family': currentSettings.fontFamily ?? null,
+			'line-height':
+				currentSettings.lineHeight != null
+					? `${currentSettings.lineHeight}`
+					: null,
+			'letter-spacing':
+				currentSettings.letterSpacing != null
+					? `${currentSettings.letterSpacing}px`
+					: null,
+			'text-align': currentSettings.textAlign ?? null,
+		};
+	});
 
 	private wordCount = signal(0);
 	private virtualPages = signal(1);
 	private lastReportedPage = 0;
 
+	// Keep compatibility with stale/cached templates that still call textStyle().
+	textStyle(): Record<string, string | null> {
+		return this.styleSnapshot();
+	}
+
+	ngOnChanges(changes: SimpleChanges): void {
+		if (changes.content || changes.format) {
+			this.updateSafeContent();
+			this.calculateWordCount();
+		}
+	}
+
 	ngOnInit() {
+		this.updateSafeContent();
 		this.calculateWordCount();
 
 		if (isPlatformBrowser(this.platformId)) {
@@ -66,6 +111,16 @@ export class TextReaderComponent implements OnInit, OnDestroy {
 					100,
 				);
 			}
+		}
+	}
+
+	private updateSafeContent() {
+		if (this.format === 'html' && this.content) {
+			this.safeContent.set(
+				this.sanitizer.bypassSecurityTrustHtml(this.content),
+			);
+		} else {
+			this.safeContent.set('');
 		}
 	}
 

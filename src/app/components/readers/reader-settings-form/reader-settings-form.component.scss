@@ -1,0 +1,159 @@
+.reader-settings-form {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.settings-body {
+	padding: 16px 24px;
+	max-height: 60vh;
+	overflow-y: auto;
+}
+
+.view-selector {
+	margin-bottom: 24px;
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+
+	.selector-btn {
+		flex: 1;
+		min-width: 100px;
+	}
+}
+
+.settings-group {
+	margin-bottom: 32px;
+
+	&:last-of-type {
+		margin-bottom: 0;
+	}
+}
+
+.group-title {
+	margin: 0 0 4px 0;
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--app-text-color);
+}
+
+.group-desc {
+	margin: 0 0 16px 0;
+	font-size: 14px;
+	color: var(--app-text-color);
+	opacity: 0.7;
+}
+
+.setting-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 0;
+	border-bottom: 1px solid color-mix(in srgb, var(--app-text-color) 10%, transparent);
+
+	&.column {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+
+		app-select {
+			width: 100%;
+		}
+	}
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	.setting-info {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		flex: 1;
+	}
+
+	.setting-icon {
+		background-color: var(--primary-color);
+		width: 40px;
+		height: 40px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 10px;
+		color: white;
+	}
+
+	.setting-text {
+		flex: 1;
+
+		h3 {
+			margin: 0;
+			font-size: 16px;
+			font-weight: 500;
+			color: var(--app-text-color);
+		}
+
+		p {
+			margin: 4px 0 0 0;
+			font-size: 13px;
+			color: var(--app-text-color);
+			opacity: 0.8;
+			line-height: 1.4;
+		}
+	}
+}
+
+.font-size-controls {
+	display: flex;
+	gap: 12px;
+	width: 100%;
+
+	app-button {
+		flex: 1;
+	}
+}
+
+.spacing-slider-group {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+}
+
+.spacing-slider {
+	flex: 1;
+	accent-color: var(--primary-color);
+}
+
+.spacing-slider-value {
+	min-width: 60px;
+	text-align: right;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--app-text-color);
+	font-variant-numeric: tabular-nums;
+}
+
+.settings-footer {
+	padding-top: 24px;
+	border-top: 1px solid color-mix(in srgb, var(--app-text-color) 10%, transparent);
+	display: flex;
+	justify-content: center;
+}
+
+@media (max-width: 768px) {
+	.view-selector {
+		.selector-btn {
+			min-width: calc(50% - 4px);
+		}
+	}
+
+	.setting-item {
+		padding: 12px 0;
+
+		.setting-icon {
+			width: 36px;
+			height: 36px;
+		}
+	}
+}

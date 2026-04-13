@@ -19,6 +19,7 @@ import {
 	Injector,
 	ViewChild,
 	WritableSignal,
+	NgZone,
 } from '@angular/core';
 import { DatePipe, isPlatformBrowser } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -138,6 +139,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private injector = inject(Injector);
 	private headerStateService = inject(HeaderStateService);
 	private userService = inject(UserService);
+	private ngZone = inject(NgZone);
 
 	progressBarRef = viewChild<ElementRef>('progressBarRef');
 	@ViewChild(ImageReaderComponent) imageReader?: ImageReaderComponent;
@@ -299,22 +301,24 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			return;
 		}
 
-		if (!this.bookWebsocketService.isConnected()) {
-			this.bookWebsocketService.connect();
-		}
+		this.ngZone.runOutsideAngular(() => {
+			if (!this.bookWebsocketService.isConnected()) {
+				this.bookWebsocketService.connect();
+			}
 
-		this.bookWebsocketService
-			.watchChapter(chapterId, bookId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe((event) => {
-				const typedEvent = event as { type: string; data: unknown };
-				if (
-					typedEvent.type === 'chapter.updated' ||
-					typedEvent.type === 'chapter.scraping.completed'
-				) {
-					this.refreshChapter();
-				}
-			});
+			this.bookWebsocketService
+				.watchChapter(chapterId, bookId)
+				.pipe(takeUntilDestroyed(this.destroyRef))
+				.subscribe((event) => {
+					const typedEvent = event as { type: string; data: unknown };
+					if (
+						typedEvent.type === 'chapter.updated' ||
+						typedEvent.type === 'chapter.scraping.completed'
+					) {
+						this.ngZone.run(() => this.refreshChapter());
+					}
+				});
+		});
 	}
 
 	async loadChapter(
@@ -1243,6 +1247,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			componentData: {
 				title: 'Configurações do Leitor',
 				subtitle: 'Personalize sua experiência de leitura',
+				contentType: this.chapter()?.contentType || 'image',
 			},
 			useBackdrop: true,
 			backdropOpacity: 0.8,
