@@ -1,9 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subject, of, EMPTY } from 'rxjs';
 import { provideRouter } from '@angular/router';
-import { signal, WritableSignal } from '@angular/core';
+import { signal, WritableSignal, LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
 
 import { InfoBookComponent } from './info-book.component';
+
+registerLocaleData(localePt, 'pt-BR');
 import { BookService } from '../../service/book.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { ScrapingStatus } from '../../models/book.models';
@@ -110,6 +114,7 @@ describe('InfoBookComponent', () => {
 			imports: [InfoBookComponent],
 			providers: [
 				provideRouter([]),
+				{ provide: LOCALE_ID, useValue: 'pt-BR' },
 				{ provide: BookService, useValue: mockBookService },
 				{
 					provide: ModalNotificationService,
