@@ -16,13 +16,18 @@ export const environment = {
 };
 `;
 
-fs.writeFile(targetPath, envConfigFile, 'utf8', (err) => {
-	if (err) {
-		console.error('Error generating environment.prod.ts file:', err);
-		process.exit(1);
-	} else {
-		console.log(
-			`Successfully generated environment.prod.ts at ${targetPath}`,
-		);
-	}
-});
+fs.writeFile(
+	targetPath,
+	envConfigFile,
+	'utf8',
+	(err: NodeJS.ErrnoException | null) => {
+		if (err) {
+			console.error('Error generating environment.prod.ts file:', err);
+			process.exit(1);
+		} else {
+			console.log(
+				`Successfully generated environment.prod.ts at ${targetPath}`,
+			);
+		}
+	},
+);
