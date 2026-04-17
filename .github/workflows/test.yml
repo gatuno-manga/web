@@ -1,43 +1,57 @@
 name: Run Tests
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: test-and-publish-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-    test-frontend:
-        runs-on: ubuntu-latest
+  test-frontend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.11.1'
+          cache: 'npm'
+          cache-dependency-path: ./package-lock.json
+
+      - name: Setup Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install Dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Run Tests
+        run: npm run test:headless
         env:
-            CHROME_BIN: /usr/bin/google-chrome-stable
-        steps:
-            - uses: actions/checkout@v4
+          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: '24.11.1'
-                  cache: 'npm'
-                  cache-dependency-path: ./package-lock.json
+      - name: Build
+        run: npm run build
 
-            - name: Install Google Chrome for Headless Tests
-              run: |
-                  sudo apt-get update
-                  wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-                  echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-                  sudo apt-get update
-                  sudo apt-get install -y google-chrome-stable
-              env:
-                  DEBIAN_FRONTEND: noninteractive
-
-            - name: Install Dependencies
-              run: npm ci
-
-            - name: Run Tests
-              run: npm run test:headless
-
-            - name: Build
-              run: npm run build
+  build-and-publish:
+    name: call-registry
+    needs: test-frontend
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: gatuno-manga/workflows/.github/workflows/registry.yml@main
+    with:
+      image_name: myapp
+      build_context: .
+      dockerfile_path: Dockerfile.prod
+      dockerfile_candidates: Dockerfile,Dockerfile.prod,docker/Dockerfile,build/Dockerfile
+      runner_labels_json: '["self-hosted","linux","x64"]'
+      build_platform: linux/amd64
+    secrets: inherit
