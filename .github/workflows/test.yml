@@ -48,7 +48,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: gatuno-manga/workflows/.github/workflows/registry.yml@main
     with:
-      image_name: myapp
+      image_name: gatuno-web
       build_context: .
       dockerfile_path: Dockerfile.prod
       dockerfile_candidates: Dockerfile,Dockerfile.prod,docker/Dockerfile,build/Dockerfile
