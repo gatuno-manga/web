@@ -34,13 +34,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -z "${REGISTRY_HOST:-}" ]; then
+          REGISTRY_HOST_CLEAN="$(printf '%s' "${REGISTRY_HOST:-}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+          REGISTRY_PORT_CLEAN="$(printf '%s' "${REGISTRY_PORT:-}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+
+          if [ -z "${REGISTRY_HOST_CLEAN}" ]; then
             echo "REGISTRY_HOST is required in repository variables."
             exit 1
           fi
 
-          if [ -z "${REGISTRY_PORT:-}" ]; then
-            REGISTRY_PORT="5000"
+          if [ -z "${REGISTRY_PORT_CLEAN}" ]; then
+            REGISTRY_PORT_CLEAN="5000"
           fi
 
           if [ -z "${IMAGE_NAME:-}" ]; then
@@ -92,9 +95,10 @@ jobs:
             OPER_TAG="latest"
           fi
 
-          IMAGE_BASE="${REGISTRY_HOST}:${REGISTRY_PORT}/${IMAGE_NAME}"
+          IMAGE_BASE="${REGISTRY_HOST_CLEAN}:${REGISTRY_PORT_CLEAN}/${IMAGE_NAME}"
 
-          echo "REGISTRY_PORT=${REGISTRY_PORT}" >> "${GITHUB_ENV}"
+          echo "REGISTRY_HOST=${REGISTRY_HOST_CLEAN}" >> "${GITHUB_ENV}"
+          echo "REGISTRY_PORT=${REGISTRY_PORT_CLEAN}" >> "${GITHUB_ENV}"
           echo "IMAGE_NAME=${IMAGE_NAME}" >> "${GITHUB_ENV}"
           echo "BUILD_CONTEXT=${BUILD_CONTEXT}" >> "${GITHUB_ENV}"
           echo "DOCKERFILE_PATH=${DOCKERFILE_PATH_CLEAN}" >> "${GITHUB_ENV}"
@@ -107,8 +111,19 @@ jobs:
           echo "Dockerfile path: ${DOCKERFILE_PATH_CLEAN}"
           echo "Tags: ${SHORT_SHA}, ${OPER_TAG}"
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Buildx builder for HTTP registry
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          REGISTRY_REF="${REGISTRY_HOST}:${REGISTRY_PORT}"
+          BUILDKIT_CONFIG_FILE="/tmp/buildkitd.toml"
+
+          printf '[registry."%s"]\n  http = true\n  insecure = true\n' "${REGISTRY_REF}" > "${BUILDKIT_CONFIG_FILE}"
+
+          docker buildx rm ci-builder >/dev/null 2>&1 || true
+          docker buildx create --name ci-builder --driver docker-container --buildkitd-config "${BUILDKIT_CONFIG_FILE}" --use
+          docker buildx inspect --bootstrap
 
       - name: Login to internal registry (optional)
         shell: bash
@@ -178,12 +193,19 @@ jobs:
           set -euo pipefail
 
           docker buildx build \
+            --builder ci-builder \
             --platform linux/amd64 \
             --file "${DOCKERFILE_PATH}" \
             --tag "${IMAGE_BASE}:${SHORT_SHA}" \
             --tag "${IMAGE_BASE}:${OPER_TAG}" \
             --push \
             "${BUILD_CONTEXT}"
+
+      - name: Cleanup Buildx builder
+        if: always()
+        shell: bash
+        run: |
+          docker buildx rm ci-builder >/dev/null 2>&1 || true
 
       - name: Validate published image
         shell: bash
