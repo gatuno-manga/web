@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        - API_URL=https://${API_HOST:-localhost:3000}
+        - API_URL_SERVER=http://api:3000
+    ports:
+      - "${APP_PORT:-4000}:4000"
+    restart: always

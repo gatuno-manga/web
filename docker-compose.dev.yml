@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "${APP_PORT:-4200}:4200"
+    environment:
+      - API_URL=${API_URL:-http://localhost:3000}
+      - API_URL_SERVER=${API_URL_SERVER:-http://api:3000}
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /usr/src/app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./package.json
+    volumes:
+      - ./public:/usr/src/app/public
