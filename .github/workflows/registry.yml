@@ -1,0 +1,97 @@
+name: registry-build-and-publish
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+      - lxc-runner
+
+    env:
+      IMAGE_NAME: ${{ vars.IMAGE_NAME }}
+      REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
+      REGISTRY_PORT: ${{ secrets.REGISTRY_PORT }}
+      REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set defaults and validate inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "${REGISTRY_HOST:-}" ]; then
+            echo "REGISTRY_HOST is required in repository variables."
+            exit 1
+          fi
+
+          if [ -z "${REGISTRY_PORT:-}" ]; then
+            REGISTRY_PORT="5000"
+          fi
+
+          if [ -z "${IMAGE_NAME:-}" ]; then
+            IMAGE_NAME="${GITHUB_REPOSITORY##*/}"
+          fi
+
+          SHORT_SHA="${GITHUB_SHA::12}"
+
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            OPER_TAG="${GITHUB_REF_NAME}"
+          else
+            OPER_TAG="latest"
+          fi
+
+          IMAGE_BASE="${REGISTRY_HOST}:${REGISTRY_PORT}/${IMAGE_NAME}"
+
+          echo "REGISTRY_PORT=${REGISTRY_PORT}" >> "${GITHUB_ENV}"
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> "${GITHUB_ENV}"
+          echo "SHORT_SHA=${SHORT_SHA}" >> "${GITHUB_ENV}"
+          echo "OPER_TAG=${OPER_TAG}" >> "${GITHUB_ENV}"
+          echo "IMAGE_BASE=${IMAGE_BASE}" >> "${GITHUB_ENV}"
+
+          echo "Image base: ${IMAGE_BASE}"
+          echo "Tags: ${SHORT_SHA}, ${OPER_TAG}"
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to internal registry (optional)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "${REGISTRY_USERNAME:-}" ] && [ -n "${REGISTRY_PASSWORD:-}" ]; then
+            echo "${REGISTRY_PASSWORD}" | docker login "${REGISTRY_HOST}:${REGISTRY_PORT}" -u "${REGISTRY_USERNAME}" --password-stdin
+          else
+            echo "Registry login skipped (username/password not configured)."
+          fi
+
+      - name: Build and push image
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          docker buildx build \
+            --platform linux/amd64 \
+            --tag "${IMAGE_BASE}:${SHORT_SHA}" \
+            --tag "${IMAGE_BASE}:${OPER_TAG}" \
+            --push \
+            .
+
+      - name: Validate published image
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull "${IMAGE_BASE}:${SHORT_SHA}"
+          echo "Publish validation completed for ${IMAGE_BASE}:${SHORT_SHA}"
