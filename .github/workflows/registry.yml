@@ -21,6 +21,9 @@ jobs:
       REGISTRY_PORT: ${{ secrets.REGISTRY_PORT }}
       REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      BUILD_CONTEXT: ${{ vars.BUILD_CONTEXT }}
+      DOCKERFILE_PATH: ${{ vars.DOCKERFILE_PATH }}
+      DOCKERFILE_CANDIDATES: ${{ vars.DOCKERFILE_CANDIDATES }}
 
     steps:
       - name: Checkout
@@ -44,6 +47,43 @@ jobs:
             IMAGE_NAME="${GITHUB_REPOSITORY##*/}"
           fi
 
+          if [ -z "${BUILD_CONTEXT:-}" ]; then
+            BUILD_CONTEXT="."
+          fi
+
+          if [ ! -d "${BUILD_CONTEXT}" ]; then
+            echo "Build context directory not found: ${BUILD_CONTEXT}"
+            exit 1
+          fi
+
+          if [ -z "${DOCKERFILE_CANDIDATES:-}" ]; then
+            DOCKERFILE_CANDIDATES="Dockerfile,Dockerfile.prod,docker/Dockerfile,build/Dockerfile"
+          fi
+
+          DOCKERFILE_PATH_CLEAN="$(printf '%s' "${DOCKERFILE_PATH:-}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+
+          if [ -z "${DOCKERFILE_PATH_CLEAN}" ]; then
+            IFS=',' read -r -a DOCKERFILE_CANDIDATE_ARRAY <<< "${DOCKERFILE_CANDIDATES}"
+            for raw_candidate in "${DOCKERFILE_CANDIDATE_ARRAY[@]}"; do
+              candidate="$(printf '%s' "${raw_candidate}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+              if [ -n "${candidate}" ] && [ -f "${candidate}" ]; then
+                DOCKERFILE_PATH_CLEAN="${candidate}"
+                break
+              fi
+            done
+          fi
+
+          if [ -z "${DOCKERFILE_PATH_CLEAN}" ]; then
+            echo "No Dockerfile found."
+            echo "Set vars.DOCKERFILE_PATH or create one of: ${DOCKERFILE_CANDIDATES}"
+            exit 1
+          fi
+
+          if [ ! -f "${DOCKERFILE_PATH_CLEAN}" ]; then
+            echo "Configured DOCKERFILE_PATH not found: ${DOCKERFILE_PATH_CLEAN}"
+            exit 1
+          fi
+
           SHORT_SHA="${GITHUB_SHA::12}"
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
@@ -56,11 +96,15 @@ jobs:
 
           echo "REGISTRY_PORT=${REGISTRY_PORT}" >> "${GITHUB_ENV}"
           echo "IMAGE_NAME=${IMAGE_NAME}" >> "${GITHUB_ENV}"
+          echo "BUILD_CONTEXT=${BUILD_CONTEXT}" >> "${GITHUB_ENV}"
+          echo "DOCKERFILE_PATH=${DOCKERFILE_PATH_CLEAN}" >> "${GITHUB_ENV}"
           echo "SHORT_SHA=${SHORT_SHA}" >> "${GITHUB_ENV}"
           echo "OPER_TAG=${OPER_TAG}" >> "${GITHUB_ENV}"
           echo "IMAGE_BASE=${IMAGE_BASE}" >> "${GITHUB_ENV}"
 
           echo "Image base: ${IMAGE_BASE}"
+          echo "Build context: ${BUILD_CONTEXT}"
+          echo "Dockerfile path: ${DOCKERFILE_PATH_CLEAN}"
           echo "Tags: ${SHORT_SHA}, ${OPER_TAG}"
 
       - name: Setup Docker Buildx
@@ -72,10 +116,27 @@ jobs:
           set -euo pipefail
 
           if [ -n "${REGISTRY_USERNAME:-}" ] && [ -n "${REGISTRY_PASSWORD:-}" ]; then
-            REGISTRY_HOST_CLEAN="$(printf '%s' "${REGISTRY_HOST}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
-            REGISTRY_PORT_CLEAN="$(printf '%s' "${REGISTRY_PORT}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
-            REGISTRY_USERNAME_CLEAN="$(printf '%s' "${REGISTRY_USERNAME}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
-            REGISTRY_PASSWORD_CLEAN="$(printf '%s' "${REGISTRY_PASSWORD}" | tr -d '\r\n')"
+            sanitize_secret() {
+              local raw="$1"
+              local cleaned
+
+              cleaned="$(printf '%s' "${raw}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+
+              if [[ "${cleaned}" == \"*\" && "${cleaned}" == *\" ]]; then
+                cleaned="${cleaned#\"}"
+                cleaned="${cleaned%\"}"
+              elif [[ "${cleaned}" == \'*\' ]]; then
+                cleaned="${cleaned#\'}"
+                cleaned="${cleaned%\'}"
+              fi
+
+              printf '%s' "${cleaned}"
+            }
+
+            REGISTRY_HOST_CLEAN="$(sanitize_secret "${REGISTRY_HOST}")"
+            REGISTRY_PORT_CLEAN="$(sanitize_secret "${REGISTRY_PORT}")"
+            REGISTRY_USERNAME_CLEAN="$(sanitize_secret "${REGISTRY_USERNAME}")"
+            REGISTRY_PASSWORD_CLEAN="$(sanitize_secret "${REGISTRY_PASSWORD}")"
 
             if [ -z "${REGISTRY_HOST_CLEAN}" ]; then
               echo "REGISTRY_HOST is required in repository variables."
@@ -90,6 +151,15 @@ jobs:
             echo "Registry endpoint precheck status: ${PRECHECK_STATUS}"
             if [ "${PRECHECK_STATUS}" != "200" ] && [ "${PRECHECK_STATUS}" != "401" ]; then
               echo "Registry endpoint is not reachable at http://${REGISTRY_HOST_CLEAN}:${REGISTRY_PORT_CLEAN}/v2/"
+              exit 1
+            fi
+
+            AUTH_CHECK_STATUS="$(curl -sS -o /dev/null -w '%{http_code}' -u "${REGISTRY_USERNAME_CLEAN}:${REGISTRY_PASSWORD_CLEAN}" "http://${REGISTRY_HOST_CLEAN}:${REGISTRY_PORT_CLEAN}/v2/" || true)"
+            echo "Registry auth check status: ${AUTH_CHECK_STATUS}"
+            if [ "${AUTH_CHECK_STATUS}" != "200" ]; then
+              echo "Registry rejected configured credentials (status=${AUTH_CHECK_STATUS})."
+              echo "Re-save REGISTRY_USERNAME and REGISTRY_PASSWORD in this repository without extra quotes/spaces/newlines."
+              echo "Credential length check: user_len=${#REGISTRY_USERNAME_CLEAN}, pass_len=${#REGISTRY_PASSWORD_CLEAN}"
               exit 1
             fi
 
@@ -109,10 +179,11 @@ jobs:
 
           docker buildx build \
             --platform linux/amd64 \
+            --file "${DOCKERFILE_PATH}" \
             --tag "${IMAGE_BASE}:${SHORT_SHA}" \
             --tag "${IMAGE_BASE}:${OPER_TAG}" \
             --push \
-            .
+            "${BUILD_CONTEXT}"
 
       - name: Validate published image
         shell: bash
