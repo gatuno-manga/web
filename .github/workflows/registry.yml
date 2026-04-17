@@ -17,8 +17,8 @@ jobs:
 
     env:
       IMAGE_NAME: ${{ vars.IMAGE_NAME }}
-      REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
-      REGISTRY_PORT: ${{ secrets.REGISTRY_PORT }}
+      REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
+      REGISTRY_PORT: ${{ vars.REGISTRY_PORT }}
       REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
 
@@ -72,19 +72,32 @@ jobs:
           set -euo pipefail
 
           if [ -n "${REGISTRY_USERNAME:-}" ] && [ -n "${REGISTRY_PASSWORD:-}" ]; then
-            REGISTRY_HOST_CLEAN="$(printf '%s' "${REGISTRY_HOST}" | tr -d '\r\n')"
-            REGISTRY_PORT_CLEAN="$(printf '%s' "${REGISTRY_PORT}" | tr -d '\r\n')"
-            REGISTRY_USERNAME_CLEAN="$(printf '%s' "${REGISTRY_USERNAME}" | tr -d '\r\n')"
+            REGISTRY_HOST_CLEAN="$(printf '%s' "${REGISTRY_HOST}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+            REGISTRY_PORT_CLEAN="$(printf '%s' "${REGISTRY_PORT}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+            REGISTRY_USERNAME_CLEAN="$(printf '%s' "${REGISTRY_USERNAME}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
             REGISTRY_PASSWORD_CLEAN="$(printf '%s' "${REGISTRY_PASSWORD}" | tr -d '\r\n')"
 
-            AUTH_CHECK_STATUS="$(curl -sS -o /dev/null -w '%{http_code}' -u "${REGISTRY_USERNAME_CLEAN}:${REGISTRY_PASSWORD_CLEAN}" "http://${REGISTRY_HOST_CLEAN}:${REGISTRY_PORT_CLEAN}/v2/" || true)"
-            if [ "${AUTH_CHECK_STATUS}" != "200" ]; then
-              echo "Registry auth check failed at http://${REGISTRY_HOST_CLEAN}:${REGISTRY_PORT_CLEAN}/v2/ (status=${AUTH_CHECK_STATUS})."
-              echo "Verify REGISTRY_USERNAME/REGISTRY_PASSWORD secrets and remove hidden CR/LF characters."
+            if [ -z "${REGISTRY_HOST_CLEAN}" ]; then
+              echo "REGISTRY_HOST is required in repository variables."
               exit 1
             fi
 
-            printf '%s' "${REGISTRY_PASSWORD_CLEAN}" | docker login "${REGISTRY_HOST_CLEAN}:${REGISTRY_PORT_CLEAN}" -u "${REGISTRY_USERNAME_CLEAN}" --password-stdin
+            if [ -z "${REGISTRY_PORT_CLEAN}" ]; then
+              REGISTRY_PORT_CLEAN="5000"
+            fi
+
+            PRECHECK_STATUS="$(curl -sS -o /dev/null -w '%{http_code}' "http://${REGISTRY_HOST_CLEAN}:${REGISTRY_PORT_CLEAN}/v2/" || true)"
+            echo "Registry endpoint precheck status: ${PRECHECK_STATUS}"
+            if [ "${PRECHECK_STATUS}" != "200" ] && [ "${PRECHECK_STATUS}" != "401" ]; then
+              echo "Registry endpoint is not reachable at http://${REGISTRY_HOST_CLEAN}:${REGISTRY_PORT_CLEAN}/v2/"
+              exit 1
+            fi
+
+            if ! printf '%s' "${REGISTRY_PASSWORD_CLEAN}" | docker login "${REGISTRY_HOST_CLEAN}:${REGISTRY_PORT_CLEAN}" -u "${REGISTRY_USERNAME_CLEAN}" --password-stdin; then
+              echo "Docker login failed with configured secrets."
+              echo "Re-save REGISTRY_USERNAME and REGISTRY_PASSWORD in the same repository where this workflow runs."
+              exit 1
+            fi
           else
             echo "Registry login skipped (username/password not configured)."
           fi
