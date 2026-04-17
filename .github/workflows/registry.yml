@@ -17,8 +17,8 @@ jobs:
 
     env:
       IMAGE_NAME: ${{ vars.IMAGE_NAME }}
-      REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
-      REGISTRY_PORT: ${{ vars.REGISTRY_PORT }}
+      REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
+      REGISTRY_PORT: ${{ secrets.REGISTRY_PORT }}
       REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
 
