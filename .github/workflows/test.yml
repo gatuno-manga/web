@@ -54,4 +54,7 @@ jobs:
       dockerfile_candidates: Dockerfile,Dockerfile.prod,docker/Dockerfile,build/Dockerfile
       runner_labels_json: '["self-hosted","linux","x64"]'
       build_platform: linux/amd64
+      build_args: |
+        --build-arg API_URL=${{ vars.API_URL }}
+        --build-arg API_URL_SERVER=${{ vars.API_URL_SERVER }}
     secrets: inherit
