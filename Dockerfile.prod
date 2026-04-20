@@ -17,7 +17,11 @@ ARG API_URL_SERVER
 ENV API_URL=$API_URL
 ENV API_URL_SERVER=$API_URL_SERVER
 
-RUN npm run build
+RUN npm run build \
+	&& if grep -R --line-number --fixed-strings "localhost:3001" dist/front/browser; then \
+		echo "Build falhou: bundle de producao contem localhost:3001"; \
+		exit 1; \
+	fi
 
 FROM node:${NODE_VERSION}-alpine AS runtime
 

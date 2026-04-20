@@ -35,6 +35,46 @@ const normalizeLoopbackHost = (baseUrl: string, origin?: string): string => {
 	return baseUrl;
 };
 
+const resolveSafeBrowserApiBaseUrl = (
+	baseUrl: string,
+	origin?: string,
+): string => {
+	if (!baseUrl?.trim()) {
+		return `${origin || window.location.origin}/api`;
+	}
+
+	if (!baseUrl.startsWith('http')) {
+		return baseUrl;
+	}
+
+	const resolvedOrigin = origin || window.location.origin;
+
+	try {
+		const parsedBaseUrl = new URL(baseUrl);
+		const parsedOrigin = new URL(resolvedOrigin);
+		const baseLoopback = LOOPBACK_HOSTS.has(
+			parsedBaseUrl.hostname.toLowerCase(),
+		);
+		const originLoopback = LOOPBACK_HOSTS.has(
+			parsedOrigin.hostname.toLowerCase(),
+		);
+
+		// Em ambiente publicado, nunca usar loopback do bundle.
+		if (baseLoopback && !originLoopback) {
+			return `${parsedOrigin.origin}/api`;
+		}
+
+		// Evita mixed content quando o app roda em HTTPS.
+		if (parsedOrigin.protocol === 'https:' && parsedBaseUrl.protocol === 'http:') {
+			return `${parsedOrigin.origin}/api`;
+		}
+
+		return normalizeLoopbackHost(baseUrl, resolvedOrigin);
+	} catch {
+		return baseUrl;
+	}
+};
+
 type RuntimeProcess = {
 	env?: {
 		API_URL_SERVER?: string;
@@ -45,7 +85,7 @@ type RuntimeProcess = {
 };
 
 const isLikelyDockerContainerRuntime = (): boolean => {
-	const runtimeProcess = (globalThis as { process?: RuntimeProcess }).process;
+	const runtimeProcess = (globalThis as { process?: RuntimeProcess; }).process;
 	const hostName = runtimeProcess?.env?.HOSTNAME;
 	return typeof hostName === 'string' && /^[a-f0-9]{12,}$/i.test(hostName);
 };
@@ -77,7 +117,7 @@ const normalizeLoopbackHostForDockerSsr = (baseUrl: string): string => {
 };
 
 const resolveServerApiBaseUrlFromRuntime = (): string | null => {
-	const runtimeProcess = (globalThis as { process?: RuntimeProcess }).process;
+	const runtimeProcess = (globalThis as { process?: RuntimeProcess; }).process;
 	const env = runtimeProcess?.env;
 	const rawBaseUrl = env?.API_URL_SERVER || env?.API_URL;
 
@@ -124,11 +164,8 @@ export function buildApiUrl(path: string, config: UrlConfig): string {
 		}
 	}
 
-	if (config.isBrowser && baseUrl.startsWith('http')) {
-		baseUrl = normalizeLoopbackHost(
-			baseUrl,
-			config.origin || window.location.origin,
-		);
+	if (config.isBrowser) {
+		baseUrl = resolveSafeBrowserApiBaseUrl(baseUrl, config.origin);
 	}
 
 	const cleanBase = baseUrl.replace(/\/+$/, '');
@@ -197,6 +234,10 @@ export function buildWebSocketUrl(
 		} else {
 			baseUrl = `${protocol}//${baseUrl}`;
 		}
+	}
+
+	if (config.isBrowser) {
+		baseUrl = resolveSafeBrowserApiBaseUrl(baseUrl, config.origin);
 	}
 
 	// Remover trailing slashes e o sufixo /api para obter a raiz do servidor

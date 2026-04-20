@@ -58,6 +58,26 @@ describe('buildApiUrl', () => {
 		expect(url).toBe('https://api.gatuno.dev/api/auth/refresh');
 	});
 
+	it('deve ignorar loopback do bundle em browser publicado', () => {
+		const url = buildApiUrl('/auth/refresh', {
+			isBrowser: true,
+			apiUrl: 'http://localhost:3001/api',
+			origin: 'https://app.gatuno.dev',
+		});
+
+		expect(url).toBe('https://app.gatuno.dev/api/auth/refresh');
+	});
+
+	it('deve evitar mixed content em origem HTTPS', () => {
+		const url = buildApiUrl('/auth/refresh', {
+			isBrowser: true,
+			apiUrl: 'http://api.gatuno.internal/api',
+			origin: 'https://app.gatuno.dev',
+		});
+
+		expect(url).toBe('https://app.gatuno.dev/api/auth/refresh');
+	});
+
 	it('deve priorizar API_URL_SERVER em SSR quando disponível no runtime', () => {
 		runtimeAccess.process = {
 			env: {
