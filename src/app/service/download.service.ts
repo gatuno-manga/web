@@ -68,7 +68,9 @@ export class DownloadService {
       tags: book.tags,
       sensitiveContent: book.sensitiveContent,
       totalChapters: totalChapters,
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      blurHash: book.blurHash,
+      dominantColor: book.dominantColor,
     };
     await db.put('books', offlineBook);
   }

@@ -25,6 +25,7 @@ import {
 	UpdateBookDto,
 	ContentType,
 	ContentTypes,
+	ImageMetadata,
 } from '../../models/book.models';
 import { RouterModule } from '@angular/router';
 import { IconsComponent } from '../icons/icons.component';
@@ -38,6 +39,7 @@ import { ContextMenuService } from '../../service/context-menu.service';
 import { ContextMenuItem } from '../../models/context-menu.models';
 import { UserTokenService } from '../../service/user-token.service';
 import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
+import { BlurhashComponent } from '../blurhash/blurhash.component';
 import { SavedPagesService } from '../../service/saved-pages.service';
 import { SavedPage } from '../../models/saved-page.models';
 import {
@@ -77,6 +79,7 @@ interface ModulesLoad {
 		IconsComponent,
 		ButtonComponent,
 		ImageViewerComponent,
+		BlurhashComponent,
 		DragDropModule,
 	],
 	templateUrl: './info-book.component.html',
@@ -164,6 +167,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	viewerImageUrl = signal('');
 	viewerImageTitle = signal('');
 	viewerImageDescription = signal('');
+	viewerImageMetadata = signal<ImageMetadata | undefined>(undefined);
 
 	// Cover edit modal state
 	editingCover = signal<Cover | null>(null);
@@ -805,6 +809,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				savedPage.page.path,
 				`Capítulo ${savedPage.chapter.index} - Página ${savedPage.page.index}`,
 				savedPage.comment,
+				savedPage.page.metadata,
 			);
 		}
 	}
@@ -1260,17 +1265,18 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	onCoverClick(cover: Cover) {
 		if (cover.url && !this.coverImageErrors().has(cover.id)) {
-			this.openImageViewer(cover.url, cover.title);
+			this.openImageViewer(cover.url, cover.title, '', cover.metadata);
 		} else {
 			// Open edit modal for covers without image or with loading error
 			this.openCoverEditModal(cover);
 		}
 	}
 
-	openImageViewer(url: string, title: string, description = '') {
+	openImageViewer(url: string, title: string, description = '', metadata?: ImageMetadata) {
 		this.viewerImageUrl.set(url);
 		this.viewerImageTitle.set(title);
 		this.viewerImageDescription.set(description);
+		this.viewerImageMetadata.set(metadata);
 		this.showImageViewer.set(true);
 		this.lockScroll();
 	}
@@ -1280,6 +1286,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		this.viewerImageUrl.set('');
 		this.viewerImageTitle.set('');
 		this.viewerImageDescription.set('');
+		this.viewerImageMetadata.set(undefined);
 		this.unlockScroll();
 	}
 

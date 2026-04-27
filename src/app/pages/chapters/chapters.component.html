@@ -78,6 +78,8 @@
 				<app-image-reader
 					[pages]="currentChapter.pages"
 					[showPageNumbers]="settings().showPageNumbers"
+					[bookBlurHash]="bookBlurHash()"
+					[bookMetadata]="bookMetadata()"
 					(progressChange)="onImageProgress($event)"
 					(contextMenu)="
 						onContextMenu($event.event, $event.page, $event.index)

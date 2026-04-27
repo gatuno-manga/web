@@ -1,9 +1,10 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, signal, computed } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 import { BookList } from '../../models/book.models';
 import { IconsComponent } from '../icons/icons.component';
-import { NgOptimizedImage } from '@angular/common';
+import { BlurhashComponent } from '../blurhash/blurhash.component';
+import { NgOptimizedImage, CommonModule } from '@angular/common';
 import { ContextMenuService } from '../../service/context-menu.service';
 import { DownloadService } from '../../service/download.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
@@ -16,7 +17,7 @@ import { ChapterService } from '../../service/chapter.service';
 @Component({
 	selector: 'app-item-book',
 	standalone: true,
-	imports: [RouterModule, NgOptimizedImage],
+	imports: [RouterModule, NgOptimizedImage, BlurhashComponent, CommonModule],
 	templateUrl: './item-book.component.html',
 	styleUrl: './item-book.component.scss',
 })
@@ -33,6 +34,26 @@ export class ItemBookComponent {
 	private chapterService = inject(ChapterService);
 
 	imageError = false;
+	isImageLoaded = signal(false);
+
+	cardCoverStyle = computed(() => {
+		if (this.book.cover && !this.imageError) {
+			return { '--card-cover': `url(${this.book.cover})` };
+		}
+		return {};
+	});
+
+	truncatedDescription = computed(() => {
+		const desc = this.book.description || '';
+		if (desc.length > 150) {
+			return desc.substring(0, 150) + '...';
+		}
+		return desc;
+	});
+
+	onImageLoad() {
+		this.isImageLoaded.set(true);
+	}
 
 	isBlobUrl(url: string): boolean {
 		return url.startsWith('blob:');

@@ -3,12 +3,11 @@ import {
 	signal,
 	OnInit,
 	OnDestroy,
-	HostListener,
 	inject,
 	NgZone,
-	AfterViewInit,
 	ChangeDetectorRef,
-	ElementRef,
+	ChangeDetectionStrategy,
+	computed,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
@@ -25,6 +24,7 @@ import { ModalNotificationService } from '../../service/modal-notification.servi
 import { InfoBookComponent } from '../../components/info-book/info-book.component';
 import { AsideComponent } from '../../components/aside/aside.component';
 import { ButtonComponent } from '../../components/inputs/button/button.component';
+import { BlurhashComponent } from '../../components/blurhash/blurhash.component';
 import { MarkdownComponent } from 'ngx-markdown';
 import { BookWebsocketService } from '../../service/book-websocket.service';
 import { DownloadService } from '../../service/download.service';
@@ -50,17 +50,28 @@ import {
 		ButtonComponent,
 		MarkdownComponent,
 		NgOptimizedImage,
+		BlurhashComponent,
 	],
 	templateUrl: './book.component.html',
 	styleUrl: './book.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
+	host: {
+		'(document:click)': 'onDocumentClick()',
+	},
 })
-export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
+export class BookComponent implements OnInit, OnDestroy {
 	ScrapingStatus = ScrapingStatus;
-	book!: BookBasic;
-	admin = false;
+	book = signal<BookBasic | undefined>(undefined);
+	private userTokenService = inject(UserTokenService);
+	admin = computed(() => this.userTokenService.isAdminSignal());
 	isLoading = signal(true);
+	isImageLoaded = signal(false);
 	private wsSubscription?: Subscription;
 	private coverUrl?: string;
+
+	onImageLoad() {
+		this.isImageLoaded.set(true);
+	}
 
 	// Estado para "Continue lendo"
 	lastReadChapterId: string | null = null;
@@ -77,48 +88,21 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	// Estado para erro de imagem de capa
 	coverImageError = false;
 
-	// Largura dinâmica do background (rotacionado)
-	backgroundWidth = typeof window !== 'undefined' ? window.innerHeight : 0;
-	private resizeObserver?: ResizeObserver;
-	private mutationObserver?: MutationObserver;
-
 	private metaService = inject(MetaDataService);
 	private modalService = inject(ModalNotificationService);
 	private notificationService = inject(NotificationService);
-	private userTokenService = inject(UserTokenService);
 	private ngZone = inject(NgZone);
 	private cdr = inject(ChangeDetectorRef);
-	private elRef = inject(ElementRef);
+	private bookService = inject(BookService);
+	private activatedRoute = inject(ActivatedRoute);
+	private router = inject(Router);
+	private wsService = inject(BookWebsocketService);
+	private downloadService = inject(DownloadService);
+	private readingProgressService = inject(UnifiedReadingProgressService);
+	private chapterService = inject(ChapterService);
 
-	constructor(
-		private bookService: BookService,
-		private activatedRoute: ActivatedRoute,
-		private router: Router,
-		private wsService: BookWebsocketService,
-		private downloadService: DownloadService,
-		private readingProgressService: UnifiedReadingProgressService,
-		private chapterService: ChapterService,
-	) {
-		this.admin = this.userTokenService.isAdmin;
-	}
-
-	@HostListener('document:click')
 	onDocumentClick() {
 		this.closeOptionsDropdown();
-	}
-
-	@HostListener('window:resize')
-	updateBackgroundSize() {
-		const hostHeight = (this.elRef.nativeElement as HTMLElement)
-			.offsetHeight;
-		const viewportHeight =
-			typeof window !== 'undefined' ? window.innerHeight : 0;
-		const newWidth = Math.max(hostHeight, viewportHeight);
-
-		if (this.backgroundWidth !== newWidth) {
-			this.backgroundWidth = newWidth;
-			this.cdr.detectChanges();
-		}
 	}
 
 	onCoverImageError() {
@@ -140,7 +124,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 					});
 					return;
 				}
-				this.book = book;
+				this.book.set(book);
 				this.setMetaData();
 				this.isLoading.set(false);
 
@@ -162,7 +146,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 						if (this.coverUrl) URL.revokeObjectURL(this.coverUrl);
 						this.coverUrl = URL.createObjectURL(offlineBook.cover);
 
-						this.book = {
+						this.book.set({
 							id: offlineBook.id,
 							title: offlineBook.title,
 							cover: this.coverUrl,
@@ -174,7 +158,9 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 							sensitiveContent: offlineBook.sensitiveContent,
 							totalChapters: offlineBook.totalChapters,
 							authors: offlineBook.authors || [],
-						};
+							blurHash: offlineBook.blurHash,
+							dominantColor: offlineBook.dominantColor,
+						});
 						this.isLoading.set(false);
 						this.setMetaData();
 
@@ -196,8 +182,11 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	private async loadOfflineChapters() {
 		try {
+			const bookId = this.book()?.id;
+			if (!bookId) return;
+
 			const offlineChapters =
-				await this.downloadService.getChaptersByBook(this.book.id);
+				await this.downloadService.getChaptersByBook(bookId);
 			if (offlineChapters && offlineChapters.length > 0) {
 				const chapters: Chapterlist[] = offlineChapters.map((oc) => ({
 					id: oc.id,
@@ -218,47 +207,16 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		}
 	}
 
-	ngAfterViewInit() {
-		this.updateBackgroundSize();
-		this.setupObservers();
-	}
-
 	ngOnDestroy() {
 		// Limpa a inscrição do WebSocket
 		this.wsSubscription?.unsubscribe();
-		if (this.book) {
-			this.wsService.unsubscribeFromBook(this.book.id);
+		const bookId = this.book()?.id;
+		if (bookId) {
+			this.wsService.unsubscribeFromBook(bookId);
 		}
 		if (this.coverUrl) {
 			URL.revokeObjectURL(this.coverUrl);
 		}
-		this.resizeObserver?.disconnect();
-		this.mutationObserver?.disconnect();
-	}
-
-	private setupObservers() {
-		if (typeof window === 'undefined') return;
-
-		// ResizeObserver no próprio host para capturar crescimento do conteúdo
-		// independente de qual elemento pai faz o scroll
-		if (window.ResizeObserver) {
-			this.resizeObserver = new ResizeObserver(() => {
-				this.ngZone.run(() => this.updateBackgroundSize());
-			});
-			this.resizeObserver.observe(this.elRef.nativeElement);
-		}
-
-		// MutationObserver para detectar mudanças no DOM (ex: @defer carregando)
-		this.mutationObserver = new MutationObserver(() => {
-			this.ngZone.run(() => this.updateBackgroundSize());
-		});
-
-		this.mutationObserver.observe(this.elRef.nativeElement, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: ['style', 'class'],
-		});
 	}
 
 	private setupWebSocket(bookId: string) {
@@ -281,9 +239,16 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 				switch (typedEvent.type) {
 					case 'book.updated':
 						// Atualiza informações do livro
-						this.book.title = (
-							typedEvent.data as { title: string }
-						).title;
+						this.book.update((b) =>
+							b
+								? {
+										...b,
+										title: (
+											typedEvent.data as { title: string }
+										).title,
+									}
+								: b,
+						);
 						console.log('✅ Livro atualizado em tempo real');
 						break;
 
@@ -327,11 +292,12 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	private refreshBook() {
-		if (this.book) {
-			this.bookService.getBook(this.book.id).subscribe({
+		const bookId = this.book()?.id;
+		if (bookId) {
+			this.bookService.getBook(bookId).subscribe({
 				next: (book) => {
 					if (book) {
-						this.book = book;
+						this.book.set(book);
 						console.log('♻️ Livro recarregado');
 					}
 				},
@@ -340,11 +306,13 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	setMetaData() {
+		const b = this.book();
+		if (!b) return;
 		this.metaService.setMetaData({
-			title: this.book.title,
-			description: this.book.description,
-			image: this.book.cover,
-			url: `https://example.com/books/${this.book.id}`,
+			title: b.title,
+			description: b.description,
+			image: b.cover,
+			url: `https://example.com/books/${b.id}`,
 		});
 	}
 
@@ -362,16 +330,19 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	getAuthorNames(): string {
-		return this.book.authors?.map((author) => author.name).join(', ') || '';
+		return (
+			this.book()?.authors?.map((author) => author.name).join(', ') || ''
+		);
 	}
 	filterByTag(tagId: string) {
 		this.router.navigate(['/books'], { queryParams: { tags: tagId } });
 	}
 	fixBook() {
-		if (this.book) {
+		const b = this.book();
+		if (b) {
 			this.modalService.show(
 				'Consertar Livro',
-				`Você tem certeza que deseja consertar o livro "${this.book.title}"?`,
+				`Você tem certeza que deseja consertar o livro "${b.title}"?`,
 				[
 					{
 						label: 'Cancelar',
@@ -391,8 +362,9 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	confirmFixBook() {
-		if (this.book) {
-			this.bookService.fixBook(this.book.id).subscribe(() => {
+		const bookId = this.book()?.id;
+		if (bookId) {
+			this.bookService.fixBook(bookId).subscribe(() => {
 				this.router.navigate(['../'], {
 					relativeTo: this.activatedRoute,
 				});
@@ -401,10 +373,11 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	resetBook() {
-		if (this.book) {
+		const b = this.book();
+		if (b) {
 			this.modalService.show(
 				'Redefinir Livro',
-				`Você tem certeza que deseja redefinir o livro "${this.book.title}"? Esta ação não pode ser desfeita.`,
+				`Você tem certeza que deseja redefinir o livro "${b.title}"? Esta ação não pode ser desfeita.`,
 				[
 					{
 						label: 'Cancelar',
@@ -424,8 +397,9 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	confirmResetBook() {
-		if (this.book) {
-			this.bookService.resetBook(this.book.id).subscribe(() => {
+		const bookId = this.book()?.id;
+		if (bookId) {
+			this.bookService.resetBook(bookId).subscribe(() => {
 				this.router.navigate(['../'], {
 					relativeTo: this.activatedRoute,
 				});
@@ -434,10 +408,11 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	forceCheckUpdates() {
-		if (this.book) {
+		const b = this.book();
+		if (b) {
 			this.modalService.show(
 				'Forçar Atualização',
-				`Deseja forçar a verificação de atualizações para o livro "${this.book.title}"? Isso buscará novos capítulos na fonte original.`,
+				`Deseja forçar a verificação de atualizações para o livro "${b.title}"? Isso buscará novos capítulos na fonte original.`,
 				[
 					{
 						label: 'Cancelar',
@@ -457,8 +432,9 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	confirmForceCheckUpdates() {
-		if (this.book) {
-			this.bookService.checkUpdates(this.book.id).subscribe({
+		const bookId = this.book()?.id;
+		if (bookId) {
+			this.bookService.checkUpdates(bookId).subscribe({
 				next: () => {
 					this.modalService.close();
 					this.notificationService.success(
@@ -478,12 +454,13 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	toggleAutoUpdate() {
-		if (this.book) {
-			const newState = !this.book.autoUpdate;
+		const b = this.book();
+		if (b) {
+			const newState = !b.autoUpdate;
 			const action = newState ? 'ativar' : 'desativar';
 			this.modalService.show(
 				`${newState ? 'Ativar' : 'Desativar'} Atualizações Automáticas`,
-				`Deseja ${action} as atualizações automáticas para o livro "${this.book.title}"? ${newState ? 'O sistema verificará novos capítulos periodicamente.' : 'O livro não será mais verificado automaticamente.'}`,
+				`Deseja ${action} as atualizações automáticas para o livro "${b.title}"? ${newState ? 'O sistema verificará novos capítulos periodicamente.' : 'O livro não será mais verificado automaticamente.'}`,
 				[
 					{
 						label: 'Cancelar',
@@ -503,11 +480,14 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	confirmToggleAutoUpdate(enabled: boolean) {
-		if (this.book) {
-			this.bookService.toggleAutoUpdate(this.book.id, enabled).subscribe({
+		const b = this.book();
+		if (b) {
+			this.bookService.toggleAutoUpdate(b.id, enabled).subscribe({
 				next: (response) => {
 					this.modalService.close();
-					this.book.autoUpdate = response.autoUpdate;
+					this.book.update((curr) =>
+						curr ? { ...curr, autoUpdate: response.autoUpdate } : curr,
+					);
 					this.notificationService.success(
 						`Atualizações automáticas ${enabled ? 'ativadas' : 'desativadas'} com sucesso.`,
 						'Configuração Atualizada',
@@ -527,12 +507,11 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	// ==================== CONTINUE LENDO ====================
 
 	private async loadLastReadingProgress() {
-		if (!this.book) return;
+		const bookId = this.book()?.id;
+		if (!bookId) return;
 
 		const progress =
-			await this.readingProgressService.getLastProgressForBook(
-				this.book.id,
-			);
+			await this.readingProgressService.getLastProgressForBook(bookId);
 		if (progress) {
 			this.lastReadChapterId = progress.chapterId;
 			this.lastReadPage = progress.pageIndex;
@@ -540,9 +519,10 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	private loadFirstChapter() {
-		if (!this.book) return;
+		const bookId = this.book()?.id;
+		if (!bookId) return;
 
-		this.bookService.getAllChapters(this.book.id).subscribe({
+		this.bookService.getAllChapters(bookId).subscribe({
 			next: (chapters: Chapterlist[]) => {
 				if (chapters && chapters.length > 0) {
 					// Ordena por índice e guarda a lista
@@ -601,13 +581,14 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	private async ensureFirstChapterLoaded() {
-		if (this.firstChapterId || !this.book) {
+		const b = this.book();
+		if (this.firstChapterId || !b) {
 			return;
 		}
 
 		try {
 			const chapters = await firstValueFrom(
-				this.bookService.getAllChapters(this.book.id),
+				this.bookService.getAllChapters(b.id),
 			);
 
 			if (chapters.length > 0) {
@@ -691,21 +672,21 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	async checkBookDownloaded() {
-		if (!this.book) return;
-		const isDownloaded = await this.downloadService.isBookDownloaded(
-			this.book.id,
-		);
+		const bookId = this.book()?.id;
+		if (!bookId) return;
+		const isDownloaded = await this.downloadService.isBookDownloaded(bookId);
 		this.isBookDownloaded.set(isDownloaded);
 	}
 
 	async saveOffline() {
 		this.closeOptionsDropdown();
 
-		if (!this.book) return;
+		const b = this.book();
+		if (!b) return;
 
 		this.modalService.show(
 			'Salvar no App',
-			`Deseja salvar todos os capítulos do livro "${this.book.title}" para leitura offline no app? Isso pode demorar dependendo do número de capítulos.`,
+			`Deseja salvar todos os capítulos do livro "${b.title}" para leitura offline no app? Isso pode demorar dependendo do número de capítulos.`,
 			[
 				{
 					label: 'Cancelar',
@@ -725,12 +706,13 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	private async startOfflineSaveProcess() {
-		if (!this.book) return;
+		const b = this.book();
+		if (!b) return;
 
 		try {
 			// Buscar lista de capítulos
 			const chapters = await firstValueFrom(
-				this.bookService.getAllChapters(this.book.id),
+				this.bookService.getAllChapters(b.id),
 			);
 
 			if (chapters.length === 0) {
@@ -768,11 +750,12 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	async downloadFiles() {
 		this.closeOptionsDropdown();
 
-		if (!this.book) return;
+		const b = this.book();
+		if (!b) return;
 
 		this.modalService.show(
 			'Baixar Arquivos',
-			`Deseja baixar os capítulos do livro "${this.book.title}" em formato ZIP (Imagens ou PDF)?`,
+			`Deseja baixar os capítulos do livro "${b.title}" em formato ZIP (Imagens ou PDF)?`,
 			[
 				{
 					label: 'Cancelar',
@@ -792,10 +775,13 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	private async startDownloadProcess() {
+		const b = this.book();
+		if (!b) return;
+
 		try {
 			// Buscar lista de capítulos
 			const chapters = await firstValueFrom(
-				this.bookService.getAllChapters(this.book.id),
+				this.bookService.getAllChapters(b.id),
 			);
 
 			if (chapters.length === 0) {
@@ -822,6 +808,9 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	private openDownloadFilesModal(chapters: Chapterlist[]) {
+		const b = this.book();
+		if (!b) return;
+
 		this.notificationService.notify({
 			message: '',
 			level: 'custom',
@@ -833,7 +822,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 					title: ch.title,
 					index: ch.index,
 				})),
-				bookTitle: this.book.title,
+				bookTitle: b.title,
 				close: (result: BookDownloadResult | null) => {
 					this.modalService.close();
 					if (result) {
@@ -858,7 +847,8 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		selectedChapterIds: string[],
 		totalChapters: number,
 	) {
-		if (!this.book) return;
+		const b = this.book();
+		if (!b) return;
 
 		// Se todos selecionados, envia array vazio (otimização)
 		const chapterIds =
@@ -869,8 +859,8 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		// Usar o DownloadManagerService para download em background
 		// O download continua mesmo se o usuário navegar para outra página
 		this.downloadManager.startDownload(
-			this.book.id,
-			this.book.title,
+			b.id,
+			b.title,
 			format,
 			chapterIds,
 		);
@@ -884,11 +874,12 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	async deleteDownloadedBook() {
 		this.closeOptionsDropdown();
 
-		if (!this.book) return;
+		const b = this.book();
+		if (!b) return;
 
 		this.modalService.show(
 			'Excluir Download',
-			`Deseja excluir o livro "${this.book.title}" dos downloads? Os capítulos baixados serão removidos do seu dispositivo.`,
+			`Deseja excluir o livro "${b.title}" dos downloads? Os capítulos baixados serão removidos do seu dispositivo.`,
 			[
 				{
 					label: 'Cancelar',
@@ -898,7 +889,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 					label: 'Excluir',
 					type: 'danger',
 					callback: async () => {
-						await this.downloadService.deleteBook(this.book.id);
+						await this.downloadService.deleteBook(b.id);
 						this.isBookDownloaded.set(false);
 						this.modalService.close();
 						this.notificationService.success(
@@ -916,6 +907,9 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		chapters: Chapterlist[],
 		delay: (ms: number) => Promise<unknown>,
 	) {
+		const b = this.book();
+		if (!b) return;
+
 		let downloadedCount = 0;
 		let skippedCount = 0;
 
@@ -955,7 +949,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 				for (const fullChapter of fullChapters) {
 					// Baixar capítulo individualmente para salvar no banco local
 					await this.downloadService.downloadChapter(
-						this.book,
+						b,
 						fullChapter,
 					);
 					downloadedCount++;
@@ -973,7 +967,7 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 		// Notificar conclusão e atualizar status
 		this.isBookDownloaded.set(true);
 		this.notificationService.success(
-			`${downloadedCount} capítulos baixados de "${this.book.title}"${skippedCount > 0 ? `, ${skippedCount} já estavam salvos` : ''}.`,
+			`${downloadedCount} capítulos baixados de "${b.title}"${skippedCount > 0 ? `, ${skippedCount} já estavam salvos` : ''}.`,
 			'Download concluído',
 		);
 	}
@@ -981,11 +975,14 @@ export class BookComponent implements OnInit, OnDestroy, AfterViewInit {
 	shareBook() {
 		this.closeOptionsDropdown();
 
+		const b = this.book();
+		if (!b) return;
+
 		if (navigator.share) {
 			navigator
 				.share({
-					title: this.book.title,
-					text: this.book.description,
+					title: b.title,
+					text: b.description,
 					url: window.location.href,
 				})
 				.catch(console.error);

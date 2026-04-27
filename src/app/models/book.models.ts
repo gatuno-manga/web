@@ -11,6 +11,7 @@ export interface BookList {
 	totalChapters?: number;
 	blurHash?: string;
 	dominantColor?: string;
+	metadata?: ImageMetadata;
 }
 
 export interface ImageMetadata {
@@ -49,6 +50,9 @@ export interface BookBasic {
 	sensitiveContent: SensitiveContentResponse[];
 	totalChapters: number;
 	authors: Author[];
+	blurHash?: string;
+	dominantColor?: string;
+	metadata?: ImageMetadata;
 }
 
 export interface BookDetail {
@@ -79,6 +83,9 @@ export interface Book {
 	tags: tag[];
 	sensitiveContent: SensitiveContentResponse[];
 	authors: Author[];
+	blurHash?: string;
+	dominantColor?: string;
+	metadata?: ImageMetadata;
 }
 
 export interface Author {
@@ -168,6 +175,8 @@ export interface Cover {
 	url: string;
 	selected: boolean;
 	title: string;
+	blurHash?: string;
+	metadata?: ImageMetadata;
 }
 
 export interface SensitiveContentResponse {
@@ -183,6 +192,8 @@ export interface Page {
 	id?: number;
 	index: string;
 	path: string;
+	blurHash?: string;
+	metadata?: ImageMetadata;
 }
 
 export interface BookPageOptions extends PageRequest {

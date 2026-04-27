@@ -1,9 +1,14 @@
 <div class="image-viewer-backdrop" (click)="onBackdropClick($event)">
+    @if (blurHash) {
+        <div class="blur-background">
+            <app-blurhash [hash]="blurHash" [width]="metadata?.width || 32" [height]="metadata?.height || 32" />
+        </div>
+    }
 	<button class="close-btn" (click)="closeViewer()">
 		<app-icons name="close" />
 	</button>
 	<div class="image-container">
-		<img [src]="imageUrl" [alt]="imageTitle" />
+		<img [src]="imageUrl" [alt]="imageTitle" (load)="onImageLoad()" />
 		@if(imageTitle) {
 		<div class="image-title">{{ imageTitle }}</div>
 		}

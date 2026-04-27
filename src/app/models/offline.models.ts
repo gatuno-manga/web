@@ -11,6 +11,8 @@ export interface OfflineBook {
   sensitiveContent: SensitiveContentResponse[];
   totalChapters: number;
   updatedAt: Date;
+  blurHash?: string;
+  dominantColor?: string;
 }
 
 export interface OfflineChapter {

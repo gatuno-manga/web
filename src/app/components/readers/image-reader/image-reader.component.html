@@ -6,12 +6,21 @@
 		[attr.data-index]="$index"
 		(contextmenu)="onContextMenu($event, page, $index)"
 	>
+		<div class="blur-placeholder" [class.fade-out]="loadedPages.has($index)">
+			@if (page.blurHash) {
+				<app-blurhash [hash]="page.blurHash" [width]="page.metadata?.width || 32" [height]="page.metadata?.height || 32" />
+			} @else if (bookBlurHash) {
+				<app-blurhash [hash]="bookBlurHash" [width]="bookMetadata?.width || 32" [height]="bookMetadata?.height || 32" />
+			}
+		</div>
 		<img
 			[src]="page.path"
 			[alt]="'Página ' + ($index + 1)"
 			[attr.fetchpriority]="$index < 2 ? 'high' : 'auto'"
 			[attr.loading]="$index < 2 ? 'eager' : 'lazy'"
+			(load)="onImageLoad($index)"
 			(error)="onImageError()"
+			[class.loaded]="loadedPages.has($index)"
 		/>
 		@if (showPageNumbers) {
 			<div class="page-number">{{ $index + 1 }}</div>

@@ -287,9 +287,14 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.bookOptions = option;
 		this.localStorage.set('books-layout', option);
 
-		// Se mudou para 'list', precisamos das descrições que não foram baixadas no grid/cover
+		// Se mudou para 'list', precisamos garantir que temos as descrições para todos os itens
 		if (option === 'list' && previousOption !== 'list') {
+			this.currentPage = 1;
+			this.books = [];
 			this.loadBooks();
+		} else {
+			// Força atualização das referências para garantir que o OnPush detecte a mudança de 'type'
+			this.books = [...this.books];
 		}
 	}
 
@@ -376,6 +381,8 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 					publication: ob.publication,
 					authors: ob.authors || [],
 					totalChapters: ob.totalChapters,
+					blurHash: ob.blurHash,
+					dominantColor: ob.dominantColor,
 				} as BookList;
 			});
 
@@ -439,14 +446,19 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		this.bookService.getBooksGraphQL(gqlFilter, fields).subscribe({
 			next: (bookPage) => {
+				const newBooks = bookPage.data;
+
 				if (
 					this.listSettings.listMode === 'infinite-scroll' &&
 					this.currentPage > 1
 				) {
-					this.books = [...this.books, ...bookPage.data];
+					// Quando carregando mais no infinite scroll, apenas adicionamos
+					this.books = [...this.books, ...newBooks];
 				} else {
-					this.books = bookPage.data;
+					// Substituímos a lista para garantir que as referências sejam novas
+					this.books = [...newBooks];
 				}
+
 				this.currentPage = bookPage.page || this.currentPage;
 				this.lastPage = bookPage.lastPage || 1;
 				this.hasNextPage = this.currentPage < this.lastPage;

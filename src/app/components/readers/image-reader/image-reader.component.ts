@@ -13,14 +13,16 @@ import {
 	PLATFORM_ID,
 	DestroyRef,
 	ChangeDetectionStrategy,
+	ChangeDetectorRef,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
-import { Page } from '../../../models/book.models';
+import { Page, ImageMetadata } from '../../../models/book.models';
 import { SettingsService } from '../../../service/settings.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { BlurhashComponent } from '../../blurhash/blurhash.component';
 
 export interface ReadingProgressEvent {
 	pageIndex: number;
@@ -40,10 +42,13 @@ export interface ContextMenuEvent {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './image-reader.component.html',
 	styleUrl: './image-reader.component.scss',
+	imports: [CommonModule, BlurhashComponent],
 })
 export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
-	@Input() pages: Page[] = [];
+	@Input() pages: (Page & { blurHash?: string })[] = [];
 	@Input() showPageNumbers = false;
+	@Input() bookBlurHash?: string;
+	@Input() bookMetadata?: ImageMetadata;
 	@Output() progressChange = new EventEmitter<ReadingProgressEvent>();
 	@Output() contextMenu = new EventEmitter<ContextMenuEvent>();
 
@@ -53,6 +58,7 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	private platformId = inject(PLATFORM_ID);
 	private destroyRef = inject(DestroyRef);
 	private settingsService = inject(SettingsService);
+	private cdr = inject(ChangeDetectorRef);
 
 	private intersectionObserver: IntersectionObserver | null = null;
 	private maxReadPageIndex = 0;
@@ -63,6 +69,12 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	});
 
 	imageError = false;
+	loadedPages = new Set<number>();
+
+	onImageLoad(index: number) {
+		this.loadedPages.add(index);
+		this.cdr.markForCheck();
+	}
 
 	onImageError() {
 		this.imageError = true;

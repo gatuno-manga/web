@@ -89,8 +89,13 @@
 			</div>
 			<div class="scrollable">
 				@if (isInitialChaptersLoading()) {
-					@for (i of [].constructor(8); track $index) {
-						<div class="chapter-skeleton">
+					@for (i of [0,1,2,3,4,5,6,7]; track $index) {
+						<div class="chapter-skeleton" [style.background-color]="bookBasic()?.dominantColor">
+							@if (bookBasic()?.blurHash) {
+								<div class="skeleton-blur">
+									<app-blurhash [hash]="bookBasic()?.blurHash" [width]="bookBasic()?.metadata?.width || 32" [height]="bookBasic()?.metadata?.height || 32" />
+								</div>
+							}
 							<div class="chapter-skeleton-left">
 								<div class="placeholder skeleton-line skeleton-title"></div>
 								<div class="placeholder skeleton-line skeleton-subtitle"></div>
@@ -118,7 +123,7 @@
 										size="16"
 										class="content-type-icon"
 									/>
-									<h2>capítulo {{ chapter.index | number: '1.0-0' : 'pt-BR' }}</h2>
+									<h2>capítulo {{ chapter.index | number: '1.0-5' : 'pt-BR' }}</h2>
 								</div>
 								@if (chapter.title) {
 									<h3>{{ chapter.title }}</h3>
@@ -211,8 +216,8 @@
 					}
 
 					@if (isAppendingChapters()) {
-						@for (i of [].constructor(3); track $index) {
-							<div class="chapter-skeleton chapter-skeleton-compact">
+						@for (i of [0,1,2]; track $index) {
+							<div class="chapter-skeleton chapter-skeleton-compact" [style.background-color]="bookBasic()?.dominantColor">
 								<div class="chapter-skeleton-left">
 									<div class="placeholder skeleton-line skeleton-title"></div>
 									<div class="placeholder skeleton-line skeleton-subtitle"></div>
@@ -227,8 +232,8 @@
 				}
 			</div>
 		} @placeholder {
-			@for (i of [].constructor(20); track $index) {
-				<div class="placeholder"></div>
+			@for (i of [0,1,2,3,4,5,6,7,8,9]; track $index) {
+				<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor" style="height: 75px; margin: 10px 1rem; border-radius: 12px;"></div>
 			}
 		}
 	</div>
@@ -291,14 +296,16 @@
 								<app-icons name="image" />
 							</div>
 						}
-						<div class="metadata">{{ cover.title }}</div>
+						<div class="info">
+							<span>{{ cover.title }}</span>
+						</div>
 					</div>
 				}
 			</div>
 		} @placeholder {
 			<div class="placeholder-container">
-				@for (i of [].constructor(10); track $index) {
-					<div class="placeholder"></div>
+				@for (i of [0,1,2,3,4,5,6,7,8,9]; track $index) {
+					<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor"></div>
 				}
 			</div>
 		}
@@ -322,8 +329,8 @@
 							<p>Nenhum titulo alternativo disponível</p>
 						}
 					} @placeholder {
-						@for (i of [].constructor(10); track $index) {
-							<div class="placeholder"></div>
+						@for (i of [0,1,2,3,4]; track $index) {
+							<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor" style="height: 30px; margin: 10px 0; border-radius: 8px;"></div>
 						}
 					}
 				</div>
@@ -358,8 +365,8 @@
 							<p>Nenhuma fonte disponível</p>
 						}
 					} @placeholder {
-						@for (i of [].constructor(5); track $index) {
-							<div class="placeholder"></div>
+						@for (i of [0,1,2,3,4]; track $index) {
+							<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor" style="display: inline-block; width: 100px; height: 30px; margin: 0 10px; border-radius: 12px;"></div>
 						}
 					}
 				</div>
@@ -392,13 +399,10 @@
 								<app-icons name="image" />
 							</div>
 						}
-						<div class="metadata">
-							Cap. {{ savedPage.chapter.index | number: '1.0-0' : 'pt-BR' }} - Pág.
-							{{ savedPage.page.index | number: '1.0-0' : 'pt-BR' }}
+						<div class="info">
+							<span>Cap. {{ savedPage.chapter.index | number: '1.0-5' : 'pt-BR' }} - Pág. {{ savedPage.page.index | number: '1.0-5' : 'pt-BR' }}</span>
 							@if (savedPage.comment) {
-								<div class="comment">
-									"{{ savedPage.comment }}"
-								</div>
+								<span class="description">"{{ savedPage.comment }}"</span>
 							}
 						</div>
 					</div>
@@ -410,8 +414,8 @@
 			</div>
 		} @placeholder {
 			<div class="placeholder-container">
-				@for (i of [].constructor(10); track $index) {
-					<div class="placeholder"></div>
+				@for (i of [0,1,2,3,4,5,6,7,8,9]; track $index) {
+					<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor"></div>
 				}
 			</div>
 		}
@@ -423,6 +427,7 @@
 		[imageUrl]="viewerImageUrl()"
 		[imageTitle]="viewerImageTitle()"
 		[imageDescription]="viewerImageDescription()"
+		[metadata]="viewerImageMetadata()"
 		(close)="closeImageViewer()"
 	/>
 }
