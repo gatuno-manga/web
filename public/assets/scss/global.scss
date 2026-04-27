@@ -1,5 +1,6 @@
 @use 'color';
 @use 'color-definitions';
+@use 'mixins';
 
 * {
 	padding: 0;
@@ -50,35 +51,26 @@ body {
 }
 
 .placeholder {
-	background-color: rgb(from var(--gray-600) r g b / 0.25);
+	@include mixins.skeleton-gradient-animation;
+	background-color: rgba(var(--shadow-base), 0.25);
 	position: relative;
 	overflow: hidden;
-
-	&::after {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: -50%;
-		width: 50%;
-		height: 100%;
-		background: linear-gradient(
-			120deg,
-			transparent 0%,
-			rgb(from var(--white) r g b / 0.6) 50%,
-			transparent 100%
-		);
-		animation: light-beam-move 1.5s linear infinite;
-		pointer-events: none;
-		filter: blur(4rem);
-	}
 }
 
-@keyframes light-beam-move {
-	0% {
-		left: -50%;
+.skeleton-text {
+	@include mixins.skeleton-block($height: 1.2rem);
+	margin-bottom: 0.5rem;
+	background-color: rgba(var(--shadow-base), 0.22);
+
+	&.title {
+		width: 80%;
+		height: 1.4rem;
 	}
-	100% {
-		left: 250%;
+
+	&.subtitle {
+		width: 60%;
+		height: 1rem;
+		background-color: rgba(var(--shadow-base), 0.15);
 	}
 }
 

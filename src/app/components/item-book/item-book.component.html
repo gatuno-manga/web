@@ -1,27 +1,60 @@
 <a
 	[routerLink]="[book.id]"
 	[class]="'book-card ' + type"
+	[ngStyle]="cardCoverStyle()"
 	(contextmenu)="onContextMenu($event)"
 >
+	@if (book.blurHash) {
+		<div
+			class="card-blur-background"
+			[class.fade-out]="isImageLoaded()"
+		>
+			<app-blurhash [hash]="book.blurHash" [width]="book.metadata?.width || 32" [height]="book.metadata?.height || 32" />
+		</div>
+	}
 	@if (book.cover && !imageError) {
-		<div class="cover-image-container">
-			<img
-				[ngSrc]="book.cover"
-				[alt]="'Capa do livro ' + book.title"
-				fill
-				[priority]="priority"
-				(error)="onImageError()"
-			/>
+		<div
+			class="cover-image-container"
+			[style.background-color]="book.dominantColor || 'var(--secondary-color)'"
+		>
+			@if (book.blurHash) {
+				<div
+					class="blur-placeholder"
+					[class.fade-out]="isImageLoaded()"
+				>
+					<app-blurhash [hash]="book.blurHash" [width]="book.metadata?.width || 32" [height]="book.metadata?.height || 32" />
+				</div>
+			}
+
+			@if (isBlobUrl(book.cover)) {
+				<img
+					[src]="book.cover"
+					[alt]="'Capa do livro ' + book.title"
+					[class.loaded]="isImageLoaded()"
+					(load)="onImageLoad()"
+					(error)="onImageError()"
+				/>
+			} @else {
+				<img
+					[ngSrc]="book.cover"
+					[alt]="'Capa do livro ' + book.title"
+					fill
+					[priority]="priority"
+					[class.loaded]="isImageLoaded()"
+					(load)="onImageLoad()"
+					(error)="onImageError()"
+				/>
+			}
 		</div>
 	} @else {
 		<div class="cover-placeholder">
-			<app-icons name="image" />
+			<img src="assets/icons/image-placeholder-14824e.svg" alt="Placeholder" class="placeholder-icon" />
 		</div>
 	}
 	@if (type === 'list') {
 		<div class="info">
 			<span class="title">{{ book.title }}</span>
-			<span class="description">{{ book.description }}</span>
+			<span class="description">{{ truncatedDescription() }}</span>
 		</div>
 	} @else {
 		<div class="info">

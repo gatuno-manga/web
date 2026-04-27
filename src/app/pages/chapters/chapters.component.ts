@@ -18,17 +18,19 @@ import {
 	ViewChild,
 	NgZone,
 } from '@angular/core';
-import { DatePipe, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
 	Chapter,
 	ContentType,
 	Page,
+	ImageMetadata,
 } from '../../models/book.models';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '../../components/icons/icons.component';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { ChapterService } from '../../service/chapter.service';
+import { BookService } from '../../service/book.service';
 import { UserTokenService } from '../../service/user-token.service';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { NotificationService } from '../../service/notification.service';
@@ -95,7 +97,6 @@ type ChapterLoadFailureDiagnostic = {
 		RouterModule,
 		NgClass,
 		DecimalPipe,
-		DatePipe,
 		ButtonComponent,
 		AsideComponent,
 		ImageReaderComponent,
@@ -126,6 +127,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private injector = inject(Injector);
 	private headerStateService = inject(HeaderStateService);
 	private ngZone = inject(NgZone);
+	private bookService = inject(BookService);
 
 	progressBarRef = viewChild<ElementRef>('progressBarRef');
 	@ViewChild(ImageReaderComponent) imageReader?: ImageReaderComponent;
@@ -134,6 +136,8 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	documentReader?: DocumentReaderComponent;
 
 	chapter = signal<Chapter | null>(null);
+	bookBlurHash = signal<string | undefined>(undefined);
+	bookMetadata = signal<ImageMetadata | undefined>(undefined);
 	readingProgress = signal<number>(0);
 	showScrollToTopButton = signal<boolean>(false);
 	savedPageIndex = signal<number>(0);
@@ -326,6 +330,17 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.chapter.set(chapter);
 			this.dismissedChapterLoadErrorModalId = null;
 			this.updateMetadata(chapter);
+
+			// Fetch book blurHash
+			this.bookService.getBook(chapter.bookId).subscribe({
+				next: (book) => {
+					if (book) {
+						this.bookBlurHash.set(book.blurHash);
+						this.bookMetadata.set(book.metadata);
+					}
+				},
+			});
+
 			try {
 				await this.restoreReadingProgress();
 			} catch (e) {

@@ -7,6 +7,20 @@ export interface BookList {
 	cover: string;
 	description: string;
 	scrapingStatus: ScrapingStatus;
+	authors?: Author[];
+	totalChapters?: number;
+	blurHash?: string;
+	dominantColor?: string;
+	metadata?: ImageMetadata;
+}
+
+export interface ImageMetadata {
+	blurHash?: string;
+	dominantColor?: string;
+	height: number;
+	width: number;
+	mimeType?: string;
+	sizeBytes?: number;
 }
 
 export enum ScrapingStatus {
@@ -36,6 +50,9 @@ export interface BookBasic {
 	sensitiveContent: SensitiveContentResponse[];
 	totalChapters: number;
 	authors: Author[];
+	blurHash?: string;
+	dominantColor?: string;
+	metadata?: ImageMetadata;
 }
 
 export interface BookDetail {
@@ -66,6 +83,9 @@ export interface Book {
 	tags: tag[];
 	sensitiveContent: SensitiveContentResponse[];
 	authors: Author[];
+	blurHash?: string;
+	dominantColor?: string;
+	metadata?: ImageMetadata;
 }
 
 export interface Author {
@@ -155,6 +175,8 @@ export interface Cover {
 	url: string;
 	selected: boolean;
 	title: string;
+	blurHash?: string;
+	metadata?: ImageMetadata;
 }
 
 export interface SensitiveContentResponse {
@@ -170,6 +192,8 @@ export interface Page {
 	id?: number;
 	index: string;
 	path: string;
+	blurHash?: string;
+	metadata?: ImageMetadata;
 }
 
 export interface BookPageOptions extends PageRequest {
@@ -187,4 +211,32 @@ export interface BookPageOptions extends PageRequest {
 	orderBy?: 'title' | 'createdAt' | 'updatedAt' | 'publication';
 	order?: 'ASC' | 'DESC';
 	random?: boolean;
+}
+
+export interface BookFilterInput {
+	authors?: string[];
+	authorsLogic?: 'AND' | 'OR';
+	cursor?: string;
+	excludeTags?: string[];
+	excludeTagsLogic?: 'AND' | 'OR';
+	limit?: number;
+	order?: 'ASC' | 'DESC';
+	orderBy?: 'CREATED_AT' | 'PUBLICATION' | 'TITLE' | 'UPDATED_AT';
+	page?: number;
+	publication?: number;
+	publicationOperator?: 'EQ' | 'GT' | 'GTE' | 'LT' | 'LTE';
+	search?: string;
+	sensitiveContent?: string[];
+	tags?: string[];
+	tagsLogic?: 'AND' | 'OR';
+	type?: string[];
+}
+
+export interface PaginatedBookResponse {
+	data: BookList[];
+	hasNextPage?: boolean;
+	lastPage?: number;
+	nextCursor?: string;
+	page?: number;
+	total?: number;
 }

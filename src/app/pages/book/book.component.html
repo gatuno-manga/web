@@ -1,156 +1,187 @@
 @defer (when !isLoading()) {
-	@if (book.cover && !coverImageError) {
+	@if (book(); as b) {
 		<div
-			[style.background-image]="'url(' + book.cover + ')'"
-			[style.width.px]="backgroundWidth"
-			class="book-background"
+			class="background-container"
+			[style.background-color]="b.dominantColor"
 		>
-			<div class="gradient"></div>
-		</div>
-	} @else {
-		<div class="book-background placeholder-background"></div>
-	}
-	<div class="book">
-		<div class="book-header">
-			<div class="book-cover">
-				@if (book.cover && !coverImageError) {
-					<img
-						[ngSrc]="book.cover"
-						[alt]="'Capa do livro ' + book.title"
-						width="200"
-						height="350"
-						priority
-						(error)="onCoverImageError()"
-					/>
-				} @else {
-					<div class="cover-placeholder">
-						<app-icons name="image" />
-					</div>
-				}
-			</div>
-			<div class="book-info">
-				<div class="top">
-					<h1
-						[class.long-title]="book.title.length > 90"
-						[class.very-long-title]="book.title.length > 140"
-					>
-						{{ book.title }}
-					</h1>
-					<h6>
-						{{ getAuthorNames() }}
-					</h6>
+			@if (b.blurHash) {
+				<div
+					class="book-background blur-placeholder"
+				>
+					<app-blurhash [hash]="b.blurHash" [width]="b.metadata?.width || 32" [height]="b.metadata?.height || 32" />
 				</div>
-				<div class="bottom">
-					<div class="caps">{{ book.totalChapters }} Capítulos</div>
-					<div class="release">Lançamento {{ book.publication }}</div>
-					<div class="actions">
-						<app-button
-							class="reading-btn"
-							(click)="continueReading()"
-							variant="primary"
-							rounded="small"
+			}
+			@if (b.cover && !coverImageError) {
+				<div
+					[style.background-image]="'url(' + b.cover + ')'"
+					[style.background-color]="b.dominantColor"
+					class="book-background detailed-background"
+					[class.loaded]="isImageLoaded()"
+				>
+					<div class="gradient"></div>
+				</div>
+			} @else {
+				<div class="book-background placeholder-background"></div>
+			}
+		</div>
+		<div class="book">
+			<div class="book-header">
+				<div class="book-cover">
+					@if (b.cover && !coverImageError) {
+						@if (b.blurHash) {
+							<div
+								class="blur-placeholder"
+								[class.fade-out]="isImageLoaded()"
+							>
+								<app-blurhash [hash]="b.blurHash" [width]="b.metadata?.width || 32" [height]="b.metadata?.height || 32" />
+							</div>
+						}
+						<img
+							[ngSrc]="b.cover"
+							[alt]="'Capa do livro ' + b.title"
+							width="200"
+							height="350"
+							priority
+							[class.loaded]="isImageLoaded()"
+							(load)="onImageLoad()"
+							(error)="onCoverImageError()"
+						/>
+					} @else {
+						<div class="cover-placeholder">
+							<app-icons name="image" />
+						</div>
+					}
+				</div>
+				<div class="book-info">
+					<div class="top">
+						<h1
+							[class.long-title]="b.title.length > 90"
+							[class.very-long-title]="b.title.length > 140"
 						>
-							{{
-								lastReadChapterId
-									? 'Continue lendo'
-									: 'Começar a ler'
-							}}
-						</app-button>
-						<div class="options-wrapper btn-actions">
+							{{ b.title }}
+						</h1>
+						<h6>
+							{{ getAuthorNames() }}
+						</h6>
+					</div>
+					<div class="bottom">
+						<div class="caps">{{ b.totalChapters }} Capítulos</div>
+						<div class="release">Lançamento {{ b.publication }}</div>
+						<div class="actions">
 							<app-button
+								class="reading-btn"
+								(click)="continueReading()"
+								variant="primary"
+								rounded="small"
+							>
+								{{
+									lastReadChapterId
+										? 'Continue lendo'
+										: 'Começar a ler'
+								}}
+							</app-button>
+							<div class="options-wrapper btn-actions">
+								<app-button
+									radio="square"
+									rounded="small"
+									padding="none"
+									class="options-btn"
+									aria-label="Mais opções"
+									(click)="
+										toggleOptionsDropdown();
+										$event.stopPropagation()
+									"
+								>
+									<app-icons name="more" />
+								</app-button>
+								@if (showOptionsDropdown()) {
+									<div class="options-dropdown">
+										<button (click)="saveOffline()">
+											<app-icons name="smartphone" />
+											<span>Salvar no app</span>
+										</button>
+										@if (isBookDownloaded()) {
+											<button
+												(click)="deleteDownloadedBook()"
+												class="danger"
+											>
+												<app-icons name="trash" />
+												<span>Excluir download</span>
+											</button>
+										}
+										<button (click)="shareBook()">
+											<app-icons name="share" />
+											<span>Compartilhar</span>
+										</button>
+										@if (admin()) {
+											<button (click)="forceCheckUpdates()">
+												<app-icons name="refresh-ccw-dot" />
+												<span>Forçar atualização</span>
+											</button>
+										}
+										<button (click)="downloadFiles()">
+											<app-icons name="download" />
+											<span>Baixar arquivos</span>
+										</button>
+									</div>
+								}
+							</div>
+							<app-button
+								class="btn-actions"
+								type="primary"
 								radio="square"
 								rounded="small"
 								padding="none"
-								class="options-btn"
-								aria-label="Mais opções"
-								(click)="
-									toggleOptionsDropdown();
-									$event.stopPropagation()
+								[disabled]="!admin()"
+								[aria-label]="
+									b.autoUpdate
+										? 'Desativar atualizações automáticas'
+										: 'Ativar atualizações automáticas'
 								"
+								(click)="toggleAutoUpdate()"
 							>
-								<app-icons name="more" />
+								<app-icons
+									[name]="
+										b.autoUpdate
+											? 'refresh-ccw'
+											: 'refresh-cw-off'
+									"
+								/>
 							</app-button>
-							@if (showOptionsDropdown()) {
-								<div class="options-dropdown">
-									<button (click)="saveOffline()">
-										<app-icons name="smartphone" />
-										<span>Salvar no app</span>
-									</button>
-									@if (isBookDownloaded()) {
-										<button
-											(click)="deleteDownloadedBook()"
-											class="danger"
-										>
-											<app-icons name="trash" />
-											<span>Excluir download</span>
-										</button>
-									}
-									<button (click)="shareBook()">
-										<app-icons name="share" />
-										<span>Compartilhar</span>
-									</button>
-									@if (admin) {
-										<button (click)="forceCheckUpdates()">
-											<app-icons name="refresh-ccw-dot" />
-											<span>Forçar atualização</span>
-										</button>
-									}
-									<button (click)="downloadFiles()">
-										<app-icons name="download" />
-										<span>Baixar arquivos</span>
-									</button>
-								</div>
-							}
 						</div>
-						<app-button
-							class="btn-actions"
-							type="primary"
-							radio="square"
-							rounded="small"
-							padding="none"
-							[disabled]="!admin"
-							[aria-label]="
-								book.autoUpdate
-									? 'Desativar atualizações automáticas'
-									: 'Ativar atualizações automáticas'
-							"
-							(click)="toggleAutoUpdate()"
-						>
-							<app-icons
-								[name]="
-									book.autoUpdate
-										? 'refresh-ccw'
-										: 'refresh-cw-off'
-								"
-							/>
-						</app-button>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="book-info-plus">
-			<div class="tags">
-				@for (content of book.sensitiveContent; track content) {
-					<span class="sensitive">{{ content.name }}</span>
-				}
-				@for (tag of book.tags; track tag.id) {
-					<span class="tag" (click)="filterByTag(tag.id)">{{
-						tag.name
-					}}</span>
-				}
+			<div class="book-info-plus">
+				<div class="tags">
+					@for (content of b.sensitiveContent || []; track content) {
+						<span class="sensitive">{{ content.name }}</span>
+					}
+					@for (tag of b.tags || []; track tag.id) {
+						<span class="tag" (click)="filterByTag(tag.id)">{{
+							tag.name
+						}}</span>
+					}
+				</div>
+				<markdown
+					[data]="b.description"
+					class="book-description"
+				></markdown>
 			</div>
-			<markdown
-				[data]="book.description"
-				class="book-description"
-			></markdown>
 		</div>
-	</div>
-	<app-info-book [id]="book.id" [bookBasic]="book" />
+		<app-info-book [id]="b.id" [bookBasic]="b" />
+	}
 } @placeholder {
-	<div class="book-background placeholder-background"></div>
+	<div class="background-container">
+		<div class="book-background placeholder-background"></div>
+	</div>
 	<div class="book">
 		<div class="book-header">
-			<div class="book-cover placeholder"></div>
+			<div class="book-cover placeholder" [style.background-color]="book()?.dominantColor">
+				@if (book()?.blurHash) {
+					<app-blurhash [hash]="book()?.blurHash" [width]="32" [height]="32" />
+				}
+			</div>
 			<div class="book-info">
 				<div class="top">
 					<h1 class="placeholder"></h1>
@@ -164,7 +195,7 @@
 		</div>
 		<div class="book-info-plus">
 			<div class="tags">
-				@for (i of [].constructor(5); track $index) {
+				@for (i of [0, 1, 2, 3, 4]; track $index) {
 					<span class="placeholder"></span>
 				}
 			</div>
@@ -172,14 +203,14 @@
 		</div>
 	</div>
 	<div class="chapters">
-		@for (i of [].constructor(4); track $index) {
+		@for (i of [0, 1, 2, 3]; track $index) {
 			<div class="placeholder"></div>
 		}
 	</div>
 }
-@if (admin && book) {
+@if (admin() && book()) {
 	<app-aside>
-		<h1><app-icons name="book" /> {{ book.title }}</h1>
+		<h1><app-icons name="book" /> {{ book()?.title }}</h1>
 		<div class="line"></div>
 		<div class="actions">
 			<app-button (click)="resetBook()" variant="text"

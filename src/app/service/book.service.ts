@@ -12,6 +12,8 @@ import {
 	Cover,
 	UpdateBookDto,
 	ScrapingStatus,
+	BookFilterInput,
+	PaginatedBookResponse,
 } from '../models/book.models';
 import { Page } from '../models/miscellaneous.models';
 import { SensitiveContentService } from './sensitive-content.service';
@@ -75,6 +77,78 @@ export class BookService {
 						err,
 					);
 					return this.getOfflineBooks(options);
+				}),
+			);
+	}
+
+	getBooksGraphQL(
+		filter: BookFilterInput,
+		fields: string[] = ['id', 'title', 'cover'],
+	): Observable<PaginatedBookResponse> {
+		const queryFields = fields.filter((f) => f !== 'cover');
+		if (fields.includes('cover')) {
+			queryFields.push(
+				'covers { url isMain metadata { blurHash dominantColor } }',
+			);
+		}
+
+		const query = `
+			query GetBooks($filter: BookFilterInput) {
+				books(filter: $filter) {
+					data {
+						${queryFields.join('\n')}
+					}
+					hasNextPage
+					lastPage
+					nextCursor
+					page
+					total
+				}
+			}
+		`;
+
+		return this.http
+			.post<{ data: { books: PaginatedBookResponse } }>('graphql', {
+				query,
+				variables: { filter },
+			})
+			.pipe(
+				map((response) => {
+					const books = response.data.books;
+					// Mapear cover, blurHash e dominantColor da capa principal para o objeto BookList
+					books.data = books.data.map((book: any) => {
+						const mainCover =
+							book.covers?.find((c: any) => c.isMain) ||
+							book.covers?.[0];
+						if (mainCover) {
+							book.cover = mainCover.url;
+							if (mainCover.metadata) {
+								book.blurHash = mainCover.metadata.blurHash;
+								book.dominantColor =
+									mainCover.metadata.dominantColor;
+							}
+						}
+						return book;
+					});
+					return books;
+				}),
+				catchError((err) => {
+					console.warn(
+						'GraphQL fetch failed, falling back to REST/Offline',
+						err,
+					);
+					return this.getBooks({
+						page: filter.page,
+						limit: filter.limit,
+						search: filter.search,
+					}).pipe(
+						map((res) => ({
+							data: res.data,
+							page: res.metadata.page,
+							lastPage: res.metadata.lastPage,
+							total: res.metadata.total,
+						})),
+					);
 				}),
 			);
 	}

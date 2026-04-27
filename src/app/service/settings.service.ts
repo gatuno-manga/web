@@ -73,12 +73,12 @@ export class SettingsService {
 	}
 
 	private loadSettings(): ReaderSettings {
-		const saved = this.localStorageService.get(this.SETTINGS_KEY);
+		const saved = this.localStorageService.get<ReaderSettings>(this.SETTINGS_KEY);
 		if (saved) {
 			try {
 				const mergedSettings = {
 					...DEFAULT_SETTINGS,
-					...JSON.parse(saved),
+					...saved,
 				};
 				return this.normalizeSettings(mergedSettings);
 			} catch (error) {
@@ -104,7 +104,7 @@ export class SettingsService {
 	private saveSettings(settings: ReaderSettings): void {
 		this.localStorageService.set(
 			this.SETTINGS_KEY,
-			JSON.stringify(settings),
+			settings,
 		);
 	}
 
