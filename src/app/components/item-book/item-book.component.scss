@@ -1,79 +1,13 @@
 $width: 250px;
 $width-mobile: 150px;
 
-.cover {
-	position: relative;
-	width: $width;
-	overflow: hidden;
-	border-radius: 12px;
-	border: none;
-	background-color: transparent;
-
-	@media (max-width: 768px) {
-		width: $width-mobile;
-	}
-
-	img,
-	.cover-placeholder {
-		display: block;
-		width: 100%;
-		height: 355px;
-		object-fit: cover;
-		border-radius: 12px;
-
-		@media (max-width: 768px) {
-			height: 220px;
-		}
-	}
-
-	.cover-placeholder {
-		background-color: var(--secondary-color);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
-		app-icons {
-			width: 48px;
-			height: 48px;
-			color: var(--app-text-color);
-			opacity: 0.4;
-		}
-	}
-
-	.info {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		padding: 32px 12px 12px;
-		background: linear-gradient(
-			to top,
-			rgb(0 0 0 / 0.85) 0%,
-			transparent 100%
-		);
-		border-radius: 0 0 12px 12px;
-
-		span {
-			color: #fff;
-			font-size: 0.95rem;
-			line-height: 1.2rem;
-			height: 2.4rem;
-			display: -webkit-box;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: normal;
-			line-clamp: 2;
-			-webkit-box-orient: vertical;
-		}
-	}
-}
-
 .cover-image-container {
 	position: relative;
 	width: $width;
 	height: 355px;
 	overflow: hidden;
 	border-radius: 12px;
+	display: block;
 
 	@media (max-width: 768px) {
 		width: $width-mobile;
@@ -81,20 +15,10 @@ $width-mobile: 150px;
 	}
 
 	img {
+		width: 100%;
+		height: 100%;
 		object-fit: cover;
-	}
-}
-
-.book-card.list {
-	.cover-image-container {
-		width: 120px;
-		height: 180px;
-		border-radius: 0;
-
-		@media (max-width: 768px) {
-			width: 100px;
-			height: 150px;
-		}
+		display: block;
 	}
 }
 
@@ -106,9 +30,25 @@ $width-mobile: 150px;
 	border-radius: 5px;
 	overflow: hidden;
 	transition: background-color 0.3s ease;
+
+	.cover-placeholder {
+		background-color: var(--secondary-color);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+
+		.placeholder-icon {
+			width: 32px;
+			height: 32px;
+			opacity: 0.15;
+			filter: grayscale(1);
+		}
+	}
 }
 
-.grid {
+.grid,
+.cover {
 	align-items: center;
 	flex-direction: column;
 	width: $width;
@@ -120,31 +60,25 @@ $width-mobile: 150px;
 	.cover-placeholder {
 		width: $width;
 		height: 355px;
-		border-radius: 15px;
-		background-color: var(--secondary-color);
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		border-radius: 1px; // Slight radius to match card
 
 		@media (max-width: 768px) {
 			width: $width-mobile;
 			height: 220px;
 		}
 
-		app-icons {
-			width: 48px;
-			height: 48px;
-			color: var(--app-text-color);
-			opacity: 0.4;
+		.placeholder-icon {
+			width: 64px;
+			height: 64px;
 		}
 	}
 
 	.info {
 		padding: 20px;
-		border: 1px solid var(--primary-color);
-		border-top: none;
+		width: 100%;
 		border-bottom-left-radius: inherit;
 		border-bottom-right-radius: inherit;
+		
 		span {
 			width: 100%;
 			line-height: 1.2rem;
@@ -165,21 +99,26 @@ $width-mobile: 150px;
 	height: 180px;
 	width: 100%;
 
-	.cover-placeholder {
-		width: 60px;
-		min-width: 60px;
-		height: 90px;
-		flex-shrink: 0;
-		background-color: var(--secondary-color);
-		display: flex;
-		align-items: center;
-		justify-content: center;
+	.cover-image-container {
+		width: 120px;
+		height: 180px;
+		border-radius: 0;
 
-		app-icons {
-			width: 28px;
-			height: 28px;
-			color: var(--app-text-color);
-			opacity: 0.4;
+		@media (max-width: 768px) {
+			width: 100px;
+			height: 150px;
+		}
+	}
+
+	.cover-placeholder {
+		width: 120px;
+		min-width: 120px;
+		height: 180px;
+		flex-shrink: 0;
+
+		@media (max-width: 768px) {
+			width: 100px;
+			height: 150px;
 		}
 	}
 

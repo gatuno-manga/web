@@ -40,11 +40,16 @@
 		<app-select [items]="selectList" [select]="selectListItem()" />
 	</div>
 </div>
-
 <div id="books" [class]="bookOptions">
 	@if (isLoading() && books.length === 0) {
 		@for (i of [].constructor(10); track $index) {
-			<div class="placeholder"></div>
+			<div class="book-card-skeleton" [class]="bookOptions">
+				<div class="cover-skeleton placeholder"></div>
+				<div class="info-skeleton">
+					<div class="skeleton-text title"></div>
+					<div class="skeleton-text subtitle"></div>
+				</div>
+			</div>
 		}
 	} @else {
 		@for (book of books; track book.id; let i = $index) {

@@ -8,6 +8,7 @@ import {
 	ViewChild,
 	ElementRef,
 	AfterViewInit,
+	NgZone,
 } from '@angular/core';
 import { LocalStorageService } from '../../service/local-storage.service';
 import { BookService } from '../../service/book.service';
@@ -73,6 +74,7 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private sensitiveContentService = inject(SensitiveContentService);
 	private modalService = inject(ModalNotificationService);
 	private networkStatus = inject(NetworkStatusService);
+	private ngZone = inject(NgZone);
 
 	books: BookList[] = [];
 	currentPage = 1;
@@ -88,7 +90,18 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private coverUrls: string[] = [];
 	private observer: IntersectionObserver | null = null;
 
-	@ViewChild('scrollAnchor') scrollAnchor?: ElementRef;
+	private _scrollAnchor?: ElementRef;
+	@ViewChild('scrollAnchor') set scrollAnchor(element: ElementRef | undefined) {
+		this._scrollAnchor = element;
+		if (element && this.observer) {
+			this.observer.disconnect();
+			this.observer.observe(element.nativeElement);
+		}
+	}
+
+	get scrollAnchor(): ElementRef | undefined {
+		return this._scrollAnchor;
+	}
 
 	selectList = [
 		{
@@ -221,6 +234,10 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	setupInfiniteScroll() {
 		if (this.listSettings.listMode !== 'infinite-scroll') return;
 
+		if (this.observer) {
+			this.observer.disconnect();
+		}
+
 		this.observer = new IntersectionObserver(
 			(entries) => {
 				if (
@@ -228,10 +245,15 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 					!this.isLoading() &&
 					this.hasNextPage
 				) {
-					this.loadMore();
+					this.ngZone.run(() => {
+						this.loadMore();
+					});
 				}
 			},
-			{ threshold: 0.1 },
+			{
+				threshold: 0.1,
+				rootMargin: '200px',
+			},
 		);
 
 		if (this.scrollAnchor) {
@@ -240,6 +262,7 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	loadMore() {
+		if (this.isLoading() || !this.hasNextPage) return;
 		this.currentPage++;
 		this.loadBooks();
 	}
@@ -260,8 +283,14 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	setBookOptions(option: 'grid' | 'list' | 'cover') {
+		const previousOption = this.bookOptions;
 		this.bookOptions = option;
 		this.localStorage.set('books-layout', option);
+
+		// Se mudou para 'list', precisamos das descrições que não foram baixadas no grid/cover
+		if (option === 'list' && previousOption !== 'list') {
+			this.loadBooks();
+		}
 	}
 
 	toggleViewMode(mode: 'online' | 'offline') {
@@ -362,6 +391,17 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.lastPage = Math.ceil(total / limit) || 1;
 			this.hasNextPage = this.currentPage < this.lastPage;
 			this.pagesToShow = this.getPagesToShow();
+
+			// Manually trigger a check if the anchor is visible after loading
+			if (this.hasNextPage && this.listSettings.listMode === 'infinite-scroll') {
+				setTimeout(() => {
+					if (this.scrollAnchor && !this.isLoading() && this.hasNextPage) {
+						const rect = this.scrollAnchor.nativeElement.getBoundingClientRect();
+						const isInView = rect.top <= window.innerHeight + 200;
+						if (isInView) this.loadMore();
+					}
+				}, 100);
+			}
 		} catch (err) {
 			console.error('Error loading offline books:', err);
 		} finally {
@@ -375,9 +415,7 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			limit: this.listSettings.limit,
 			search: this.filterOptions.search,
 			sensitiveContent: this.filterOptions.sensitiveContent,
-			type: this.filterOptions.type?.map((t) =>
-				t.toUpperCase(),
-			) as any,
+			type: this.filterOptions.type?.map((t) => t.toUpperCase()) as any,
 			tags: this.filterOptions.tags,
 			tagsLogic: this.filterOptions.tagsLogic?.toUpperCase() as any,
 			excludeTags: this.filterOptions.excludeTags,
@@ -386,11 +424,20 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			authorsLogic: this.filterOptions.authorsLogic?.toUpperCase() as any,
 			publication: this.filterOptions.publication,
 			publicationOperator: this.filterOptions.publicationOperator?.toUpperCase() as any,
-			orderBy: this.filterOptions.orderBy?.toUpperCase() as any,
+			orderBy: this.filterOptions.orderBy
+				?.replace(/[A-Z]/g, '_$&')
+				.toUpperCase() as any,
 			order: this.filterOptions.order as any,
 		};
 
-		this.bookService.getBooksGraphQL(gqlFilter).subscribe({
+		const fields = ['id', 'title'];
+		if (this.bookOptions === 'list') {
+			fields.push('description');
+		}
+		// Always include 'cover' to trigger 'covers' mapping in service
+		fields.push('cover');
+
+		this.bookService.getBooksGraphQL(gqlFilter, fields).subscribe({
 			next: (bookPage) => {
 				if (
 					this.listSettings.listMode === 'infinite-scroll' &&
@@ -402,9 +449,20 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 				}
 				this.currentPage = bookPage.page || this.currentPage;
 				this.lastPage = bookPage.lastPage || 1;
-				this.hasNextPage = bookPage.hasNextPage || false;
+				this.hasNextPage = this.currentPage < this.lastPage;
 				this.pagesToShow = this.getPagesToShow();
 				this.isLoading.set(false);
+
+				// Manually trigger a check if the anchor is visible after loading
+				if (this.hasNextPage && this.listSettings.listMode === 'infinite-scroll') {
+					setTimeout(() => {
+						if (this.scrollAnchor && !this.isLoading() && this.hasNextPage) {
+							const rect = this.scrollAnchor.nativeElement.getBoundingClientRect();
+							const isInView = rect.top <= window.innerHeight + 200;
+							if (isInView) this.loadMore();
+						}
+					}, 100);
+				}
 			},
 			error: () => {
 				console.log('Online GraphQL load failed, falling back to offline view');

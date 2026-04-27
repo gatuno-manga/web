@@ -9,6 +9,17 @@ export interface BookList {
 	scrapingStatus: ScrapingStatus;
 	authors?: Author[];
 	totalChapters?: number;
+	blurHash?: string;
+	dominantColor?: string;
+}
+
+export interface ImageMetadata {
+	blurHash?: string;
+	dominantColor?: string;
+	height: number;
+	width: number;
+	mimeType?: string;
+	sizeBytes?: number;
 }
 
 export enum ScrapingStatus {

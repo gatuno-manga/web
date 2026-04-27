@@ -81,15 +81,22 @@ export class BookService {
 			);
 	}
 
-	getBooksGraphQL(filter: BookFilterInput): Observable<PaginatedBookResponse> {
+	getBooksGraphQL(
+		filter: BookFilterInput,
+		fields: string[] = ['id', 'title', 'cover'],
+	): Observable<PaginatedBookResponse> {
+		const queryFields = fields.filter((f) => f !== 'cover');
+		if (fields.includes('cover')) {
+			queryFields.push(
+				'covers { url isMain metadata { blurHash dominantColor } }',
+			);
+		}
+
 		const query = `
 			query GetBooks($filter: BookFilterInput) {
 				books(filter: $filter) {
 					data {
-						id
-						title
-						cover
-						description
+						${queryFields.join('\n')}
 					}
 					hasNextPage
 					lastPage
@@ -106,7 +113,25 @@ export class BookService {
 				variables: { filter },
 			})
 			.pipe(
-				map((response) => response.data.books),
+				map((response) => {
+					const books = response.data.books;
+					// Mapear cover, blurHash e dominantColor da capa principal para o objeto BookList
+					books.data = books.data.map((book: any) => {
+						const mainCover =
+							book.covers?.find((c: any) => c.isMain) ||
+							book.covers?.[0];
+						if (mainCover) {
+							book.cover = mainCover.url;
+							if (mainCover.metadata) {
+								book.blurHash = mainCover.metadata.blurHash;
+								book.dominantColor =
+									mainCover.metadata.dominantColor;
+							}
+						}
+						return book;
+					});
+					return books;
+				}),
 				catchError((err) => {
 					console.warn(
 						'GraphQL fetch failed, falling back to REST/Offline',

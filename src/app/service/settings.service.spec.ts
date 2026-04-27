@@ -35,13 +35,23 @@ describe('SettingsService', () => {
 		expect(service.getSettings()).toEqual(DEFAULT_SETTINGS);
 	});
 
+	it('should initialize with saved settings from local storage', () => {
+		const savedSettings = { ...DEFAULT_SETTINGS, grayScale: true };
+		const localStorageSpy = jasmine.createSpyObj('LocalStorageService', ['get', 'set']);
+		localStorageSpy.get.and.returnValue(savedSettings);
+
+		const newService = new SettingsService(localStorageSpy);
+		expect(newService.getSettings().grayScale).toBeTrue();
+		expect(newService.getSettings().asidePosition).toBe(DEFAULT_SETTINGS.asidePosition);
+	});
+
 	it('should update settings and persist to local storage', () => {
 		const newPartial = { showPageNumbers: false };
 		service.updateSettings(newPartial);
 		expect(service.getSettings().showPageNumbers).toBeFalse();
 		expect(localStorageService.set).toHaveBeenCalledWith(
 			'reader-settings',
-			jasmine.any(String),
+			jasmine.any(Object),
 		);
 	});
 

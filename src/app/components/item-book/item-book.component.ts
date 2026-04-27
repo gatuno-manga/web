@@ -16,7 +16,7 @@ import { ChapterService } from '../../service/chapter.service';
 @Component({
 	selector: 'app-item-book',
 	standalone: true,
-	imports: [RouterModule, IconsComponent, NgOptimizedImage],
+	imports: [RouterModule, NgOptimizedImage],
 	templateUrl: './item-book.component.html',
 	styleUrl: './item-book.component.scss',
 })
@@ -33,6 +33,10 @@ export class ItemBookComponent {
 	private chapterService = inject(ChapterService);
 
 	imageError = false;
+
+	isBlobUrl(url: string): boolean {
+		return url.startsWith('blob:');
+	}
 
 	onImageError() {
 		this.imageError = true;

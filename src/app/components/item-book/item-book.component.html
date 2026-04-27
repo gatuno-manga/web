@@ -4,18 +4,26 @@
 	(contextmenu)="onContextMenu($event)"
 >
 	@if (book.cover && !imageError) {
-		<div class="cover-image-container">
-			<img
-				[ngSrc]="book.cover"
-				[alt]="'Capa do livro ' + book.title"
-				fill
-				[priority]="priority"
-				(error)="onImageError()"
-			/>
+		<div class="cover-image-container" [style.background-color]="book.dominantColor || 'var(--secondary-color)'">
+			@if (isBlobUrl(book.cover)) {
+				<img
+					[src]="book.cover"
+					[alt]="'Capa do livro ' + book.title"
+					(error)="onImageError()"
+				/>
+			} @else {
+				<img
+					[ngSrc]="book.cover"
+					[alt]="'Capa do livro ' + book.title"
+					fill
+					[priority]="priority"
+					(error)="onImageError()"
+				/>
+			}
 		</div>
 	} @else {
 		<div class="cover-placeholder">
-			<app-icons name="image" />
+			<img src="assets/icons/image-placeholder-14824e.svg" alt="Placeholder" class="placeholder-icon" />
 		</div>
 	}
 	@if (type === 'list') {
