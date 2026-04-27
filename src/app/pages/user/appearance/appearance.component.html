@@ -1,11 +1,40 @@
 @if (showPage()) {
-	<section [class.list-view]="isListView()">
+	<section [class.list-view]="isListView()" class="appearance-container">
 		@if (!isListView()) {
-			<h1>Aparencia</h1>
+			<h1>Aparência</h1>
 			<p class="subtitle">Mude como as coisas do seu aplicativo se parecem</p>
 		}
+
+		<div class="settings-group">
+			<h2>Listagem de Livros</h2>
+			<p class="group-description">Personalize como os livros são exibidos nas listas.</p>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<label>Modo de Exibição</label>
+					<span>Escolha entre paginação tradicional ou carregamento contínuo.</span>
+				</div>
+				<div class="setting-control">
+					<select [value]="bookSettings().listMode" (change)="onModeChange($event)">
+						<option value="pagination">Paginação</option>
+						<option value="infinite-scroll">Scroll Infinito</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<label>Itens por Lote/Página</label>
+					<span>Quantidade de livros carregados de cada vez.</span>
+				</div>
+				<div class="setting-control">
+					<input type="number" [value]="bookSettings().limit" (change)="onLimitChange($event)" min="1" max="100">
+				</div>
+			</div>
+		</div>
+
 		<div class="placeholder">
-			<p>Opções de aparência estarão disponíveis em breve.</p>
+			<p>Mais opções de aparência estarão disponíveis em breve.</p>
 		</div>
 	</section>
 }

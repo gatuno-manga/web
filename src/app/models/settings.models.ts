@@ -16,6 +16,16 @@ export interface ReaderSettings {
 	textAlign?: 'left' | 'center' | 'right' | 'justify';
 }
 
+export interface BookListSettings {
+	listMode: 'pagination' | 'infinite-scroll';
+	limit: number;
+}
+
+export const DEFAULT_BOOK_LIST_SETTINGS: BookListSettings = {
+	listMode: 'pagination',
+	limit: 20,
+};
+
 export const DEFAULT_SETTINGS: ReaderSettings = {
 	grayScale: false,
 	asidePosition: 'right',

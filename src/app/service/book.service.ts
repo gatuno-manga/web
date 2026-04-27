@@ -12,6 +12,8 @@ import {
 	Cover,
 	UpdateBookDto,
 	ScrapingStatus,
+	BookFilterInput,
+	PaginatedBookResponse,
 } from '../models/book.models';
 import { Page } from '../models/miscellaneous.models';
 import { SensitiveContentService } from './sensitive-content.service';
@@ -75,6 +77,53 @@ export class BookService {
 						err,
 					);
 					return this.getOfflineBooks(options);
+				}),
+			);
+	}
+
+	getBooksGraphQL(filter: BookFilterInput): Observable<PaginatedBookResponse> {
+		const query = `
+			query GetBooks($filter: BookFilterInput) {
+				books(filter: $filter) {
+					data {
+						id
+						title
+						cover
+						description
+					}
+					hasNextPage
+					lastPage
+					nextCursor
+					page
+					total
+				}
+			}
+		`;
+
+		return this.http
+			.post<{ data: { books: PaginatedBookResponse } }>('graphql', {
+				query,
+				variables: { filter },
+			})
+			.pipe(
+				map((response) => response.data.books),
+				catchError((err) => {
+					console.warn(
+						'GraphQL fetch failed, falling back to REST/Offline',
+						err,
+					);
+					return this.getBooks({
+						page: filter.page,
+						limit: filter.limit,
+						search: filter.search,
+					}).pipe(
+						map((res) => ({
+							data: res.data,
+							page: res.metadata.page,
+							lastPage: res.metadata.lastPage,
+							total: res.metadata.total,
+						})),
+					);
 				}),
 			);
 	}

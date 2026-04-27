@@ -13,33 +13,46 @@ export class LocalStorageService {
         this.isBrowser = isPlatformBrowser(this.platformId);
     }
 
-    set(key: string, value: string) {
+    set(key: string, value: any) {
         if (this.isBrowser) {
-            localStorage.setItem(`${this.KEY}/${key}`, value);
+            const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
+            localStorage.setItem(`${this.KEY}/${key}`, stringValue);
         }
     }
-    get(key: string): string | null {
+
+    get<T = string>(key: string): T | null {
         if (this.isBrowser) {
-            return localStorage.getItem(`${this.KEY}/${key}`);
+            const value = localStorage.getItem(`${this.KEY}/${key}`);
+            if (value === null) return null;
+
+            try {
+                return JSON.parse(value) as T;
+            } catch (error) {
+                return value as unknown as T;
+            }
         }
         return null;
     }
+
     delete(key: string) {
         if (this.isBrowser) {
             localStorage.removeItem(`${this.KEY}/${key}`);
         }
     }
+
     clear() {
         if (this.isBrowser) {
             localStorage.clear();
         }
     }
+
     has(key: string): boolean {
         if (this.isBrowser) {
             return localStorage.getItem(`${this.KEY}/${key}`) !== null;
         }
         return false;
     }
+
     keys(): string[] {
         const keys: string[] = [];
         if (this.isBrowser) {

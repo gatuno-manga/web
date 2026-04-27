@@ -7,6 +7,8 @@ export interface BookList {
 	cover: string;
 	description: string;
 	scrapingStatus: ScrapingStatus;
+	authors?: Author[];
+	totalChapters?: number;
 }
 
 export enum ScrapingStatus {
@@ -187,4 +189,32 @@ export interface BookPageOptions extends PageRequest {
 	orderBy?: 'title' | 'createdAt' | 'updatedAt' | 'publication';
 	order?: 'ASC' | 'DESC';
 	random?: boolean;
+}
+
+export interface BookFilterInput {
+	authors?: string[];
+	authorsLogic?: 'AND' | 'OR';
+	cursor?: string;
+	excludeTags?: string[];
+	excludeTagsLogic?: 'AND' | 'OR';
+	limit?: number;
+	order?: 'ASC' | 'DESC';
+	orderBy?: 'CREATED_AT' | 'PUBLICATION' | 'TITLE' | 'UPDATED_AT';
+	page?: number;
+	publication?: number;
+	publicationOperator?: 'EQ' | 'GT' | 'GTE' | 'LT' | 'LTE';
+	search?: string;
+	sensitiveContent?: string[];
+	tags?: string[];
+	tagsLogic?: 'AND' | 'OR';
+	type?: string[];
+}
+
+export interface PaginatedBookResponse {
+	data: BookList[];
+	hasNextPage?: boolean;
+	lastPage?: number;
+	nextCursor?: string;
+	page?: number;
+	total?: number;
 }

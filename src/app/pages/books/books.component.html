@@ -17,30 +17,32 @@
 			[disabled]="isOfflineMode"
 		/>
 	</div>
-	<div class="pages">
-		@if (isLoading()) {
-			@for (i of [].constructor(5); track $index) {
-				<div class="placeholder"></div>
+	@if (listSettings.listMode === 'pagination') {
+		<div class="pages">
+			@if (isLoading() && books.length === 0) {
+				@for (i of [].constructor(5); track $index) {
+					<div class="placeholder"></div>
+				}
+			} @else {
+				@for (page of pagesToShow; track page) {
+					<div
+						class="page"
+						[class.active]="page === currentPage"
+						(click)="goToPage(page)"
+					>
+						{{ page }}
+					</div>
+				}
 			}
-		} @else {
-			@for (page of pagesToShow; track page) {
-				<div
-					class="page"
-					[class.active]="page === currentPage"
-					(click)="goToPage(page)"
-				>
-					{{ page }}
-				</div>
-			}
-		}
-	</div>
+		</div>
+	}
 	<div>
 		<app-select [items]="selectList" [select]="selectListItem()" />
 	</div>
 </div>
 
 <div id="books" [class]="bookOptions">
-	@if (isLoading()) {
+	@if (isLoading() && books.length === 0) {
 		@for (i of [].constructor(10); track $index) {
 			<div class="placeholder"></div>
 		}
@@ -55,20 +57,37 @@
 	}
 </div>
 
-@defer (on idle) {
-	<div class="controller">
-		<div class="pages">
-			@for (page of pagesToShow; track page) {
-				<div
-					class="page"
-					[class.active]="page === currentPage"
-					(click)="goToPage(page)"
-				>
-					{{ page }}
+@if (listSettings.listMode === 'infinite-scroll') {
+	<div #scrollAnchor class="scroll-anchor">
+		@if (isLoading() && books.length > 0) {
+			<div class="infinite-loader">
+				<div class="dot-loader">
+					<span></span>
+					<span></span>
+					<span></span>
 				</div>
-			}
-		</div>
+				<p>Carregando mais...</p>
+			</div>
+		}
 	</div>
-} @placeholder {
-	<div class="controller" style="height: 100px;"></div>
+}
+
+@if (listSettings.listMode === 'pagination') {
+	@defer (on idle) {
+		<div class="controller">
+			<div class="pages">
+				@for (page of pagesToShow; track page) {
+					<div
+						class="page"
+						[class.active]="page === currentPage"
+						(click)="goToPage(page)"
+					>
+						{{ page }}
+					</div>
+				}
+			</div>
+		</div>
+	} @placeholder {
+		<div class="controller" style="height: 100px;"></div>
+	}
 }

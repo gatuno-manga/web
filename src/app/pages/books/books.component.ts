@@ -5,6 +5,9 @@ import {
 	OnInit,
 	inject,
 	computed,
+	ViewChild,
+	ElementRef,
+	AfterViewInit,
 } from '@angular/core';
 import { LocalStorageService } from '../../service/local-storage.service';
 import { BookService } from '../../service/book.service';
@@ -13,7 +16,12 @@ import {
 	BookPageOptions,
 	ScrapingStatus,
 	TypeBook,
+	BookFilterInput,
 } from '../../models/book.models';
+import {
+	BookListSettings,
+	DEFAULT_BOOK_LIST_SETTINGS,
+} from '../../models/settings.models';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ItemBookComponent } from '../../components/item-book/item-book.component';
 import { Page } from '../../models/miscellaneous.models';
@@ -55,7 +63,7 @@ interface BookQueryParams {
 	templateUrl: './books.component.html',
 	styleUrl: './books.component.scss',
 })
-export class BooksComponent implements OnInit, OnDestroy {
+export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private localStorage = inject(LocalStorageService);
 	private bookService = inject(BookService);
 	private router = inject(Router);
@@ -69,13 +77,18 @@ export class BooksComponent implements OnInit, OnDestroy {
 	books: BookList[] = [];
 	currentPage = 1;
 	lastPage = 1;
+	hasNextPage = false;
 	pagesToShow: number[] = [];
 	isLoading = signal(true);
 	bookOptions: 'grid' | 'list' | 'cover' = 'grid';
 	viewMode: 'online' | 'offline' = 'online';
 	isOfflineMode = false;
 	filterOptions: BookPageOptions = {};
+	listSettings: BookListSettings = DEFAULT_BOOK_LIST_SETTINGS;
 	private coverUrls: string[] = [];
+	private observer: IntersectionObserver | null = null;
+
+	@ViewChild('scrollAnchor') scrollAnchor?: ElementRef;
 
 	selectList = [
 		{
@@ -107,6 +120,10 @@ export class BooksComponent implements OnInit, OnDestroy {
 	];
 
 	ngOnInit() {
+		this.listSettings =
+			this.localStorage.get<BookListSettings>('book-list-settings') ||
+			DEFAULT_BOOK_LIST_SETTINGS;
+
 		const savedLayout = this.localStorage.get('books-layout');
 		if (
 			savedLayout === 'grid' ||
@@ -137,6 +154,7 @@ export class BooksComponent implements OnInit, OnDestroy {
 
 			const filters: BookPageOptions = {
 				page: this.currentPage,
+				limit: this.listSettings.limit,
 			};
 
 			// Only apply these filters in online mode
@@ -183,6 +201,7 @@ export class BooksComponent implements OnInit, OnDestroy {
 					: [params.sensitiveContent];
 
 			this.filterOptions = filters;
+
 			this.loadBooks();
 		});
 		this.setMetaData();
@@ -190,6 +209,39 @@ export class BooksComponent implements OnInit, OnDestroy {
 
 	ngOnDestroy() {
 		this.clearCoverUrls();
+		if (this.observer) {
+			this.observer.disconnect();
+		}
+	}
+
+	ngAfterViewInit() {
+		this.setupInfiniteScroll();
+	}
+
+	setupInfiniteScroll() {
+		if (this.listSettings.listMode !== 'infinite-scroll') return;
+
+		this.observer = new IntersectionObserver(
+			(entries) => {
+				if (
+					entries[0].isIntersecting &&
+					!this.isLoading() &&
+					this.hasNextPage
+				) {
+					this.loadMore();
+				}
+			},
+			{ threshold: 0.1 },
+		);
+
+		if (this.scrollAnchor) {
+			this.observer.observe(this.scrollAnchor.nativeElement);
+		}
+	}
+
+	loadMore() {
+		this.currentPage++;
+		this.loadBooks();
 	}
 
 	clearCoverUrls() {
@@ -282,7 +334,7 @@ export class BooksComponent implements OnInit, OnDestroy {
 
 			this.clearCoverUrls();
 
-			this.books = paginated.map((ob) => {
+			const newBooks = paginated.map((ob) => {
 				const url = URL.createObjectURL(ob.cover);
 				this.coverUrls.push(url);
 				return {
@@ -298,7 +350,17 @@ export class BooksComponent implements OnInit, OnDestroy {
 				} as BookList;
 			});
 
+			if (
+				this.listSettings.listMode === 'infinite-scroll' &&
+				this.currentPage > 1
+			) {
+				this.books = [...this.books, ...newBooks];
+			} else {
+				this.books = newBooks;
+			}
+
 			this.lastPage = Math.ceil(total / limit) || 1;
+			this.hasNextPage = this.currentPage < this.lastPage;
 			this.pagesToShow = this.getPagesToShow();
 		} catch (err) {
 			console.error('Error loading offline books:', err);
@@ -308,16 +370,44 @@ export class BooksComponent implements OnInit, OnDestroy {
 	}
 
 	loadOnlineBooks() {
-		this.bookService.getBooks(this.filterOptions).subscribe({
-			next: (bookPage: Page<BookList>) => {
-				this.books = bookPage.data;
-				this.currentPage = bookPage.metadata.page;
-				this.lastPage = bookPage.metadata.lastPage;
+		const gqlFilter: BookFilterInput = {
+			page: this.currentPage,
+			limit: this.listSettings.limit,
+			search: this.filterOptions.search,
+			sensitiveContent: this.filterOptions.sensitiveContent,
+			type: this.filterOptions.type?.map((t) =>
+				t.toUpperCase(),
+			) as any,
+			tags: this.filterOptions.tags,
+			tagsLogic: this.filterOptions.tagsLogic?.toUpperCase() as any,
+			excludeTags: this.filterOptions.excludeTags,
+			excludeTagsLogic: this.filterOptions.excludeTagsLogic?.toUpperCase() as any,
+			authors: this.filterOptions.authors,
+			authorsLogic: this.filterOptions.authorsLogic?.toUpperCase() as any,
+			publication: this.filterOptions.publication,
+			publicationOperator: this.filterOptions.publicationOperator?.toUpperCase() as any,
+			orderBy: this.filterOptions.orderBy?.toUpperCase() as any,
+			order: this.filterOptions.order as any,
+		};
+
+		this.bookService.getBooksGraphQL(gqlFilter).subscribe({
+			next: (bookPage) => {
+				if (
+					this.listSettings.listMode === 'infinite-scroll' &&
+					this.currentPage > 1
+				) {
+					this.books = [...this.books, ...bookPage.data];
+				} else {
+					this.books = bookPage.data;
+				}
+				this.currentPage = bookPage.page || this.currentPage;
+				this.lastPage = bookPage.lastPage || 1;
+				this.hasNextPage = bookPage.hasNextPage || false;
 				this.pagesToShow = this.getPagesToShow();
 				this.isLoading.set(false);
 			},
-			error: async () => {
-				console.log('Online load failed, falling back to offline view');
+			error: () => {
+				console.log('Online GraphQL load failed, falling back to offline view');
 				this.viewMode = 'offline';
 				this.loadOfflineBooks();
 			},
@@ -365,6 +455,12 @@ export class BooksComponent implements OnInit, OnDestroy {
 	}
 
 	onFiltersChange(filters: Partial<BookPageOptions>) {
+		// Reset books for infinite scroll when filters change
+		if (this.listSettings.listMode === 'infinite-scroll') {
+			this.books = [];
+			this.currentPage = 1;
+		}
+
 		// Check if all filters are empty (clearing filters)
 		const hasAnyFilter = Object.keys(filters).some((key) => {
 			const value = filters[key as keyof BookPageOptions];

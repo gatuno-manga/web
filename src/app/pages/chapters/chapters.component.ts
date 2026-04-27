@@ -18,7 +18,7 @@ import {
 	ViewChild,
 	NgZone,
 } from '@angular/core';
-import { DatePipe, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
 	Chapter,
@@ -95,7 +95,6 @@ type ChapterLoadFailureDiagnostic = {
 		RouterModule,
 		NgClass,
 		DecimalPipe,
-		DatePipe,
 		ButtonComponent,
 		AsideComponent,
 		ImageReaderComponent,
