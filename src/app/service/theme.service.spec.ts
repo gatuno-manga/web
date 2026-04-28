@@ -23,15 +23,14 @@ describe('ThemeService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('toggleTheme should flip currentTheme', () => {
-        const before = service.currentTheme();
-        service.toggleTheme();
-        const after = service.currentTheme();
-        expect(after).not.toBe(before);
+    it('setTheme should change currentTheme and set hasUserSelectedTheme', () => {
+        service.setTheme('true-dark');
+        expect(service.currentTheme()).toBe('true-dark');
+        expect(service.hasUserSelectedTheme()).toBeTrue();
     });
 
     it('setThemeFromServer should set theme in non-browser', () => {
-        service.setThemeFromServer('dark');
-        expect(service.currentTheme()).toBe('dark');
+        service.setThemeFromServer('true-dark');
+        expect(service.currentTheme()).toBe('true-dark');
     });
 });

@@ -6,6 +6,25 @@
 		}
 
 		<div class="settings-group">
+			<h2>Tema</h2>
+			<p class="group-description">Escolha o esquema de cores global do aplicativo.</p>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<label>Tema Ativo</label>
+					<span>Altere entre temas claros e escuros conforme sua preferência.</span>
+				</div>
+				<div class="setting-control">
+					<select [value]="themeService.currentTheme()" (change)="onThemeChange($event)">
+						@for (theme of themes; track theme.id) {
+							<option [value]="theme.id">{{ theme.label }}</option>
+						}
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<div class="settings-group">
 			<h2>Listagem de Livros</h2>
 			<p class="group-description">Personalize como os livros são exibidos nas listas.</p>
 

@@ -1,1 +1,7 @@
-<router-outlet /> <app-overlay-notification /> <app-context-menu />
+<router-outlet />
+<app-overlay-notification />
+<app-context-menu />
+
+@if (!themeService.hasUserSelectedTheme()) {
+	<app-theme-setup-modal />
+}

@@ -10,6 +10,7 @@ import {
 import { MetaDataService } from '../../../service/meta-data.service';
 import { SearchService } from '../../../service/search.service';
 import { LocalStorageService } from '../../../service/local-storage.service';
+import { ThemeService, AppTheme } from '../../../service/theme.service';
 import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,
@@ -27,11 +28,18 @@ export class AppearanceComponent implements OnInit {
 	private readonly metaService = inject(MetaDataService);
 	private readonly searchService = inject(SearchService);
 	private readonly localStorage = inject(LocalStorageService);
+	public readonly themeService = inject(ThemeService);
 
 	isListView = input<boolean>(false);
 	private globalSearchQuery = this.searchService.query;
 
 	bookSettings = signal<BookListSettings>(DEFAULT_BOOK_LIST_SETTINGS);
+
+	themes: { id: AppTheme; label: string }[] = [
+		{ id: 'light', label: 'Claro' },
+		{ id: 'dark', label: 'Escuro' },
+		{ id: 'true-dark', label: 'True Dark (OLED)' },
+	];
 
 	showPage = computed(() => {
 		const q = this.globalSearchQuery().toLowerCase();
@@ -49,6 +57,11 @@ export class AppearanceComponent implements OnInit {
 		if (saved) {
 			this.bookSettings.set(saved);
 		}
+	}
+
+	onThemeChange(event: Event) {
+		const select = event.target as HTMLSelectElement;
+		this.themeService.setTheme(select.value as AppTheme);
 	}
 
 	onModeChange(event: Event) {
