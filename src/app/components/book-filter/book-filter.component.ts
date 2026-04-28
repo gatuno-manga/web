@@ -512,6 +512,11 @@ export class BookFilterComponent implements OnInit {
 			filters.sensitiveContent = this.availableSensitiveContent()
 				.filter((c) => this.selectedSensitiveContent().includes(c.id))
 				.map((c) => c.name);
+		} else if (this.availableSensitiveContent().length > 0) {
+			// If nothing selected, consider all available (allowed) sensitive content
+			filters.sensitiveContent = this.availableSensitiveContent().map(
+				(c) => c.name,
+			);
 		}
 
 		filters.orderBy = this.orderBy();
