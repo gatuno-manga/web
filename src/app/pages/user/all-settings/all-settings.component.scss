@@ -2,13 +2,14 @@
 	color: var(--white);
 
 	h1 {
-		font-size: 2rem; // 32px
-		font-weight: 300; // Light
-		margin-bottom: 2rem;
+		font-size: 2rem;
+		font-weight: 300;
+		margin-bottom: 3rem;
 	}
 }
 
 .settings-list {
 	display: flex;
 	flex-direction: column;
+	padding-bottom: 4rem;
 }

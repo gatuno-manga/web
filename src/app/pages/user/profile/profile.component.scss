@@ -1,26 +1,30 @@
+:host {
+	width: 100%;
+}
+
 h1 {
-	font-size: 2.5rem; // 40px
-	font-weight: 300; // Light
+	font-size: 2rem;
+	font-weight: 300;
 	margin-bottom: 0.5rem;
 	color: var(--white);
 }
 
 .subtitle {
-	font-size: 1rem; // 16px
-	font-weight: 300; // Light
-	margin-bottom: 2rem;
+	font-size: 1rem;
+	font-weight: 300;
+	margin-bottom: 3rem;
 	color: var(--white);
 	opacity: 0.8;
 }
 
 .profile-editor {
 	color: var(--white);
-	max-width: 600px;
+	width: 100%;
 
 	h3 {
-		font-size: 1.25rem;
+		font-size: 1.5rem;
 		font-weight: 400;
-		margin: 2rem 0 1rem;
+		margin: 3rem 0 1.5rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		padding-bottom: 0.5rem;
 	}
@@ -30,7 +34,7 @@ h1 {
 	}
 
 	.image-preview {
-		margin-bottom: 1rem;
+		margin-bottom: 1.5rem;
 		background: rgba(255, 255, 255, 0.05);
 		border-radius: 8px;
 		overflow: hidden;
@@ -57,25 +61,25 @@ h1 {
 	}
 
 	.banner-preview {
-		height: 150px;
+		height: 200px;
 		width: 100%;
 	}
 
 	.avatar-preview {
-		width: 100px;
-		height: 100px;
+		width: 120px;
+		height: 120px;
 		border-radius: 50%;
 
 		.avatar-placeholder {
-			background: var(--primary);
+			background: var(--primary-color);
 			color: var(--white);
-			font-size: 1.5rem;
+			font-size: 1.75rem;
 			font-weight: 500;
 		}
 	}
 
 	.form-group {
-		margin-bottom: 1.5rem;
+		margin-bottom: 2rem;
 		display: flex;
 		flex-direction: column;
 
@@ -85,62 +89,26 @@ h1 {
 			margin-bottom: 0.5rem;
 			color: rgba(255, 255, 255, 0.7);
 		}
-
-		input[type="text"] {
-			background: rgba(255, 255, 255, 0.05);
-			border: 1px solid rgba(255, 255, 255, 0.1);
-			border-radius: 4px;
-			padding: 0.75rem 1rem;
-			color: var(--white);
-			font-family: inherit;
-			transition: border-color 0.2s;
-
-			&:focus {
-				outline: none;
-				border-color: var(--primary);
-			}
-
-			&::placeholder {
-				color: rgba(255, 255, 255, 0.3);
-			}
-		}
-
-		input[type="file"] {
-			font-size: 0.875rem;
-			color: rgba(255, 255, 255, 0.7);
-
-			&::file-selector-button {
-				background: rgba(255, 255, 255, 0.1);
-				border: none;
-				border-radius: 4px;
-				color: var(--white);
-				padding: 0.5rem 1rem;
-				cursor: pointer;
-				margin-right: 1rem;
-				transition: background 0.2s;
-
-				&:hover {
-					background: rgba(255, 255, 255, 0.2);
-				}
-			}
-		}
-
-		.error {
-			font-size: 0.75rem;
-			color: #ff4d4f;
-			margin-top: 0.25rem;
-		}
 	}
 
 	.form-actions {
 		display: flex;
-		gap: 1rem;
-		margin-top: 3rem;
+		gap: 1.5rem;
+		margin-top: 4rem;
 		align-items: center;
 	}
 }
 
 :host-context(.list-view) {
-	padding: 2rem 0;
+	padding-bottom: 4rem;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	margin-bottom: 4rem;
+
+	h1 {
+		display: none;
+	}
+
+	.subtitle {
+		display: none;
+	}
 }

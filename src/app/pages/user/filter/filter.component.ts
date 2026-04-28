@@ -53,12 +53,19 @@ export class FilterComponent implements OnInit {
 	selectedBookTypes = signal<string[]>([]);
 
 	isLoading = signal<boolean>(false);
+	tagSearchQuery = signal<string>('');
 
 	filteredTags = computed(() => {
-		const q = this.globalSearchQuery().toLowerCase();
-		return this.tagsList().filter((tag) =>
-			tag.name.toLowerCase().includes(q),
-		);
+		const globalQ = this.globalSearchQuery().toLowerCase();
+		const localQ = this.tagSearchQuery().toLowerCase();
+
+		return this.tagsList()
+			.filter(
+				(tag) =>
+					tag.name.toLowerCase().includes(globalQ) &&
+					tag.name.toLowerCase().includes(localQ),
+			)
+			.slice(0, 15);
 	});
 
 	filteredBookTypes = computed(() => {

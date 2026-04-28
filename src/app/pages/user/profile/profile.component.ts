@@ -1,5 +1,6 @@
 import { Component, inject, input, computed, effect } from '@angular/core';
 import { ButtonComponent } from '../../../components/inputs/button/button.component';
+import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
 import { AuthService } from '../../../service/auth.service';
 import { Router } from '@angular/router';
 import { MetaDataService } from '../../../service/meta-data.service';
@@ -14,7 +15,7 @@ import {
 
 @Component({
 	selector: 'app-profile',
-	imports: [ReactiveFormsModule, ButtonComponent],
+	imports: [ReactiveFormsModule, ButtonComponent, TextInputComponent],
 	templateUrl: './profile.component.html',
 	styleUrl: './profile.component.scss',
 })

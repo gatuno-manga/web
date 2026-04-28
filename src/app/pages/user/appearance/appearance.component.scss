@@ -1,17 +1,28 @@
+:host {
+	width: 100%;
+}
+
 h1 {
-	font-size: 2.5rem; // 40px
-	font-weight: 300; // Light
-	margin-bottom: 1rem;
+	font-size: 2rem;
+	font-weight: 300;
+	margin-bottom: 0.5rem;
+	color: var(--white);
 }
 
 .subtitle {
-	font-size: 1rem; // 16px
-	font-weight: 300; // Light
-	margin-bottom: 2rem;
+	font-size: 1rem;
+	font-weight: 300;
+	margin-bottom: 3rem;
+	color: var(--white);
+	opacity: 0.8;
 }
 
 .settings-group {
-	margin-bottom: 3rem;
+	margin-bottom: 4rem;
+
+	&:last-of-type {
+		margin-bottom: 0;
+	}
 
 	h2 {
 		font-size: 1.5rem;
@@ -22,7 +33,7 @@ h1 {
 	.group-description {
 		font-size: 0.9rem;
 		opacity: 0.7;
-		margin-bottom: 1.5rem;
+		margin-bottom: 2rem;
 	}
 }
 
@@ -41,6 +52,7 @@ h1 {
 		display: flex;
 		flex-direction: column;
 		gap: 0.25rem;
+		padding-right: 2rem;
 
 		label {
 			font-size: 1.1rem;
@@ -54,36 +66,30 @@ h1 {
 	}
 
 	.setting-control {
-		select,
-		input {
-			background: rgba(255, 255, 255, 0.05);
-			border: 1px solid rgba(255, 255, 255, 0.1);
-			color: white;
-			padding: 0.5rem 1rem;
-			border-radius: 4px;
-			font-size: 1rem;
-			outline: none;
+		width: 250px;
+		display: flex;
+		justify-content: flex-end;
 
-			&:focus {
-				border-color: var(--primary-color, #ffaa00);
-			}
+		app-select {
+			width: 100%;
 		}
 
-		input {
-			width: 80px;
-			text-align: center;
+		app-input {
+			width: 120px;
 		}
 	}
 }
 
-.placeholder {
-	color: var(--white);
-	opacity: 0.4;
-	font-style: italic;
-	margin-top: 2rem;
-}
-
 :host-context(.list-view) {
-	padding: 2rem 0;
+	padding-bottom: 4rem;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	margin-bottom: 4rem;
+
+	h1 {
+		display: none;
+	}
+
+	.subtitle {
+		display: none;
+	}
 }

@@ -1,64 +1,66 @@
 <div class="reader-settings-form">
 	<div class="settings-body">
 		<!-- Seletor de Abas Modular -->
-		<div
-			class="view-selector"
-			role="tablist"
-			aria-label="Selecionar grupo de configurações"
-		>
-			<app-button
-				[variant]="viewFilter === 'all' ? 'primary' : 'outline'"
-				role="tab"
-				[attr.aria-selected]="viewFilter === 'all'"
-				class="selector-btn"
-				(click)="setView('all')"
+		@if (!flatMode) {
+			<div
+				class="view-selector"
+				role="tablist"
+				aria-label="Selecionar grupo de configurações"
 			>
-				Geral
-			</app-button>
+				<app-button
+					[variant]="viewFilter === 'all' ? 'primary' : 'outline'"
+					role="tab"
+					[attr.aria-selected]="viewFilter === 'all'"
+					class="selector-btn"
+					(click)="setView('all')"
+				>
+					Geral
+				</app-button>
 
-			@if (contentType === 'text' || contentType === 'all') {
-			<app-button
-				[variant]="viewFilter === 'text' ? 'primary' : 'outline'"
-				role="tab"
-				[attr.aria-selected]="viewFilter === 'text'"
-				class="selector-btn"
-				(click)="setView('text')"
-			>
-				Texto
-			</app-button>
-			} @if (contentType === 'image' || contentType === 'document' ||
-			contentType === 'all') {
-			<app-button
-				[variant]="viewFilter === 'pages' ? 'primary' : 'outline'"
-				role="tab"
-				[attr.aria-selected]="viewFilter === 'pages'"
-				class="selector-btn"
-				(click)="setView('pages')"
-			>
-				Páginas
-			</app-button>
-			} @if (contentType === 'image' || contentType === 'all') {
-			<app-button
-				[variant]="viewFilter === 'filters' ? 'primary' : 'outline'"
-				role="tab"
-				[attr.aria-selected]="viewFilter === 'filters'"
-				class="selector-btn"
-				(click)="setView('filters')"
-			>
-				Filtros
-			</app-button>
-			}
+				@if (contentType === 'text' || contentType === 'all') {
+				<app-button
+					[variant]="viewFilter === 'text' ? 'primary' : 'outline'"
+					role="tab"
+					[attr.aria-selected]="viewFilter === 'text'"
+					class="selector-btn"
+					(click)="setView('text')"
+				>
+					Texto
+				</app-button>
+				} @if (contentType === 'image' || contentType === 'document' ||
+				contentType === 'all') {
+				<app-button
+					[variant]="viewFilter === 'pages' ? 'primary' : 'outline'"
+					role="tab"
+					[attr.aria-selected]="viewFilter === 'pages'"
+					class="selector-btn"
+					(click)="setView('pages')"
+				>
+					Páginas
+				</app-button>
+				} @if (contentType === 'image' || contentType === 'all') {
+				<app-button
+					[variant]="viewFilter === 'filters' ? 'primary' : 'outline'"
+					role="tab"
+					[attr.aria-selected]="viewFilter === 'filters'"
+					class="selector-btn"
+					(click)="setView('filters')"
+				>
+					Filtros
+				</app-button>
+				}
 
-			<app-button
-				[variant]="viewFilter === 'sidebar' ? 'primary' : 'outline'"
-				role="tab"
-				[attr.aria-selected]="viewFilter === 'sidebar'"
-				class="selector-btn"
-				(click)="setView('sidebar')"
-			>
-				Interface
-			</app-button>
-		</div>
+				<app-button
+					[variant]="viewFilter === 'sidebar' ? 'primary' : 'outline'"
+					role="tab"
+					[attr.aria-selected]="viewFilter === 'sidebar'"
+					class="selector-btn"
+					(click)="setView('sidebar')"
+				>
+					Interface
+				</app-button>
+			</div>
+		}
 
 		<!-- Grupo: Barra Lateral / Interface -->
 		@if(showSidebar) {

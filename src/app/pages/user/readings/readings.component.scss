@@ -1,30 +1,42 @@
+:host {
+	width: 100%;
+}
+
 h1 {
-	font-size: 1.5rem; // 24px
-	font-weight: 300; // Light
+	font-size: 2rem;
+	font-weight: 300;
 	margin-bottom: 0.5rem;
 	color: var(--white);
 }
 
 .subtitle {
-	font-size: 0.75rem; // 12px
-	font-weight: 300; // Light
-	margin-bottom: 1.5rem;
+	font-size: 1rem;
+	font-weight: 300;
+	margin-bottom: 3rem;
 	color: var(--white);
-}
-
-.placeholder-content {
-	color: var(--white);
-	opacity: 0.6;
+	opacity: 0.8;
 }
 
 .settings-container {
-	padding: 1.5rem;
-	background: rgba(255, 255, 255, 0.05);
-	border-radius: 12px;
-	margin-top: 1rem;
+	width: 100%;
 }
 
 :host-context(.list-view) {
-	padding: 2rem 0;
+	padding-bottom: 4rem;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	margin-bottom: 4rem;
+
+	h1 {
+		display: none;
+	}
+
+	.subtitle {
+		display: none;
+	}
+
+	.settings-container {
+		background: transparent;
+		padding: 0;
+		border-radius: 0;
+	}
 }

@@ -25,6 +25,7 @@ import { SwitchComponent } from '../../inputs/switch/switch.component';
 export class ReaderSettingsFormComponent implements OnInit {
 	@Input() contentType: 'image' | 'text' | 'document' | 'all' = 'all';
 	@Input() showResetButton = true;
+	@Input() flatMode = false;
 
 	private settingsService = inject(SettingsService);
 
@@ -68,12 +69,18 @@ export class ReaderSettingsFormComponent implements OnInit {
 	}
 
 	get showSidebar() {
-		return this.viewFilter === 'all' || this.viewFilter === 'sidebar';
+		return (
+			this.flatMode ||
+			this.viewFilter === 'all' ||
+			this.viewFilter === 'sidebar'
+		);
 	}
 
 	get showPages() {
 		return (
-			(this.viewFilter === 'all' || this.viewFilter === 'pages') &&
+			(this.flatMode ||
+				this.viewFilter === 'all' ||
+				this.viewFilter === 'pages') &&
 			(this.contentType === 'image' ||
 				this.contentType === 'document' ||
 				this.contentType === 'all')
@@ -82,14 +89,18 @@ export class ReaderSettingsFormComponent implements OnInit {
 
 	get showFilters() {
 		return (
-			(this.viewFilter === 'all' || this.viewFilter === 'filters') &&
+			(this.flatMode ||
+				this.viewFilter === 'all' ||
+				this.viewFilter === 'filters') &&
 			(this.contentType === 'image' || this.contentType === 'all')
 		);
 	}
 
 	get showTextSettings() {
 		return (
-			(this.viewFilter === 'all' || this.viewFilter === 'text') &&
+			(this.flatMode ||
+				this.viewFilter === 'all' ||
+				this.viewFilter === 'text') &&
 			(this.contentType === 'text' || this.contentType === 'all')
 		);
 	}

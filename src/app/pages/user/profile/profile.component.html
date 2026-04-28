@@ -43,16 +43,29 @@
 				<div class="form-section">
 					<h3>Informações Básicas</h3>
 					<div class="form-group">
-						<label for="userName">Nome de Usuário</label>
-						<input type="text" id="userName" formControlName="userName" placeholder="Ex: john_doe">
-						@if (profileForm.get('userName')?.invalid && profileForm.get('userName')?.touched) {
-							<span class="error">Nome de usuário deve ter entre 3 e 50 caracteres.</span>
-						}
+						<app-input
+							type="text"
+							id="userName"
+							formControlName="userName"
+							placeholder="Ex: john_doe"
+							[errors]="profileForm.get('userName')?.errors"
+							[touched]="profileForm.get('userName')?.touched || false"
+						>
+							Nome de Usuário
+						</app-input>
 					</div>
 
 					<div class="form-group">
-						<label for="name">Nome Completo</label>
-						<input type="text" id="name" formControlName="name" placeholder="Ex: John Doe">
+						<app-input
+							type="text"
+							id="name"
+							formControlName="name"
+							placeholder="Ex: John Doe"
+							[errors]="profileForm.get('name')?.errors"
+							[touched]="profileForm.get('name')?.touched || false"
+						>
+							Nome Completo
+						</app-input>
 					</div>
 				</div>
 

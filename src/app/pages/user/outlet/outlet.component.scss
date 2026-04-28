@@ -1,8 +1,30 @@
 :host {
 	display: flex;
+	flex-direction: column;
 	height: 100%;
 	width: 100%;
 	background-color: var(--app-background-color);
+	overflow: hidden;
+}
+
+.offline-banner {
+	flex-shrink: 0;
+	background-color: var(--badge-sensitive-bg);
+	color: var(--badge-sensitive-text);
+	padding: 8px;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	font-size: 0.875rem;
+	z-index: 10;
+}
+
+.user-layout {
+	display: flex;
+	flex: 1;
+	width: 100%;
 	overflow: hidden;
 }
 
@@ -10,8 +32,6 @@ aside {
 	border-right: 1px solid rgb(from var(--app-text-color) r g b / 0.1);
 	width: 250px;
 	height: 100%;
-	position: sticky;
-	top: 0;
 	display: flex;
 	flex-direction: column;
 	padding: 20px 0 40px 0;
@@ -31,12 +51,12 @@ aside {
 			justify-content: flex-start;
 			width: 100%;
 			gap: 12px;
-			padding: 8px 48px; // Increased padding
+			padding: 8px 48px;
 			text-decoration: none;
 			color: var(--app-text-color);
 			font-family: 'Inknut Antiqua', serif;
-			font-weight: 300; // Light
-			font-size: 1.125rem; // 18px
+			font-weight: 300;
+			font-size: 1.125rem;
 			transition: all 0.3s ease;
 			border-left: 4px solid transparent;
 
@@ -68,7 +88,7 @@ aside {
 			width: 180px;
 
 			span {
-				font-size: 0.75rem; // 12px
+				font-size: 0.75rem;
 			}
 		}
 	}
@@ -76,13 +96,23 @@ aside {
 
 main {
 	flex: 1;
+	overflow-y: auto;
+	padding: 40px 60px;
 	display: flex;
 	flex-direction: column;
-	overflow-y: auto;
-	padding: 24px 32px;
+	align-items: center;
+
+	& > * {
+		width: 100%;
+		max-width: 1200px;
+	}
+
+	@media (max-width: 1400px) {
+		padding: 40px 5%;
+	}
 
 	.search-bar {
-		margin-bottom: 32px;
+		margin-bottom: 40px;
 		width: 100%;
 
 		app-input {
@@ -92,7 +122,84 @@ main {
 	}
 }
 
-router-outlet {
-	display: block;
+@media (max-width: 1024px) {
+	.user-layout {
+		flex-direction: column;
+		overflow-y: auto;
+	}
+
+	aside {
+		flex-shrink: 0;
+		width: 100%;
+		height: auto;
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		background-color: var(--app-background-color);
+		border-right: none;
+		border-bottom: 1px solid rgb(from var(--app-text-color) r g b / 0.1);
+		padding: 0;
+
+		nav {
+			flex-direction: row;
+			overflow-x: auto;
+			padding: 0 10px;
+			gap: 0;
+			width: 100%;
+			justify-content: flex-start;
+
+			a {
+				padding: 15px 20px;
+				width: auto;
+				flex-direction: column;
+				gap: 4px;
+				border-left: none;
+				border-bottom: 4px solid transparent;
+				font-size: 0.875rem;
+				align-items: center;
+
+				span {
+					height: auto;
+					white-space: nowrap;
+				}
+
+				&.active {
+					border-bottom-color: var(--primary-color);
+				}
+			}
+
+			hr {
+				display: none;
+			}
+		}
+
+		.footer {
+			display: none;
+		}
+	}
+
+	main {
+		flex: none;
+		height: auto;
+		overflow-y: visible;
+		padding: 40px 24px;
+		align-items: center;
+
+		.search-bar {
+			margin-bottom: 32px;
+		}
+	}
 }
 
+@media (max-width: 768px) {
+	aside {
+		nav a {
+			padding: 12px 16px;
+			font-size: 0.75rem;
+		}
+	}
+
+	main {
+		padding: 32px 16px;
+	}
+}

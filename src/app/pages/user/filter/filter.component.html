@@ -4,14 +4,19 @@
 		<p class="subtitle">Filtre os resultados que voce gostaria que aparesseesm ou nao na sua listegem de livros</p>
 	}
 
-	@if (filteredTags().length > 0) {
+	@if (filteredTags().length > 0 || tagSearchQuery()) {
 		<div class="filter-section">
 			<h2>Tags</h2>
-			@if (!isListView()) {
-				<div class="search-box">
-					<app-input type="text" placeholder="Pesquisa" leftIcon="lock" [showLabel]="false" />
-				</div>
-			}
+			<div class="search-box">
+				<app-input
+					type="text"
+					placeholder="Filtrar tags..."
+					[showLabel]="false"
+					[value]="tagSearchQuery()"
+					(input)="tagSearchQuery.set($any($event.target).value)"
+					leftIcon="search"
+				/>
+			</div>
 			<div class="grid">
 				@for (tag of filteredTags(); track tag.id) {
 					<div class="card">
@@ -19,6 +24,9 @@
 							{{ tag.name }}
 						</app-switch>
 					</div>
+				}
+				@if (filteredTags().length === 0 && tagSearchQuery()) {
+					<div class="no-results">Nenhuma tag encontrada.</div>
 				}
 			</div>
 		</div>

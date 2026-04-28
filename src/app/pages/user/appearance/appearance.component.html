@@ -15,11 +15,11 @@
 					<span>Altere entre temas claros e escuros conforme sua preferência.</span>
 				</div>
 				<div class="setting-control">
-					<select [value]="themeService.currentTheme()" (change)="onThemeChange($event)">
-						@for (theme of themes; track theme.id) {
-							<option [value]="theme.id">{{ theme.label }}</option>
-						}
-					</select>
+					<app-select
+						[options]="themes"
+						[ngModel]="themeService.currentTheme()"
+						(valueChange)="themeService.setTheme($any($event))"
+					/>
 				</div>
 			</div>
 		</div>
@@ -34,10 +34,14 @@
 					<span>Escolha entre paginação tradicional ou carregamento contínuo.</span>
 				</div>
 				<div class="setting-control">
-					<select [value]="bookSettings().listMode" (change)="onModeChange($event)">
-						<option value="pagination">Paginação</option>
-						<option value="infinite-scroll">Scroll Infinito</option>
-					</select>
+					<app-select
+						[options]="[
+							{ value: 'pagination', label: 'Paginação' },
+							{ value: 'infinite-scroll', label: 'Scroll Infinito' }
+						]"
+						[ngModel]="bookSettings().listMode"
+						(valueChange)="onModeChangeFromSelect($event)"
+					/>
 				</div>
 			</div>
 
@@ -47,7 +51,14 @@
 					<span>Quantidade de livros carregados de cada vez.</span>
 				</div>
 				<div class="setting-control">
-					<input type="number" [value]="bookSettings().limit" (change)="onLimitChange($event)" min="1" max="100">
+					<app-input
+						type="number"
+						[value]="bookSettings().limit.toString()"
+						(input)="onLimitChangeFromInput($event)"
+						[showLabel]="false"
+						min="1"
+						max="100"
+					/>
 				</div>
 			</div>
 		</div>

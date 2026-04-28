@@ -15,11 +15,19 @@ import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,
 } from '../../../models/settings.models';
+import { ButtonComponent } from '../../../components/inputs/button/button.component';
+import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
+import { SelectComponent } from '../../../components/inputs/select/select.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
 	selector: 'app-appearance',
 	standalone: true,
-	imports: [],
+	imports: [
+		TextInputComponent,
+		SelectComponent,
+		FormsModule,
+	],
 	templateUrl: './appearance.component.html',
 	styleUrl: './appearance.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,10 +43,10 @@ export class AppearanceComponent implements OnInit {
 
 	bookSettings = signal<BookListSettings>(DEFAULT_BOOK_LIST_SETTINGS);
 
-	themes: { id: AppTheme; label: string }[] = [
-		{ id: 'light', label: 'Claro' },
-		{ id: 'dark', label: 'Escuro' },
-		{ id: 'true-dark', label: 'True Dark (OLED)' },
+	themes: { value: AppTheme; label: string }[] = [
+		{ value: 'light', label: 'Claro' },
+		{ value: 'dark', label: 'Escuro' },
+		{ value: 'true-dark', label: 'True Dark (OLED)' },
 	];
 
 	showPage = computed(() => {
@@ -71,9 +79,23 @@ export class AppearanceComponent implements OnInit {
 		});
 	}
 
+	onModeChangeFromSelect(value: string) {
+		this.updateBookSettings({
+			listMode: value as 'pagination' | 'infinite-scroll',
+		});
+	}
+
 	onLimitChange(event: Event) {
 		const input = event.target as HTMLInputElement;
 		this.updateBookSettings({ limit: Number.parseInt(input.value, 10) });
+	}
+
+	onLimitChangeFromInput(event: Event) {
+		const input = event.target as HTMLInputElement;
+		const val = Number.parseInt(input.value, 10);
+		if (!Number.isNaN(val)) {
+			this.updateBookSettings({ limit: val });
+		}
 	}
 
 	private updateBookSettings(settings: Partial<BookListSettings>) {

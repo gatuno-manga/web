@@ -1,27 +1,31 @@
+:host {
+	width: 100%;
+}
+
 .security-page {
 	color: var(--white);
+	width: 100%;
 
 	h1 {
-		font-size: 1.5rem; // 24px
-		font-weight: 300; // Light
+		font-size: 2rem;
+		font-weight: 300;
 		margin-bottom: 0.5rem;
 	}
 
 	.subtitle {
-		font-size: 0.75rem; // 12px
-		font-weight: 300; // Light
-		margin-bottom: 1.5rem;
-		max-width: 700px;
+		font-size: 1rem;
+		font-weight: 300;
+		margin-bottom: 3rem;
+		opacity: 0.8;
 	}
 }
 
 .main-card {
-	background-color: var(--secondary-color); // #20142a
-	padding: 12px 16px;
-	border-radius: 12px;
+	background-color: var(--secondary-color);
+	padding: 24px;
+	border-radius: 15px;
 	width: 100%;
-	max-width: 700px;
-	margin-bottom: 1.5rem;
+	margin-bottom: 4rem;
 
 	.card-content {
 		display: flex;
@@ -30,43 +34,41 @@
 
 		.text {
 			flex: 1;
-			margin-right: 1rem;
+			margin-right: 2rem;
 
 			h2 {
-				font-size: 1.125rem; // 18px
-				font-weight: 300; // Light
-				margin-bottom: 0.25rem;
+				font-size: 1.5rem;
+				font-weight: 400;
+				margin-bottom: 0.5rem;
 			}
 
 			p {
-				font-size: 0.75rem; // 12px
-				font-weight: 300;
-				opacity: 0.8;
+				font-size: 0.9rem;
+				opacity: 0.7;
 			}
 		}
 	}
 }
 
 .security-section {
-	margin-bottom: 1.5rem;
+	margin-bottom: 4rem;
 
 	h2 {
-		font-size: 1.125rem; // 18px
-		font-weight: 300; // Light
-		margin-bottom: 1rem;
+		font-size: 1.5rem;
+		font-weight: 400;
+		margin-bottom: 1.5rem;
 	}
 
 	.section-actions {
-		margin-bottom: 1rem;
+		margin-bottom: 1.5rem;
 	}
 }
 
 .inline-form {
 	display: flex;
-	gap: 0.5rem;
-	margin-bottom: 1rem;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
 	width: 100%;
-	max-width: 700px;
 
 	app-input {
 		flex: 1;
@@ -74,20 +76,19 @@
 
 	app-button {
 		width: auto;
-		min-width: 140px;
+		min-width: 180px;
 	}
 }
 
 .list {
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
+	gap: 1rem;
 	width: 100%;
-	max-width: 700px;
 
 	.list-item {
 		background-color: var(--secondary-color);
-		padding: 1rem;
+		padding: 1.25rem 1.5rem;
 		border-radius: 12px;
 		display: flex;
 		justify-content: space-between;
@@ -96,17 +97,17 @@
 		.item-header {
 			display: flex;
 			align-items: center;
-			gap: 12px;
+			gap: 16px;
 		}
 
 		.item-info {
 			strong {
 				display: block;
-				font-size: 0.875rem;
-				margin-bottom: 0.1rem;
+				font-size: 1rem;
+				margin-bottom: 0.25rem;
 			}
 			p {
-				font-size: 0.75rem;
+				font-size: 0.85rem;
 				opacity: 0.7;
 			}
 		}
@@ -114,34 +115,47 @@
 		.badge {
 			background-color: var(--primary-color);
 			color: var(--white);
-			padding: 1px 6px;
+			padding: 2px 8px;
 			border-radius: 4px;
-			font-size: 0.625rem;
-			margin-left: 0.4rem;
+			font-size: 0.7rem;
+			margin-left: 0.5rem;
 		}
 
 		app-button {
 			width: auto;
-			min-width: 100px;
+			min-width: 120px;
 		}
 	}
 }
 
 :host-context(.list-view) {
+	padding-bottom: 4rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	margin-bottom: 4rem;
+
+	h1 {
+		display: none;
+	}
+
+	.subtitle {
+		display: none;
+	}
+
 	.main-card, .security-section {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-		padding-bottom: 2rem;
-		margin-bottom: 2rem;
-		max-width: 100%;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		padding-bottom: 3rem;
+		margin-bottom: 3rem;
 
 		&:last-child {
 			border-bottom: none;
+			padding-bottom: 0;
+			margin-bottom: 0;
 		}
 	}
 
 	.main-card, .list-item {
 		background: transparent;
-		padding: 1rem 0;
+		padding: 1.5rem 0;
 		border-radius: 0;
 	}
 

@@ -134,7 +134,17 @@ export class BookFilterComponent implements OnInit {
 	// UI state
 	showAdvancedFilters = signal<boolean>(false);
 	loadingTags = signal<boolean>(false);
+	tagSearchQuery = signal<string>('');
 	private pendingSensitiveNames = signal<string[]>([]);
+
+	displayTags = computed(() => {
+		const query = this.tagSearchQuery().toLowerCase();
+		const tags = this.availableTags();
+		if (!query) return tags.slice(0, 15);
+		return tags
+			.filter((tag) => tag.name.toLowerCase().includes(query))
+			.slice(0, 15);
+	});
 
 	activeFilters = computed(() => {
 		const filters: ActiveFilter[] = [];

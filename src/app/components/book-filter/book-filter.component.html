@@ -132,11 +132,20 @@
 		<!-- Row 2: Tags -->
 		<div class="filter-group tags-group">
 			<h3 class="filter-title">Tags</h3>
+			<app-input
+				type="text"
+				placeholder="Filtrar tags..."
+				[showLabel]="false"
+				[value]="tagSearchQuery()"
+				(input)="tagSearchQuery.set($any($event.target).value)"
+				class="tag-search-input"
+				leftIcon="search"
+			/>
 			@if (loadingTags()) {
 				<div class="loading">Carregando tags...</div>
 			} @else {
 				<div class="badges-container">
-					@for (tag of availableTags(); track tag.id) {
+					@for (tag of displayTags(); track tag.id) {
 						<div
 							class="badge"
 							[class.selected]="isTagSelected(tag.id)"
@@ -145,6 +154,9 @@
 						>
 							{{ tag.name }}
 						</div>
+					}
+					@if (displayTags().length === 0 && tagSearchQuery()) {
+						<div class="no-tags">Nenhuma tag encontrada.</div>
 					}
 				</div>
 			}
