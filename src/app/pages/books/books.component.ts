@@ -151,6 +151,14 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			const pageFromUrl = params.page
 				? Number.parseInt(params.page, 10)
 				: 1;
+
+			if (
+				this.listSettings.listMode === 'infinite-scroll' &&
+				(!params.page || pageFromUrl === 1)
+			) {
+				this.books = [];
+			}
+
 			this.currentPage = pageFromUrl > 0 ? pageFromUrl : 1;
 
 			this.isOfflineMode = this.networkStatus.isOffline();
@@ -525,12 +533,6 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	onFiltersChange(filters: Partial<BookPageOptions>) {
-		// Reset books for infinite scroll when filters change
-		if (this.listSettings.listMode === 'infinite-scroll') {
-			this.books = [];
-			this.currentPage = 1;
-		}
-
 		// Check if all filters are empty (clearing filters)
 		const hasAnyFilter = Object.keys(filters).some((key) => {
 			const value = filters[key as keyof BookPageOptions];
