@@ -5,7 +5,7 @@
 	padding: 20px;
 	gap: 20px;
 	max-width: calc(300px * 5);
-	margin: auto;
+	margin: 0 auto;
 	user-select: none;
 
 	// --- grid (padrão) ---
@@ -107,118 +107,114 @@
 
 .filter {
 	position: relative;
-	max-width: calc(255px * 5);
-	margin: auto auto;
-	margin-top: 40px;
+	max-width: calc(300px * 5);
+	margin: 40px auto 0;
 	padding: 0 20px;
 }
 
 .controller {
 	position: relative;
-	max-width: calc(255px * 5);
-	height: 100px;
+	max-width: calc(300px * 5);
+	min-height: 80px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	flex-wrap: wrap;
+	gap: 15px;
 	padding: 0 20px;
-	margin: auto auto;
+	margin: 0 auto;
 	z-index: 5;
 
 	.mode-switch {
 		display: flex;
-		gap: 1rem;
-
-		app-icons {
-			cursor: pointer;
-			padding: 5px;
-			border-radius: 50%;
-			border: 2px solid transparent;
-			transition: all 0.3s ease;
-
-			&:hover {
-				color: var(--primary-color);
-			}
-
-			&.active {
-				color: var(--primary-color);
-				border-color: var(--primary-color);
-			}
-		}
-	}
-}
-
-.pages {
-	display: flex;
-	gap: 8px;
-	position: absolute;
-	margin: 20px auto;
-	left: 50%;
-	transform: translateX(-50%);
-
-	.placeholder {
-		width: 60px;
-		height: 60px;
-		border-radius: 12px;
-		background-color: var(--secondary-color);
-		opacity: 0.5;
-
-		&::after {
-			filter: blur(1rem);
-		}
+		gap: 0.5rem;
+		flex-shrink: 0;
 	}
 
-	.page {
+	.pages {
 		display: flex;
-		align-items: center;
 		justify-content: center;
-		border: none;
-		width: 60px;
-		height: 60px;
-		border-radius: 12px;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		background-color: var(--secondary-color);
-		cursor: pointer;
-		transition:
-			background-color 0.3s ease,
-			color 0.3s ease;
-		aspect-ratio: 1/1;
-		font-size: 1.2rem;
+		flex-wrap: wrap;
+		gap: 6px;
+		flex: 1;
+		margin: 10px 0;
 
-		&.active,
-		&:hover {
-			background-color: rgba(255, 255, 255, 0.15);
-			border-color: rgba(255, 255, 255, 0.4);
-			color: #fff;
-			font-weight: bold;
+		.placeholder {
+			width: 45px;
+			height: 45px;
+			border-radius: 10px;
+			background-color: var(--secondary-color);
+			opacity: 0.5;
+		}
+
+		.page {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 45px;
+			height: 45px;
+			border-radius: 10px;
+			border: 1px solid rgba(255, 255, 255, 0.2);
+			background-color: var(--secondary-color);
+			cursor: pointer;
+			transition: all 0.3s ease;
+			font-size: 1rem;
+			color: rgba(255, 255, 255, 0.7);
+
+			&.active,
+			&:hover {
+				background-color: rgba(255, 255, 255, 0.15);
+				border-color: var(--primary-color);
+				color: #fff;
+				font-weight: bold;
+			}
+		}
+	}
+
+	.view-options {
+		display: flex;
+		flex-shrink: 0;
+	}
+}
+
+@media (max-width: 900px) {
+	.controller {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-areas: 
+			"mode view"
+			"pages pages";
+		height: auto;
+		padding: 15px 20px;
+		
+		.mode-switch {
+			grid-area: mode;
+			justify-content: flex-start;
+		}
+		
+		.view-options {
+			grid-area: view;
+			justify-content: flex-end;
+		}
+		
+		.pages {
+			grid-area: pages;
+			margin-top: 15px;
 		}
 	}
 }
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
 	.controller {
-		flex-direction: column;
-		height: auto;
-		gap: 10px;
-
 		.pages {
-			position: static;
-			transform: none;
-			margin: 10px 0;
-			flex-wrap: wrap;
-			justify-content: center;
-			width: 100%;
-
+			gap: 4px;
 			.page {
-				width: 45px;
-				height: 45px;
-				font-size: 1rem;
-				border-width: 3px;
+				width: 38px;
+				height: 38px;
+				font-size: 0.9rem;
 			}
-
 			.placeholder {
-				width: 45px;
-				height: 45px;
+				width: 38px;
+				height: 38px;
 			}
 		}
 	}

@@ -36,7 +36,7 @@
 			}
 		</div>
 	}
-	<div>
+	<div class="view-options">
 		<app-select [items]="selectList" [select]="selectListItem()" />
 	</div>
 </div>
@@ -80,6 +80,7 @@
 @if (listSettings.listMode === 'pagination') {
 	@defer (on idle) {
 		<div class="controller">
+			<div class="mode-switch"></div>
 			<div class="pages">
 				@for (page of pagesToShow; track page) {
 					<div
@@ -91,6 +92,7 @@
 					</div>
 				}
 			</div>
+			<div class="view-options"></div>
 		</div>
 	} @placeholder {
 		<div class="controller" style="height: 100px;"></div>

@@ -497,7 +497,10 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 		pages.add(1);
 		pages.add(this.lastPage);
 
-		for (let i = this.currentPage - 2; i <= this.currentPage + 2; i++) {
+		const isMobile = typeof window !== 'undefined' && window.innerWidth < 600;
+		const range = isMobile ? 1 : 2;
+
+		for (let i = this.currentPage - range; i <= this.currentPage + range; i++) {
 			if (i > 1 && i < this.lastPage) {
 				pages.add(i);
 			}
