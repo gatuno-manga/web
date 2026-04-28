@@ -13,7 +13,7 @@ export type AppTheme = 'light' | 'dark' | 'true-dark' | string;
 export class ThemeService {
 	private renderer: Renderer2;
 	public currentTheme = signal<AppTheme>('light');
-	public hasUserSelectedTheme = signal<boolean>(false);
+	public hasUserSelectedTheme = signal<boolean>(true);
 
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object,
