@@ -8,7 +8,6 @@ import {
 	output,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { IconsComponent } from '../icons/icons.component';
 import { ThemeService } from '../../service/theme.service';
 import { UserTokenService } from '../../service/user-token.service';
@@ -16,7 +15,7 @@ import { UserTokenService } from '../../service/user-token.service';
 @Component({
 	selector: 'app-header',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [RouterModule, IconsComponent, ThemeToggleComponent],
+	imports: [RouterModule, IconsComponent],
 	templateUrl: './header.component.html',
 	styleUrl: './header.component.scss',
 })
@@ -32,7 +31,9 @@ export class HeaderComponent {
 		this.location.back();
 	}
 
-	isDarkTheme = computed(() => this.themeService.currentTheme() === 'dark');
+	isDarkTheme = computed(() =>
+		['dark', 'true-dark'].includes(this.themeService.currentTheme()),
+	);
 	isLoggedIn = this.userTokenService.hasValidAccessTokenSignal;
 	isAdmin = this.userTokenService.isAdminSignal;
 }

@@ -1,0 +1,32 @@
+<div class="setup-overlay">
+	<div class="setup-card">
+		<header>
+			<h1>Bem-vindo ao Gatuno</h1>
+			<p>Escolha como você prefere visualizar o aplicativo.</p>
+		</header>
+
+		<div class="theme-options">
+			@for (theme of themes; track theme.id) {
+				<button
+					class="theme-card"
+					[class.selected]="themeService.currentTheme() === theme.id"
+					(click)="selectTheme(theme.id)"
+				>
+					<div class="icon-container">
+						<app-icons [name]="theme.icon" />
+					</div>
+					<div class="theme-info">
+						<span class="label">{{ theme.label }}</span>
+						<span class="description">{{ theme.description }}</span>
+					</div>
+				</button>
+			}
+		</div>
+
+		<footer>
+			<button class="confirm-button" (click)="themeService.hasUserSelectedTheme.set(true)">
+				Confirmar Escolha
+			</button>
+		</footer>
+	</div>
+</div>

@@ -1,33 +1,24 @@
 <header>
 	<nav>
 		@if (!hideLogo()) {
-			<button
-				class="menu-btn"
-				(click)="toggleMenu.emit()"
-				aria-label="Abrir menu"
-			>
-				<app-icons name="list" size="24" />
-			</button>
-			<a
-				id="logo"
-				[routerLink]="['/']"
-				[class.dark-theme]="isDarkTheme()"
-			>
-				<app-icons name="logo" size="48" />
-			</a>
+		<button class="menu-btn" (click)="toggleMenu.emit()" aria-label="Abrir menu">
+			<app-icons name="list" size="24" />
+		</button>
+		<a id="logo" [routerLink]="['/']" [class.dark-theme]="isDarkTheme()">
+			<app-icons name="logo" size="48" />
+		</a>
 		}
 	</nav>
 	<nav>
 		@if (!isLoggedIn()) {
-			<a [routerLink]="['/auth/login']">Login</a>
+		<a [routerLink]="['/auth/login']">Login</a>
 		}
+		@else{
 		<div class="icons">
-			<app-theme-toggle />
-			@if (isLoggedIn()) {
-				<a [routerLink]="['/user']" class="user">
-					<app-icons name="user" size="32" />
-				</a>
-			}
+			<a [routerLink]="['/user']" class="user">
+				<app-icons name="user" size="32" />
+			</a>
 		</div>
+		}
 	</nav>
 </header>
