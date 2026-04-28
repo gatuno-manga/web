@@ -1,4 +1,4 @@
-import { Component, Input, inject, signal, computed } from '@angular/core';
+import { Component, input, inject, signal, computed } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 import { BookList } from '../../models/book.models';
@@ -22,9 +22,9 @@ import { ChapterService } from '../../service/chapter.service';
 	styleUrl: './item-book.component.scss',
 })
 export class ItemBookComponent {
-	@Input() book!: BookList;
-	@Input() type: 'grid' | 'list' | 'cover' = 'grid';
-	@Input() priority = false;
+	book = input.required<BookList>();
+	type = input<'grid' | 'list' | 'cover'>('grid');
+	priority = input(false);
 
 	private contextMenuService = inject(ContextMenuService);
 	private downloadService = inject(DownloadService);
@@ -37,26 +37,34 @@ export class ItemBookComponent {
 	isImageLoaded = signal(false);
 
 	cardCoverStyle = computed(() => {
-		if (this.book.cover && !this.imageError) {
-			return { '--card-cover': `url(${this.book.cover})` };
+		if (this.book().cover && !this.imageError) {
+			return { '--card-cover': `url(${this.book().cover})` };
 		}
 		return {};
 	});
 
 	truncatedDescription = computed(() => {
-		const desc = this.book.description || '';
+		const desc = this.book()?.description?.toString() || '';
 		if (desc.length > 150) {
 			return desc.substring(0, 150) + '...';
 		}
 		return desc;
 	});
 
+	truncatedTitle = computed(() => {
+		const title = this.book()?.title?.toString() || '';
+		if (title.length > 80) {
+			return title.substring(0, 80) + '...';
+		}
+		return title;
+	});
+
 	onImageLoad() {
 		this.isImageLoaded.set(true);
 	}
 
-	isBlobUrl(url: string): boolean {
-		return url.startsWith('blob:');
+	isBlobUrl(url: string | undefined | null): boolean {
+		return typeof url === 'string' && url.startsWith('blob:');
 	}
 
 	onImageError() {
@@ -82,7 +90,7 @@ export class ItemBookComponent {
 
 		// Check if book is downloaded to add delete option
 		this.downloadService
-			.isBookDownloaded(this.book.id)
+			.isBookDownloaded(this.book().id)
 			.then((isDownloaded) => {
 				if (isDownloaded) {
 					items.push(
@@ -102,7 +110,7 @@ export class ItemBookComponent {
 	downloadBook() {
 		this.modalService.show(
 			'Baixar Livro',
-			`Deseja baixar todos os capítulos do livro "${this.book.title}"?`,
+			`Deseja baixar todos os capítulos do livro "${this.book().title}"?`,
 			[
 				{ label: 'Cancelar', type: 'primary' },
 				{
@@ -129,7 +137,7 @@ export class ItemBookComponent {
 			// BookList doesn't have chapters.
 			// So we fetch chapters.
 			const chapters = await firstValueFrom(
-				this.bookService.getAllChapters(this.book.id),
+				this.bookService.getAllChapters(this.book().id),
 			);
 
 			if (chapters.length === 0) {
@@ -145,7 +153,7 @@ export class ItemBookComponent {
 			// Convert BookList to Book-like object or fetch full book if needed.
 			// Ideally we should fetch full book metadata.
 			const fullBook = await firstValueFrom(
-				this.bookService.getBook(this.book.id),
+				this.bookService.getBook(this.book().id),
 			);
 			if (!fullBook) throw new Error('Book not found');
 
@@ -186,7 +194,7 @@ export class ItemBookComponent {
 
 			this.modalService.close();
 			this.notificationService.success(
-				`${downloadedCount} novos capítulos baixados de "${this.book.title}".`,
+				`${downloadedCount} novos capítulos baixados de "${this.book().title}".`,
 				'Download concluído',
 			);
 		} catch (e) {
@@ -203,14 +211,14 @@ export class ItemBookComponent {
 	deleteDownloadedBook() {
 		this.modalService.show(
 			'Excluir Download',
-			`Deseja excluir o livro "${this.book.title}" dos downloads?`,
+			`Deseja excluir o livro "${this.book().title}" dos downloads?`,
 			[
 				{ label: 'Cancelar', type: 'primary' },
 				{
 					label: 'Excluir',
 					type: 'danger',
 					callback: async () => {
-						await this.downloadService.deleteBook(this.book.id);
+						await this.downloadService.deleteBook(this.book().id);
 						this.modalService.close();
 						this.notificationService.success(
 							'Livro removido dos downloads.',
@@ -223,12 +231,12 @@ export class ItemBookComponent {
 	}
 
 	shareBook() {
-		const url = `${window.location.origin}/books/${this.book.id}`;
+		const url = `${window.location.origin}/books/${this.book().id}`;
 		if (navigator.share) {
 			navigator
 				.share({
-					title: this.book.title,
-					text: this.book.description,
+					title: this.book().title,
+					text: this.book().description,
 					url: url,
 				})
 				.catch(console.error);
