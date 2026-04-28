@@ -61,6 +61,7 @@ import {
 } from '../../components/readers';
 import { HeaderStateService } from '../../service/header-state.service';
 import { ChapterCommentsComponent } from '../../components/chapter-comments/chapter-comments.component';
+import { BlurhashComponent } from '../../components/blurhash/blurhash.component';
 
 type ChapterLoadOrigin =
 	| 'route'
@@ -103,6 +104,7 @@ type ChapterLoadFailureDiagnostic = {
 		TextReaderComponent,
 		DocumentReaderComponent,
 		ChapterCommentsComponent,
+		BlurhashComponent,
 	],
 	templateUrl: './chapters.component.html',
 	styleUrl: './chapters.component.scss',
@@ -137,6 +139,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	chapter = signal<Chapter | null>(null);
 	bookBlurHash = signal<string | undefined>(undefined);
+	bookDominantColor = signal<string | undefined>(undefined);
 	bookMetadata = signal<ImageMetadata | undefined>(undefined);
 	readingProgress = signal<number>(0);
 	showScrollToTopButton = signal<boolean>(false);
@@ -200,6 +203,18 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			.subscribe((params) => {
 				const chapterId = params.get('chapter');
 				const bookId = params.get('id');
+
+				if (bookId) {
+					this.bookService.getBook(bookId).subscribe({
+						next: (book) => {
+							if (book) {
+								this.bookBlurHash.set(book.blurHash);
+								this.bookDominantColor.set(book.dominantColor);
+								this.bookMetadata.set(book.metadata);
+							}
+						},
+					});
+				}
 
 				if (chapterId) {
 					if (this.currentChapterRouteId !== chapterId) {
@@ -330,16 +345,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.chapter.set(chapter);
 			this.dismissedChapterLoadErrorModalId = null;
 			this.updateMetadata(chapter);
-
-			// Fetch book blurHash
-			this.bookService.getBook(chapter.bookId).subscribe({
-				next: (book) => {
-					if (book) {
-						this.bookBlurHash.set(book.blurHash);
-						this.bookMetadata.set(book.metadata);
-					}
-				},
-			});
 
 			try {
 				await this.restoreReadingProgress();

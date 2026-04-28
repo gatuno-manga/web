@@ -1,9 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
+import { of, ReplaySubject } from 'rxjs';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { ModalNotificationService } from '../../service/modal-notification.service';
 import { NotificationService } from '../../service/notification.service';
 import { DownloadService } from '../../service/download.service';
+import { BookService } from '../../service/book.service';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 
 import { ChaptersComponent } from './chapters.component';
 
@@ -211,4 +214,51 @@ describe('ChaptersComponent', () => {
 
 		expect(showSpy).toHaveBeenCalledTimes(2);
 	});
+
+	it('should fetch book data early when bookId is available in params', async () => {
+		// Reset testing module to allow fresh configuration for this test
+		TestBed.resetTestingModule();
+
+		const paramMap$ = new ReplaySubject(1);
+		paramMap$.next(
+			convertToParamMap({
+				id: 'test-book-id',
+				chapter: 'test-chapter-id',
+			}),
+		);
+
+		const mockActivatedRoute = {
+			paramMap: paramMap$,
+			snapshot: {
+				paramMap: convertToParamMap({
+					id: 'test-book-id',
+					chapter: 'test-chapter-id',
+				}),
+			},
+		};
+
+		await TestBed.configureTestingModule({
+			imports: [ChaptersComponent, SharedTestingModule],
+			providers: [{ provide: ActivatedRoute, useValue: mockActivatedRoute }],
+		}).compileComponents();
+
+		const bookService = TestBed.inject(BookService);
+		const getBookSpy = spyOn(bookService, 'getBook').and.returnValue(
+			of({
+				blurHash: 'test-hash',
+				metadata: { width: 100, height: 200 },
+			} as any),
+		);
+
+		const newFixture = TestBed.createComponent(ChaptersComponent);
+		const newComponent = newFixture.componentInstance;
+		newFixture.detectChanges();
+
+		expect(getBookSpy).toHaveBeenCalledWith('test-book-id');
+		expect(newComponent.bookBlurHash()).toBe('test-hash');
+	});
 });
+
+
+
+

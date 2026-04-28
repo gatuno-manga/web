@@ -32,7 +32,7 @@
 		flex: none;
 		width: 3rem;
 		height: 3rem;
-		background-color: var(--secondary-color, var(--gray-700));
+		background-color: var(--primary-color);
 		border: none;
 		border-radius: 15px;
 		cursor: pointer;
@@ -42,7 +42,7 @@
 		transition: all 0.2s;
 
 		&:hover {
-			background-color: var(--secondary-color-hover, var(--gray-800));
+			opacity: 0.9;
 			transform: scale(1.05);
 		}
 
@@ -51,8 +51,61 @@
 		}
 
 		app-icons {
-			color: var(--icon-color, var(--white));
+			color: var(--app-text-color);
 		}
+	}
+}
+
+.chapter-loading {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 80vh;
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	border-radius: 8px;
+	overflow: hidden;
+	position: relative;
+	transition: background-color 0.3s ease;
+
+	app-blurhash {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: block;
+		z-index: 1;
+
+		::ng-deep canvas {
+			width: 100% !important;
+			height: 100% !important;
+			object-fit: cover;
+		}
+	}
+
+
+	.placeholder {
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(
+			90deg,
+			var(--secondary-color) 25%,
+			var(--app-background-color) 50%,
+			var(--secondary-color) 75%
+		);
+		background-size: 200% 100%;
+		animation: loading 1.5s infinite;
+	}
+}
+
+@keyframes loading {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
 	}
 }
 
@@ -88,11 +141,6 @@
 	max-width: 1200px;
 	flex-direction: column;
 	position: relative;
-	padding: 0 2.5rem; // Aumentado de 1rem para 2.5rem
-
-	@media (max-width: 768px) {
-		padding: 0 1rem; // Aumentado de 0.5rem para 1rem
-	}
 
 	.reading-progress-bar {
 		$space: 10px;
@@ -283,29 +331,13 @@ app-aside {
 		gap: 0.6rem;
 	}
 
-	.button {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		margin: 10px 0;
-		button {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			width: 2rem;
-			height: 2rem;
-			background-color: transparent;
-			border: none;
-			outline: none;
-			cursor: pointer;
-		}
-	}
 	app-button {
 		width: 100%;
 		margin-bottom: 0.4rem;
 		font-size: 1.4rem;
 	}
 }
+
 
 .pages {
 	position: relative;

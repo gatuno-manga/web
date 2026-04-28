@@ -45,9 +45,20 @@ export interface ContextMenuEvent {
 	imports: [CommonModule, BlurhashComponent],
 })
 export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
-	@Input() pages: (Page & { blurHash?: string })[] = [];
+	private _pages: (Page & { blurHash?: string })[] = [];
+	@Input() set pages(value: (Page & { blurHash?: string })[]) {
+		this._pages = value;
+		this.loadedPages.clear();
+		this.imageError = false;
+		this.cdr.markForCheck();
+	}
+	get pages() {
+		return this._pages;
+	}
+
 	@Input() showPageNumbers = false;
 	@Input() bookBlurHash?: string;
+	@Input() bookDominantColor?: string;
 	@Input() bookMetadata?: ImageMetadata;
 	@Output() progressChange = new EventEmitter<ReadingProgressEvent>();
 	@Output() contextMenu = new EventEmitter<ContextMenuEvent>();

@@ -4,13 +4,28 @@
 		id="page-{{ $index }}"
 		#pageRef
 		[attr.data-index]="$index"
+		[style.background-color]="page.metadata?.dominantColor || bookDominantColor"
+		[style.aspect-ratio]="page.metadata?.width && page.metadata?.height 
+			? page.metadata?.width + ' / ' + page.metadata?.height 
+			: (bookMetadata?.width && bookMetadata?.height ? bookMetadata?.width + ' / ' + bookMetadata?.height : 'auto')"
+		[style.min-height]="page.metadata?.width && page.metadata?.height ? 'auto' : (bookMetadata?.height ? 'auto' : '400px')"
 		(contextmenu)="onContextMenu($event, page, $index)"
 	>
 		<div class="blur-placeholder" [class.fade-out]="loadedPages.has($index)">
-			@if (page.blurHash) {
-				<app-blurhash [hash]="page.blurHash" [width]="page.metadata?.width || 32" [height]="page.metadata?.height || 32" />
+			@if (page.blurHash || page.metadata?.blurHash) {
+				<app-blurhash
+					[hash]="page.blurHash || page.metadata?.blurHash"
+					[width]="page.metadata?.width || 32"
+					[height]="page.metadata?.height || 32"
+				/>
 			} @else if (bookBlurHash) {
-				<app-blurhash [hash]="bookBlurHash" [width]="bookMetadata?.width || 32" [height]="bookMetadata?.height || 32" />
+				<app-blurhash
+					[hash]="bookBlurHash"
+					[width]="bookMetadata?.width || 32"
+					[height]="bookMetadata?.height || 32"
+				/>
+			} @else if (!(page.metadata?.dominantColor || bookDominantColor)) {
+				<div class="placeholder"></div>
 			}
 		</div>
 		<img

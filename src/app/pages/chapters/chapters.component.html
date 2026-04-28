@@ -22,6 +22,9 @@
 					<app-icons name="arrow-right" size="42" />
 				</a>
 			}
+			<button class="settings-btn" (click)="openSettings()" aria-label="Configurações">
+				<app-icons name="settings" size="42" />
+			</button>
 		</div>
 	</div>
 
@@ -79,6 +82,7 @@
 					[pages]="currentChapter.pages"
 					[showPageNumbers]="settings().showPageNumbers"
 					[bookBlurHash]="bookBlurHash()"
+					[bookDominantColor]="bookDominantColor()"
 					[bookMetadata]="bookMetadata()"
 					(progressChange)="onImageProgress($event)"
 					(contextMenu)="
@@ -114,13 +118,30 @@
 	</div>
 
 	<app-chapter-comments [chapterId]="currentChapter.id" />
+} @else {
+	<div
+		class="chapter-loading"
+		[style.background-color]="bookDominantColor()"
+	>
+		@if (bookBlurHash(); as hash) {
+			<app-blurhash
+				[hash]="hash"
+				[width]="bookMetadata()?.width || 32"
+				[height]="bookMetadata()?.height || 32"
+			/>
+		} @else if (!bookDominantColor()) {
+			<div class="placeholder"></div>
+		}
+	</div>
+}
 
-	<app-aside [topOffset]="0" [position]="settings().asidePosition">
-		<div class="title">
-			<h1 (click)="backPage()">
-				<app-icons name="book" size="22" />
-				{{ currentChapter.bookTitle }}
-			</h1>
+<app-aside [topOffset]="0" [position]="settings().asidePosition">
+	<div class="title">
+		<h1 (click)="backPage()">
+			<app-icons name="book" size="22" />
+			{{ chapter()?.bookTitle || 'Livro' }}
+		</h1>
+		@if (chapter(); as currentChapter) {
 			<h1>
 				<app-icons name="file" size="22" />
 				{{
@@ -128,40 +149,36 @@
 						'Capítulo ' + (currentChapter.index | number)
 				}}
 			</h1>
-		</div>
-		<div class="controls">
-			@if (currentChapter.previous) {
-				<a class="arrow" (click)="previousPage()">
-					<app-icons name="arrow-left" size="16" />
-				</a>
-			}
-			<a class="index" (click)="backPage()">
-				{{ currentChapter.index | number }}/{{
-					currentChapter.totalChapters
-				}}
-			</a>
-			@if (currentChapter.next) {
-				<a class="arrow" (click)="nextPage()">
-					<app-icons name="arrow-right" size="16" />
-				</a>
-			}
-		</div>
-
-		<div class="button">
-			<button (click)="openSettings()">
-				<app-icons name="settings" size="32" />
-			</button>
-		</div>
-		@if (admin()) {
-			<div class="line"></div>
-			<div class="actions">
-				<app-button (click)="resetChapter()" variant="text">
-					Resetar capítulo
-				</app-button>
-				<app-button (click)="openOriginalLink()" variant="text">
-					Link original
-				</app-button>
-			</div>
 		}
-	</app-aside>
-}
+	</div>
+	<div class="controls">
+		@if (chapter()?.previous; as prev) {
+			<a class="arrow" (click)="previousPage()">
+				<app-icons name="arrow-left" size="16" />
+			</a>
+		}
+		<a class="index" (click)="backPage()">
+			{{ chapter()?.index || 0 | number }}/{{
+				chapter()?.totalChapters || 0
+			}}
+		</a>
+		@if (chapter()?.next; as next) {
+			<a class="arrow" (click)="nextPage()">
+				<app-icons name="arrow-right" size="16" />
+			</a>
+		}
+	</div>
+
+	@if (admin()) {
+		<div class="line"></div>
+		<div class="actions">
+			<app-button (click)="resetChapter()" variant="text">
+				Resetar capítulo
+			</app-button>
+			<app-button (click)="openOriginalLink()" variant="text">
+				Link original
+			</app-button>
+		</div>
+	}
+</app-aside>
+
