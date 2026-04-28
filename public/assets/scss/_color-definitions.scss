@@ -51,6 +51,59 @@
 	--badge-author-border: rgba(26, 188, 156, 0.4);
 	--badge-author-text: var(--badge-turquoise-light);
 }
+
+@mixin true-dark-definitions() {
+	--app-background-color: var(--true-black);
+	--app-text-color: var(--beige);
+	--primary-color: var(--orange);
+	--secondary-color: var(--dark-purple);
+	--scrollbar-color: var(--dark-gray);
+	--scrollbar-thumb-color: var(--orange);
+	--erro-message-color: var(--orange);
+	--scraping-status-ready-color: var(--dark-green);
+	--scraping-status-processing-color: var(--orange);
+	--scraping-status-error-color: var(--dark-red);
+	--context-menu-bg: rgba(0, 0, 0, 0.9);
+	--degrader: linear-gradient(
+		88deg,
+		var(--true-black) 55%,
+		var(--dark-purple) 194%
+	);
+
+	// Overlays & Shadows
+	--overlay-bg: rgba(0, 0, 0, 0.85);
+	--shadow-color: rgba(0, 0, 0, 0.4);
+
+	// Badge System
+	--badge-default-bg: rgba(43, 127, 255, 0.2);
+	--badge-default-border: rgba(43, 127, 255, 0.4);
+	--badge-default-text: var(--badge-blue-light);
+
+	--badge-search-bg: rgba(46, 204, 113, 0.15);
+	--badge-search-border: rgba(46, 204, 113, 0.3);
+	--badge-search-text: var(--badge-green-light);
+
+	--badge-type-bg: rgba(241, 133, 34, 0.15);
+	--badge-type-border: rgba(241, 133, 34, 0.3);
+	--badge-type-text: var(--badge-orange-light);
+
+	--badge-excluded-bg: rgba(255, 67, 67, 0.15);
+	--badge-excluded-border: rgba(255, 67, 67, 0.3);
+	--badge-excluded-text: var(--badge-red-light);
+
+	--badge-sensitive-bg: rgba(155, 89, 182, 0.15);
+	--badge-sensitive-border: rgba(155, 89, 182, 0.3);
+	--badge-sensitive-text: var(--badge-purple-light);
+
+	--badge-publication-bg: rgba(241, 196, 15, 0.15);
+	--badge-publication-border: rgba(241, 196, 15, 0.3);
+	--badge-publication-text: var(--badge-yellow-light);
+
+	--badge-author-bg: rgba(26, 188, 156, 0.15);
+	--badge-author-border: rgba(26, 188, 156, 0.3);
+	--badge-author-text: var(--badge-turquoise-light);
+}
+
 @mixin light-definitions() {
 	--app-background-color: var(--white);
 	--app-text-color: var(--dark-purple);

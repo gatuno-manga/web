@@ -28,6 +28,9 @@
 [data-theme='dark'] {
 	@include color-definitions.dark-definitions();
 }
+[data-theme='true-dark'] {
+	@include color-definitions.true-dark-definitions();
+}
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme]) {
 		@include color-definitions.dark-definitions();
