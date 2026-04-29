@@ -425,11 +425,19 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	loadOnlineBooks() {
+		let allowedSensitiveContent = this.filterOptions.sensitiveContent;
+
+		if (!allowedSensitiveContent) {
+			const allowedNames = this.sensitiveContentService.getContentAllow();
+			allowedSensitiveContent =
+				allowedNames.length > 0 ? ['safe', ...allowedNames] : ['safe'];
+		}
+
 		const gqlFilter: BookFilterInput = {
 			page: this.currentPage,
 			limit: this.listSettings.limit,
 			search: this.filterOptions.search,
-			sensitiveContent: this.filterOptions.sensitiveContent,
+			sensitiveContent: allowedSensitiveContent,
 			type: this.filterOptions.type?.map((t) => t.toUpperCase()) as any,
 			tags: this.filterOptions.tags,
 			tagsLogic: this.filterOptions.tagsLogic?.toUpperCase() as any,
