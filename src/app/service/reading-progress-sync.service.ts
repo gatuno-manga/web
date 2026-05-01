@@ -319,13 +319,65 @@ export class ReadingProgressSyncService implements OnDestroy {
 			// Envia via WebSocket
 			this.socket.emit('progress:update', progressData);
 		} else {
-			// Adiciona à fila de pendentes
+			// Adiciona à fila de pendentes em memória
 			this.pendingChanges.set(chapterId, progressData);
 			this.updateSyncStatus({ pendingChanges: this.pendingChanges.size });
 
-			// Tenta sincronizar via HTTP
-			this.syncViaHttp(progressData);
+			// Prepara para Background Sync (salva no IndexedDB e registra tag)
+			const token = this.userTokenService.accessToken;
+			if (token && this.isBrowser) {
+				await this.localProgressService.enqueueSync({
+					...progressData,
+					accessToken: token,
+				});
+
+				// Registra o evento de Background Sync no Service Worker
+				this.registerBackgroundSync();
+			}
+
+			// Tenta sincronizar via HTTP imediatamente (se houver rede básica mas sem WebSocket)
+			this.syncViaHttp(progressData).catch(() => {
+				logConnectionEvent(
+					this.serviceName,
+					'sync',
+					'Falha no sync via HTTP. Background Sync agendado.',
+					LogLevel.DEBUG,
+				);
+			});
 		}
+	}
+
+	/**
+	 * Registra o evento de Background Sync no Service Worker
+	 */
+	private registerBackgroundSync(): void {
+		if (
+			!this.isBrowser ||
+			!('serviceWorker' in navigator) ||
+			!('SyncManager' in window)
+		) {
+			return;
+		}
+
+		navigator.serviceWorker.ready
+			.then((registration: any) => {
+				return registration.sync.register('sync-reading-progress');
+			})
+			.then(() => {
+				logConnectionEvent(
+					this.serviceName,
+					'sync',
+					'Background Sync registrado: sync-reading-progress',
+					LogLevel.INFO,
+				);
+			})
+			.catch((err) => {
+				logWebSocketError(
+					this.serviceName,
+					err,
+					'Falha ao registrar Background Sync',
+				);
+			});
 	}
 
 	/**

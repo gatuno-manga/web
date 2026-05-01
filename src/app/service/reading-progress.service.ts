@@ -10,6 +10,16 @@ export interface ReadingProgress {
   updatedAt: Date;
 }
 
+export interface SyncQueueItem {
+  chapterId: string;
+  bookId: string;
+  pageIndex: number;
+  timestamp: number;
+  totalPages?: number;
+  completed?: boolean;
+  accessToken: string;
+}
+
 const GUEST_USER_ID = 'guest';
 
 @Injectable({
@@ -18,6 +28,7 @@ const GUEST_USER_ID = 'guest';
 export class ReadingProgressService {
   private dbName = 'gatuno_db';
   private storeName = 'reading_progress';
+  private syncStoreName = 'sync_queue';
   private dbPromise: Promise<IDBDatabase> | null = null;
   private isBrowser: boolean;
   private currentUserId: string = GUEST_USER_ID;
@@ -57,8 +68,8 @@ export class ReadingProgressService {
       if (!this.isBrowser) {
         return reject('Not in browser');
       }
-      // Incrementar a versão para forçar o upgrade
-      const request = indexedDB.open(this.dbName, 2);
+      // Incrementar a versão para forçar o upgrade (v3 para sync_queue)
+      const request = indexedDB.open(this.dbName, 3);
 
       request.onerror = (event) => {
         console.error('Erro ao abrir IndexedDB:', event);
@@ -73,19 +84,17 @@ export class ReadingProgressService {
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
 
-        // Remove a store antiga se existir
-        if (db.objectStoreNames.contains(this.storeName)) {
-          db.deleteObjectStore(this.storeName);
+        // Store de progresso de leitura
+        if (!db.objectStoreNames.contains(this.storeName)) {
+          const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
+          store.createIndex('userId', 'userId', { unique: false });
+          store.createIndex('chapterId', 'chapterId', { unique: false });
         }
 
-        // Cria a nova store com keyPath 'id' (chave composta)
-        const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
-
-        // Índice para buscar por usuário
-        store.createIndex('userId', 'userId', { unique: false });
-
-        // Índice para buscar por capítulo
-        store.createIndex('chapterId', 'chapterId', { unique: false });
+        // Nova store de fila de sincronização (background sync)
+        if (!db.objectStoreNames.contains(this.syncStoreName)) {
+          db.createObjectStore(this.syncStoreName, { keyPath: 'chapterId' });
+        }
       };
     });
   }
@@ -127,6 +136,67 @@ export class ReadingProgressService {
       });
     } catch (error) {
       console.error('Erro ao salvar progresso de leitura:', error);
+    }
+  }
+
+  /**
+   * Adiciona um item à fila de sincronização em background
+   */
+  async enqueueSync(item: SyncQueueItem): Promise<void> {
+    if (!this.isBrowser || !this.dbPromise) return;
+
+    try {
+      const db = await this.dbPromise;
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.syncStoreName], 'readwrite');
+        const store = transaction.objectStore(this.syncStoreName);
+        const request = store.put(item);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Erro ao enfileirar sincronização:', error);
+    }
+  }
+
+  /**
+   * Obtém todos os itens da fila de sincronização
+   */
+  async getSyncQueue(): Promise<SyncQueueItem[]> {
+    if (!this.isBrowser || !this.dbPromise) return [];
+
+    try {
+      const db = await this.dbPromise;
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.syncStoreName], 'readonly');
+        const store = transaction.objectStore(this.syncStoreName);
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Erro ao recuperar fila de sincronização:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Remove um item da fila de sincronização
+   */
+  async removeFromSyncQueue(chapterId: string): Promise<void> {
+    if (!this.isBrowser || !this.dbPromise) return;
+
+    try {
+      const db = await this.dbPromise;
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.syncStoreName], 'readwrite');
+        const store = transaction.objectStore(this.syncStoreName);
+        const request = store.delete(chapterId);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Erro ao remover da fila de sincronização:', error);
     }
   }
 

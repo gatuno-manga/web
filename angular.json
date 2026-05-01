@@ -27,7 +27,8 @@
 							{
 								"glob": "**/*",
 								"input": "public"
-							}
+							},
+							"src/custom-sw.js"
 						],
 						"styles": ["public/assets/scss/global.scss"],
 						"stylePreprocessorOptions": {
