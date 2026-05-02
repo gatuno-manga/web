@@ -675,6 +675,34 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		);
 	}
 
+	confirmResetChapter(chapter: Chapterlist) {
+		this.modalService.show(
+			'Redefinir Capítulo',
+			`Tem certeza que deseja redefinir o capítulo ${chapter.index}${chapter.title ? ` - ${chapter.title}` : ''}?`,
+			[
+				{ label: 'Cancelar', type: 'primary' },
+				{
+					label: 'Redefinir',
+					type: 'danger',
+					callback: () => {
+						this.chapterService
+							.resetChapter(chapter.id)
+							.subscribe(() => {
+								this.notificationService.success(
+									`Capítulo ${chapter.index} redefinido com sucesso!`,
+								);
+								// Se estiver na aba de capítulos, recarregar a lista
+								if (this.selectedTab() === tab.chapters) {
+									this.loadChapters();
+								}
+							});
+					},
+				},
+			],
+			'warning',
+		);
+	}
+
 	markChapterAsRead(chapter: Chapterlist) {
 		this.chapterService.markAsRead(chapter.id).subscribe({
 			next: () => {
@@ -1205,6 +1233,22 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			});
 		}
 
+		if (this.userTokenService.isAdminSignal()) {
+			items.push({ type: 'separator' });
+			items.push({
+				label: 'Resetar Capítulo',
+				icon: 'refresh-ccw',
+				action: () => this.confirmResetChapter(chapter),
+			});
+			if (chapter.originalUrl) {
+				items.push({
+					label: 'Link Original',
+					icon: 'globe',
+					action: () => window.open(chapter.originalUrl, '_blank'),
+				});
+			}
+		}
+
 		this.contextMenuService.open(event, items);
 	}
 
@@ -1249,6 +1293,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					label: 'Editar',
 					icon: 'settings',
 					action: () => this.openCoverEditModal(cover),
+				},
+				{
+					label: 'Corrigir Capa',
+					icon: 'refresh-ccw',
+					action: () => this.fixSpecificCover(cover),
 				},
 				{ type: 'separator' },
 				{
@@ -1731,7 +1780,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					label: 'Corrigir',
 					type: 'danger',
 					callback: () => {
-						this.bookService.fixBook(this.id()).subscribe({
+						this.bookService.fixAllCovers(this.id()).subscribe({
 							next: () => {
 								this.notificationService.success(
 									'Tarefa de correção de capas agendada.',
@@ -1747,6 +1796,41 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 								this.modalService.close();
 							},
 						});
+					},
+				},
+			],
+			'info',
+		);
+	}
+
+	fixSpecificCover(cover: Cover) {
+		this.modalService.show(
+			'Corrigir Capa',
+			`Deseja tentar corrigir automaticamente a capa "${cover.title || cover.id}"?`,
+			[
+				{ label: 'Cancelar', type: 'primary' },
+				{
+					label: 'Corrigir',
+					type: 'danger',
+					callback: () => {
+						this.bookService
+							.fixCover(this.id(), cover.id)
+							.subscribe({
+								next: () => {
+									this.notificationService.success(
+										'Tarefa de correção da capa agendada.',
+										'Processando',
+									);
+									this.modalService.close();
+								},
+								error: (err) => {
+									console.error('Error fixing cover:', err);
+									this.notificationService.error(
+										'Erro ao agendar correção da capa.',
+									);
+									this.modalService.close();
+								},
+							});
 					},
 				},
 			],

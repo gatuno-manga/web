@@ -360,6 +360,17 @@ export class BookService {
 		return this.http.patch<Book>(`books/${id}/fix`, {});
 	}
 
+	fixCover(bookId: string, coverId: string) {
+		return this.http.patch<void>(
+			`books/${bookId}/covers/${coverId}/fix`,
+			{},
+		);
+	}
+
+	fixAllCovers(bookId: string) {
+		return this.http.patch<void>(`books/${bookId}/covers/fix`, {});
+	}
+
 	resetBook(id: string) {
 		return this.http.patch<Book>(`books/${id}/reset`, {});
 	}

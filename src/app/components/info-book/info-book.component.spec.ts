@@ -313,7 +313,7 @@ describe('InfoBookComponent', () => {
 		expect(args[1][1].label).toBe('Baixar Imagem');
 	});
 
-	it('onCoverContextMenu should show Select Cover, Edit and Remove options for admin', () => {
+	it('onCoverContextMenu should show Select Cover, Edit, Correct and Remove options for admin', () => {
 		mockUserTokenService.isAdminSignal.set(true);
 		const event = new MouseEvent('contextmenu');
 		const cover = { id: 'cv1', url: 'http://img' } as any;
@@ -321,14 +321,15 @@ describe('InfoBookComponent', () => {
 		component.onCoverContextMenu(event, cover);
 
 		const args = mockContextMenuService.open.calls.mostRecent().args;
-		// Admin sees 7 items: Copy Image, Download Image, Separator, Select, Edit, Separator, Remove
-		expect(args[1].length).toBe(7);
+		// Admin sees 8 items: Copy Image, Download Image, Separator, Select, Edit, Correct, Separator, Remove
+		expect(args[1].length).toBe(8);
 		expect(args[1][0].label).toBe('Copiar Imagem');
 		expect(args[1][1].label).toBe('Baixar Imagem');
 		expect(args[1][2].type).toBe('separator');
 		expect(args[1][3].label).toBe('Selecionar Capa');
 		expect(args[1][4].label).toBe('Editar');
-		expect(args[1][5].type).toBe('separator');
-		expect(args[1][6].label).toBe('Remover');
+		expect(args[1][5].label).toBe('Corrigir Capa');
+		expect(args[1][6].type).toBe('separator');
+		expect(args[1][7].label).toBe('Remover');
 	});
 });
