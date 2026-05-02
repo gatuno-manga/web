@@ -13,11 +13,18 @@ import { BookService } from '../../service/book.service';
 import { ContextMenuItem } from '../../models/context-menu.models';
 import { firstValueFrom } from 'rxjs';
 import { ChapterService } from '../../service/chapter.service';
+import { UserTokenService } from '../../service/user-token.service';
 
 @Component({
 	selector: 'app-item-book',
 	standalone: true,
-	imports: [RouterModule, NgOptimizedImage, BlurhashComponent, CommonModule],
+	imports: [
+		RouterModule,
+		NgOptimizedImage,
+		BlurhashComponent,
+		CommonModule,
+		IconsComponent,
+	],
 	templateUrl: './item-book.component.html',
 	styleUrl: './item-book.component.scss',
 })
@@ -32,6 +39,7 @@ export class ItemBookComponent {
 	private notificationService = inject(NotificationService);
 	private bookService = inject(BookService);
 	private chapterService = inject(ChapterService);
+	public userTokenService = inject(UserTokenService);
 
 	imageError = false;
 	isImageLoaded = signal(false);
@@ -87,6 +95,17 @@ export class ItemBookComponent {
 				action: () => this.shareBook(),
 			},
 		];
+
+		if (this.userTokenService.isAdminSignal()) {
+			items.push(
+				{ type: 'separator' },
+				{
+					label: 'Corrigir Capas',
+					icon: 'refresh-ccw',
+					action: () => this.fixCovers(),
+				},
+			);
+		}
 
 		// Check if book is downloaded to add delete option
 		this.downloadService
@@ -248,5 +267,38 @@ export class ItemBookComponent {
 				);
 			});
 		}
+	}
+
+	fixCovers() {
+		this.modalService.show(
+			'Corrigir Capas',
+			`Deseja tentar corrigir automaticamente as capas do livro "${this.book().title}"?`,
+			[
+				{ label: 'Cancelar', type: 'primary' },
+				{
+					label: 'Corrigir',
+					type: 'danger',
+					callback: () => {
+						this.bookService.fixBook(this.book().id).subscribe({
+							next: () => {
+								this.notificationService.success(
+									'Tarefa de correção de capas agendada.',
+									'Processando',
+								);
+								this.modalService.close();
+							},
+							error: (err) => {
+								console.error('Error fixing covers:', err);
+								this.notificationService.error(
+									'Erro ao agendar correção de capas.',
+								);
+								this.modalService.close();
+							},
+						});
+					},
+				},
+			],
+			'info',
+		);
 	}
 }
