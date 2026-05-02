@@ -247,6 +247,31 @@
 				<div class="covers-toolbar">
 					<div class="toolbar-info"></div>
 					<div class="toolbar-actions">
+						<app-button
+							(click)="redefineCover()"
+							variant="text"
+							size="small"
+						>
+							<app-icons name="upload" size="16" />
+							<span>Upload</span>
+						</app-button>
+						<app-button
+							(click)="correctCover()"
+							variant="text"
+							size="small"
+						>
+							<app-icons name="globe" size="16" />
+							<span>URL</span>
+						</app-button>
+						<app-button
+							(click)="fixCovers()"
+							variant="text"
+							size="small"
+						>
+							<app-icons name="refresh-ccw" size="16" />
+							<span>Corrigir</span>
+						</app-button>
+
 						@if (hasCoversChanged()) {
 							<app-button
 								(click)="cancelCoversReorder()"

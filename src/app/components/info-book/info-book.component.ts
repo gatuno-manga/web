@@ -1607,4 +1607,153 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			],
 		);
 	}
+
+	redefineCover() {
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: PromptModalComponent,
+			componentData: {
+				title: 'Adicionar Nova Capa',
+				message: 'Informe um nome para a nova capa:',
+				placeholder: 'Ex: Capa Volume 1...',
+				value: '',
+				close: (title: string | null) => {
+					this.modalService.close();
+					if (title !== null) {
+						this.openFileSelectorForUpload(title.trim());
+					}
+				},
+			},
+			useBackdrop: true,
+			backdropOpacity: 0.5,
+		});
+	}
+
+	private openFileSelectorForUpload(title: string) {
+		const fileInput = document.createElement('input');
+		fileInput.type = 'file';
+		fileInput.accept = 'image/*';
+		fileInput.onchange = (event: Event) => {
+			const target = event.target as HTMLInputElement;
+			if (target.files && target.files.length > 0) {
+				const file = target.files[0];
+				this.bookService.uploadCover(this.id(), file, title).subscribe({
+					next: () => {
+						this.notificationService.success(
+							'Nova capa enviada com sucesso!',
+							'Capa Adicionada',
+						);
+						this.loadCovers();
+					},
+					error: (err) => {
+						console.error('Error uploading cover:', err);
+						this.notificationService.error(
+							'Erro ao enviar nova capa.',
+						);
+					},
+				});
+			}
+		};
+		fileInput.click();
+	}
+
+	correctCover() {
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: PromptModalComponent,
+			componentData: {
+				title: 'Capturar Capa por URL',
+				message: 'Informe a URL da imagem externa:',
+				placeholder: 'https://...',
+				value: '',
+				close: (url: string | null) => {
+					this.modalService.close();
+					if (url && url.trim().length > 0) {
+						this.promptForScrapeTitle(url.trim());
+					}
+				},
+			},
+			useBackdrop: true,
+			backdropOpacity: 0.5,
+		});
+	}
+
+	private promptForScrapeTitle(url: string) {
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: PromptModalComponent,
+			componentData: {
+				title: 'Nome da Capa',
+				message: 'Informe um nome para esta nova capa:',
+				placeholder: 'Ex: Capa Alternativa...',
+				value: '',
+				close: (title: string | null) => {
+					this.modalService.close();
+					if (title !== null) {
+						this.bookService
+							.scrapeCover(this.id(), url, title.trim())
+							.subscribe({
+								next: () => {
+									this.notificationService.success(
+										'Tarefa de captura de capa agendada.',
+										'Processando',
+									);
+									// O backend geralmente processa isso via job, 
+									// mas vamos recarregar para ver se já aparece algo
+									setTimeout(() => this.loadCovers(), 2000);
+								},
+								error: (err: any) => {
+									console.error('Error scraping cover:', err);
+									this.notificationService.error(
+										'Erro ao agendar captura de capa.',
+									);
+								},
+							});
+					}
+				},
+			},
+			useBackdrop: true,
+			backdropOpacity: 0.5,
+		});
+	}
+
+	fixCovers() {
+		const bookTitle = this.bookBasic()?.title || 'este livro';
+		this.modalService.show(
+			'Corrigir Capas',
+			`Deseja tentar corrigir automaticamente as capas do livro "${bookTitle}"?`,
+			[
+				{ label: 'Cancelar', type: 'primary' },
+				{
+					label: 'Corrigir',
+					type: 'danger',
+					callback: () => {
+						this.bookService.fixBook(this.id()).subscribe({
+							next: () => {
+								this.notificationService.success(
+									'Tarefa de correção de capas agendada.',
+									'Processando',
+								);
+								this.modalService.close();
+							},
+							error: (err) => {
+								console.error('Error fixing covers:', err);
+								this.notificationService.error(
+									'Erro ao agendar correção de capas.',
+								);
+								this.modalService.close();
+							},
+						});
+					},
+				},
+			],
+			'info',
+		);
+	}
 }

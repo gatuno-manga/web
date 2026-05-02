@@ -341,6 +341,13 @@ export class BookService {
 		return this.http.delete<void>(`books/${bookId}/covers/${coverId}`);
 	}
 
+	scrapeCover(bookId: string, url: string, title?: string) {
+		return this.http.post<void>(`books/${bookId}/covers/scrape`, {
+			url,
+			title,
+		});
+	}
+
 	getInfo(bookId: string) {
 		return this.http.get<BookDetail>(`books/${bookId}/infos`);
 	}
