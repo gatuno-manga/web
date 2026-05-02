@@ -93,7 +93,7 @@ export class UserTokenService {
 		this._accessToken.set(initialToken);
 		this.initCrossTabSync();
 
-		if (this.hasValidAccessToken) {
+		if (this.accessToken) {
 			this.scheduleAutoRefresh();
 		}
 	}
@@ -210,13 +210,10 @@ export class UserTokenService {
 					);
 				});
 			} else {
-				if (this.isTokenValid(this.accessToken)) {
-					this.refreshTokens().subscribe({
-						error: () => this.removeTokens(true),
-					});
-				} else {
-					this.removeTokens(true);
-				}
+				// Tenta refresh imediato mesmo se já expirou (ou está na margem)
+				this.refreshTokens().subscribe({
+					error: () => this.removeTokens(true),
+				});
 			}
 		} catch (e) {
 			console.error(e);
@@ -235,6 +232,7 @@ export class UserTokenService {
 		if (!this.refreshObservable) {
 			const csrfToken = this.csrfToken?.trim();
 			if (!csrfToken) {
+				console.error('Refresh token attempt failed: Missing CSRF token');
 				return throwError(
 					() => new Error('Missing CSRF token for refresh request'),
 				);

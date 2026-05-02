@@ -41,9 +41,10 @@ export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
 	});
 
 	const authHeader = userTokenService.authHeaderSignal();
+	const isRefreshRequest = req.url.includes('/auth/refresh');
 	let headers = req.headers;
 
-	if (authHeader) {
+	if (authHeader && !isRefreshRequest) {
 		headers = headers.set('Authorization', authHeader);
 
 		if (!isBrowser) {
