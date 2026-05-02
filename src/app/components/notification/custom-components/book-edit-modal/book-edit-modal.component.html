@@ -1,0 +1,231 @@
+<div class="book-edit-modal-content" role="dialog" aria-labelledby="book-edit-title">
+	<div class="modal-header">
+		<h2 id="book-edit-title">Editar Livro: {{ book.title }}</h2>
+	</div>
+
+	<div class="modal-body">
+		@if (isLoading()) {
+			<div class="loading-state">
+				<app-icons name="loader" size="48" class="spin" />
+				<p>Carregando dados mestre...</p>
+			</div>
+		} @else {
+			<form [formGroup]="editForm" class="edit-form">
+				<!-- Basic Info Section -->
+				<section class="form-section">
+					<h3>Informações Básicas</h3>
+					<div class="input-grid">
+						<div class="grid-span-2">
+							<app-input
+								type="text"
+								id="title"
+								formControlName="title"
+								placeholder="Título do Livro"
+								label="Título"
+								[errors]="editForm.get('title')?.errors"
+								[touched]="editForm.get('title')?.touched || false"
+							/>
+						</div>
+						<app-input
+							type="number"
+							id="publication"
+							formControlName="publication"
+							placeholder="Ex: 2024"
+							label="Ano de Publicação"
+							[errors]="editForm.get('publication')?.errors"
+							[touched]="editForm.get('publication')?.touched || false"
+						/>
+						<app-select
+							id="type"
+							formControlName="type"
+							[options]="bookTypes"
+							placeholder="Tipo de Livro"
+						/>
+					</div>
+					<div class="full-width">
+						<app-text-area
+							id="description"
+							formControlName="description"
+							placeholder="Sinopse do livro..."
+							[rows]="5"
+							[errors]="editForm.get('description')?.errors"
+							[touched]="editForm.get('description')?.touched || false"
+						/>
+					</div>
+				</section>
+
+				<!-- Alternative Titles Section -->
+				<section class="form-section">
+					<h3>Títulos Alternativos</h3>
+					<div class="list-manager">
+						<div class="scrollable-list" cdkDropList (cdkDropListDropped)="onAltTitleDrop($event)">
+							@for (title of alternativeTitles(); track title; let i = $index) {
+								<div class="list-item" cdkDrag>
+									<div class="drag-handle" cdkDragHandle>
+										<app-icons name="list" size="20" />
+									</div>
+									<span class="item-text">{{ title }}</span>
+									<button class="remove-btn" (click)="removeAltTitle(i)">
+										<app-icons name="trash" size="18" />
+									</button>
+								</div>
+							}
+						</div>
+						<div class="add-row">
+							<app-input
+								type="text"
+								[ngModel]="newAltTitle()"
+								(ngModelChange)="newAltTitle.set($event)"
+								[ngModelOptions]="{standalone: true}"
+								placeholder="Novo título alternativo"
+								(keyup.enter)="addAltTitle()"
+							/>
+							<app-button variant="primary" (click)="addAltTitle()" [disabled]="!newAltTitle().trim()">
+								<app-icons name="plus" size="20" />
+							</app-button>
+						</div>
+					</div>
+				</section>
+
+				<!-- Original URLs Section -->
+				<section class="form-section">
+					<h3>Fontes Originais</h3>
+					<div class="list-manager">
+						<div class="scrollable-list" cdkDropList (cdkDropListDropped)="onUrlDrop($event)">
+							@for (url of originalUrls(); track url; let i = $index) {
+								<div class="list-item" cdkDrag>
+									<div class="drag-handle" cdkDragHandle>
+										<app-icons name="list" size="20" />
+									</div>
+									<div class="item-info">
+										<span class="host">{{ urlTransform(url) }}</span>
+										<span class="full-url">{{ url }}</span>
+									</div>
+									<button class="remove-btn" (click)="removeUrl(i)">
+										<app-icons name="trash" size="18" />
+									</button>
+								</div>
+							}
+						</div>
+						<div class="add-row">
+							<app-input
+								type="text"
+								[ngModel]="newUrl()"
+								(ngModelChange)="newUrl.set($event)"
+								[ngModelOptions]="{standalone: true}"
+								placeholder="https://..."
+								(keyup.enter)="addUrl()"
+							/>
+							<app-button variant="primary" (click)="addUrl()" [disabled]="!newUrl().trim()">
+								<app-icons name="plus" size="20" />
+							</app-button>
+						</div>
+					</div>
+				</section>
+
+				<!-- Categorization Section -->
+				<section class="form-section">
+					<h3>Categorização</h3>
+
+					<div class="category-group">
+						<div class="group-header">
+							<h4>Tags</h4>
+							<app-input
+								type="text"
+								[ngModel]="tagSearch()"
+								(ngModelChange)="tagSearch.set($event)"
+								[ngModelOptions]="{standalone: true}"
+								placeholder="Filtrar tags..."
+								[showLabel]="false"
+								leftIcon="search"
+							/>
+						</div>
+						<div class="chip-container">
+							@for (tag of filteredTags(); track tag.id) {
+								<div 
+									class="chip" 
+									[class.selected]="selectedTagIds().has(tag.id)"
+									(click)="toggleTag(tag.id)"
+								>
+									{{ tag.name }}
+								</div>
+							}
+							@for (tag of selectedTagsNotInFilter(); track tag.id) {
+								<div class="chip selected" (click)="toggleTag(tag.id)">{{ tag.name }}</div>
+							}
+						</div>
+					</div>
+
+					<div class="category-group">
+						<div class="group-header">
+							<h4>Autores</h4>
+							<app-input
+								type="text"
+								[ngModel]="authorSearch()"
+								(ngModelChange)="authorSearch.set($event)"
+								[ngModelOptions]="{standalone: true}"
+								placeholder="Filtrar autores..."
+								[showLabel]="false"
+								leftIcon="search"
+							/>
+						</div>
+						<div class="chip-container">
+							@for (author of filteredAuthors(); track author.id) {
+								<div 
+									class="chip" 
+									[class.selected]="selectedAuthorIds().has(author.id)"
+									(click)="toggleAuthor(author.id)"
+								>
+									{{ author.name }}
+								</div>
+							}
+							@for (author of selectedAuthorsNotInFilter(); track author.id) {
+								<div class="chip selected" (click)="toggleAuthor(author.id)">{{ author.name }}</div>
+							}
+						</div>
+					</div>
+
+					<div class="category-group">
+						<h4>Conteúdo Sensível</h4>
+
+	<div class="chip-container">
+		@for (item of availableSensitive(); track item.id) {
+			<div 
+				class="chip danger" 
+				[class.selected]="selectedSensitiveIds().has(item.id)"
+				(click)="toggleSensitive(item.id)"
+			>
+				{{ item.name }}
+			</div>
+		} @empty {
+			<span class="empty-text">Nenhuma classificação disponível.</span>
+		}
+	</div>
+</div>
+
+				</section>
+			</form>
+		}
+	</div>
+
+	<div class="modal-footer">
+		<app-button
+			variant="outline"
+			(click)="onCancel()"
+			[disabled]="isSaving()"
+		>
+			Cancelar
+		</app-button>
+		<app-button
+			variant="primary"
+			(click)="onSave()"
+			[disabled]="isLoading() || isSaving() || editForm.invalid"
+		>
+			@if (isSaving()) {
+				<span>Salvando...</span>
+			} @else {
+				<span>Salvar Alterações</span>
+			}
+		</app-button>
+	</div>
+</div>

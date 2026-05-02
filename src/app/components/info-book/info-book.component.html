@@ -4,6 +4,19 @@
 	<span (click)="selectTab(tab.covers, $event)">Artes</span>
 	<span (click)="selectTab(tab.extraInfo, $event)">Informações extras</span>
 	<span (click)="selectTab(tab.savedPages, $event)">Páginas Salvas</span>
+	
+	@if (userTokenService.isAdminSignal()) {
+		<div class="header-actions">
+			<app-button
+				variant="text"
+				size="small"
+				(click)="openBookEditModal()"
+				title="Editar informações do livro"
+			>
+				<app-icons name="edit" size="20" />
+			</app-button>
+		</div>
+	}
 </div>
 <div
 	id="container"

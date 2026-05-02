@@ -50,6 +50,7 @@ export interface BookBasic {
 	sensitiveContent: SensitiveContentResponse[];
 	totalChapters: number;
 	authors: Author[];
+	type?: TypeBook;
 	blurHash?: string;
 	dominantColor?: string;
 	metadata?: ImageMetadata;
@@ -70,6 +71,9 @@ export interface UpdateBookDto {
 	alternativeTitle?: string[];
 	originalUrl?: string[];
 	type?: TypeBook;
+	tags?: string[];
+	authors?: { name: string }[];
+	sensitiveContent?: string[];
 }
 
 export interface Book {
@@ -83,6 +87,7 @@ export interface Book {
 	tags: tag[];
 	sensitiveContent: SensitiveContentResponse[];
 	authors: Author[];
+	type?: TypeBook;
 	blurHash?: string;
 	dominantColor?: string;
 	metadata?: ImageMetadata;

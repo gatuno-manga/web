@@ -65,6 +65,15 @@
 		z-index: 1;
 		flex-shrink: 0;
 	}
+
+	.header-actions {
+		margin-left: auto;
+		display: flex;
+		align-items: flex-end;
+		padding-bottom: 4px;
+		padding-right: 8px;
+		z-index: 1;
+	}
 }
 
 #container {

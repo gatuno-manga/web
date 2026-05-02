@@ -11,6 +11,7 @@ import {
 	ChangeDetectorRef,
 	computed,
 	input,
+	output,
 	ChangeDetectionStrategy,
 } from '@angular/core';
 import { isPlatformBrowser, DecimalPipe } from '@angular/common';
@@ -43,6 +44,10 @@ import { BlurhashComponent } from '../blurhash/blurhash.component';
 import { SavedPagesService } from '../../service/saved-pages.service';
 import { SavedPage } from '../../models/saved-page.models';
 import {
+	BookEditModalComponent,
+	BookEditSaveEvent,
+} from '../notification/custom-components/book-edit-modal/book-edit-modal.component';
+import {
 	CoverEditModalComponent,
 	CoverEditSaveEvent,
 } from '../notification/custom-components/cover-edit-modal/cover-edit-modal.component';
@@ -52,7 +57,7 @@ import {
 } from '../notification/custom-components/source-add-modal/source-add-modal.component';
 import { PromptModalComponent } from '../notification/custom-components/prompt-modal/prompt-modal.component';
 import { NotificationService } from '../../service/notification.service';
-import { NotificationSeverity } from 'app/service/notification';
+import { NotificationSeverity } from '@service/notification';
 import {
 	CdkDragDrop,
 	moveItemInArray,
@@ -109,6 +114,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	id = input.required<string>();
 	bookBasic = input<BookBasic | undefined>();
+	updated = output<void>();
 
 	selectedTab = signal<tab>(tab.chapters);
 	sortAscending = signal(true);
@@ -1384,6 +1390,53 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 	};
 
+	openBookEditModal() {
+		const book = this.bookBasic();
+		if (!book) return;
+
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: BookEditModalComponent,
+			componentData: {
+				book: book,
+				close: (result: BookEditSaveEvent | null) => {
+					this.modalService.close();
+					if (result) {
+						this.onBookEditSave(result);
+					}
+				},
+			},
+			useBackdrop: true,
+			backdropOpacity: 0.5,
+		});
+	}
+
+	onBookEditSave(event: BookEditSaveEvent) {
+		this.bookService.updateBook(event.id, event.data).subscribe({
+			next: () => {
+				this.notificationService.success('Livro atualizado com sucesso!');
+				this.updated.emit();
+
+				// Recarrega dados das abas locais se já foram carregados
+				if (this.modulesLoad[this.tab.extraInfo].load()) {
+					this.loadExtraInfo();
+				}
+				if (this.modulesLoad[this.tab.covers].load()) {
+					this.loadCovers();
+				}
+				if (this.modulesLoad[this.tab.chapters].load()) {
+					this.loadChapters();
+				}
+			},
+			error: (err) => {
+				console.error('Error updating book:', err);
+				this.notificationService.error('Erro ao atualizar livro.');
+			},
+		});
+	}
+
 	openSourceAddModal() {
 		this.notificationService.notify({
 			message: '',
@@ -1644,8 +1697,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 						this.bookService
 							.selectCover(this.id(), cover.id)
 							.subscribe({
-								next: (book) => {
-									window.location.reload();
+								next: () => {
+									this.notificationService.success(
+										'Capa alterada com sucesso!',
+									);
+									this.updated.emit();
+									this.loadCovers();
 								},
 							});
 					},

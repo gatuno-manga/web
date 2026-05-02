@@ -39,6 +39,10 @@ import {
 	BookDownloadModalComponent,
 	BookDownloadResult,
 } from '../../components/notification/custom-components/book-download-modal/book-download-modal.component';
+import {
+	BookEditModalComponent,
+	BookEditSaveEvent,
+} from '../../components/notification/custom-components/book-edit-modal/book-edit-modal.component';
 
 @Component({
 	selector: 'app-book',
@@ -291,7 +295,7 @@ export class BookComponent implements OnInit, OnDestroy {
 			});
 	}
 
-	private refreshBook() {
+	public refreshBook() {
 		const bookId = this.book()?.id;
 		if (bookId) {
 			this.bookService.getBook(bookId).subscribe({
@@ -337,6 +341,43 @@ export class BookComponent implements OnInit, OnDestroy {
 	filterByTag(tagId: string) {
 		this.router.navigate(['/books'], { queryParams: { tags: tagId } });
 	}
+
+	openBookEditModal() {
+		const book = this.book();
+		if (!book) return;
+
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: BookEditModalComponent,
+			componentData: {
+				book: book,
+				close: (result: BookEditSaveEvent | null) => {
+					this.modalService.close();
+					if (result) {
+						this.onBookEditSave(result);
+					}
+				},
+			},
+			useBackdrop: true,
+			backdropOpacity: 0.5,
+		});
+	}
+
+	onBookEditSave(event: BookEditSaveEvent) {
+		this.bookService.updateBook(event.id, event.data).subscribe({
+			next: () => {
+				this.notificationService.success('Livro atualizado com sucesso!');
+				this.refreshBook();
+			},
+			error: (err) => {
+				console.error('Error updating book:', err);
+				this.notificationService.error('Erro ao atualizar livro.');
+			},
+		});
+	}
+
 	fixBook() {
 		const b = this.book();
 		if (b) {

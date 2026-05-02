@@ -169,7 +169,7 @@
 				></markdown>
 			</div>
 		</div>
-		<app-info-book [id]="b.id" [bookBasic]="b" />
+		<app-info-book [id]="b.id" [bookBasic]="b" (updated)="refreshBook()" />
 	}
 } @placeholder {
 	<div class="background-container">
@@ -213,6 +213,9 @@
 		<h1><app-icons name="book" /> {{ book()?.title }}</h1>
 		<div class="line"></div>
 		<div class="actions">
+			<app-button (click)="openBookEditModal()" variant="text"
+				>Editar</app-button
+			>
 			<app-button (click)="resetBook()" variant="text"
 				>Resetar</app-button
 			>
