@@ -83,3 +83,9 @@ markdown {
 		text-decoration: underline;
 	}
 }
+
+img {
+	user-select: none;
+	-webkit-user-drag: none;
+  	user-drag: none;
+}
