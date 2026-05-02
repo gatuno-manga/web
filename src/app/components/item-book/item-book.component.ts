@@ -1,4 +1,4 @@
-import { Component, input, inject, signal, computed } from '@angular/core';
+import { Component, input, inject, signal, computed, output } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 import { BookList } from '../../models/book.models';
@@ -32,6 +32,14 @@ export class ItemBookComponent {
 	book = input.required<BookList>();
 	type = input<'grid' | 'list' | 'cover'>('grid');
 	priority = input(false);
+	progress = input<{
+		currentChapterTitle?: string;
+		nextChapterTitle?: string;
+		nextChapterId?: string;
+		pageIndex?: number;
+	}>();
+	canRemove = input(false);
+	remove = output<void>();
 
 	private contextMenuService = inject(ContextMenuService);
 	private downloadService = inject(DownloadService);
@@ -43,6 +51,12 @@ export class ItemBookComponent {
 
 	imageError = false;
 	isImageLoaded = signal(false);
+
+	onRemove(event: MouseEvent) {
+		event.preventDefault();
+		event.stopPropagation();
+		this.remove.emit();
+	}
 
 	cardCoverStyle = computed(() => {
 		if (this.book().cover && !this.imageError) {

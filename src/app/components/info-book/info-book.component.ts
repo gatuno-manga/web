@@ -1367,27 +1367,24 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	};
 
 	onSourceAddSave(data: SourceAddSaveEvent) {
-		// Adicionar nova URL ao array existente
-		const updatedUrls = [...this.extraInfo().originalUrl, data.url];
-
-		// Chamar API para atualizar o livro
+		// Chamar API para atualizar o livro com a nova lista (incluindo ordem)
 		this.bookService
-			.updateBook(this.id(), { originalUrl: updatedUrls })
+			.updateBook(this.id(), { originalUrl: data.urls })
 			.subscribe({
 				next: () => {
 					// Atualizar estado local
 					this.extraInfo.update((info) => ({
 						...info,
-						originalUrl: updatedUrls,
+						originalUrl: data.urls,
 					}));
 					this.closeSourceAddModal();
 					this.notificationService.success(
-						'Fonte adicionada com sucesso!',
+						'Fontes atualizadas com sucesso!',
 					);
 				},
 				error: (error) => {
-					console.error('Error adding source:', error);
-					this.notificationService.error('Erro ao adicionar fonte.');
+					console.error('Error updating sources:', error);
+					this.notificationService.error('Erro ao atualizar fontes.');
 					this.closeSourceAddModal();
 				},
 			});

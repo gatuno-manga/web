@@ -4,33 +4,72 @@
 	aria-labelledby="source-add-title"
 >
 	<div class="settings-header">
-		<h2 id="source-add-title">Adicionar Nova Fonte</h2>
+		<h2 id="source-add-title">Gerenciar Fontes</h2>
 	</div>
 
 	<div class="settings-body">
-		<div class="setting-item column">
-			<app-input
-				type="text"
-				id="sourceUrl"
-				[ngModel]="newUrl()"
-				(ngModelChange)="newUrl.set($event)"
-				placeholder="URL da Fonte"
-				(blur)="validateUrl()"
-				(keyup.enter)="onSave()"
-				[disabled]="isLoading()"
-				leftIcon="globe"
-				aria-describedby="url-error url-help"
-			/>
-			@if (urlError()) {
-				<span id="url-error" class="error" role="alert">
-					<app-icons name="alert-circle" size="16" />
-					{{ urlError() }}
+		<div class="priority-notice">
+			<app-icons name="alert-circle" size="18" />
+			<span>Arraste os itens para definir a ordem de prioridade. A primeira fonte será a principal.</span>
+		</div>
+
+		<div class="scrollable-list">
+			<div class="sources-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
+				@for (url of urls(); track url; let i = $index) {
+					<div class="source-item" cdkDrag cdkDragHandle>
+						<div class="drag-handle">
+							<app-icons name="list" size="20" />
+						</div>
+						<div class="source-info">
+							<span class="host">{{ urlTransform(url) }}</span>
+							<span class="full-url">{{ url }}</span>
+						</div>
+						<button class="remove-btn" (click)="removeSource(i); $event.stopPropagation()" title="Remover fonte">
+							<app-icons name="trash" size="18" />
+						</button>
+					</div>
+				} @empty {
+					<div class="empty-state">
+						<p>Nenhuma fonte adicionada.</p>
+					</div>
+				}
+			</div>
+		</div>
+
+		<div class="add-section">
+			<div class="setting-item column">
+				<div class="input-row">
+					<app-input
+						type="text"
+						id="sourceUrl"
+						[ngModel]="newUrl()"
+						(ngModelChange)="newUrl.set($event)"
+						placeholder="URL da nova Fonte"
+						(blur)="validateUrl()"
+						(keyup.enter)="addSource()"
+						[disabled]="isLoading()"
+						leftIcon="globe"
+						aria-describedby="url-error url-help"
+					/>
+					<app-button
+						variant="primary"
+						(click)="addSource()"
+						[disabled]="isLoading() || !newUrl().trim()"
+					>
+						<app-icons name="plus" size="20" />
+					</app-button>
+				</div>
+				@if (urlError()) {
+					<span id="url-error" class="error" role="alert">
+						<app-icons name="alert-circle" size="16" />
+						{{ urlError() }}
+					</span>
+				}
+				<span id="url-help" class="help-text">
+					Insira a URL completa da fonte original (ex:
+					https://example.com/manga).
 				</span>
-			}
-			<span id="url-help" class="help-text">
-				Insira a URL completa da fonte original do livro (ex:
-				https://example.com/manga).
-			</span>
+			</div>
 		</div>
 	</div>
 
@@ -45,12 +84,12 @@
 		<app-button
 			variant="primary"
 			(click)="onSave()"
-			[disabled]="isLoading() || !newUrl().trim()"
+			[disabled]="isLoading()"
 		>
 			@if (isLoading()) {
-				<span>Adicionando...</span>
+				<span>Salvando...</span>
 			} @else {
-				<span>Adicionar</span>
+				<span>Salvar Alterações</span>
 			}
 		</app-button>
 	</div>

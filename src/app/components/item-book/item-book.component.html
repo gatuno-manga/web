@@ -1,9 +1,9 @@
 <a
-	[routerLink]="[book().id]"
+	[routerLink]="['/books', book().id]"
 	[class]="'book-card ' + type()"
 	[ngStyle]="cardCoverStyle()"
 	(contextmenu)="onContextMenu($event)"
->
+	>
 	@if (book().blurHash) {
 		<div
 			class="card-blur-background"
@@ -17,6 +17,23 @@
 			class="cover-image-container"
 			[style.background-color]="book().dominantColor || 'var(--secondary-color)'"
 		>
+			@if (canRemove()) {
+				<button
+					class="remove-btn"
+					(click)="onRemove($event)"
+					aria-label="Remover do histórico"
+					title="Remover do histórico"
+				>
+					<app-icons name="close" size="18" />
+				</button>
+			}
+
+			@if (progress()) {
+				<div class="progress-badge">
+					{{ progress()?.nextChapterTitle || progress()?.currentChapterTitle }}
+				</div>
+			}
+
 			@if (book().blurHash) {
 				<div
 					class="blur-placeholder"
@@ -58,7 +75,7 @@
 		</div>
 	} @else {
 		<div class="info">
-			<span>{{ truncatedTitle() }}</span>
+			<span class="title">{{ truncatedTitle() }}</span>
 		</div>
 	}
 </a>

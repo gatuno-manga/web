@@ -20,10 +20,179 @@
 }
 
 .settings-body {
+	overflow-y: hidden; // Previne scroll duplo
+	flex: 1;
+	padding: 24px;
+	max-height: 75vh;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.scrollable-list {
 	overflow-y: auto;
 	flex: 1;
-	padding: 16px 24px;
-	max-height: 60vh;
+	max-height: 350px; // Limita o tamanho da lista antes de scrollar
+	padding-right: 8px; // Espaço para a scrollbar
+	
+	&::-webkit-scrollbar {
+		width: 6px;
+	}
+	
+	&::-webkit-scrollbar-thumb {
+		background-color: var(--primary-color);
+		border-radius: 10px;
+	}
+	
+	&::-webkit-scrollbar-track {
+		background: rgb(from var(--app-text-color) r g b / 0.05);
+	}
+}
+
+.priority-notice {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 14px 18px;
+	background-color: rgb(from var(--primary-color) r g b / 0.1);
+	border-radius: 12px;
+	border-left: 4px solid var(--primary-color);
+	font-size: 0.9rem;
+	color: var(--app-text-color);
+
+	app-icons {
+		color: var(--primary-color);
+		flex-shrink: 0;
+	}
+}
+
+.sources-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-height: 50px;
+}
+
+.source-item {
+	display: flex;
+	align-items: center;
+	padding: 14px 18px;
+	background-color: var(--secondary-color);
+	border-radius: 12px;
+	gap: 16px;
+	border: 1px solid rgb(from var(--app-text-color) r g b / 0.1);
+	cursor: grab;
+	transition: all 0.2s ease;
+
+	&:hover {
+		border-color: var(--primary-color);
+		background-color: rgb(from var(--secondary-color) r g b / 0.9);
+	}
+
+	&:active {
+		cursor: grabbing;
+	}
+
+	&.cdk-drag-preview {
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+		opacity: 0.95;
+		border-color: var(--primary-color);
+		cursor: grabbing;
+	}
+
+	&.cdk-drag-placeholder {
+		opacity: 0.3;
+	}
+
+	.drag-handle {
+		cursor: grab;
+		color: var(--app-text-color-secondary);
+		display: flex;
+		align-items: center;
+
+		&:active {
+			cursor: grabbing;
+		}
+	}
+
+	.source-info {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+
+		.host {
+			font-weight: 600;
+			font-size: 0.95rem;
+		}
+
+		.full-url {
+			font-size: 0.75rem;
+			color: var(--app-text-color-secondary);
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+
+	.remove-btn {
+		background: transparent;
+		border: none;
+		color: var(--app-text-color-secondary);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		padding: 5px;
+		border-radius: 4px;
+		transition: all 0.2s;
+
+		&:hover {
+			color: var(--danger-color);
+			background-color: rgb(from var(--danger-color) r g b / 0.1);
+		}
+	}
+}
+
+.add-section {
+	margin-top: 24px;
+	padding-top: 32px;
+	border-top: 2px dashed rgb(from var(--app-text-color) r g b / 0.15);
+	position: relative;
+
+	&::before {
+		content: 'Adicionar nova fonte';
+		position: absolute;
+		top: -12px;
+		left: 24px;
+		background-color: var(--app-background-color, #1a1a1a);
+		padding: 0 12px;
+		font-size: 0.8rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--app-text-color-secondary);
+	}
+
+	.input-row {
+		display: flex;
+		gap: 8px;
+		align-items: flex-start;
+
+		app-input {
+			flex: 1;
+		}
+
+		app-button {
+			height: 42px;
+		}
+	}
+}
+
+.empty-state {
+	text-align: center;
+	padding: 20px;
+	color: var(--app-text-color-secondary);
+	font-style: italic;
 }
 
 .setting-item {

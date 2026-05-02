@@ -34,10 +34,10 @@ describe('SourceAddModalComponent', () => {
     });
 
     it('should detect duplicate URLs', () => {
-        component.existingUrls = ['https://example.com/manga'];
+        component.urls.set(['https://example.com/manga']);
         component.newUrl.set('https://example.com/manga/');
         expect(component.validateUrl()).toBeFalse();
-        expect(component.urlError()).toContain('já foi adicionada');
+        expect(component.urlError()).toContain('já está na lista');
     });
 
     it('should require http or https protocol', () => {
