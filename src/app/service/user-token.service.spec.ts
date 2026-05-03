@@ -508,7 +508,7 @@ describe('UserTokenService', () => {
 			discardPeriodicTasks();
 
 			expect(httpMock.match('/auth/refresh').length).toBe(0);
-			expect(capturedError?.message).toContain('Missing CSRF token');
+			expect(capturedError?.message).toContain('Token CSRF não encontrado');
 		}));
 	});
 

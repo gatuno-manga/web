@@ -259,13 +259,19 @@ export class UserTokenService {
 
 	refreshTokens(): Observable<{ accessToken: string; refreshToken?: string }> {
 		if (!this.refreshObservable) {
+			console.log('[GATUNO_REFRESH_V2] Iniciando processo de refresh...');
 			this.refreshObservable = timer(0, 500).pipe(
 				take(3),
-				map(() => this.csrfToken?.trim()),
+				map((i) => {
+					const token = this.csrfToken?.trim();
+					console.log(`[GATUNO_REFRESH_V2] Tentativa ${i + 1} de obter CSRF... ${token ? 'Sucesso' : 'Falha'}`);
+					return token;
+				}),
 				filter((token): token is string => !!token),
 				take(1),
-				throwIfEmpty(() => new Error('Missing CSRF token for refresh request')),
+				throwIfEmpty(() => new Error('CRITICAL: Token CSRF não encontrado após 3 tentativas')),
 				switchMap((csrfToken) => {
+					console.log('[GATUNO_REFRESH_V2] Disparando requisição POST /auth/refresh');
 					return this.http.post<{ accessToken: string; refreshToken?: string }>(
 						'/auth/refresh',
 						null,
@@ -275,18 +281,25 @@ export class UserTokenService {
 						},
 					);
 				}),
-				tap(({ accessToken }) => {
-					this.setTokens(accessToken);
+				tap((body) => {
+					if (body?.accessToken) {
+						console.log('[GATUNO_REFRESH_V2] Refresh concluído com sucesso!');
+						this.setTokens(body.accessToken);
+					} else {
+						console.warn('[GATUNO_REFRESH_V2] Resposta de refresh vazia ou inválida');
+					}
 				}),
 				finalize(() => {
 					this.refreshObservable = null;
 				}),
 				shareReplay(1),
 				catchError((err) => {
-					if (err.message?.includes('Missing CSRF token')) {
+					if (err.message?.includes('Token CSRF não encontrado')) {
 						console.error(
-							'Refresh token attempt failed: Missing CSRF token after retries',
+							'[GATUNO_REFRESH_V2] Erro fatal: CSRF ausente após retries',
 						);
+					} else {
+						console.error('[GATUNO_REFRESH_V2] Erro na requisição de refresh:', err);
 					}
 					return throwError(() => err);
 				}),

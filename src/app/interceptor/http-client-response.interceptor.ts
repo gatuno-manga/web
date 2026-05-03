@@ -44,29 +44,46 @@ const handle401Error = (
 	authQueue: AuthQueueService,
 ): Observable<HttpEvent<unknown>> => {
 	if (!authQueue.isRefreshing) {
+		console.log('[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...');
 		authQueue.startRefreshing();
 
 		return tokenService.refreshTokens().pipe(
-			switchMap((tokens) => {
-				authQueue.notifySuccess(tokens.accessToken);
-				return next(addToken(req, tokens.accessToken));
-			}),
 			catchError((err) => {
-				tokenService.removeTokens();
+				console.error('[GATUNO_INTERCEPTOR] Erro no refreshTokens:', err);
+				tokenService.removeTokens(true);
 				authQueue.notifyFailure(err);
 				return throwError(() => err);
 			}),
+			switchMap((tokens) => {
+				if (!tokens || !tokens.accessToken) {
+					console.error(
+						'[GATUNO_INTERCEPTOR] Token de acesso ausente na resposta de refresh. Encerrando sessão.',
+					);
+					const err = new Error('Missing accessToken in refresh response');
+					tokenService.removeTokens(true);
+					authQueue.notifyFailure(err);
+					return throwError(() => err);
+				}
+				console.log(
+					'[GATUNO_INTERCEPTOR] Refresh concluído, repetindo requisição original...',
+				);
+				authQueue.notifySuccess(tokens.accessToken);
+				return next(addToken(req, tokens.accessToken));
+			}),
 		);
 	}
+
+	console.log('[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...');
 	return authQueue.token$.pipe(
-		filter((token): token is string => {
-			if (authQueue.hasFailed) {
-				return false;
-			}
-			return token !== null;
-		}),
+		filter((token): token is string => token !== null || authQueue.hasFailed),
 		take(1),
-		switchMap((token) => next(addToken(req, token))),
+		switchMap((token) => {
+			if (authQueue.hasFailed) {
+				return throwError(() => new Error('Falha na renovação do token (fila)'));
+			}
+			console.log('[GATUNO_INTERCEPTOR] Retentando requisição enfileirada...');
+			return next(addToken(req, token as string));
+		}),
 	);
 };
 
