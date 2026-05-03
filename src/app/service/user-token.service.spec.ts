@@ -528,4 +528,87 @@ describe('UserTokenService', () => {
 			expect(service.refreshToken).toBeNull();
 		});
 	});
+
+	describe('Regressão: Correções do Token Refresh', () => {
+		beforeEach(() => {
+			localStorage.clear();
+		});
+
+		afterEach(() => {
+			localStorage.clear();
+		});
+
+		it('deve manter o refreshObservable ativo mesmo se um subscriber cancelar cedo (finalize order)', fakeAsync(() => {
+			const newAccessToken = createValidToken();
+
+			// Primeiro subscriber cancela cedo
+			const sub1 = service.refreshTokens().subscribe();
+			sub1.unsubscribe();
+
+			// Segundo subscriber entra logo em seguida
+			let result: any;
+			service.refreshTokens().subscribe((res) => (result = res));
+
+			// Deve haver apenas UMA requisição, provando que o primeiro unsubscribe não limpou o cache prematuramente
+			const requests = httpMock.match('/auth/refresh');
+			expect(requests.length).toBe(1);
+
+			requests[0].flush({ accessToken: newAccessToken });
+			tick();
+			discardPeriodicTasks();
+
+			expect(result.accessToken).toBe(newAccessToken);
+		}));
+
+		it('deve respeitar o bloqueio de localStorage para evitar thundering herd (multi-tab)', fakeAsync(() => {
+			const token = createValidToken();
+			// Simula que outra aba já iniciou o refresh e definiu o lock
+			localStorage.setItem(
+				'gatuno-refresh-lock',
+				(Date.now() - 1000).toString(),
+			);
+
+			// Tenta disparar o refresh via timer do auto-refresh
+			(service as any).scheduleAutoRefresh();
+			tick(10000); // Avança tempo suficiente para disparar o timer (incluindo jitter)
+
+			// Não deve ter disparado nenhuma requisição HTTP porque o lock estava ativo
+			const requests = httpMock.match('/auth/refresh');
+			expect(requests.length).toBe(0);
+
+			discardPeriodicTasks();
+		}));
+
+		it('deve limpar o lock do localStorage após sucesso do refresh', fakeAsync(() => {
+			const token = createValidToken();
+			service.setTokens(token);
+			// Avança o tempo para disparar o auto-refresh agendado no setTokens
+			tick(3600 * 1000);
+
+			const requests = httpMock.match('/auth/refresh');
+			expect(requests.length).toBe(1);
+			expect(localStorage.getItem('gatuno-refresh-lock')).toBeTruthy();
+
+			requests[0].flush({ accessToken: createValidToken() });
+			tick();
+			discardPeriodicTasks();
+
+			expect(localStorage.getItem('gatuno-refresh-lock')).toBeNull();
+		}));
+
+		it('deve limpar o lock do localStorage após falha do refresh', fakeAsync(() => {
+			const token = createValidToken();
+			service.setTokens(token);
+			tick(3600 * 1000);
+
+			const requests = httpMock.match('/auth/refresh');
+			expect(requests.length).toBe(1);
+
+			requests[0].error(new ProgressEvent('error'));
+			tick();
+			discardPeriodicTasks();
+
+			expect(localStorage.getItem('gatuno-refresh-lock')).toBeNull();
+		}));
+	});
 });

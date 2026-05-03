@@ -34,6 +34,8 @@ export class UserTokenService {
 	private notificationService = inject(NotificationService);
 
 	private readonly ACCESSKEY = 'accessToken';
+	private readonly REFRESH_LOCK_KEY = 'gatuno-refresh-lock';
+	private readonly LOCK_TIMEOUT_MS = 10000;
 	private readonly REFRESH_MARGIN_SEC = 60;
 	private sessionMayExist = isPlatformBrowser(this.platformId);
 
@@ -193,11 +195,29 @@ export class UserTokenService {
 			const timeToRefresh = expiresAtMs - nowMs - marginMs;
 
 			if (timeToRefresh > 0) {
+				const jitter = Math.floor(Math.random() * 5000); // 0-5s jitter
 				this.ngZone.runOutsideAngular(() => {
-					this.refreshSubscription = timer(timeToRefresh).subscribe(
-						() => {
-							this.ngZone.run(() => {
-								this.refreshTokens().subscribe({
+					this.refreshSubscription = timer(
+						timeToRefresh + jitter,
+					).subscribe(() => {
+						this.ngZone.run(() => {
+							const lock = localStorage.getItem(this.REFRESH_LOCK_KEY);
+							const now = Date.now();
+
+							if (lock && now - parseInt(lock, 10) < this.LOCK_TIMEOUT_MS) {
+								// Outra aba já está processando o refresh
+								return;
+							}
+
+							localStorage.setItem(this.REFRESH_LOCK_KEY, now.toString());
+
+							this.refreshTokens()
+								.pipe(
+									finalize(() =>
+										localStorage.removeItem(this.REFRESH_LOCK_KEY),
+									),
+								)
+								.subscribe({
 									error: () => {
 										console.warn(
 											'Auto-refresh falhou. Encerrando sessão.',
@@ -205,9 +225,8 @@ export class UserTokenService {
 										this.removeTokens(true);
 									},
 								});
-							});
-						},
-					);
+						});
+					});
 				});
 			} else {
 				// Tenta refresh imediato mesmo se já expirou (ou está na margem)
@@ -250,10 +269,10 @@ export class UserTokenService {
 					tap(({ accessToken }) => {
 						this.setTokens(accessToken);
 					}),
-					shareReplay(1),
 					finalize(() => {
 						this.refreshObservable = null;
 					}),
+					shareReplay(1),
 				);
 		}
 		return this.refreshObservable;
