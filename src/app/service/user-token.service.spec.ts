@@ -448,6 +448,7 @@ describe('UserTokenService', () => {
 			const newAccessToken = createValidToken([Role.ADMIN]);
 
 			service.refreshTokens().subscribe();
+			tick(); // Avança o timer(0, 500) do CSRF retry
 
 			const req = httpMock.expectOne('/auth/refresh');
 			expect(req.request.method).toBe('POST');
@@ -474,6 +475,7 @@ describe('UserTokenService', () => {
 			service.refreshTokens().subscribe(() => callCount++);
 			service.refreshTokens().subscribe(() => callCount++);
 			service.refreshTokens().subscribe(() => callCount++);
+			tick(); // Avança o timer(0, 500)
 
 			// Apenas UMA requisição HTTP
 			const requests = httpMock.match('/auth/refresh');
@@ -502,7 +504,7 @@ describe('UserTokenService', () => {
 					capturedError = error;
 				},
 			});
-			tick();
+			tick(2000); // Avança tempo suficiente para os 3 retries (0ms, 500ms, 1000ms)
 			discardPeriodicTasks();
 
 			expect(httpMock.match('/auth/refresh').length).toBe(0);
@@ -548,6 +550,7 @@ describe('UserTokenService', () => {
 			// Segundo subscriber entra logo em seguida
 			let result: any;
 			service.refreshTokens().subscribe((res) => (result = res));
+			tick(); // Avança o timer(0, 500) do CSRF retry
 
 			// Deve haver apenas UMA requisição, provando que o primeiro unsubscribe não limpou o cache prematuramente
 			const requests = httpMock.match('/auth/refresh');

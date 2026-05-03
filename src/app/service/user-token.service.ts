@@ -15,7 +15,17 @@ import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { payloadToken, Role } from '../models/user.models';
 import { Observable, Subscription, throwError, timer } from 'rxjs';
-import { shareReplay, tap, finalize } from 'rxjs/operators';
+import {
+	shareReplay,
+	tap,
+	finalize,
+	map,
+	filter,
+	take,
+	switchMap,
+	catchError,
+	throwIfEmpty,
+} from 'rxjs/operators';
 import { NotificationService } from './notification.service';
 import { CrossTabSyncService, AuthSyncMessage } from './cross-tab-sync.service';
 
@@ -247,35 +257,42 @@ export class UserTokenService {
 		}
 	}
 
-	refreshTokens() {
+	refreshTokens(): Observable<{ accessToken: string; refreshToken?: string }> {
 		if (!this.refreshObservable) {
-			const csrfToken = this.csrfToken?.trim();
-			if (!csrfToken) {
-				console.error('Refresh token attempt failed: Missing CSRF token');
-				return throwError(
-					() => new Error('Missing CSRF token for refresh request'),
-				);
-			}
-			this.refreshObservable = this.http
-				.post<{ accessToken: string; refreshToken?: string }>(
-					'/auth/refresh',
-					null,
-					{
-						withCredentials: true,
-						headers: { 'x-csrf-token': csrfToken },
-					},
-				)
-				.pipe(
-					tap(({ accessToken }) => {
-						this.setTokens(accessToken);
-					}),
-					finalize(() => {
-						this.refreshObservable = null;
-					}),
-					shareReplay(1),
-				);
+			this.refreshObservable = timer(0, 500).pipe(
+				take(3),
+				map(() => this.csrfToken?.trim()),
+				filter((token): token is string => !!token),
+				take(1),
+				throwIfEmpty(() => new Error('Missing CSRF token for refresh request')),
+				switchMap((csrfToken) => {
+					return this.http.post<{ accessToken: string; refreshToken?: string }>(
+						'/auth/refresh',
+						null,
+						{
+							withCredentials: true,
+							headers: { 'x-csrf-token': csrfToken },
+						},
+					);
+				}),
+				tap(({ accessToken }) => {
+					this.setTokens(accessToken);
+				}),
+				finalize(() => {
+					this.refreshObservable = null;
+				}),
+				shareReplay(1),
+				catchError((err) => {
+					if (err.message?.includes('Missing CSRF token')) {
+						console.error(
+							'Refresh token attempt failed: Missing CSRF token after retries',
+						);
+					}
+					return throwError(() => err);
+				}),
+			) as Observable<{ accessToken: string; refreshToken?: string }>;
 		}
-		return this.refreshObservable;
+		return this.refreshObservable!;
 	}
 
 	private hasRole(role: Role): boolean {
