@@ -44,8 +44,12 @@ label {
 label.ative,
 input:focus + label {
 	top: -2.5rem;
-	left: -40px;
+	left: 0;
 	transform: translateY(0);
+
+	&.icons {
+		left: -40px;
+	}
 }
 
 app-icons.clickable {
