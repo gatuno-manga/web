@@ -60,6 +60,23 @@ describe('UserTokenService', () => {
 		return `${header}.${payload}.${signature}`;
 	};
 
+	// Token JWT que expira em 30 segundos (dentro da margem de 60s)
+	const createExpiringSoonToken = () => {
+		const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+		const payload = btoa(
+			JSON.stringify({
+				email: 'test@example.com',
+				sub: 'user-123',
+				roles: [Role.USER],
+				iss: 'gatuno',
+				iat: Math.floor(Date.now() / 1000),
+				exp: Math.floor(Date.now() / 1000) + 30, // Expirará em 30 segundos
+			}),
+		);
+		const signature = btoa('fake-signature');
+		return `${header}.${payload}.${signature}`;
+	};
+
 	beforeEach(() => {
 		crossTabMessages$ = new Subject<AuthSyncMessage>();
 
@@ -509,6 +526,49 @@ describe('UserTokenService', () => {
 
 			expect(httpMock.match('/auth/refresh').length).toBe(0);
 			expect(capturedError?.message).toContain('Token CSRF não encontrado');
+		}));
+
+		it('deve tentar refresh imediato se o token expirar em menos que a margem (60s)', fakeAsync(() => {
+			const soonExpiringToken = createExpiringSoonToken();
+
+			service.setTokens(soonExpiringToken);
+			tick(); // Avança o timer(0, 500) do refreshTokens()
+			
+			const requests = httpMock.match('/auth/refresh');
+			expect(requests.length).toBe(1);
+
+			requests[0].flush({
+				accessToken: createValidToken(),
+			});
+			tick();
+			discardPeriodicTasks();
+		}));
+
+		it('deve tentar refresh novamente se o token recebido pelo próprio refresh ainda estiver na margem (loop protection)', fakeAsync(() => {
+			const shortToken = createExpiringSoonToken();
+			
+			// 1. Inicia um refresh manual
+			service.refreshTokens().subscribe();
+			tick(); // CSRF
+			
+			const req1 = httpMock.expectOne('/auth/refresh');
+			
+			// 2. O servidor responde com um token que AINDA está na margem (< 60s)
+			// Isso vai disparar setTokens -> scheduleAutoRefresh -> refreshTokens novamente
+			req1.flush({ accessToken: shortToken });
+			tick();
+			
+			// 3. Devido ao bug, a segunda chamada de refreshTokens pode ter retornado o mesmo observable
+			// que estava terminando. Precisamos verificar se uma SEGUNDA requisição HTTP foi feita.
+			const req2 = httpMock.match('/auth/refresh');
+			expect(req2.length).withContext('Deveria ter disparado uma segunda requisição para tentar obter um token longo').toBe(1);
+			
+			if (req2.length > 0) {
+				req2[0].flush({ accessToken: createValidToken() });
+			}
+			
+			tick();
+			discardPeriodicTasks();
 		}));
 	});
 

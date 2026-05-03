@@ -14,7 +14,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { payloadToken, Role } from '../models/user.models';
-import { Observable, Subscription, throwError, timer } from 'rxjs';
+import { Observable, Subscription, throwError, timer, asapScheduler } from 'rxjs';
 import {
 	shareReplay,
 	tap,
@@ -240,8 +240,12 @@ export class UserTokenService {
 				});
 			} else {
 				// Tenta refresh imediato mesmo se já expirou (ou está na margem)
-				this.refreshTokens().subscribe({
-					error: () => this.removeTokens(true),
+				// Usamos asapScheduler para garantir que, se chamado dentro de um refreshTokens atual,
+				// a requisição anterior termine e limpe o refreshObservable antes da nova tentativa.
+				asapScheduler.schedule(() => {
+					this.refreshTokens().subscribe({
+						error: () => this.removeTokens(true),
+					});
 				});
 			}
 		} catch (e) {
@@ -257,7 +261,7 @@ export class UserTokenService {
 		}
 	}
 
-	refreshTokens(): Observable<{ accessToken: string; refreshToken?: string }> {
+	refreshTokens(): Observable<{ accessToken: string; refreshToken?: string; }> {
 		if (!this.refreshObservable) {
 			console.log('[GATUNO_REFRESH_V2] Iniciando processo de refresh...');
 			this.refreshObservable = timer(0, 500).pipe(
@@ -272,7 +276,7 @@ export class UserTokenService {
 				throwIfEmpty(() => new Error('CRITICAL: Token CSRF não encontrado após 3 tentativas')),
 				switchMap((csrfToken) => {
 					console.log('[GATUNO_REFRESH_V2] Disparando requisição POST /auth/refresh');
-					return this.http.post<{ accessToken: string; refreshToken?: string }>(
+					return this.http.post<{ accessToken: string; refreshToken?: string; }>(
 						'/auth/refresh',
 						null,
 						{
@@ -303,7 +307,7 @@ export class UserTokenService {
 					}
 					return throwError(() => err);
 				}),
-			) as Observable<{ accessToken: string; refreshToken?: string }>;
+			) as Observable<{ accessToken: string; refreshToken?: string; }>;
 		}
 		return this.refreshObservable!;
 	}
