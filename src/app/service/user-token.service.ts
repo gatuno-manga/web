@@ -43,9 +43,10 @@ export class UserTokenService {
 
 	private readonly ACCESSKEY = 'accessToken';
 	private readonly REFRESH_LOCK_KEY = 'gatuno-refresh-lock';
+	private readonly SESSION_INTENT_KEY = 'gatuno-session-intent';
 	private readonly LOCK_TIMEOUT_MS = 10000;
 	private readonly REFRESH_MARGIN_SEC = 60;
-	private sessionMayExist = isPlatformBrowser(this.platformId);
+	private sessionMayExist = false;
 
 	private refreshObservable: Observable<{
 		accessToken: string;
@@ -104,6 +105,10 @@ export class UserTokenService {
 		const initialToken = this.cookieService.get(this.ACCESSKEY, false);
 		this._accessToken.set(initialToken);
 		
+		if (isPlatformBrowser(this.platformId)) {
+			this.sessionMayExist = !!initialToken || localStorage.getItem(this.SESSION_INTENT_KEY) === 'true';
+		}
+
 		this.initCrossTabSync();
 
 		if (this.accessToken) {
@@ -117,6 +122,9 @@ export class UserTokenService {
 			.subscribe((message: AuthSyncMessage) => {
 				if (message.type === 'TOKEN_UPDATE') {
 					this.sessionMayExist = true;
+					if (isPlatformBrowser(this.platformId)) {
+						localStorage.setItem(this.SESSION_INTENT_KEY, 'true');
+					}
 					this._accessToken.set(message.accessToken ?? null);
 					if (message.accessToken) {
 						this.scheduleAutoRefresh();
@@ -124,6 +132,9 @@ export class UserTokenService {
 				} else if (message.type === 'TOKEN_REMOVE') {
 					this.stopAutoRefresh();
 					this.sessionMayExist = false;
+					if (isPlatformBrowser(this.platformId)) {
+						localStorage.removeItem(this.SESSION_INTENT_KEY);
+					}
 					this._accessToken.set(null);
 					this.csrfService.clear();
 				}
@@ -133,6 +144,9 @@ export class UserTokenService {
 	setTokens(accessToken: string, csrfToken?: string) {
 		this.cookieService.set(this.ACCESSKEY, accessToken, false);
 		this.sessionMayExist = true;
+		if (isPlatformBrowser(this.platformId)) {
+			localStorage.setItem(this.SESSION_INTENT_KEY, 'true');
+		}
 		this._accessToken.set(accessToken);
 
 		if (csrfToken) {
@@ -149,6 +163,9 @@ export class UserTokenService {
 		this.csrfService.clear();
 		
 		this.sessionMayExist = false;
+		if (isPlatformBrowser(this.platformId)) {
+			localStorage.removeItem(this.SESSION_INTENT_KEY);
+		}
 		this._accessToken.set(null);
 		
 		this.crossTabSync.notifyTokenRemove();

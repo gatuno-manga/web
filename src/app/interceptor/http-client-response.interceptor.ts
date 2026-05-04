@@ -27,7 +27,8 @@ export const httpClientResponseInterceptor: HttpInterceptorFn = (req, next) => {
 			if (
 				error instanceof HttpErrorResponse &&
 				error.status === 401 &&
-				!excludedUrls.some((url) => req.url.includes(url))
+				!excludedUrls.some((url) => req.url.includes(url)) &&
+				userTokenService.hasValidRefreshToken
 			) {
 				return handle401Error(req, next, userTokenService, authQueue);
 			}
@@ -50,7 +51,16 @@ const handle401Error = (
 		return tokenService.refreshTokens().pipe(
 			catchError((err) => {
 				console.error('[GATUNO_INTERCEPTOR] Erro no refreshTokens:', err);
-				tokenService.removeTokens(true);
+				
+				// Só remove tokens se for um erro de autenticação (401 ou 403)
+				// Erros de rede (0) ou servidor (500) não devem deslogar o usuário
+				if (err instanceof HttpErrorResponse && (err.status === 401 || err.status === 403)) {
+					console.warn('[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.');
+					tokenService.removeTokens(true);
+				} else {
+					console.warn('[GATUNO_INTERCEPTOR] Falha temporária no refresh. Mantendo sessão.');
+				}
+
 				authQueue.notifyFailure(err);
 				return throwError(() => err);
 			}),
