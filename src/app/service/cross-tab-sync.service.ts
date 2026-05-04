@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 export interface AuthSyncMessage {
     type: 'TOKEN_UPDATE' | 'TOKEN_REMOVE';
     accessToken?: string | null;
+    csrfToken?: string | null;
     timestamp: number;
 }
 
@@ -76,10 +77,11 @@ export class CrossTabSyncService implements OnDestroy {
         });
     }
 
-    notifyTokenUpdate(accessToken: string | null): void {
+    notifyTokenUpdate(accessToken: string | null, csrfToken?: string | null): void {
         this.postMessage({
             type: 'TOKEN_UPDATE',
             accessToken,
+            csrfToken,
             timestamp: Date.now()
         });
     }
@@ -88,6 +90,7 @@ export class CrossTabSyncService implements OnDestroy {
         this.postMessage({
             type: 'TOKEN_REMOVE',
             accessToken: null,
+            csrfToken: null,
             timestamp: Date.now()
         });
     }

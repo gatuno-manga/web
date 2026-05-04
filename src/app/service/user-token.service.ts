@@ -126,6 +126,11 @@ export class UserTokenService {
 						localStorage.setItem(this.SESSION_INTENT_KEY, 'true');
 					}
 					this._accessToken.set(message.accessToken ?? null);
+
+					if (message.csrfToken) {
+						this.csrfService.setToken(message.csrfToken);
+					}
+
 					if (message.accessToken) {
 						this.scheduleAutoRefresh();
 					}
@@ -154,20 +159,37 @@ export class UserTokenService {
 		}
 
 		this.scheduleAutoRefresh();
-		this.crossTabSync.notifyTokenUpdate(accessToken);
+		this.crossTabSync.notifyTokenUpdate(accessToken, csrfToken);
 	}
 
 	removeTokens(notifyUser = false): void {
 		this.stopAutoRefresh();
 		this.cookieService.delete(this.ACCESSKEY, false);
+
+		if (isPlatformBrowser(this.platformId)) {
+			const hostname = window.location.hostname;
+			const parts = hostname.split('.');
+
+			const domainsToTry = [hostname, `.${hostname}`];
+			if (parts.length > 2) {
+				domainsToTry.push(`.${parts.slice(-2).join('.')}`);
+				domainsToTry.push(`.${parts.slice(-3).join('.')}`);
+			}
+
+			for (const domain of domainsToTry) {
+				document.cookie = `${this.ACCESSKEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+			}
+			document.cookie = `${this.ACCESSKEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+		}
+
 		this.csrfService.clear();
-		
+
 		this.sessionMayExist = false;
 		if (isPlatformBrowser(this.platformId)) {
 			localStorage.removeItem(this.SESSION_INTENT_KEY);
 		}
 		this._accessToken.set(null);
-		
+
 		this.crossTabSync.notifyTokenRemove();
 
 		if (notifyUser) {

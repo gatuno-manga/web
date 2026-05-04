@@ -21,7 +21,11 @@ export class CsrfService {
 	}
 
 	get csrfToken(): string | null {
-		return this._csrfToken() || (isPlatformBrowser(this.platformId) ? this.cookieService.get('csrfToken', false) : null);
+		if (isPlatformBrowser(this.platformId)) {
+			const cookieToken = this.cookieService.get('csrfToken', false);
+			if (cookieToken) return cookieToken;
+		}
+		return this._csrfToken();
 	}
 
 	setToken(token: string) {
