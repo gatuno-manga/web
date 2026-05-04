@@ -1,6 +1,6 @@
-import { Injectable, OnDestroy, Inject } from '@angular/core';
+import { Injectable, OnDestroy, Inject, signal, computed } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { Observable, Subject, BehaviorSubject, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { ENVIRONMENT, Environment } from '../tokens/environment.token';
 import { WINDOW } from '../tokens/window.token';
 import { UserTokenService } from './user-token.service';
@@ -33,6 +33,7 @@ import {
 	LogLevel,
 } from '../utils/websocket-logger.utils';
 import { isPlatformBrowser } from '@angular/common';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 /**
  * Service para gerenciar conexões WebSocket e receber eventos em tempo real
@@ -50,11 +51,16 @@ import { isPlatformBrowser } from '@angular/common';
 export class BookWebsocketService implements OnDestroy {
 	private socket: Socket<ServerToClientEvents, ClientToServerEvents> | null =
 		null;
-	private connectedSubject = new BehaviorSubject<boolean>(false);
-	private connectionStateSubject =
-		new BehaviorSubject<WebSocketConnectionState>(
-			WebSocketConnectionState.DISCONNECTED,
-		);
+
+	// Estado usando Signals
+	private readonly _connected = signal<boolean>(false);
+	private readonly _connectionState = signal<WebSocketConnectionState>(
+		WebSocketConnectionState.DISCONNECTED,
+	);
+
+	public readonly connected = this._connected.asReadonly();
+	public readonly connectionState = this._connectionState.asReadonly();
+
 	private subscribedBooks = new Set<string>();
 	private subscribedChapters = new Set<string>();
 	private networkSubscription: Subscription | null = null;
@@ -78,9 +84,10 @@ export class BookWebsocketService implements OnDestroy {
 	private chapterScrapingFailedSubject = new Subject<ScrapingEvent>();
 	private errorSubject = new Subject<{ message: string }>();
 
-	// Observables públicos
-	public connected$ = this.connectedSubject.asObservable();
-	public connectionState$ = this.connectionStateSubject.asObservable();
+	// Observables públicos (compatibilidade e eventos)
+	public readonly connected$ = toObservable(this._connected);
+	public readonly connectionState$ = toObservable(this._connectionState);
+	
 	public bookCreated$ = this.bookCreatedSubject.asObservable();
 	public bookUpdated$ = this.bookUpdatedSubject.asObservable();
 	public bookNewChapters$ = this.bookNewChaptersSubject.asObservable();
@@ -126,7 +133,7 @@ export class BookWebsocketService implements OnDestroy {
 		newState: WebSocketConnectionState,
 		reason?: string,
 	): void {
-		const currentState = this.connectionStateSubject.value;
+		const currentState = this._connectionState();
 
 		if (currentState === newState) {
 			return; // Já está no estado desejado
@@ -142,7 +149,7 @@ export class BookWebsocketService implements OnDestroy {
 		}
 
 		logStateTransition(this.serviceName, currentState, newState, reason);
-		this.connectionStateSubject.next(newState);
+		this._connectionState.set(newState);
 	}
 
 	/**
@@ -163,7 +170,7 @@ export class BookWebsocketService implements OnDestroy {
 
 		// Reconecta automaticamente quando a rede volta
 		this.networkStatusService.wentOnline$.subscribe(() => {
-			const currentState = this.connectionStateSubject.value;
+			const currentState = this._connectionState();
 			if (currentState === WebSocketConnectionState.OFFLINE_PAUSED) {
 				logConnectionEvent(
 					this.serviceName,
@@ -189,7 +196,7 @@ export class BookWebsocketService implements OnDestroy {
 				WebSocketConnectionState.OFFLINE_PAUSED,
 				'Rede offline',
 			);
-			this.connectedSubject.next(false);
+			this._connected.set(false);
 		}
 	}
 
@@ -197,7 +204,7 @@ export class BookWebsocketService implements OnDestroy {
 	 * Conecta ao WebSocket com autenticação JWT
 	 */
 	connect(): void {
-		const currentState = this.connectionStateSubject.value;
+		const currentState = this._connectionState();
 
 		if (
 			currentState === WebSocketConnectionState.CONNECTED ||
@@ -250,10 +257,34 @@ export class BookWebsocketService implements OnDestroy {
 		// Obtém configuração padronizada do Socket.io
 		const socketConfig = getSocketConfig(token);
 
-		this.socket = io(namespaceUrl, socketConfig) as Socket<
+		this.socket = this.createSocket(namespaceUrl, socketConfig) as Socket<
 			ServerToClientEvents,
 			ClientToServerEvents
 		>;
+
+		this.setupSocketListeners();
+	}
+
+	/**
+	 * Cria a instância do Socket.io.
+	 * Protegido para facilitar a substituição em testes unitários.
+	 */
+	protected createSocket(url: string, config: any): Socket<any, any> {
+		return io(url, config);
+	}
+
+	/**
+	 * Configura os listeners do WebSocket
+	 */
+	private setupSocketListeners(): void {
+		if (!this.socket) return;
+
+		this.setupConnectionListeners();
+		this.registerEventListeners();
+	}
+
+	private setupConnectionListeners(): void {
+		if (!this.socket) return;
 
 		this.socket.on('connect', () => {
 			logConnectionEvent(
@@ -266,7 +297,7 @@ export class BookWebsocketService implements OnDestroy {
 				WebSocketConnectionState.CONNECTED,
 				'Handshake bem-sucedido',
 			);
-			this.connectedSubject.next(true);
+			this._connected.set(true);
 			this.resubscribeAll();
 		});
 
@@ -278,7 +309,7 @@ export class BookWebsocketService implements OnDestroy {
 				LogLevel.WARN,
 			);
 
-			const currentState = this.connectionStateSubject.value;
+			const currentState = this._connectionState();
 			if (currentState !== WebSocketConnectionState.OFFLINE_PAUSED) {
 				this.transitionTo(
 					WebSocketConnectionState.DISCONNECTED,
@@ -286,7 +317,7 @@ export class BookWebsocketService implements OnDestroy {
 				);
 			}
 
-			this.connectedSubject.next(false);
+			this._connected.set(false);
 		});
 
 		this.socket.on('connect_error', (error: unknown) => {
@@ -313,7 +344,7 @@ export class BookWebsocketService implements OnDestroy {
 			}
 
 			this.transitionTo(WebSocketConnectionState.ERROR, err.message);
-			this.connectedSubject.next(false);
+			this._connected.set(false);
 		});
 
 		this.socket.on('error', (error: unknown) => {
@@ -333,8 +364,6 @@ export class BookWebsocketService implements OnDestroy {
 				'Tentativa de reconexão',
 			);
 		});
-
-		this.registerEventListeners();
 	}
 
 	/**
@@ -348,7 +377,7 @@ export class BookWebsocketService implements OnDestroy {
 				WebSocketConnectionState.DISCONNECTED,
 				'Desconexão manual',
 			);
-			this.connectedSubject.next(false);
+			this._connected.set(false);
 			this.subscribedBooks.clear();
 			this.subscribedChapters.clear();
 			logConnectionEvent(
@@ -364,7 +393,7 @@ export class BookWebsocketService implements OnDestroy {
 	 * Verifica se está conectado
 	 */
 	isConnected(): boolean {
-		return this.connectedSubject.value;
+		return this._connected();
 	}
 
 	/**
@@ -373,7 +402,16 @@ export class BookWebsocketService implements OnDestroy {
 	private registerEventListeners(): void {
 		if (!this.socket) return;
 
-		// --- Eventos de Confirmação ---
+		this.setupConfirmationListeners();
+		this.setupBookEventListeners();
+		this.setupChapterEventListeners();
+		this.setupScrapingEventListeners();
+		this.setupCoverEventListeners();
+	}
+
+	private setupConfirmationListeners(): void {
+		if (!this.socket) return;
+
 		this.socket.on('subscribed', (data: SubscriptionResponse) => {
 			if (data.success) {
 				logConnectionEvent(
@@ -410,8 +448,11 @@ export class BookWebsocketService implements OnDestroy {
 				LogLevel.DEBUG,
 			);
 		});
+	}
 
-		// --- Eventos de Livros ---
+	private setupBookEventListeners(): void {
+		if (!this.socket) return;
+
 		this.socket.on(BookEvents.CREATED, (event: BookEvent) => {
 			logConnectionEvent(
 				this.serviceName,
@@ -476,8 +517,11 @@ export class BookWebsocketService implements OnDestroy {
 			);
 			this.bookUpdateFailedSubject.next(event);
 		});
+	}
 
-		// --- Eventos de Capítulos ---
+	private setupChapterEventListeners(): void {
+		if (!this.socket) return;
+
 		this.socket.on(BookEvents.CHAPTERS_UPDATED, (event: ChapterEvent) => {
 			logConnectionEvent(
 				this.serviceName,
@@ -507,8 +551,11 @@ export class BookWebsocketService implements OnDestroy {
 			);
 			this.chaptersFixSubject.next(event);
 		});
+	}
 
-		// --- Eventos de Scraping ---
+	private setupScrapingEventListeners(): void {
+		if (!this.socket) return;
+
 		this.socket.on(BookEvents.SCRAPING_STARTED, (event: ScrapingEvent) => {
 			logConnectionEvent(
 				this.serviceName,
@@ -540,8 +587,11 @@ export class BookWebsocketService implements OnDestroy {
 			);
 			this.chapterScrapingFailedSubject.next(event);
 		});
+	}
 
-		// --- Eventos de Capas ---
+	private setupCoverEventListeners(): void {
+		if (!this.socket) return;
+
 		this.socket.on(BookEvents.COVER_PROCESSED, (event: CoverEvent) => {
 			logConnectionEvent(
 				this.serviceName,
@@ -569,7 +619,7 @@ export class BookWebsocketService implements OnDestroy {
 	 * Inscreve-se em um livro específico
 	 */
 	subscribeToBook(bookId: string): void {
-		if (!this.socket || !this.connectedSubject.value) {
+		if (!this.socket || !this._connected()) {
 			logConnectionEvent(
 				this.serviceName,
 				'subscribe',
@@ -597,7 +647,7 @@ export class BookWebsocketService implements OnDestroy {
 	 * Inscreve-se em um capítulo específico
 	 */
 	subscribeToChapter(chapterId: string): void {
-		if (!this.socket || !this.connectedSubject.value) {
+		if (!this.socket || !this._connected()) {
 			logConnectionEvent(
 				this.serviceName,
 				'subscribe',

@@ -1,8 +1,8 @@
-import { Injectable, Inject, OnDestroy } from '@angular/core';
+import { Injectable, Inject, OnDestroy, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
-import { BehaviorSubject, Subject, firstValueFrom, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Subject, firstValueFrom, Subscription, fromEvent, of } from 'rxjs';
+import { map, timeout, catchError, take } from 'rxjs/operators';
 import { ENVIRONMENT, Environment } from '../tokens/environment.token';
 import { WINDOW } from '../tokens/window.token';
 import { UserTokenService } from './user-token.service';
@@ -32,6 +32,7 @@ import {
 	ReadingProgressServerToClientEvents,
 	ReadingProgressClientToServerEvents,
 } from '../models/reading-progress-events.model';
+import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
 
 export interface SyncStatus {
 	connected: boolean;
@@ -65,19 +66,20 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private readonly serviceName = 'ReadingProgressSync';
 	private readonly baseUrl = 'users/me/reading-progress';
 
-	// Estado da conexão
-	private connectionStateSubject =
-		new BehaviorSubject<WebSocketConnectionState>(
-			WebSocketConnectionState.DISCONNECTED,
-		);
+	// Estado da conexão usando Signals
+	private readonly _connectionState = signal<WebSocketConnectionState>(
+		WebSocketConnectionState.DISCONNECTED,
+	);
+	public readonly connectionState = this._connectionState.asReadonly();
 
-	// Estado da sincronização
-	private syncStatusSubject = new BehaviorSubject<SyncStatus>({
+	// Estado da sincronização usando Signals
+	private readonly _syncStatus = signal<SyncStatus>({
 		connected: false,
 		syncing: false,
 		lastSyncAt: null,
 		pendingChanges: 0,
 	});
+	public readonly syncStatus = this._syncStatus.asReadonly();
 
 	// Eventos
 	private progressSyncedSubject = new Subject<RemoteReadingProgress>();
@@ -85,8 +87,6 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private errorSubject = new Subject<{ message: string }>();
 
 	// Observables públicos
-	public connectionState$ = this.connectionStateSubject.asObservable();
-	public syncStatus$ = this.syncStatusSubject.asObservable();
 	public progressSynced$ = this.progressSyncedSubject.asObservable();
 	public progressDeleted$ = this.progressDeletedSubject.asObservable();
 	public error$ = this.errorSubject.asObservable();
@@ -96,6 +96,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 		private userTokenService: UserTokenService,
 		private localProgressService: ReadingProgressService,
 		private networkStatusService: NetworkStatusService,
+		private backgroundSyncService: BackgroundSyncRegistrationService,
 		@Inject(ENVIRONMENT) private env: Environment,
 		@Inject(WINDOW) private window: Window,
 	) {
@@ -125,7 +126,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 		newState: WebSocketConnectionState,
 		reason?: string,
 	): void {
-		const currentState = this.connectionStateSubject.value;
+		const currentState = this._connectionState();
 
 		if (currentState === newState) {
 			return; // Já está no estado desejado
@@ -141,7 +142,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 		}
 
 		logStateTransition(this.serviceName, currentState, newState, reason);
-		this.connectionStateSubject.next(newState);
+		this._connectionState.set(newState);
 	}
 
 	/**
@@ -162,7 +163,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 
 		// Reconecta automaticamente quando a rede volta
 		this.networkStatusService.wentOnline$.subscribe(() => {
-			const currentState = this.connectionStateSubject.value;
+			const currentState = this._connectionState();
 			if (currentState === WebSocketConnectionState.OFFLINE_PAUSED) {
 				logConnectionEvent(
 					this.serviceName,
@@ -198,7 +199,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 	connect(): void {
 		if (!this.isBrowser) return;
 
-		const currentState = this.connectionStateSubject.value;
+		const currentState = this._connectionState();
 
 		if (
 			currentState === WebSocketConnectionState.CONNECTED ||
@@ -253,12 +254,20 @@ export class ReadingProgressSyncService implements OnDestroy {
 			reconnectionAttempts: 10,
 		});
 
-		this.socket = io(namespaceUrl, socketConfig) as Socket<
+		this.socket = this.createSocket(namespaceUrl, socketConfig) as Socket<
 			ReadingProgressServerToClientEvents,
 			ReadingProgressClientToServerEvents
 		>;
 
 		this.setupSocketListeners();
+	}
+
+	/**
+	 * Cria a instância do Socket.io.
+	 * Protegido para facilitar a substituição em testes unitários.
+	 */
+	protected createSocket(url: string, config: any): Socket<any, any> {
+		return io(url, config);
 	}
 
 	/**
@@ -292,28 +301,15 @@ export class ReadingProgressSyncService implements OnDestroy {
 	/**
 	 * Salva e sincroniza o progresso de leitura
 	 */
-	async saveProgress(
-		chapterId: string,
-		bookId: string,
-		pageIndex: number,
-		totalPages?: number,
-		completed?: boolean,
-	): Promise<void> {
+	async saveProgress(progressData: SaveProgressDto): Promise<void> {
+		const { chapterId, bookId, pageIndex } = progressData;
+
 		// Salva localmente primeiro (offline-first)
 		await this.localProgressService.saveProgress(
 			chapterId,
 			bookId,
 			pageIndex,
 		);
-
-		const progressData: SaveProgressDto = {
-			chapterId,
-			bookId,
-			pageIndex,
-			timestamp: Date.now(),
-			totalPages,
-			completed,
-		};
 
 		if (this.socket?.connected) {
 			// Envia via WebSocket
@@ -332,7 +328,9 @@ export class ReadingProgressSyncService implements OnDestroy {
 				});
 
 				// Registra o evento de Background Sync no Service Worker
-				this.registerBackgroundSync();
+				this.backgroundSyncService
+					.register('sync-reading-progress')
+					.catch(() => {});
 			}
 
 			// Tenta sincronizar via HTTP imediatamente (se houver rede básica mas sem WebSocket)
@@ -349,35 +347,12 @@ export class ReadingProgressSyncService implements OnDestroy {
 
 	/**
 	 * Registra o evento de Background Sync no Service Worker
+	 * @deprecated Use BackgroundSyncRegistrationService instead
 	 */
 	private registerBackgroundSync(): void {
-		if (
-			!this.isBrowser ||
-			!('serviceWorker' in navigator) ||
-			!('SyncManager' in window)
-		) {
-			return;
-		}
-
-		navigator.serviceWorker.ready
-			.then((registration: any) => {
-				return registration.sync.register('sync-reading-progress');
-			})
-			.then(() => {
-				logConnectionEvent(
-					this.serviceName,
-					'sync',
-					'Background Sync registrado: sync-reading-progress',
-					LogLevel.INFO,
-				);
-			})
-			.catch((err) => {
-				logWebSocketError(
-					this.serviceName,
-					err,
-					'Falha ao registrar Background Sync',
-				);
-			});
+		this.backgroundSyncService
+			.register('sync-reading-progress')
+			.catch(() => {});
 	}
 
 	/**
@@ -389,42 +364,34 @@ export class ReadingProgressSyncService implements OnDestroy {
 			await this.localProgressService.getProgress(chapterId);
 
 		if (this.socket?.connected) {
-			// Solicita do servidor
-			return new Promise((resolve) => {
-				this.socket?.emit('progress:chapter', { chapterId });
+			// Solicita do servidor usando RxJS para gerenciar timeout de forma limpa
+			this.socket.emit('progress:chapter', { chapterId });
 
-				const timeout = setTimeout(() => {
-					resolve(localProgress);
-				}, 3000);
-
-				this.socket?.once(
-					'progress:chapter:response',
-					(data: {
-						chapterId: string;
-						progress: RemoteReadingProgress | null;
-					}) => {
-						clearTimeout(timeout);
-						if (data.progress) {
-							// Compara e retorna o mais recente
-							if (
-								!localProgress ||
-								data.progress.pageIndex >=
-									localProgress.pageIndex
-							) {
-								const userId =
-									this.localProgressService.getCurrentUserId();
-								resolve(
-									this.remoteToLocal(data.progress, userId),
-								);
-							} else {
-								resolve(localProgress);
-							}
-						} else {
-							resolve(localProgress);
-						}
-					},
+			try {
+				const responseData = await firstValueFrom(
+					fromEvent<any>(this.socket as any, 'progress:chapter:response')
+						.pipe(
+							take(1),
+							timeout(3000),
+							catchError(() => of({ progress: null })),
+						)
 				);
-			});
+
+				if (responseData.progress) {
+					// Compara e retorna o mais recente
+					if (
+						!localProgress ||
+						responseData.progress.pageIndex >=
+							localProgress.pageIndex
+					) {
+						const userId =
+							this.localProgressService.getCurrentUserId();
+						return this.remoteToLocal(responseData.progress, userId);
+					}
+				}
+			} catch (err) {
+				logWebSocketError(this.serviceName, err, 'Erro ao obter progresso remoto');
+			}
 		}
 
 		return localProgress;
@@ -515,7 +482,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 	): Promise<SyncResponse> {
 		const dto: SyncReadingProgressDto = {
 			progress,
-			lastSyncAt: this.syncStatusSubject.value.lastSyncAt || undefined,
+			lastSyncAt: this._syncStatus().lastSyncAt || undefined,
 		};
 
 		try {
@@ -541,7 +508,18 @@ export class ReadingProgressSyncService implements OnDestroy {
 		}
 	}
 
+	/**
+	 * Configura os listeners do WebSocket, divididos por domínio
+	 */
 	private setupSocketListeners(): void {
+		if (!this.socket) return;
+
+		this.setupConnectionListeners();
+		this.setupProgressListeners();
+		this.setupErrorListeners();
+	}
+
+	private setupConnectionListeners(): void {
 		if (!this.socket) return;
 
 		this.socket.on('connect', () => {
@@ -557,10 +535,8 @@ export class ReadingProgressSyncService implements OnDestroy {
 			);
 			this.updateSyncStatus({ connected: true });
 
-			// Sincroniza mudanças pendentes
+			// Sincroniza mudanças pendentes e solicita sincronização completa
 			this.syncPendingChanges();
-
-			// Solicita sincronização completa
 			this.syncAll();
 		});
 
@@ -572,7 +548,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 				LogLevel.WARN,
 			);
 
-			const currentState = this.connectionStateSubject.value;
+			const currentState = this._connectionState();
 			if (currentState !== WebSocketConnectionState.OFFLINE_PAUSED) {
 				this.transitionTo(
 					WebSocketConnectionState.DISCONNECTED,
@@ -592,18 +568,14 @@ export class ReadingProgressSyncService implements OnDestroy {
 				err.message?.includes('401') ||
 				err.message?.includes('unauthorized')
 			) {
-				const newToken = this.userTokenService.accessToken;
-				if (newToken && this.socket) {
-					logConnectionEvent(
-						this.serviceName,
-						'reconnect',
-						'Token expirado - desconectando para reconexão',
-						LogLevel.INFO,
-					);
-					// Desconecta e deixa que o usuário reconecte manualmente ou refresh a página
-					this.disconnect();
-					return;
-				}
+				logConnectionEvent(
+					this.serviceName,
+					'reconnect',
+					'Token expirado ou inválido - desconectando',
+					LogLevel.INFO,
+				);
+				this.disconnect();
+				return;
 			}
 
 			const errorMessage =
@@ -636,6 +608,10 @@ export class ReadingProgressSyncService implements OnDestroy {
 				);
 			},
 		);
+	}
+
+	private setupProgressListeners(): void {
+		if (!this.socket) return;
 
 		// Progresso salvo com sucesso
 		this.socket.on('progress:saved', (progress: RemoteReadingProgress) => {
@@ -661,16 +637,13 @@ export class ReadingProgressSyncService implements OnDestroy {
 				LogLevel.DEBUG,
 			);
 
-			// O servidor pode retornar progresso sincronizado ou conflitos
 			if (response.success && response.progress) {
 				const progress = response.progress;
-				// Atualiza localmente
 				await this.localProgressService.saveProgress(
 					progress.chapterId,
 					progress.bookId,
 					progress.pageIndex,
 				);
-
 				this.progressSyncedSubject.next(progress);
 			}
 
@@ -681,7 +654,6 @@ export class ReadingProgressSyncService implements OnDestroy {
 					'Conflito de sincronização detectado',
 					LogLevel.WARN,
 				);
-				// Conflito pode ser tratado aqui ou via observable
 			}
 		});
 
@@ -699,14 +671,12 @@ export class ReadingProgressSyncService implements OnDestroy {
 					LogLevel.INFO,
 				);
 
-				// Atualiza todos os itens localmente
 				for (const progress of data.progress) {
 					const localProgress =
 						await this.localProgressService.getProgress(
 							progress.chapterId,
 						);
 
-					// Só atualiza se o remoto for mais recente
 					if (
 						!localProgress ||
 						progress.pageIndex >= localProgress.pageIndex
@@ -740,8 +710,11 @@ export class ReadingProgressSyncService implements OnDestroy {
 				this.progressDeletedSubject.next(data);
 			},
 		);
+	}
 
-		// Erros
+	private setupErrorListeners(): void {
+		if (!this.socket) return;
+
 		this.socket.on('error', (error: { message: string }) => {
 			logWebSocketError(
 				this.serviceName,
@@ -837,10 +810,10 @@ export class ReadingProgressSyncService implements OnDestroy {
 	}
 
 	private updateSyncStatus(partial: Partial<SyncStatus>): void {
-		this.syncStatusSubject.next({
-			...this.syncStatusSubject.value,
+		this._syncStatus.update((state) => ({
+			...state,
 			...partial,
-		});
+		}));
 	}
 
 	private remoteToLocal(

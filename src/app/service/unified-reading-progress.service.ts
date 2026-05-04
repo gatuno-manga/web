@@ -7,9 +7,10 @@ import {
 	ReadingProgress,
 } from './reading-progress.service';
 import { ReadingProgressSyncService } from './reading-progress-sync.service';
-import { RemoteReadingProgress } from '../models/reading-progress-events.model';
+import { RemoteReadingProgress, SaveProgressDto } from '../models/reading-progress-events.model';
 import { UserTokenService } from './user-token.service';
 import { jwtDecode } from 'jwt-decode';
+import { toObservable as signalToObservable } from '@angular/core/rxjs-interop';
 
 interface JwtPayload {
 	sub: string;
@@ -24,12 +25,6 @@ interface JwtPayload {
  * - Sincronização em tempo real via WebSocket
  * - Fallback HTTP quando WebSocket não disponível
  * - Suporte a múltiplos usuários no mesmo dispositivo
- *
- * Estratégia:
- * - Offline-first: salva localmente primeiro
- * - Sincroniza automaticamente quando online
- * - Resolve conflitos usando "maior página vence"
- * - Migra dados do guest para usuário logado
  */
 @Injectable({
 	providedIn: 'root',
@@ -41,13 +36,7 @@ export class UnifiedReadingProgressService implements OnDestroy {
 
 	// Debounce para sincronização com API
 	private syncTimeout: ReturnType<typeof setTimeout> | null = null;
-	private pendingSyncData: {
-		chapterId: string;
-		bookId: string;
-		pageIndex: number;
-		totalPages?: number;
-		completed?: boolean;
-	} | null = null;
+	private pendingSyncData: SaveProgressDto | null = null;
 	private readonly SYNC_DEBOUNCE_MS = 10000;
 
 	constructor(
@@ -86,12 +75,17 @@ export class UnifiedReadingProgressService implements OnDestroy {
 		}
 	}
 
-	// Expõe o status de sincronização
-	get syncStatus$() {
-		return this.syncService.syncStatus$;
+	// Expõe o status de sincronização como sinal (padrão moderno)
+	public get syncStatus() {
+		return this.syncService.syncStatus;
 	}
 
-	get progressSynced$() {
+	// Mantém compatibilidade com observable se necessário
+	public get syncStatus$() {
+		return signalToObservable(this.syncService.syncStatus);
+	}
+
+	public get progressSynced$() {
 		return this.syncService.progressSynced$;
 	}
 
@@ -106,14 +100,6 @@ export class UnifiedReadingProgressService implements OnDestroy {
 
 	/**
 	 * Salva o progresso de leitura (local + remoto)
-	 * Local: instantâneo
-	 * API: com debounce de 2 segundos
-	 *
-	 * @param chapterId ID do capítulo
-	 * @param bookId ID do livro
-	 * @param pageIndex Índice da página atual
-	 * @param totalPages Total de páginas do capítulo (opcional)
-	 * @param completed Se o capítulo foi concluído (opcional)
 	 */
 	async saveProgress(
 		chapterId: string,
@@ -132,19 +118,19 @@ export class UnifiedReadingProgressService implements OnDestroy {
 
 		// Se usuário está autenticado, sincroniza com DEBOUNCE
 		if (this.userTokenService.hasValidAccessToken) {
-			this.debounceSyncToApi(
+			this.debounceSyncToApi({
 				chapterId,
 				bookId,
-				safePageIndex,
+				pageIndex: safePageIndex,
+				timestamp: Date.now(),
 				totalPages,
 				completed,
-			);
+			});
 		}
 	}
 
 	/**
 	 * Salva o progresso imediatamente (local + API sem debounce)
-	 * Usado quando o usuário troca de capítulo
 	 */
 	async saveProgressImmediate(
 		chapterId: string,
@@ -155,7 +141,6 @@ export class UnifiedReadingProgressService implements OnDestroy {
 	): Promise<void> {
 		if (!this.isBrowser) return;
 
-		// Garante que o índice da página nunca seja negativo
 		const safePageIndex = Math.max(0, pageIndex);
 
 		// Cancela qualquer sync pendente
@@ -166,34 +151,23 @@ export class UnifiedReadingProgressService implements OnDestroy {
 
 		// Sincroniza imediatamente se autenticado
 		if (this.userTokenService.hasValidAccessToken) {
-			await this.syncService.saveProgress(
+			await this.syncService.saveProgress({
 				chapterId,
 				bookId,
-				safePageIndex,
+				pageIndex: safePageIndex,
+				timestamp: Date.now(),
 				totalPages,
 				completed,
-			);
+			});
 		}
 	}
 
 	/**
 	 * Agenda a sincronização com a API usando debounce
 	 */
-	private debounceSyncToApi(
-		chapterId: string,
-		bookId: string,
-		pageIndex: number,
-		totalPages?: number,
-		completed?: boolean,
-	): void {
+	private debounceSyncToApi(progressData: SaveProgressDto): void {
 		// Atualiza os dados pendentes
-		this.pendingSyncData = {
-			chapterId,
-			bookId,
-			pageIndex,
-			totalPages,
-			completed,
-		};
+		this.pendingSyncData = progressData;
 
 		// Cancela o timeout anterior
 		if (this.syncTimeout) {
@@ -203,13 +177,7 @@ export class UnifiedReadingProgressService implements OnDestroy {
 		// Agenda novo sync
 		this.syncTimeout = setTimeout(async () => {
 			if (this.pendingSyncData) {
-				await this.syncService.saveProgress(
-					this.pendingSyncData.chapterId,
-					this.pendingSyncData.bookId,
-					this.pendingSyncData.pageIndex,
-					this.pendingSyncData.totalPages,
-					this.pendingSyncData.completed,
-				);
+				await this.syncService.saveProgress(this.pendingSyncData);
 				this.pendingSyncData = null;
 			}
 		}, this.SYNC_DEBOUNCE_MS);
@@ -228,7 +196,6 @@ export class UnifiedReadingProgressService implements OnDestroy {
 
 	/**
 	 * Obtém o progresso de leitura de um capítulo
-	 * Combina dados locais e remotos, priorizando o mais recente
 	 */
 	async getProgress(chapterId: string): Promise<ReadingProgress | undefined> {
 		if (!this.isBrowser) return undefined;
@@ -244,15 +211,11 @@ export class UnifiedReadingProgressService implements OnDestroy {
 
 	/**
 	 * Obtém o último progresso de leitura de um livro específico
-	 * Usado para o botão "Continue lendo"
 	 */
 	async getLastProgressForBook(
 		bookId: string,
 	): Promise<ReadingProgress | undefined> {
 		if (!this.isBrowser) return undefined;
-
-		// Por enquanto, usa apenas o local service
-		// TODO: Adicionar busca no servidor se autenticado
 		return this.localService.getLastProgressForBook(bookId);
 	}
 
@@ -265,7 +228,7 @@ export class UnifiedReadingProgressService implements OnDestroy {
 	}
 
 	/**
-	 * Conecta ao serviço de sincronização (se autenticado)
+	 * Conecta ao serviço de sincronização
 	 */
 	connect(): void {
 		if (!this.isBrowser) return;
@@ -300,14 +263,9 @@ export class UnifiedReadingProgressService implements OnDestroy {
 
 	/**
 	 * Sincroniza todo o histórico local com o servidor
-	 * Chamado quando o usuário faz login para enviar o progresso
-	 * que foi salvo enquanto estava deslogado
 	 */
 	async syncLocalHistoryToServer(): Promise<void> {
 		if (!this.isBrowser || !this.userTokenService.hasValidAccessToken) {
-			console.log(
-				'⚠️ Não é possível sincronizar: usuário não autenticado',
-			);
 			return;
 		}
 
@@ -316,29 +274,19 @@ export class UnifiedReadingProgressService implements OnDestroy {
 			const localProgress = await this.localService.getAllProgress();
 
 			if (localProgress.length === 0) {
-				console.log('📭 Nenhum progresso local para sincronizar');
 				return;
 			}
 
-			console.log(
-				`📤 Sincronizando ${localProgress.length} itens de progresso local em lote...`,
-			);
-
 			// Converte para o formato de DTO esperado pela API
-			const progressDtos = localProgress.map((p) => ({
+			const progressDtos: SaveProgressDto[] = localProgress.map((p) => ({
 				chapterId: p.chapterId,
 				bookId: p.bookId,
 				pageIndex: Math.max(0, p.pageIndex),
 				timestamp: Date.now(),
-				// totalPages e completed podem ser inferidos ou omitidos se não disponíveis
 			}));
 
 			// Envia todos os progressos em uma única chamada
 			await this.syncService.uploadProgress(progressDtos);
-
-			console.log(
-				'✅ Histórico local sincronizado com o servidor com sucesso',
-			);
 		} catch (error) {
 			console.error(
 				'❌ Erro ao sincronizar histórico local em lote:',
@@ -349,37 +297,18 @@ export class UnifiedReadingProgressService implements OnDestroy {
 
 	/**
 	 * Chamado após o login para sincronizar dados
-	 * Combina o histórico local com o remoto
 	 */
 	async onUserLogin(): Promise<void> {
 		if (!this.isBrowser) return;
 
 		const userId = this.extractUserIdFromToken();
-		if (!userId) {
-			console.error(
-				'❌ Não foi possível extrair o ID do usuário do token',
-			);
-			return;
-		}
+		if (!userId) return;
 
-		console.log(`🔐 Usuário ${userId} logado, iniciando sincronização...`);
-
-		// Define o usuário atual no serviço local
 		this.localService.setCurrentUser(userId);
-
-		// Migra os progressos do guest para o usuário
 		await this.localService.migrateGuestProgressToUser(userId);
-
-		// Sincroniza o histórico local para o servidor
 		await this.syncLocalHistoryToServer();
-
-		// Conecta ao WebSocket para sincronização em tempo real
 		this.connect();
-
-		// Sincroniza todos os dados (local ← remoto)
 		await this.syncAll();
-
-		console.log('✅ Sincronização pós-login concluída');
 	}
 
 	/**
@@ -388,18 +317,9 @@ export class UnifiedReadingProgressService implements OnDestroy {
 	onUserLogout(): void {
 		if (!this.isBrowser) return;
 
-		console.log('🚪 Usuário deslogado, resetando estado...');
-
-		// Cancela sincronizações pendentes
 		this.cancelPendingSync();
-
-		// Desconecta do WebSocket
 		this.disconnect();
-
-		// Volta para o usuário guest
 		this.localService.setCurrentUser(null);
-
-		console.log('✅ Estado resetado para guest');
 	}
 
 	// ==================== MÉTODOS PRIVADOS ====================
@@ -407,11 +327,9 @@ export class UnifiedReadingProgressService implements OnDestroy {
 	private setupSyncListener(): void {
 		if (!this.isBrowser) return;
 
-		// Escuta mudanças remotas e atualiza local
 		this.syncService.progressSynced$
 			.pipe(takeUntil(this.destroy$))
 			.subscribe(async (remoteProgress: RemoteReadingProgress) => {
-				// Atualiza progresso local com dados remotos
 				await this.localService.saveProgress(
 					remoteProgress.chapterId,
 					remoteProgress.bookId,
@@ -419,7 +337,6 @@ export class UnifiedReadingProgressService implements OnDestroy {
 				);
 			});
 
-		// Escuta deleções remotas
 		this.syncService.progressDeleted$
 			.pipe(takeUntil(this.destroy$))
 			.subscribe(async (data: { chapterId: string }) => {

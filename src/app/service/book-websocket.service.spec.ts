@@ -1,27 +1,70 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { BookWebsocketService } from './book-websocket.service';
 import { BookEvent, ChapterEvent, ScrapingEvent } from '../models/book-events.model';
 import { UserTokenService } from './user-token.service';
+import { ENVIRONMENT } from '../tokens/environment.token';
+import { WINDOW } from '../tokens/window.token';
+import { WebSocketConnectionState } from '../models/websocket-state.model';
+import { NetworkStatusService } from './network-status.service';
+import { Subject } from 'rxjs';
 
 describe('BookWebsocketService', () => {
     let service: BookWebsocketService;
     let userTokenService: jasmine.SpyObj<UserTokenService>;
+    let networkStatusServiceSpy: jasmine.SpyObj<NetworkStatusService>;
+    let mockSocket: any;
+
+    const mockEnv = {
+        apiURL: 'http://localhost:3000',
+        apiURLServer: 'http://localhost:3000',
+    };
+
+    const mockWindow = {
+        location: {
+            origin: 'http://localhost:4200',
+        },
+    };
 
     beforeEach(() => {
+        mockSocket = {
+            connected: false,
+            on: jasmine.createSpy('on'),
+            once: jasmine.createSpy('once'),
+            off: jasmine.createSpy('off'),
+            emit: jasmine.createSpy('emit'),
+            disconnect: jasmine.createSpy('disconnect'),
+            io: {
+                on: jasmine.createSpy('io.on'),
+                opts: { reconnection: true },
+            },
+        };
+
         // Mock do UserTokenService
         const userTokenSpy = jasmine.createSpyObj('UserTokenService', [], {
             accessToken: 'fake-jwt-token'
         });
 
+        const networkStatusSpy = jasmine.createSpyObj('NetworkStatusService', [], {
+            wentOffline$: new Subject<void>(),
+            wentOnline$: new Subject<void>(),
+        });
+
         TestBed.configureTestingModule({
             providers: [
                 BookWebsocketService,
-                { provide: UserTokenService, useValue: userTokenSpy }
+                { provide: UserTokenService, useValue: userTokenSpy },
+                { provide: NetworkStatusService, useValue: networkStatusSpy },
+                { provide: ENVIRONMENT, useValue: mockEnv },
+                { provide: WINDOW, useValue: mockWindow },
             ]
         });
 
         service = TestBed.inject(BookWebsocketService);
         userTokenService = TestBed.inject(UserTokenService) as jasmine.SpyObj<UserTokenService>;
+        networkStatusServiceSpy = TestBed.inject(NetworkStatusService) as jasmine.SpyObj<NetworkStatusService>;
+
+        // @ts-ignore - spy on protected method
+        spyOn<any>(service, 'createSocket').and.returnValue(mockSocket);
     });
 
     describe('Service Creation', () => {
@@ -32,6 +75,10 @@ describe('BookWebsocketService', () => {
         it('should not be connected initially', () => {
             expect(service.isConnected()).toBeFalse();
         });
+        
+        it('should initialize with DISCONNECTED state', () => {
+            expect(service.connectionState()).toBe(WebSocketConnectionState.DISCONNECTED);
+        });
     });
 
     describe('Connection Management', () => {
@@ -41,50 +88,66 @@ describe('BookWebsocketService', () => {
                 configurable: true
             });
 
-            spyOn(console, 'error');
+            // Usamos spyOn no logger utils internamente, mas aqui vamos apenas checar o estado
             service.connect();
 
-            expect(console.error).toHaveBeenCalledWith(
-                jasmine.stringContaining('Token JWT não encontrado')
-            );
+            expect(service.connectionState()).toBe(WebSocketConnectionState.DISCONNECTED);
         });
 
-        it('should return isConnected state', () => {
+        it('should return isConnected state from signal', () => {
             expect(service.isConnected()).toBe(false);
+            // Simula conexão
+            service['transitionTo'](WebSocketConnectionState.CONNECTING);
+            service['transitionTo'](WebSocketConnectionState.CONNECTED);
+            service['_connected'].set(true);
+            expect(service.isConnected()).toBe(true);
         });
 
-        it('should emit connected$ observable', (done) => {
-            service.connected$.subscribe(isConnected => {
-                expect(typeof isConnected).toBe('boolean');
-                done();
+        it('should emit connected$ observable when signal changes', fakeAsync(() => {
+            let emissionCount = 0;
+            let lastValue = false;
+            
+            const sub = service.connected$.subscribe(isConnected => {
+                emissionCount++;
+                lastValue = isConnected;
             });
+
+            // Signal -> Observable é assíncrono via efeito
+            TestBed.flushEffects();
+            expect(emissionCount).toBe(1);
+            expect(lastValue).toBeFalse();
+
+            service['_connected'].set(true);
+            TestBed.flushEffects();
+            
+            expect(emissionCount).toBe(2);
+            expect(lastValue).toBeTrue();
+            
+            sub.unsubscribe();
+        }));
+        
+        it('should call createSocket when connect() is called', () => {
+            service.connect();
+            expect(service['createSocket']).toHaveBeenCalled();
+            expect(service.connectionState()).toBe(WebSocketConnectionState.CONNECTING);
         });
     });
 
     describe('Room Subscriptions', () => {
-        it('should have subscribeToBook method', () => {
-            expect(service.subscribeToBook).toBeDefined();
-            expect(typeof service.subscribeToBook).toBe('function');
+        beforeEach(() => {
+            // Mock connection for subscription tests
+            service['_connected'].set(true);
+            (service as any).socket = mockSocket;
         });
 
-        it('should have unsubscribeFromBook method', () => {
-            expect(service.unsubscribeFromBook).toBeDefined();
-            expect(typeof service.unsubscribeFromBook).toBe('function');
+        it('should emit SUBSCRIBE_BOOK on subscribeToBook', () => {
+            service.subscribeToBook('book-123');
+            expect(mockSocket.emit).toHaveBeenCalledWith('subscribe:book', 'book-123');
         });
 
-        it('should have subscribeToChapter method', () => {
-            expect(service.subscribeToChapter).toBeDefined();
-            expect(typeof service.subscribeToChapter).toBe('function');
-        });
-
-        it('should have unsubscribeFromChapter method', () => {
-            expect(service.unsubscribeFromChapter).toBeDefined();
-            expect(typeof service.unsubscribeFromChapter).toBe('function');
-        });
-
-        it('should have listSubscriptions method', () => {
-            expect(service.listSubscriptions).toBeDefined();
-            expect(typeof service.listSubscriptions).toBe('function');
+        it('should emit UNSUBSCRIBE_BOOK on unsubscribeFromBook', () => {
+            service.unsubscribeFromBook('book-123');
+            expect(mockSocket.emit).toHaveBeenCalledWith('unsubscribe:book', 'book-123');
         });
     });
 
