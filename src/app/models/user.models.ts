@@ -6,6 +6,7 @@ export interface loginRequest {
 export interface authTokensResponse {
 	accessToken: string;
 	refreshToken?: string;
+	csrfToken?: string;
 	sessionId?: string;
 }
 

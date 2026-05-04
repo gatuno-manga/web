@@ -2,7 +2,8 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../environments/environment';
-import { UserTokenService } from '../service/user-token.service';
+import { CookieService } from '../service/cookie.service';
+import { CsrfService } from '../service/csrf.service';
 import { buildApiUrl } from '../utils/api-url.utils';
 
 const DEVICE_ID_STORAGE_KEY = 'gatuno-device-id';
@@ -23,13 +24,14 @@ const resolveBrowserDeviceId = (): string => {
 
 const resolveBrowserDeviceName = (): string => {
 	const nav = window.navigator as Navigator & {
-		userAgentData?: { platform?: string };
+		userAgentData?: { platform?: string; };
 	};
 	return nav.userAgentData?.platform || nav.platform || 'web';
 };
 
 export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
-	const userTokenService = inject(UserTokenService);
+	const cookieService = inject(CookieService);
+	const csrfService = inject(CsrfService);
 	const platformId = inject(PLATFORM_ID);
 	const isBrowser = isPlatformBrowser(platformId);
 
@@ -40,7 +42,8 @@ export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
 		origin: isBrowser ? window.location.origin : undefined,
 	});
 
-	const authHeader = userTokenService.authHeaderSignal();
+	const accessToken = cookieService.get('accessToken', false);
+	const authHeader = accessToken ? `Bearer ${accessToken}` : null;
 	const isRefreshRequest = req.url.includes('/auth/refresh');
 	let headers = req.headers;
 
@@ -49,12 +52,7 @@ export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
 
 		if (!isBrowser) {
 			// SSR: forward only access token cookie managed by the client app
-			const cookieParts: string[] = [];
-			const accessToken = userTokenService.accessTokenSignal();
-			if (accessToken) cookieParts.push(`accessToken=${accessToken}`);
-			if (cookieParts.length > 0) {
-				headers = headers.set('cookie', cookieParts.join('; '));
-			}
+			headers = headers.set('cookie', `accessToken=${accessToken}`);
 		}
 	}
 
@@ -63,6 +61,14 @@ export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
 			.set('x-client-platform', 'web')
 			.set('x-device-id', resolveBrowserDeviceId())
 			.set('x-device-name', resolveBrowserDeviceName());
+
+		const mutableMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
+		if (mutableMethods.includes(req.method)) {
+			const csrfToken = csrfService.csrfToken;
+			if (csrfToken) {
+				headers = headers.set('x-csrf-token', csrfToken);
+			}
+		}
 	}
 
 	const clonedRequest = req.clone({

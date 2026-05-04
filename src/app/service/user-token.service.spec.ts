@@ -5,22 +5,26 @@ import {
 	discardPeriodicTasks,
 } from '@angular/core/testing';
 import {
-	HttpClientTestingModule,
 	HttpTestingController,
+	provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { PLATFORM_ID, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserTokenService } from './user-token.service';
 import { CookieService } from './cookie.service';
+import { CsrfService } from './csrf.service';
 import { NotificationService } from './notification.service';
 import { CrossTabSyncService, AuthSyncMessage } from './cross-tab-sync.service';
 import { Subject } from 'rxjs';
 import { Role } from '../models/user.models';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClientRequestInterceptor } from '../interceptor/http-client-request.interceptor';
 
 describe('UserTokenService', () => {
 	let service: UserTokenService;
 	let httpMock: HttpTestingController;
 	let cookieServiceSpy: jasmine.SpyObj<CookieService>;
+	let csrfServiceSpy: jasmine.SpyObj<CsrfService>;
 	let routerSpy: jasmine.SpyObj<Router>;
 	let notificationSpy: jasmine.SpyObj<NotificationService>;
 	let crossTabSyncSpy: jasmine.SpyObj<CrossTabSyncService>;
@@ -85,6 +89,15 @@ describe('UserTokenService', () => {
 			'set',
 			'delete',
 		]);
+		csrfServiceSpy = jasmine.createSpyObj('CsrfService', [
+			'setToken',
+			'clear',
+		]);
+		// Define o getter csrfToken
+		Object.defineProperty(csrfServiceSpy, 'csrfToken', {
+			get: () => 'csrf-token'
+		});
+		
 		routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 		notificationSpy = jasmine.createSpyObj('NotificationService', ['show']);
 		crossTabSyncSpy = jasmine.createSpyObj(
@@ -98,16 +111,27 @@ describe('UserTokenService', () => {
 		cookieServiceSpy.get
 			.withArgs('accessToken', false)
 			.and.returnValue(null);
-		cookieServiceSpy.get
-			.withArgs('csrfToken', false)
-			.and.returnValue('csrf-token');
+
+		// Mock localStorage
+		const store: Record<string, string> = {
+			'gatuno-csrf-token': 'csrf-token',
+		};
+		spyOn(localStorage, 'getItem').and.callFake((key) => store[key] || null);
+		spyOn(localStorage, 'setItem').and.callFake((key, value) => {
+			store[key] = value;
+		});
+		spyOn(localStorage, 'removeItem').and.callFake((key) => {
+			delete store[key];
+		});
 
 		TestBed.configureTestingModule({
-			imports: [HttpClientTestingModule],
 			providers: [
 				UserTokenService,
+				provideHttpClient(withInterceptors([HttpClientRequestInterceptor])),
+				provideHttpClientTesting(),
 				{ provide: PLATFORM_ID, useValue: 'browser' },
 				{ provide: CookieService, useValue: cookieServiceSpy },
+				{ provide: CsrfService, useValue: csrfServiceSpy },
 				{ provide: Router, useValue: routerSpy },
 				{ provide: NotificationService, useValue: notificationSpy },
 				{ provide: CrossTabSyncService, useValue: crossTabSyncSpy },
@@ -155,7 +179,7 @@ describe('UserTokenService', () => {
 			service.setTokens(validToken);
 
 			// Cancela requisições de auto-refresh
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({
 					accessToken: validToken,
 					refreshToken: 'refresh',
@@ -175,7 +199,7 @@ describe('UserTokenService', () => {
 			const adminToken = createValidToken([Role.ADMIN]);
 
 			service.setTokens(userToken);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({
 					accessToken: userToken,
 					refreshToken: 'refresh',
@@ -185,7 +209,7 @@ describe('UserTokenService', () => {
 			expect(service.isAdminSignal()).toBeFalse();
 
 			service.setTokens(adminToken);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({
 					accessToken: adminToken,
 					refreshToken: 'refresh',
@@ -201,7 +225,7 @@ describe('UserTokenService', () => {
 			const validToken = createValidToken();
 
 			service.setTokens(validToken);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({
 					accessToken: validToken,
 					refreshToken: 'refresh',
@@ -224,7 +248,7 @@ describe('UserTokenService', () => {
 			const accessToken = createValidToken();
 
 			service.setTokens(accessToken);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({ accessToken });
 			}
 			tick();
@@ -242,7 +266,7 @@ describe('UserTokenService', () => {
 			const accessToken = createValidToken();
 
 			service.setTokens(accessToken);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({ accessToken, refreshToken: 'refresh' });
 			}
 			tick();
@@ -256,7 +280,7 @@ describe('UserTokenService', () => {
 		it('deve remover tokens e limpar signal', fakeAsync(() => {
 			const accessToken = createValidToken();
 			service.setTokens(accessToken);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({ accessToken, refreshToken: 'refresh' });
 			}
 			tick();
@@ -309,7 +333,7 @@ describe('UserTokenService', () => {
 			});
 
 			// O scheduleAutoRefresh pode disparar requisição
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({
 					accessToken: newToken,
 					refreshToken: 'refresh',
@@ -325,7 +349,7 @@ describe('UserTokenService', () => {
 		it('deve limpar token quando outra aba envia TOKEN_REMOVE', fakeAsync(() => {
 			const accessToken = createValidToken();
 			service.setTokens(accessToken);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({ accessToken, refreshToken: 'refresh' });
 			}
 			tick();
@@ -359,7 +383,7 @@ describe('UserTokenService', () => {
 		it('deve identificar token válido', fakeAsync(() => {
 			const validToken = createValidToken();
 			service.setTokens(validToken);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({
 					accessToken: validToken,
 					refreshToken: 'refresh',
@@ -395,7 +419,7 @@ describe('UserTokenService', () => {
 		it('deve retornar roles do usuário', fakeAsync(() => {
 			const token = createValidToken([Role.USER, Role.ADMIN]);
 			service.setTokens(token);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({ accessToken: token, refreshToken: 'refresh' });
 			}
 			tick();
@@ -411,7 +435,7 @@ describe('UserTokenService', () => {
 			const userToken = createValidToken([Role.USER]);
 
 			service.setTokens(adminToken);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({
 					accessToken: adminToken,
 					refreshToken: 'refresh',
@@ -422,7 +446,7 @@ describe('UserTokenService', () => {
 			expect(service.isAdminSignal()).toBeTrue();
 
 			service.setTokens(userToken);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({
 					accessToken: userToken,
 					refreshToken: 'refresh',
@@ -438,7 +462,7 @@ describe('UserTokenService', () => {
 		it('deve retornar email do usuário', fakeAsync(() => {
 			const token = createValidToken();
 			service.setTokens(token);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({ accessToken: token, refreshToken: 'refresh' });
 			}
 			tick();
@@ -450,7 +474,7 @@ describe('UserTokenService', () => {
 		it('deve retornar ID do usuário', fakeAsync(() => {
 			const token = createValidToken();
 			service.setTokens(token);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({ accessToken: token, refreshToken: 'refresh' });
 			}
 			tick();
@@ -465,14 +489,15 @@ describe('UserTokenService', () => {
 			const newAccessToken = createValidToken([Role.ADMIN]);
 
 			service.refreshTokens().subscribe();
-			tick(); // Avança o timer(0, 500) do CSRF retry
+			tick();
 
-			const req = httpMock.expectOne('/auth/refresh');
+			const req = httpMock.expectOne((r) => r.url.endsWith('/auth/refresh'));
 			expect(req.request.method).toBe('POST');
 			expect(req.request.headers.get('x-csrf-token')).toBe('csrf-token');
 
 			req.flush({
 				accessToken: newAccessToken,
+				csrfToken: 'new-csrf-token',
 			});
 			tick();
 			discardPeriodicTasks();
@@ -482,6 +507,7 @@ describe('UserTokenService', () => {
 				newAccessToken,
 				false,
 			);
+			expect(csrfServiceSpy.setToken).toHaveBeenCalledWith('new-csrf-token');
 		}));
 
 		it('deve compartilhar observable para chamadas simultâneas (shareReplay)', fakeAsync(() => {
@@ -492,15 +518,16 @@ describe('UserTokenService', () => {
 			service.refreshTokens().subscribe(() => callCount++);
 			service.refreshTokens().subscribe(() => callCount++);
 			service.refreshTokens().subscribe(() => callCount++);
-			tick(); // Avança o timer(0, 500)
+			tick();
 
 			// Apenas UMA requisição HTTP
-			const requests = httpMock.match('/auth/refresh');
+			const requests = httpMock.match((r) => r.url.endsWith('/auth/refresh'));
 			expect(requests.length).toBe(1);
 
 			requests[0].flush({
 				accessToken: newAccessToken,
 				refreshToken: 'refresh',
+				csrfToken: 'new-csrf',
 			});
 			tick();
 			discardPeriodicTasks();
@@ -510,9 +537,9 @@ describe('UserTokenService', () => {
 		}));
 
 		it('deve falhar sem fazer requisição quando csrfToken não estiver disponível', fakeAsync(() => {
-			cookieServiceSpy.get
-				.withArgs('csrfToken', false)
-				.and.returnValue(null);
+			Object.defineProperty(csrfServiceSpy, 'csrfToken', {
+				get: () => null
+			});
 			let capturedError: Error | undefined;
 
 			service.refreshTokens().subscribe({
@@ -521,10 +548,10 @@ describe('UserTokenService', () => {
 					capturedError = error;
 				},
 			});
-			tick(2000); // Avança tempo suficiente para os 3 retries (0ms, 500ms, 1000ms)
+			tick(); 
 			discardPeriodicTasks();
 
-			expect(httpMock.match('/auth/refresh').length).toBe(0);
+			expect(httpMock.match((r) => r.url.endsWith('/auth/refresh')).length).toBe(0);
 			expect(capturedError?.message).toContain('Token CSRF não encontrado');
 		}));
 
@@ -532,13 +559,14 @@ describe('UserTokenService', () => {
 			const soonExpiringToken = createExpiringSoonToken();
 
 			service.setTokens(soonExpiringToken);
-			tick(); // Avança o timer(0, 500) do refreshTokens()
+			tick(5000); // Aguarda o delay de segurança de 5s para refresh de emergência
 			
-			const requests = httpMock.match('/auth/refresh');
+			const requests = httpMock.match((r) => r.url.endsWith('/auth/refresh'));
 			expect(requests.length).toBe(1);
 
 			requests[0].flush({
 				accessToken: createValidToken(),
+				csrfToken: 'new-csrf',
 			});
 			tick();
 			discardPeriodicTasks();
@@ -549,22 +577,22 @@ describe('UserTokenService', () => {
 			
 			// 1. Inicia um refresh manual
 			service.refreshTokens().subscribe();
-			tick(); // CSRF
+			tick();
 			
-			const req1 = httpMock.expectOne('/auth/refresh');
+			const req1 = httpMock.expectOne((r) => r.url.endsWith('/auth/refresh'));
 			
 			// 2. O servidor responde com um token que AINDA está na margem (< 60s)
 			// Isso vai disparar setTokens -> scheduleAutoRefresh -> refreshTokens novamente
-			req1.flush({ accessToken: shortToken });
-			tick();
+			req1.flush({ accessToken: shortToken, csrfToken: 'csrf-1' });
+			tick(5000); // Aguarda o delay de segurança
 			
 			// 3. Devido ao bug, a segunda chamada de refreshTokens pode ter retornado o mesmo observable
 			// que estava terminando. Precisamos verificar se uma SEGUNDA requisição HTTP foi feita.
-			const req2 = httpMock.match('/auth/refresh');
+			const req2 = httpMock.match((r) => r.url.endsWith('/auth/refresh'));
 			expect(req2.length).withContext('Deveria ter disparado uma segunda requisição para tentar obter um token longo').toBe(1);
 			
 			if (req2.length > 0) {
-				req2[0].flush({ accessToken: createValidToken() });
+				req2[0].flush({ accessToken: createValidToken(), csrfToken: 'csrf-2' });
 			}
 			
 			tick();
@@ -576,7 +604,7 @@ describe('UserTokenService', () => {
 		it('deve retornar accessToken via getter', fakeAsync(() => {
 			const token = createValidToken();
 			service.setTokens(token);
-			for (const req of httpMock.match('/auth/refresh')) {
+			for (const req of httpMock.match((r) => r.url.endsWith('/auth/refresh'))) {
 				req.flush({ accessToken: token, refreshToken: 'refresh' });
 			}
 			tick();
@@ -610,13 +638,13 @@ describe('UserTokenService', () => {
 			// Segundo subscriber entra logo em seguida
 			let result: any;
 			service.refreshTokens().subscribe((res) => (result = res));
-			tick(); // Avança o timer(0, 500) do CSRF retry
+			tick();
 
 			// Deve haver apenas UMA requisição, provando que o primeiro unsubscribe não limpou o cache prematuramente
-			const requests = httpMock.match('/auth/refresh');
+			const requests = httpMock.match((r) => r.url.endsWith('/auth/refresh'));
 			expect(requests.length).toBe(1);
 
-			requests[0].flush({ accessToken: newAccessToken });
+			requests[0].flush({ accessToken: newAccessToken, csrfToken: 'new-csrf' });
 			tick();
 			discardPeriodicTasks();
 
@@ -636,7 +664,7 @@ describe('UserTokenService', () => {
 			tick(10000); // Avança tempo suficiente para disparar o timer (incluindo jitter)
 
 			// Não deve ter disparado nenhuma requisição HTTP porque o lock estava ativo
-			const requests = httpMock.match('/auth/refresh');
+			const requests = httpMock.match((r) => r.url.endsWith('/auth/refresh'));
 			expect(requests.length).toBe(0);
 
 			discardPeriodicTasks();
@@ -648,7 +676,7 @@ describe('UserTokenService', () => {
 			// Avança o tempo para disparar o auto-refresh agendado no setTokens
 			tick(3600 * 1000);
 
-			const requests = httpMock.match('/auth/refresh');
+			const requests = httpMock.match((r) => r.url.endsWith('/auth/refresh'));
 			expect(requests.length).toBe(1);
 			expect(localStorage.getItem('gatuno-refresh-lock')).toBeTruthy();
 
@@ -664,7 +692,7 @@ describe('UserTokenService', () => {
 			service.setTokens(token);
 			tick(3600 * 1000);
 
-			const requests = httpMock.match('/auth/refresh');
+			const requests = httpMock.match((r) => r.url.endsWith('/auth/refresh'));
 			expect(requests.length).toBe(1);
 
 			requests[0].error(new ProgressEvent('error'));
