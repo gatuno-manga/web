@@ -275,6 +275,7 @@ describe('UserTokenService', () => {
 
 			expect(crossTabSyncSpy.notifyTokenUpdate).toHaveBeenCalledWith(
 				accessToken,
+				undefined,
 			);
 		}));
 
