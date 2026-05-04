@@ -95,7 +95,8 @@ describe('UserTokenService', () => {
 		]);
 		// Define o getter csrfToken
 		Object.defineProperty(csrfServiceSpy, 'csrfToken', {
-			get: () => 'csrf-token'
+			get: () => 'csrf-token',
+			configurable: true
 		});
 		
 		routerSpy = jasmine.createSpyObj('Router', ['navigate']);
@@ -538,7 +539,8 @@ describe('UserTokenService', () => {
 
 		it('deve falhar sem fazer requisição quando csrfToken não estiver disponível', fakeAsync(() => {
 			Object.defineProperty(csrfServiceSpy, 'csrfToken', {
-				get: () => null
+				get: () => null,
+				configurable: true
 			});
 			let capturedError: Error | undefined;
 
