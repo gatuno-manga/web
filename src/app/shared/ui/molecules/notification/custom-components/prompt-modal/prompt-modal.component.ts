@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, AfterViewInit, signal } from '@angular/core';
+import { Component, input, viewChild, AfterViewInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextAreaComponent } from '@ui/atoms/inputs/text-area/text-area.component';
@@ -8,39 +8,48 @@ import { TextAreaComponent } from '@ui/atoms/inputs/text-area/text-area.componen
   standalone: true,
   imports: [FormsModule, ButtonComponent, TextAreaComponent],
   templateUrl: './prompt-modal.component.html',
-  styleUrls: ['./prompt-modal.component.scss']
+  styleUrls: ['./prompt-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PromptModalComponent implements AfterViewInit {
-  @Input() title: string = '';
-  @Input() message: string = '';
-  @Input() placeholder: string = '';
-  @Input() set value(val: string) {
-    this.inputValue.set(val);
-  }
+  title = input<string>('');
+  message = input<string>('');
+  placeholder = input<string>('');
+  initialValue = input<string>('', { alias: 'value' });
 
-  @Input() close!: (value: string | null) => void;
+  close = input.required<(value: string | null) => void>();
 
-  @ViewChild(TextAreaComponent) textArea!: TextAreaComponent;
+  textArea = viewChild(TextAreaComponent);
 
   inputValue = signal<string>('');
 
+  constructor() {
+    // Initialize local signal with initial value
+    this.inputValue.set(this.initialValue());
+  }
+
   ngAfterViewInit(): void {
     setTimeout(() => {
-      if (this.textArea) {
-        this.textArea.textareaRef?.nativeElement?.focus();
+      const textAreaComponent = this.textArea();
+      if (textAreaComponent) {
+        // Correctly calling the signal textareaRef()
+        textAreaComponent.textareaRef()?.nativeElement?.focus();
       }
     }, 100);
   }
 
   confirm(): void {
-    if (this.close) {
-      this.close(this.inputValue());
+    const closeFn = this.close();
+    if (closeFn) {
+      closeFn(this.inputValue());
     }
   }
 
   cancel(): void {
-    if (this.close) {
-      this.close(null);
+    const closeFn = this.close();
+    if (closeFn) {
+      closeFn(null);
     }
   }
 }
+

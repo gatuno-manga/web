@@ -1,10 +1,11 @@
-import { Component, ElementRef, forwardRef, Input, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, forwardRef, input, viewChild, output, model, computed, ChangeDetectionStrategy, effect, AfterViewInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { NgClass } from '@angular/common';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
 	selector: 'app-text-area',
-	imports: [NgClass],
+	imports: [NgClass, IconsComponent],
 	providers: [
 		{
 			provide: NG_VALUE_ACCESSOR,
@@ -14,21 +15,35 @@ import { NgClass } from '@angular/common';
 	],
 	standalone: true,
 	templateUrl: './text-area.component.html',
-	styleUrl: './text-area.component.scss'
+	styleUrl: './text-area.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TextAreaComponent implements ControlValueAccessor {
-	@Output() focus: EventEmitter<void> = new EventEmitter<void>();
-	@Output() blur: EventEmitter<void> = new EventEmitter<void>();
-	@ViewChild('textarea') textareaRef!: ElementRef<HTMLTextAreaElement>;
-	@Input() id!: string;
-	@Input() placeholder: string = '';
-	@Input() value: string = '';
-    @Input() rows: number = 3;
-	@Input() errors: any = null;
-	@Input() touched: boolean = false;
-    
-	isFocused: boolean = false;
-	firstLostFocus: boolean = false;
+export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
+	focus = output<void>();
+	blur = output<void>();
+	textareaRef = viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
+	
+	id = input<string>();
+	placeholder = input<string>('');
+	rows = input<number>(3);
+	maxLength = input<number | null>(null);
+	showCounter = input<boolean>(false);
+	autoExpand = input<boolean>(false);
+	maxHeight = input<string>('300px');
+	leftIcon = input<string | null>(null);
+	clearable = input<boolean>(false);
+	allowResize = input<boolean>(true);
+	
+	errors = input<any>(null);
+	touched = input<boolean>(false);
+	
+	value = model<string>('');
+	
+	characterCount = computed(() => this.value()?.length || 0);
+
+	isFocused = false;
+	firstLostFocus = false;
+	
 	inputErrorMessages: {
 		[key: string]: string;
 	} = {
@@ -36,6 +51,23 @@ export class TextAreaComponent implements ControlValueAccessor {
 			minlength: 'Não pode ser menor que {{requiredLength}} caracteres',
 			maxlength: 'Não pode ser maior que {{requiredLength}} caracteres',
 		}
+
+	constructor() {
+		effect(() => {
+			const expand = this.autoExpand();
+			if (expand) {
+				// Re-evaluate whenever value changes to adjust height
+				this.value(); 
+				setTimeout(() => this.adjustHeight(), 0);
+			}
+		});
+	}
+
+	ngAfterViewInit() {
+		if (this.autoExpand()) {
+			this.adjustHeight();
+		}
+	}
 
 	onFocus(): void {
 		this.isFocused = true;
@@ -48,12 +80,8 @@ export class TextAreaComponent implements ControlValueAccessor {
 		this.blur.emit();
 	}
 
-    onTouched(): void {
-		this.touched = true;
-	}
-
 	writeValue(value: string): void {
-		this.value = value || '';
+		this.value.set(value || '');
 	}
 
 	registerOnChange(fn: (value: string) => void): void {
@@ -64,36 +92,54 @@ export class TextAreaComponent implements ControlValueAccessor {
 		this.onTouched = fn;
 	}
 
+	setDisabledState?(isDisabled: boolean): void {}
+
 	onInput(event: Event): void {
-		this.touched = true;
 		const target = event.target as HTMLTextAreaElement;
-		this.value = target.value;
-		this.onChange(this.value);
+		this.value.set(target.value);
+		this.onChange(target.value);
+		this.onTouched();
 	}
 
-	onChange(value: string): void {
-		this.touched = true;
+	clear(event: Event): void {
+		event.stopPropagation();
+		this.value.set('');
+		this.onChange('');
+		this.onTouched();
+		this.textareaRef()?.nativeElement.focus();
+	}
+
+	onChange: (value: string) => void = () => {};
+	onTouched: () => void = () => {};
+
+	private adjustHeight(): void {
+		const textarea = this.textareaRef()?.nativeElement;
+		if (!textarea) return;
+
+		textarea.style.height = 'auto';
+		textarea.style.height = `${textarea.scrollHeight}px`;
 	}
 
 	errorMessages(): string[] {
-		if (this.errors && this.firstLostFocus && this.touched) {
-			const errorKeys = Object.keys(this.errors);
+		const errorsValue = this.errors();
+		if (errorsValue && this.firstLostFocus && (this.touched() || this.firstLostFocus)) {
+			const errorKeys = Object.keys(errorsValue);
 			if (errorKeys.length > 0) {
 				const messages = errorKeys.map(key => {
 					const message = this.inputErrorMessages[key];
 
 					if (message) {
-						if (typeof this.errors[key] === 'object' && this.errors[key] !== null) {
-							for (const prop in this.errors[key]) {
-								if (this.errors[key].hasOwnProperty(prop)) {
-									return message.replace(`{{${prop}}}`, this.errors[key][prop] || '');
+						if (typeof errorsValue[key] === 'object' && errorsValue[key] !== null) {
+							for (const prop in errorsValue[key]) {
+								if (errorsValue[key].hasOwnProperty(prop)) {
+									return message.replace(`{{${prop}}}`, errorsValue[key][prop] || '');
 								}
 							}
 						}
 						return message;
 					}
-					else if (typeof this.errors[key] === 'string') {
-						return this.errors[key];
+					else if (typeof errorsValue[key] === 'string') {
+						return errorsValue[key];
 					}
 
 					return 'error ' + key;

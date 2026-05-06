@@ -1,8 +1,8 @@
 <div class="prompt-modal-content" role="dialog" aria-labelledby="prompt-title">
 	<div class="settings-header">
-		<h2 id="prompt-title">{{ title }}</h2>
-		@if (message) {
-			<p class="subtitle">{{ message }}</p>
+		<h2 id="prompt-title">{{ title() }}</h2>
+		@if (message()) {
+			<p class="subtitle">{{ message() }}</p>
 		}
 	</div>
 	<div class="settings-body">
@@ -11,7 +11,7 @@
 				id="prompt-input"
 				[ngModel]="inputValue()"
 				(ngModelChange)="inputValue.set($event)"
-				[placeholder]="placeholder"
+				[placeholder]="placeholder()"
 				[rows]="3"
 				aria-describedby="prompt-title"
 			></app-text-area>

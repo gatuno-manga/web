@@ -2,27 +2,47 @@
   <div
     class="input"
 		[ngClass]="{
-			label: isFocused || touched || value,
-			focused: isFocused
+			label: isFocused || touched() || value(),
+			focused: isFocused,
+			'has-left-icon': leftIcon()
 		}"
     >
+		@if (leftIcon()) {
+			<app-icons [name]="leftIcon()!" class="left-icon" />
+		}
+
     <div class="input-wrapper">
       <textarea
         #textarea
-        [id]="id"
-        [value]="value"
-        [rows]="rows"
+        [id]="id()"
+        [value]="value()"
+        [rows]="rows()"
+				[attr.maxlength]="maxLength()"
         (input)="onInput($event)"
-        (blur)="onBlur(value); isFocused = false"
-        (focus)="isFocused = true"
+        (blur)="onBlur(value()); isFocused = false"
+        (focus)="onFocus()"
+				[style.maxHeight]="maxHeight()"
+				[style.resize]="allowResize() ? 'vertical' : 'none'"
       ></textarea>
       <label
-        [for]="id"
-        [ngClass]="{ ative: touched || value }"
+        [for]="id()"
+        [ngClass]="{ ative: touched() || value(), icons: leftIcon() }"
         >
-        {{ placeholder }}
+        {{ placeholder() }}
       </label>
+
+			@if (clearable() && value()) {
+				<div class="clear-btn" (click)="clear($event)">
+					<app-icons name="close" size="14px" />
+				</div>
+			}
     </div>
+
+		@if (showCounter() && maxLength()) {
+			<div class="char-counter">
+				{{ characterCount() }} / {{ maxLength() }}
+			</div>
+		}
   </div>
   <div class="error-messages" [style.--error-count]="errorMessages().length">
     @for (item of errorMessages(); track $index) {
