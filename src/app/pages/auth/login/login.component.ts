@@ -6,22 +6,22 @@ import {
 	Validators,
 } from '@angular/forms';
 import { startAuthentication } from '@simplewebauthn/browser';
-import { AuthService } from '../../../service/auth.service';
+import { AuthService } from '@core/services/auth.service';
 import {
 	PasswordInputComponent,
 	TextInputComponent,
-} from '../../../components/inputs/text-input/text-input.component';
-import { MfaInputComponent } from '../../../components/inputs/mfa-input/mfa-input.component';
+} from '@ui/atoms/inputs/text-input/text-input.component';
+import { MfaInputComponent } from '@ui/atoms/inputs/mfa-input/mfa-input.component';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ButtonComponent } from '../../../components/inputs/button/button.component';
-import { IconsComponent } from '../../../components/icons/icons.component';
-import { MetaDataService } from '../../../service/meta-data.service';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { MetaDataService } from '@core/services/meta-data.service';
 import { firstValueFrom } from 'rxjs';
 import {
 	isAuthTokensResponse,
 	isMfaChallengeResponse,
 	loginResponse,
-} from '../../../models/user.models';
+} from '@models/user.models';
 
 @Component({
 	selector: 'app-login',

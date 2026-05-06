@@ -9,21 +9,21 @@ import {
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Subscription, interval } from 'rxjs';
 import { PLATFORM_ID } from '@angular/core';
-import { IconsComponent } from '../../../components/icons/icons.component';
-import { BookWebsocketService } from '../../../service/book-websocket.service';
-import { DashboardService } from '../../../service/dashboard.service';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { BookWebsocketService } from '@core/services/book-websocket.service';
+import { DashboardService } from '@core/services/dashboard.service';
 import {
 	QueueStats,
 	QueueCounts,
 	RecentQueueEvent,
-} from '../../../models/dashboard.models';
+} from '@models/dashboard.models';
 import {
 	UpdateStartedEvent,
 	UpdateCompletedEvent,
 	UpdateFailedEvent,
-} from '../../../models/book-events.model';
+} from '@models/book-events.model';
 import { RouterModule } from '@angular/router';
-import { ButtonComponent } from '../../../components/inputs/button/button.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 
 const EMPTY_COUNTS: QueueCounts = {
 	waiting: 0,

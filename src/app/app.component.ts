@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ThemeService } from './service/theme.service';
-import { SensitiveContentService } from './service/sensitive-content.service';
-import { MetaDataService } from './service/meta-data.service';
-import { OverlayNotificationComponent } from './components/notification/overlay-notification/overlay-notification.component';
-import { ContextMenuComponent } from './components/context-menu/context-menu.component';
-import { ThemeSetupModalComponent } from './components/theme-setup-modal/theme-setup-modal.component';
+import { ThemeService } from '@core/services/theme.service';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { OverlayNotificationComponent } from '@ui/molecules/notification/overlay-notification/overlay-notification.component';
+import { ContextMenuComponent } from '@ui/organisms/context-menu/context-menu.component';
+import { ThemeSetupModalComponent } from '@ui/organisms/theme-setup-modal/theme-setup-modal.component';
 
 @Component({
   selector: 'app-root',

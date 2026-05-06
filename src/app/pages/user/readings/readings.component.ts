@@ -4,8 +4,8 @@ import {
 	inject,
 	input,
 } from '@angular/core';
-import { MetaDataService } from '../../../service/meta-data.service';
-import { ReaderSettingsFormComponent } from '../../../components/readers';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { ReaderSettingsFormComponent } from '@features/reading/components/readers';
 
 @Component({
 	selector: 'app-readings',

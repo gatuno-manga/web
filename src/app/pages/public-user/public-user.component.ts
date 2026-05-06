@@ -1,13 +1,13 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { PublicUserService } from '../../service/public-user.service';
+import { PublicUserService } from '@core/services/public-user.service';
 import {
 	PublicUserCollection,
 	PublicUserProfile,
 	PublicUserSavedPage,
-} from '../../models/public-user.models';
-import { MetaDataService } from '../../service/meta-data.service';
+} from '@models/public-user.models';
+import { MetaDataService } from '@core/services/meta-data.service';
 
 @Component({
 	selector: 'app-public-user',

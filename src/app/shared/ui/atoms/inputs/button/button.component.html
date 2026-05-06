@@ -1,0 +1,26 @@
+<button
+	#button
+	[id]="id()"
+	[type]="type()"
+	[disabled]="disabled()"
+	[class]="
+		'btn-' +
+		variant() +
+		' rounded-' +
+		rounded() +
+		' fill-' +
+		fill() +
+		' padding-' +
+		padding() +
+		' radio-' +
+		radio()
+	"
+>
+	@if(leftIcon()){
+	<app-icons [name]="leftIcon()!" />
+	}
+	<ng-content></ng-content>
+	@if(rightIcon()){
+	<app-icons [name]="rightIcon()!" />
+	}
+</button>

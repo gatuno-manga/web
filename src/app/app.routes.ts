@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { RenderMode } from '@angular/ssr';
-import { networkGuard } from './guards/network.guard';
+import { networkGuard } from '@core/guards/network.guard';
 
 /**
  * Helpers para configuração de SSR e Cache
@@ -46,6 +46,14 @@ export const routes: Routes = [
 						(m) => m.HomeComponent,
 					),
 				data: PRE_RENDER_CONFIG('home'),
+			},
+			{
+				path: 'latest-reads',
+				loadComponent: () =>
+					import(
+						'./pages/latest-reads/latest-reads.component'
+					).then((m) => m.LatestReadsComponent),
+				data: PRE_RENDER_CONFIG('latest-reads'),
 			},
 			{
 				path: 'books',

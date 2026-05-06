@@ -6,9 +6,9 @@ import {
 	computed,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { IconsComponent } from '../../../../components/icons/icons.component';
-import { UserTokenService } from '../../../../service/user-token.service';
-import { ThemeService } from '../../../../service/theme.service';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { UserTokenService } from '@core/services/user-token.service';
+import { ThemeService } from '@core/services/theme.service';
 
 interface NavItem {
 	label: string;
@@ -54,7 +54,11 @@ export class SideNavComponent {
 			},
 			{
 				items: [
-					{ label: 'Ultimas leituras', icon: 'clock', route: '#' },
+					{
+						label: 'Ultimas leituras',
+						icon: 'clock',
+						route: '/latest-reads',
+					},
 					{ label: 'Livro aleatório', icon: 'shuffle', route: '#' },
 				],
 			},

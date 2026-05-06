@@ -11,7 +11,7 @@
 
 <div class="controller">
 	<div class="mode-switch">
-		<app-select
+		<app-select-cycle
 			[items]="viewModeList"
 			[select]="getViewModeIndex()"
 			[disabled]="isOfflineMode"
@@ -37,7 +37,7 @@
 		</div>
 	}
 	<div class="view-options">
-		<app-select [items]="selectList" [select]="selectListItem()" />
+		<app-select-cycle [items]="selectList" [select]="selectListItem()" />
 	</div>
 </div>
 <div id="books" [class]="bookOptions">

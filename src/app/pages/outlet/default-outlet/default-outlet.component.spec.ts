@@ -3,7 +3,7 @@ import { SharedTestingModule } from '@testing/shared-testing.module';
 import { signal } from '@angular/core';
 
 import { DefaultOutletComponent } from './default-outlet.component';
-import { HeaderStateService } from '../../../service/header-state.service';
+import { HeaderStateService } from '@core/services/header-state.service';
 
 describe('DefaultOutletComponent', () => {
 	let component: DefaultOutletComponent;

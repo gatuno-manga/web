@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
-import { IconsComponent } from '../../../components/icons/icons.component';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
   selector: 'app-outlet',

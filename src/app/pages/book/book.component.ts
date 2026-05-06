@@ -14,35 +14,35 @@ import {
 	BookBasic,
 	Chapterlist,
 	ScrapingStatus,
-} from '../../models/book.models';
-import { BookService } from '../../service/book.service';
-import { IconsComponent } from '../../components/icons/icons.component';
+} from '@models/book.models';
+import { BookService } from '@core/services/book.service';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { NgOptimizedImage } from '@angular/common';
-import { MetaDataService } from '../../service/meta-data.service';
-import { UserTokenService } from '../../service/user-token.service';
-import { ModalNotificationService } from '../../service/modal-notification.service';
-import { InfoBookComponent } from '../../components/info-book/info-book.component';
-import { AsideComponent } from '../../components/aside/aside.component';
-import { ButtonComponent } from '../../components/inputs/button/button.component';
-import { BlurhashComponent } from '../../components/blurhash/blurhash.component';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { UserTokenService } from '@core/services/user-token.service';
+import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
+import { AsideComponent } from '@ui/organisms/aside/aside.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { MarkdownComponent } from 'ngx-markdown';
-import { BookWebsocketService } from '../../service/book-websocket.service';
-import { DownloadService } from '../../service/download.service';
-import { DownloadManagerService } from '../../service/download-manager.service';
-import { UnifiedReadingProgressService } from '../../service/unified-reading-progress.service';
-import { ChapterService } from '../../service/chapter.service';
+import { BookWebsocketService } from '@core/services/book-websocket.service';
+import { DownloadService } from '@core/services/download.service';
+import { DownloadManagerService } from '@core/services/download-manager.service';
+import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
+import { ChapterService } from '@core/services/chapter.service';
 import { Subscription, firstValueFrom } from 'rxjs';
 
-import { NotificationService } from '../../service/notification.service';
-import { NotificationSeverity } from '../../service/notification/notification-strategy.interface';
+import { NotificationService } from '@core/services/notification.service';
+import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
 import {
 	BookDownloadModalComponent,
 	BookDownloadResult,
-} from '../../components/notification/custom-components/book-download-modal/book-download-modal.component';
+} from '@ui/molecules/notification/custom-components/book-download-modal/book-download-modal.component';
 import {
 	BookEditModalComponent,
 	BookEditSaveEvent,
-} from '../../components/notification/custom-components/book-edit-modal/book-edit-modal.component';
+} from '@ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component';
 
 @Component({
 	selector: 'app-book',

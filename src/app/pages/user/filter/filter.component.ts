@@ -7,15 +7,15 @@ import {
 	input,
 	computed,
 } from '@angular/core';
-import { SensitiveContentResponse } from '../../../models/book.models';
-import { SensitiveContentService } from '../../../service/sensitive-content.service';
-import { MetaDataService } from '../../../service/meta-data.service';
-import { DownloadService } from '../../../service/download.service';
-import { TagsService } from '../../../service/tags.service';
-import { Tag } from '../../../models/tags.models';
-import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
-import { SwitchComponent } from '../../../components/inputs/switch/switch.component';
-import { SearchService } from '../../../service/search.service';
+import { SensitiveContentResponse } from '@models/book.models';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { DownloadService } from '@core/services/download.service';
+import { TagsService } from '@core/services/tags.service';
+import { Tag } from '@models/tags.models';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
+import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
+import { SearchService } from '@core/services/search.service';
 import { finalize } from 'rxjs/operators';
 
 @Component({

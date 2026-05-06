@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { NetworkStatusService } from '../../../service/network-status.service';
-import { IconsComponent } from '../../../components/icons/icons.component';
-import { ButtonComponent } from '../../../components/inputs/button/button.component';
-import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
-import { AuthService } from '../../../service/auth.service';
-import { SearchService } from '../../../service/search.service';
+import { NetworkStatusService } from '@core/services/network-status.service';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
+import { AuthService } from '@core/services/auth.service';
+import { SearchService } from '@core/services/search.service';
 
 @Component({
 	selector: 'app-outlet',

@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from './profile.component';
-import { UserService } from '../../../service/user.service';
+import { UserService } from '@core/services/user.service';
 import { of } from 'rxjs';
-import { UserProfile } from '../../../models/user.models';
+import { UserProfile } from '@models/user.models';
 
 describe('ProfileComponent', () => {
 	let component: ProfileComponent;

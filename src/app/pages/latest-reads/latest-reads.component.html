@@ -1,0 +1,59 @@
+<div class="latest-reads-container">
+	<header class="page-header">
+		<div class="header-content">
+			<h1 class="page-title">Últimas Leituras</h1>
+			<p class="page-subtitle">Livros que você leu recentemente</p>
+		</div>
+
+		<div class="header-actions">
+			<button
+				class="action-btn"
+				[class.active]="showSensitiveContent()"
+				(click)="toggleSensitiveContent()"
+				title="Filtrar conteúdo sensível"
+			>
+				<app-icons name="eye" size="24" />
+			</button>
+
+			<button
+				class="action-btn"
+				(click)="toggleViewMode()"
+				[title]="viewMode() === 'grid' ? 'Mudar para lista' : 'Mudar para grade'"
+			>
+				<app-icons [name]="viewMode() === 'grid' ? 'list' : 'grid'" size="24" />
+			</button>
+		</div>
+	</header>
+
+	@if (isLoading()) {
+		<div class="loading-state">
+			<div class="skeleton-grid" [class.list-mode]="viewMode() === 'list'">
+				@for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
+					<div class="skeleton-item">
+						<div class="skeleton-cover placeholder"></div>
+						<div class="skeleton-text placeholder"></div>
+					</div>
+				}
+			</div>
+		</div>
+	} @else {
+		@if (filteredBooks().length > 0) {
+			<div class="books-container" [class]="viewMode()">
+				@for (item of filteredBooks(); track item.book.id) {
+					<app-item-book
+						[book]="item.book"
+						[type]="viewMode()"
+						[progress]="item.progress"
+						[canRemove]="true"
+						(remove)="removeProgress(item.book.id)"
+					/>
+				}
+			</div>
+		} @else {
+			<div class="empty-state">
+				<p>Você ainda não começou a ler nenhum livro.</p>
+				<a routerLink="/books" class="explore-btn">Explorar livros</a>
+			</div>
+		}
+	}
+</div>

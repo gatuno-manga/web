@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { BooksComponent } from './books.component';
-import { BookService } from '../../service/book.service';
-import { SensitiveContentService } from '../../service/sensitive-content.service';
+import { BookService } from '@core/services/book.service';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { of } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 

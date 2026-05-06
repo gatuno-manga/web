@@ -40,3 +40,9 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Gatuno Specific
+.env
+api-docs.json
+test_output.txt
+src/environments/environment.prod.ts

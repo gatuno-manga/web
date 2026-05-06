@@ -1,15 +1,59 @@
-import { Component } from '@angular/core';
-import { MetaDataService } from '../../service/meta-data.service';
+import { Component, OnInit, signal, computed, inject, OnDestroy } from '@angular/core';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { BookService } from '@core/services/book.service';
+import { ReadingProgressService } from '@core/services/reading-progress.service';
+import { BookList } from '@models/book.models';
+import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
+import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  standalone: true,
+  imports: [ItemBookComponent, BlurhashComponent, CommonModule, RouterModule, NgOptimizedImage],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
-  constructor(private metaService: MetaDataService) {
+export class HomeComponent implements OnInit, OnDestroy {
+  private metaService = inject(MetaDataService);
+  private bookService = inject(BookService);
+  private readingProgressService = inject(ReadingProgressService);
+
+  featuredBooks = signal<BookList[]>([]);
+  continueReadingBooks = signal<BookList[]>([]);
+  gridBooks = signal<BookList[]>([]);
+  
+  currentPage = signal(1);
+  totalPages = signal(1);
+  pageSize = 12;
+
+  currentFeaturedIndex = signal(0);
+  private carouselInterval?: any;
+
+  pages = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    
+    // Simple pagination: show current, some around it, and first/last if needed
+    // For now, let's keep it simple as in the Figma design (1, 2, 3, 4)
+    return Array.from({ length: Math.min(total, 5) }, (_, i) => i + 1);
+  });
+
+  constructor() {
     this.setMetaData();
+  }
+
+  ngOnInit() {
+    this.loadFeaturedBooks();
+    this.loadContinueReading();
+    this.loadGridBooks();
+    this.startCarousel();
+  }
+
+  ngOnDestroy() {
+    this.stopCarousel();
   }
 
   setMetaData() {
@@ -17,5 +61,98 @@ export class HomeComponent {
       title: 'Home',
       description: 'Bem-vindo à nossa plataforma. Explore livros, autores e muito mais.',
     });
+  }
+
+  async loadFeaturedBooks() {
+    try {
+      const res = await firstValueFrom(this.bookService.getBooks({ limit: 5, orderBy: 'updatedAt', order: 'DESC' }));
+      this.featuredBooks.set(res.data);
+    } catch (e) {
+      console.error('Error loading featured books', e);
+    }
+  }
+
+  async loadContinueReading() {
+    try {
+      const progress = await this.readingProgressService.getAllProgress();
+      if (progress.length > 0) {
+        // Sort by updatedAt DESC and get unique bookIds
+        const sortedProgress = [...progress].sort((a, b) => 
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+        
+        const bookIds = [...new Set(sortedProgress.map(p => p.bookId))].slice(0, 10);
+        const books: BookList[] = [];
+        
+        for (const id of bookIds) {
+          const book = await firstValueFrom(this.bookService.getBook(id));
+          if (book) {
+            books.push({
+              id: book.id,
+              title: book.title,
+              cover: book.cover,
+              description: book.description,
+              tags: book.tags,
+              scrapingStatus: book.scrapingStatus,
+              blurHash: book.blurHash,
+              dominantColor: book.dominantColor,
+              metadata: book.metadata
+            });
+          }
+        }
+        this.continueReadingBooks.set(books);
+      }
+    } catch (e) {
+      console.error('Error loading continue reading', e);
+    }
+  }
+
+  async loadGridBooks() {
+    try {
+      const res = await firstValueFrom(this.bookService.getBooks({ 
+        page: this.currentPage(), 
+        limit: this.pageSize,
+        orderBy: 'title',
+        order: 'ASC'
+      }));
+      this.gridBooks.set(res.data);
+      this.totalPages.set(res.metadata.lastPage);
+    } catch (e) {
+      console.error('Error loading grid books', e);
+    }
+  }
+
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      this.loadGridBooks();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  startCarousel() {
+    if (typeof window !== 'undefined') {
+      this.carouselInterval = setInterval(() => {
+        this.nextFeatured();
+      }, 8000);
+    }
+  }
+
+  stopCarousel() {
+    if (this.carouselInterval) {
+      clearInterval(this.carouselInterval);
+    }
+  }
+
+  nextFeatured() {
+    if (this.featuredBooks().length > 0) {
+      this.currentFeaturedIndex.update(idx => (idx + 1) % this.featuredBooks().length);
+    }
+  }
+
+  setFeatured(index: number) {
+    this.currentFeaturedIndex.set(index);
+    this.stopCarousel();
+    this.startCarousel();
   }
 }

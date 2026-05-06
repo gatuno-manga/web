@@ -17,13 +17,13 @@ import {
 	MfaSetupResponse,
 	MfaStatusResponse,
 	PasskeySummary,
-} from '../../../models/account-security.models';
-import { ButtonComponent } from '../../../components/inputs/button/button.component';
-import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
-import { SwitchComponent } from '../../../components/inputs/switch/switch.component';
-import { IconsComponent } from '../../../components/icons/icons.component';
-import { AccountSecurityService } from '../../../service/account-security.service';
-import { SearchService } from '../../../service/search.service';
+} from '@models/account-security.models';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
+import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { AccountSecurityService } from '@core/services/account-security.service';
+import { SearchService } from '@core/services/search.service';
 
 @Component({
 	selector: 'app-security',

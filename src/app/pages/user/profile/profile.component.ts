@@ -1,11 +1,11 @@
 import { Component, inject, input, computed, effect } from '@angular/core';
-import { ButtonComponent } from '../../../components/inputs/button/button.component';
-import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
-import { AuthService } from '../../../service/auth.service';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
+import { AuthService } from '@core/services/auth.service';
 import { Router } from '@angular/router';
-import { MetaDataService } from '../../../service/meta-data.service';
-import { SearchService } from '../../../service/search.service';
-import { UserService } from '../../../service/user.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { SearchService } from '@core/services/search.service';
+import { UserService } from '@core/services/user.service';
 import {
 	FormBuilder,
 	FormGroup,

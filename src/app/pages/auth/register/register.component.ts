@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {
 	PasswordInputComponent,
 	TextInputComponent,
-} from '../../../components/inputs/text-input/text-input.component';
+} from '@ui/atoms/inputs/text-input/text-input.component';
 import {
 	FormBuilder,
 	FormGroup,
@@ -10,13 +10,13 @@ import {
 	Validators,
 	AbstractControl,
 } from '@angular/forms';
-import { AuthService } from '../../../service/auth.service';
+import { AuthService } from '@core/services/auth.service';
 import { Router, RouterModule } from '@angular/router';
-import { ButtonComponent } from '../../../components/inputs/button/button.component';
-import { minUppercaseValidator } from '../../../validators/min-uppercase.validator';
-import { minNumberValidator } from '../../../validators/min-number.validator';
-import { minSymbolValidator } from '../../../validators/min-symbol.validator';
-import { MetaDataService } from '../../../service/meta-data.service';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { minUppercaseValidator } from '@shared/validators/min-uppercase.validator';
+import { minNumberValidator } from '@shared/validators/min-number.validator';
+import { minSymbolValidator } from '@shared/validators/min-symbol.validator';
+import { MetaDataService } from '@core/services/meta-data.service';
 
 @Component({
 	selector: 'app-register',
