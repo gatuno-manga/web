@@ -7,6 +7,7 @@ import {
 	input,
 	output,
 	ChangeDetectionStrategy,
+	effect,
 } from '@angular/core';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
@@ -29,6 +30,7 @@ import {
 	RandomFilterResult,
 } from '@ui/molecules/notification/custom-components/random-filter-modal/random-filter-modal.component';
 import { Observable, tap } from 'rxjs';
+import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';
 
 interface ActiveFilter {
 	id: string;
@@ -47,6 +49,7 @@ interface ActiveFilter {
 		TextInputComponent,
 		SelectComponent,
 		IconsComponent,
+		MultiSelectTagsComponent,
 	],
 	templateUrl: './book-filter.component.html',
 	styleUrl: './book-filter.component.scss',
@@ -58,6 +61,8 @@ export class BookFilterComponent implements OnInit {
 	private notificationService = inject(NotificationService);
 	private modalService = inject(ModalNotificationService);
 
+	constructor() {}
+
 	initialFilters = input<Partial<BookPageOptions>>();
 	filtersChange = output<Partial<BookPageOptions>>();
 
@@ -66,13 +71,28 @@ export class BookFilterComponent implements OnInit {
 
 	// Lists
 	availableTypes = Object.values(TypeBook).map((type) => ({
-		value: type,
-		label: type.toUpperCase(),
+		id: type,
+		name: type.toUpperCase(),
 	}));
 
 	// API Data
 	availableTags = signal<TagResponse[]>([]);
-	availableSensitiveContent = signal<SensitiveContentResponse[]>([]);
+	private allSensitiveContent = signal<SensitiveContentResponse[]>([]);
+	
+	availableSensitiveContent = computed(() => {
+		const all = this.allSensitiveContent();
+		const allowedNames = this.sensitiveContentService.allowContentSignal();
+		
+		const filtered = all.filter((c) => allowedNames.includes(c.name));
+
+		// Adicionar categoria "safe" manualmente (não vem da API)
+		const safeCategory: SensitiveContentResponse = {
+			id: 'safe',
+			name: 'safe',
+		};
+
+		return [safeCategory, ...filtered];
+	});
 
 	sortOptions = [
 		{ value: 'createdAt|DESC', label: 'Mais Recente' },
@@ -138,9 +158,15 @@ export class BookFilterComponent implements OnInit {
 	tagSearchQuery = signal<string>('');
 	private pendingSensitiveNames = signal<string[]>([]);
 
+	displayTagsForComponent = computed(() => {
+		const excludedGlobal = new Set(this.tagsService.excludedTagsSignal());
+		return this.availableTags().filter(t => !excludedGlobal.has(t.id));
+	});
+
 	displayTags = computed(() => {
 		const query = this.tagSearchQuery().toLowerCase();
-		const tags = this.availableTags();
+		const tags = this.displayTagsForComponent();
+		
 		if (!query) return tags.slice(0, 15);
 		return tags
 			.filter((tag) => tag.name.toLowerCase().includes(query))
@@ -242,29 +268,14 @@ export class BookFilterComponent implements OnInit {
 		this.sensitiveContentService
 			.getSensitiveContent()
 			.subscribe((content) => {
-				const allowedNames =
-					this.sensitiveContentService.getContentAllow();
-				// Filter available options based on allowed content
-				const filteredContent = content.filter((c) =>
-					allowedNames.includes(c.name),
-				);
-
-				// Adicionar categoria "safe" manualmente (não vem da API)
-				const safeCategory: SensitiveContentResponse = {
-					id: 'safe',
-					name: 'safe',
-				};
-
-				this.availableSensitiveContent.set([
-					safeCategory,
-					...filteredContent,
-				]);
+				this.allSensitiveContent.set(content);
 
 				// Reconcile pending sensitive names (if any) to IDs
 				const pending = this.pendingSensitiveNames();
 				if (pending.length > 0) {
-					const allContent = [safeCategory, ...filteredContent];
-					const ids = allContent
+					// Use availableSensitiveContent() instead of manual filtering
+					const available = this.availableSensitiveContent();
+					const ids = available
 						.filter((c) => pending.includes(c.name))
 						.map((c) => c.id);
 					this.selectedSensitiveContent.set(ids);
@@ -506,10 +517,17 @@ export class BookFilterComponent implements OnInit {
 			filters.tags = this.selectedTags();
 			filters.tagsLogic = this.tagsLogic();
 		}
-		if (this.excludedTags().length > 0) {
-			filters.excludeTags = this.excludedTags();
+
+		// Ensure global exclusions are always included in the emission
+		const globalExcluded = this.tagsService.excludedTagsSignal();
+		const currentExcluded = this.excludedTags();
+		const allExcluded = Array.from(new Set([...currentExcluded, ...globalExcluded]));
+
+		if (allExcluded.length > 0) {
+			filters.excludeTags = allExcluded;
 			filters.excludeTagsLogic = this.excludeTagsLogic();
 		}
+
 		if (this.selectedAuthors().length > 0) {
 			filters.authors = this.selectedAuthors();
 			filters.authorsLogic = this.authorsLogic();
@@ -524,8 +542,9 @@ export class BookFilterComponent implements OnInit {
 			filters.sensitiveContent = this.availableSensitiveContent()
 				.filter((c) => this.selectedSensitiveContent().includes(c.id))
 				.map((c) => c.name);
-		} else if (this.availableSensitiveContent().length > 0) {
+		} else {
 			// If nothing selected, consider all available (allowed) sensitive content
+			// availableSensitiveContent() is already filtered by global allowContentSignal
 			filters.sensitiveContent = this.availableSensitiveContent().map(
 				(c) => c.name,
 			);
@@ -590,7 +609,7 @@ export class BookFilterComponent implements OnInit {
 				this.availableTypes[
 					Math.floor(Math.random() * this.availableTypes.length)
 				];
-			this.selectedTypes.set([randomType.value]);
+			this.selectedTypes.set([randomType.id]);
 		}
 
 		// 3. Random Sensitive Content

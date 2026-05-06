@@ -128,81 +128,34 @@
 					<h3>Categorização</h3>
 
 					<div class="category-group">
-						<div class="group-header">
-							<h4>Tags</h4>
-							<app-input
-								type="text"
-								[ngModel]="tagSearch()"
-								(ngModelChange)="tagSearch.set($event)"
-								[ngModelOptions]="{standalone: true}"
-								placeholder="Filtrar tags..."
-								[showLabel]="false"
-								leftIcon="search"
-							/>
-						</div>
-						<div class="chip-container">
-							@for (tag of filteredTags(); track tag.id) {
-								<div 
-									class="chip" 
-									[class.selected]="selectedTagIds().has(tag.id)"
-									(click)="toggleTag(tag.id)"
-								>
-									{{ tag.name }}
-								</div>
-							}
-							@for (tag of selectedTagsNotInFilter(); track tag.id) {
-								<div class="chip selected" (click)="toggleTag(tag.id)">{{ tag.name }}</div>
-							}
-						</div>
+						<h4>Tags</h4>
+						<app-multi-select-tags
+							[options]="availableTags()"
+							[(selectedIds)]="selectedTagIds"
+							placeholderSearch="Filtrar tags..."
+							[groupSelectedAtTop]="true"
+						/>
 					</div>
 
 					<div class="category-group">
-						<div class="group-header">
-							<h4>Autores</h4>
-							<app-input
-								type="text"
-								[ngModel]="authorSearch()"
-								(ngModelChange)="authorSearch.set($event)"
-								[ngModelOptions]="{standalone: true}"
-								placeholder="Filtrar autores..."
-								[showLabel]="false"
-								leftIcon="search"
-							/>
-						</div>
-						<div class="chip-container">
-							@for (author of filteredAuthors(); track author.id) {
-								<div 
-									class="chip" 
-									[class.selected]="selectedAuthorIds().has(author.id)"
-									(click)="toggleAuthor(author.id)"
-								>
-									{{ author.name }}
-								</div>
-							}
-							@for (author of selectedAuthorsNotInFilter(); track author.id) {
-								<div class="chip selected" (click)="toggleAuthor(author.id)">{{ author.name }}</div>
-							}
-						</div>
+						<h4>Autores</h4>
+						<app-multi-select-tags
+							[options]="availableAuthors()"
+							[(selectedIds)]="selectedAuthorIds"
+							placeholderSearch="Filtrar autores..."
+							[groupSelectedAtTop]="true"
+						/>
 					</div>
 
 					<div class="category-group">
 						<h4>Conteúdo Sensível</h4>
-
-	<div class="chip-container">
-		@for (item of availableSensitive(); track item.id) {
-			<div 
-				class="chip danger" 
-				[class.selected]="selectedSensitiveIds().has(item.id)"
-				(click)="toggleSensitive(item.id)"
-			>
-				{{ item.name }}
-			</div>
-		} @empty {
-			<span class="empty-text">Nenhuma classificação disponível.</span>
-		}
-	</div>
-</div>
-
+						<app-multi-select-tags
+							[options]="availableSensitive()"
+							[(selectedIds)]="selectedSensitiveIds"
+							placeholderSearch="Filtrar conteúdos..."
+							[groupSelectedAtTop]="true"
+						/>
+					</div>
 				</section>
 			</form>
 		}

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, Input, OnInit, signal, computed, inject, model } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
@@ -21,6 +21,7 @@ import { SensitiveContentService } from '@core/services/sensitive-content.servic
 import { NotificationService } from '@core/services/notification.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';
 
 export interface BookEditSaveEvent {
 	id: string;
@@ -40,6 +41,7 @@ export interface BookEditSaveEvent {
 		SelectComponent,
 		IconsComponent,
 		DragDropModule,
+		MultiSelectTagsComponent,
 	],
 	templateUrl: './book-edit-modal.component.html',
 	styleUrls: ['./book-edit-modal.component.scss'],
@@ -70,36 +72,10 @@ export class BookEditModalComponent implements OnInit {
 	availableAuthors = signal<Author[]>([]);
 	availableSensitive = signal<SensitiveContentResponse[]>([]);
 
-	// Search filters
-	tagSearch = signal('');
-	authorSearch = signal('');
-
-	filteredTags = computed(() => {
-		const query = this.tagSearch().toLowerCase().trim();
-		if (!query) return []; // Oculta a lista global se não houver busca
-		return this.availableTags().filter(t => t.name.toLowerCase().includes(query));
-	});
-
-	filteredAuthors = computed(() => {
-		const query = this.authorSearch().toLowerCase().trim();
-		if (!query) return []; // Oculta a lista global se não houver busca
-		return this.availableAuthors().filter(a => a.name.toLowerCase().includes(query));
-	});
-
-	selectedTagsNotInFilter = computed(() => {
-		const filteredIds = new Set(this.filteredTags().map(t => t.id));
-		return this.availableTags().filter(t => this.selectedTagIds().has(t.id) && !filteredIds.has(t.id));
-	});
-
-	selectedAuthorsNotInFilter = computed(() => {
-		const filteredIds = new Set(this.filteredAuthors().map(a => a.id));
-		return this.availableAuthors().filter(a => this.selectedAuthorIds().has(a.id) && !filteredIds.has(a.id));
-	});
-
-	// Selected IDs
-	selectedTagIds = signal<Set<string>>(new Set());
-	selectedAuthorIds = signal<Set<string>>(new Set());
-	selectedSensitiveIds = signal<Set<string>>(new Set());
+	// Selected IDs (Refactored to model signals for MultiSelectTags compatibility)
+	selectedTagIds = model<string[]>([]);
+	selectedAuthorIds = model<string[]>([]);
+	selectedSensitiveIds = model<string[]>([]);
 
 	bookTypes = Object.values(TypeBook).map(type => ({
 		value: type,
@@ -122,9 +98,9 @@ export class BookEditModalComponent implements OnInit {
 		this.alternativeTitles.set([...(this.book as any).alternativeTitle || []]);
 		this.originalUrls.set([...(this.book as any).originalUrl || []]);
 		
-		this.selectedTagIds.set(new Set(this.book.tags.map(t => t.id)));
-		this.selectedAuthorIds.set(new Set(this.book.authors.map(a => a.id)));
-		this.selectedSensitiveIds.set(new Set(this.book.sensitiveContent.map(s => s.id)));
+		this.selectedTagIds.set(this.book.tags.map(t => t.id));
+		this.selectedAuthorIds.set(this.book.authors.map(a => a.id));
+		this.selectedSensitiveIds.set(this.book.sensitiveContent.map(s => s.id));
 	}
 
 	private loadMasterData(): void {
@@ -211,37 +187,9 @@ export class BookEditModalComponent implements OnInit {
 	}
 
 	onUrlDrop(event: CdkDragDrop<string[]>): void {
-		this.originalUrls.update(prev => {
+		this.alternativeTitles.update(prev => {
 			const next = [...prev];
 			moveItemInArray(next, event.previousIndex, event.currentIndex);
-			return next;
-		});
-	}
-
-	// --- Multi-select Toggles ---
-	toggleTag(id: string): void {
-		this.selectedTagIds.update(prev => {
-			const next = new Set(prev);
-			if (next.has(id)) next.delete(id);
-			else next.add(id);
-			return next;
-		});
-	}
-
-	toggleAuthor(id: string): void {
-		this.selectedAuthorIds.update(prev => {
-			const next = new Set(prev);
-			if (next.has(id)) next.delete(id);
-			else next.add(id);
-			return next;
-		});
-	}
-
-	toggleSensitive(id: string): void {
-		this.selectedSensitiveIds.update(prev => {
-			const next = new Set(prev);
-			if (next.has(id)) next.delete(id);
-			else next.add(id);
 			return next;
 		});
 	}

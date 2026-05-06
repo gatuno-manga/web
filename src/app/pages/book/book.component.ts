@@ -31,6 +31,7 @@ import { DownloadService } from '@core/services/download.service';
 import { DownloadManagerService } from '@core/services/download-manager.service';
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
 import { ChapterService } from '@core/services/chapter.service';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { Subscription, firstValueFrom } from 'rxjs';
 
 import { NotificationService } from '@core/services/notification.service';
@@ -104,6 +105,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	private downloadService = inject(DownloadService);
 	private readingProgressService = inject(UnifiedReadingProgressService);
 	private chapterService = inject(ChapterService);
+	private sensitiveContentService = inject(SensitiveContentService);
 
 	onDocumentClick() {
 		this.closeOptionsDropdown();
@@ -128,6 +130,17 @@ export class BookComponent implements OnInit, OnDestroy {
 					});
 					return;
 				}
+
+				// Security check: Verify if book's sensitive content is allowed
+				if (!this.sensitiveContentService.isAllowed(book.sensitiveContent)) {
+					this.notificationService.error(
+						'Conteúdo restrito',
+						'Este livro contém conteúdo que você restringiu em suas configurações.'
+					);
+					this.router.navigate(['/books']);
+					return;
+				}
+
 				this.book.set(book);
 				this.setMetaData();
 				this.isLoading.set(false);

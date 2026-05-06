@@ -1,22 +1,41 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 import { Tag, TagsPageOptions } from '@models/tags.models';
 import { SensitiveContentService } from "./sensitive-content.service";
 import { UserTokenService } from "./user-token.service";
 import { DownloadService } from "./download.service";
 import { from } from "rxjs";
 import { catchError, map } from "rxjs/operators";
+import { CookieService } from "./cookie.service";
 
 @Injectable({
     providedIn: 'root'
 })
 export class TagsService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly sensitiveContentService: SensitiveContentService,
-        private readonly userTokenService: UserTokenService,
-        private readonly downloadService: DownloadService
-    ) {}
+    private readonly http = inject(HttpClient);
+    private readonly sensitiveContentService = inject(SensitiveContentService);
+    private readonly userTokenService = inject(UserTokenService);
+    private readonly downloadService = inject(DownloadService);
+    private readonly cookieService = inject(CookieService);
+
+    private readonly EXCLUDED_TAGS_KEY = 'excluded-tags-global';
+    
+    excludedTagsSignal = signal<string[]>(this.getInitialExcludedTags());
+
+    private getInitialExcludedTags(): string[] {
+        const stored = this.cookieService.get(this.EXCLUDED_TAGS_KEY);
+        if (!stored) return [];
+        try {
+            return JSON.parse(stored) as string[];
+        } catch {
+            return [];
+        }
+    }
+
+    setExcludedTags(tags: string[]): void {
+        this.cookieService.set(this.EXCLUDED_TAGS_KEY, JSON.stringify(tags));
+        this.excludedTagsSignal.set(tags);
+    }
 
     getTags(options?: TagsPageOptions) {
         const opts = { ...options };
@@ -33,7 +52,6 @@ export class TagsService {
                 return from(this.downloadService.getAllBooks()).pipe(
                     map(books => {
                         // 1. Filtrar livros por Conteúdo Sensível para mostrar apenas tags relevantes
-                        // Recarrega as preferências se estiver offline
                         const allowedContent = this.sensitiveContentService.getContentAllow();
                         
                         const visibleBooks = books.filter(book => {
@@ -51,7 +69,7 @@ export class TagsService {
                                     allTags.set(t.id, {
                                         id: t.id,
                                         name: t.name,
-                                        description: '' // Offline books don't store tag descriptions
+                                        description: '' 
                                     });
                                 }
                             });
