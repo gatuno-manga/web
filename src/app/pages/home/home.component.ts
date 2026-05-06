@@ -4,6 +4,7 @@ import { BookService } from '@core/services/book.service';
 import { ReadingProgressService } from '@core/services/reading-progress.service';
 import { BookList } from '@models/book.models';
 import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
+import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -12,7 +13,7 @@ import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ItemBookComponent, BlurhashComponent, CommonModule, RouterModule, NgOptimizedImage],
+  imports: [BookGridComponent, BlurhashComponent, CommonModule, RouterModule, NgOptimizedImage, ItemBookComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -23,23 +24,15 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   featuredBooks = signal<BookList[]>([]);
   continueReadingBooks = signal<BookList[]>([]);
-  gridBooks = signal<BookList[]>([]);
+  latestUpdatedBooks = signal<BookList[]>([]);
+  recentlyAddedBooks = signal<BookList[]>([]);
   
-  currentPage = signal(1);
-  totalPages = signal(1);
-  pageSize = 12;
+  isLoadingGrid = signal(true);
+  isLoadingFeatured = signal(true);
+  isLoadingRecentlyAdded = signal(true);
 
   currentFeaturedIndex = signal(0);
   private carouselInterval?: any;
-
-  pages = computed(() => {
-    const total = this.totalPages();
-    const current = this.currentPage();
-    
-    // Simple pagination: show current, some around it, and first/last if needed
-    // For now, let's keep it simple as in the Figma design (1, 2, 3, 4)
-    return Array.from({ length: Math.min(total, 5) }, (_, i) => i + 1);
-  });
 
   constructor() {
     this.setMetaData();
@@ -48,7 +41,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.loadFeaturedBooks();
     this.loadContinueReading();
-    this.loadGridBooks();
+    this.loadLatestUpdated();
+    this.loadRecentlyAdded();
     this.startCarousel();
   }
 
@@ -59,16 +53,19 @@ export class HomeComponent implements OnInit, OnDestroy {
   setMetaData() {
     this.metaService.setMetaData({
       title: 'Home',
-      description: 'Bem-vindo à nossa plataforma. Explore livros, autores e muito mais.',
+      description: 'Bem-vindo ao Gatuno. Explore os últimos lançamentos e continue sua leitura.',
     });
   }
 
   async loadFeaturedBooks() {
+    this.isLoadingFeatured.set(true);
     try {
       const res = await firstValueFrom(this.bookService.getBooks({ limit: 5, orderBy: 'updatedAt', order: 'DESC' }));
       this.featuredBooks.set(res.data);
     } catch (e) {
       console.error('Error loading featured books', e);
+    } finally {
+      this.isLoadingFeatured.set(false);
     }
   }
 
@@ -107,26 +104,35 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadGridBooks() {
+  async loadLatestUpdated() {
+    this.isLoadingGrid.set(true);
     try {
       const res = await firstValueFrom(this.bookService.getBooks({ 
-        page: this.currentPage(), 
-        limit: this.pageSize,
-        orderBy: 'title',
-        order: 'ASC'
+        limit: 12,
+        orderBy: 'updatedAt',
+        order: 'DESC'
       }));
-      this.gridBooks.set(res.data);
-      this.totalPages.set(res.metadata.lastPage);
+      this.latestUpdatedBooks.set(res.data);
     } catch (e) {
-      console.error('Error loading grid books', e);
+      console.error('Error loading latest updated books', e);
+    } finally {
+      this.isLoadingGrid.set(false);
     }
   }
 
-  changePage(page: number) {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
-      this.loadGridBooks();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  async loadRecentlyAdded() {
+    this.isLoadingRecentlyAdded.set(true);
+    try {
+      const res = await firstValueFrom(this.bookService.getBooks({ 
+        limit: 12,
+        orderBy: 'createdAt',
+        order: 'DESC'
+      }));
+      this.recentlyAddedBooks.set(res.data);
+    } catch (e) {
+      console.error('Error loading recently added books', e);
+    } finally {
+      this.isLoadingRecentlyAdded.set(false);
     }
   }
 
@@ -156,3 +162,4 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.startCarousel();
   }
 }
+

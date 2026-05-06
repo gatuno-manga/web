@@ -3,11 +3,11 @@ import {
 	HostListener,
 	OnInit,
 	OnDestroy,
-	Input,
+	input,
 	PLATFORM_ID,
-	Inject,
-	OnChanges,
-	SimpleChanges,
+	inject,
+	signal,
+	computed,
 	output,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -19,39 +19,30 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 	templateUrl: './aside.component.html',
 	styleUrl: './aside.component.scss',
 })
-export class AsideComponent implements OnInit, OnDestroy, OnChanges {
-	@Input() position: 'left' | 'right' = 'right';
-	@Input() topOffset = 60;
-	@Input() readonly SWIPE_THRESHOLD = 300;
-	@Input() readonly EDGE_THRESHOLD = 150;
-	@Input() readonly ASIDE_WIDTH = 300;
+export class AsideComponent implements OnInit, OnDestroy {
+	position = input<'left' | 'right'>('right');
+	topOffset = input<number>(60);
+	swipeThreshold = input<number>(300, { alias: 'SWIPE_THRESHOLD' });
+	edgeThreshold = input<number>(150, { alias: 'EDGE_THRESHOLD' });
+	asideWidth = input<number>(400, { alias: 'ASIDE_WIDTH' });
 
 	closed = output<void>();
 
-	isOpen = false;
+	isOpen = signal(false);
 	private touchStartX = 0;
 	private touchStartY = 0;
-	private isDragging = false;
-	public dragOffset = 0;
+	private isDragging = signal(false);
+	public dragOffset = signal(0);
 	private isBrowser: boolean;
 
-	constructor(@Inject(PLATFORM_ID) platformId: object) {
+	constructor() {
+		const platformId = inject(PLATFORM_ID);
 		this.isBrowser = isPlatformBrowser(platformId);
 	}
 
 	ngOnInit() {
 		if (this.isBrowser) {
 			this.addTouchListeners();
-		}
-	}
-
-	ngOnChanges(changes: SimpleChanges) {
-		// biome-ignore lint/complexity/useLiteralKeys: noPropertyAccessFromIndexSignature obriga uso de bracket notation
-		if (changes['position'] && !changes['position'].firstChange) {
-			// Reset state when position changes
-			this.isOpen = false;
-			this.isDragging = false;
-			this.dragOffset = 0;
 		}
 	}
 
@@ -114,50 +105,50 @@ export class AsideComponent implements OnInit, OnDestroy, OnChanges {
 		const screenWidth = window.innerWidth;
 
 		const isNearEdge =
-			this.position === 'right'
-				? this.touchStartX > screenWidth - this.EDGE_THRESHOLD
-				: this.touchStartX < this.EDGE_THRESHOLD;
+			this.position() === 'right'
+				? this.touchStartX > screenWidth - this.edgeThreshold()
+				: this.touchStartX < this.edgeThreshold();
 
-		if (isNearEdge || this.isOpen) {
-			this.isDragging = true;
+		if (isNearEdge || this.isOpen()) {
+			this.isDragging.set(true);
 		}
 	}
 
 	private handleTouchMove(event: TouchEvent) {
-		if (!this.isDragging) return;
+		if (!this.isDragging()) return;
 
 		const currentX = event.touches[0].clientX;
 		const deltaX = currentX - this.touchStartX;
 
-		if (!this.isOpen) {
-			if (this.position === 'right') {
-				this.dragOffset = Math.max(
-					-this.ASIDE_WIDTH,
+		if (!this.isOpen()) {
+			if (this.position() === 'right') {
+				this.dragOffset.set(Math.max(
+					-this.asideWidth(),
 					Math.min(0, deltaX),
-				);
+				));
 			} else {
-				this.dragOffset = Math.max(
+				this.dragOffset.set(Math.max(
 					0,
-					Math.min(this.ASIDE_WIDTH, deltaX),
-				);
+					Math.min(this.asideWidth(), deltaX),
+				));
 			}
 		} else {
-			if (this.position === 'right') {
-				this.dragOffset = Math.max(
+			if (this.position() === 'right') {
+				this.dragOffset.set(Math.max(
 					0,
-					Math.min(this.ASIDE_WIDTH, deltaX),
-				);
+					Math.min(this.asideWidth(), deltaX),
+				));
 			} else {
-				this.dragOffset = Math.max(
-					-this.ASIDE_WIDTH,
+				this.dragOffset.set(Math.max(
+					-this.asideWidth(),
 					Math.min(0, deltaX),
-				);
+				));
 			}
 		}
 	}
 
 	private handleTouchEnd(event: TouchEvent) {
-		if (!this.isDragging) return;
+		if (!this.isDragging()) return;
 
 		const touchEndX = event.changedTouches[0].clientX;
 		const touchEndY = event.changedTouches[0].clientY;
@@ -165,43 +156,43 @@ export class AsideComponent implements OnInit, OnDestroy, OnChanges {
 		const deltaY = Math.abs(touchEndY - this.touchStartY);
 		const screenWidth = window.innerWidth;
 
-		this.isDragging = false;
-		this.dragOffset = 0;
+		this.isDragging.set(false);
+		this.dragOffset.set(0);
 
-		if (this.position === 'right') {
+		if (this.position() === 'right') {
 			if (
-				!this.isOpen &&
-				this.touchStartX > screenWidth - this.EDGE_THRESHOLD &&
-				deltaX < -this.SWIPE_THRESHOLD &&
-				deltaY < this.SWIPE_THRESHOLD
+				!this.isOpen() &&
+				this.touchStartX > screenWidth - this.edgeThreshold() &&
+				deltaX < -this.swipeThreshold() &&
+				deltaY < this.swipeThreshold()
 			) {
 				this.open();
 				return;
 			}
 
 			if (
-				this.isOpen &&
-				deltaX > this.SWIPE_THRESHOLD &&
-				deltaY < this.SWIPE_THRESHOLD
+				this.isOpen() &&
+				deltaX > this.swipeThreshold() &&
+				deltaY < this.swipeThreshold()
 			) {
 				this.close();
 				return;
 			}
 		} else {
 			if (
-				!this.isOpen &&
-				this.touchStartX < this.EDGE_THRESHOLD &&
-				deltaX > this.SWIPE_THRESHOLD &&
-				deltaY < this.SWIPE_THRESHOLD
+				!this.isOpen() &&
+				this.touchStartX < this.edgeThreshold() &&
+				deltaX > this.swipeThreshold() &&
+				deltaY < this.swipeThreshold()
 			) {
 				this.open();
 				return;
 			}
 
 			if (
-				this.isOpen &&
-				deltaX < -this.SWIPE_THRESHOLD &&
-				deltaY < this.SWIPE_THRESHOLD
+				this.isOpen() &&
+				deltaX < -this.swipeThreshold() &&
+				deltaY < this.swipeThreshold()
 			) {
 				this.close();
 				return;
@@ -210,35 +201,41 @@ export class AsideComponent implements OnInit, OnDestroy, OnChanges {
 	}
 
 	toggle() {
-		this.isOpen = !this.isOpen;
+		this.isOpen.update(v => !v);
 	}
 
 	open() {
-		this.isOpen = true;
+		this.isOpen.set(true);
 	}
 
 	close() {
-		this.isOpen = false;
+		this.isOpen.set(false);
 		this.closed.emit();
 	}
 
-	getDragTransform(): string {
-		if (this.isDragging) {
-			if (this.position === 'right') {
-				if (!this.isOpen) {
-					return `translateX(calc(100% + ${this.dragOffset}px))`;
+	dragTransform = computed(() => {
+		const isDragging = this.isDragging();
+		const position = this.position();
+		const isOpen = this.isOpen();
+		const dragOffset = this.dragOffset();
+
+		if (isDragging) {
+			if (position === 'right') {
+				if (!isOpen) {
+					return `translateX(calc(100% + ${dragOffset}px))`;
 				}
-				return `translateX(${this.dragOffset}px)`;
+				return `translateX(${dragOffset}px)`;
 			}
-			if (!this.isOpen) {
-				return `translateX(calc(-100% + ${this.dragOffset}px))`;
+			if (!isOpen) {
+				return `translateX(calc(-100% + ${dragOffset}px))`;
 			}
-			return `translateX(${this.dragOffset}px)`;
+			return `translateX(${dragOffset}px)`;
 		}
 
-		if (this.position === 'right') {
-			return this.isOpen ? 'translateX(0)' : 'translateX(100%)';
+		if (position === 'right') {
+			return isOpen ? 'translateX(0)' : 'translateX(100%)';
 		}
-		return this.isOpen ? 'translateX(0)' : 'translateX(-100%)';
-	}
+		return isOpen ? 'translateX(0)' : 'translateX(-100%)';
+	});
 }
+

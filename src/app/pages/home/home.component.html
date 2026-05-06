@@ -1,7 +1,7 @@
 <div class="home-container">
   <!-- Featured Carousel -->
   @if (featuredBooks().length > 0) {
-    <section class="featured-carousel">
+    <section class="featured-carousel-section">
       <div class="carousel-track">
         @for (book of featuredBooks(); track book.id; let i = $index) {
           <div class="carousel-item" [class.active]="i === currentFeaturedIndex()">
@@ -39,8 +39,8 @@
 
   <!-- Continue Reading Section -->
   @if (continueReadingBooks().length > 0) {
-    <section class="continue-reading">
-      <h2>Continue a sua leitura</h2>
+    <section class="home-section continue-reading">
+      <h2 class="section-title">Continue a sua leitura</h2>
       <div class="horizontal-scroll">
         @for (book of continueReadingBooks(); track book.id) {
           <div class="book-item-wrapper">
@@ -51,30 +51,33 @@
     </section>
   }
 
-  <!-- Grid of Books -->
-  <section class="all-books">
-    @if (continueReadingBooks().length === 0) {
-      <h2>Explorar livros</h2>
-    }
-    
-    <div class="books-grid">
-      @for (book of gridBooks(); track book.id) {
-        <app-item-book [book]="book" type="grid" />
-      }
+  <!-- Latest Updated Section -->
+  <section class="home-section latest-updates">
+    <div class="section-header">
+      <h2 class="section-title">Atualizações Recentes</h2>
+      <a routerLink="/books" [queryParams]="{ orderBy: 'updatedAt', order: 'DESC' }" class="view-more">Ver tudo</a>
     </div>
+    
+		<app-book-grid 
+			[books]="latestUpdatedBooks()" 
+			[isLoading]="isLoadingGrid()" 
+			type="grid" 
+			[skeletonCount]="6"
+		/>
+  </section>
 
-    <!-- Pagination -->
-    @if (totalPages() > 1) {
-      <div class="pagination">
-        @for (page of pages(); track page) {
-          <button 
-            (click)="changePage(page)" 
-            [class.active]="page === currentPage()"
-          >
-            {{ page }}
-          </button>
-        }
-      </div>
-    }
+  <!-- Recently Added Section -->
+  <section class="home-section recently-added">
+    <div class="section-header">
+      <h2 class="section-title">Novidades no Gatuno</h2>
+      <a routerLink="/books" [queryParams]="{ orderBy: 'createdAt', order: 'DESC' }" class="view-more">Ver tudo</a>
+    </div>
+    
+		<app-book-grid 
+			[books]="recentlyAddedBooks()" 
+			[isLoading]="isLoadingRecentlyAdded()" 
+			type="grid" 
+			[skeletonCount]="6"
+		/>
   </section>
 </div>

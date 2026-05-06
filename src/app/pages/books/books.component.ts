@@ -34,6 +34,7 @@ import { SensitiveContentService } from '@core/services/sensitive-content.servic
 import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NetworkStatusService } from '@core/services/network-status.service';
 import { BookFilterComponent } from '@features/books/components/book-filter/book-filter.component';
+import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
 
 interface BookQueryParams {
 	page?: string;
@@ -57,9 +58,9 @@ interface BookQueryParams {
 	selector: 'app-books',
 	imports: [
 		RouterModule,
-		ItemBookComponent,
 		SelectCycleComponent,
 		BookFilterComponent,
+		BookGridComponent,
 	],
 	templateUrl: './books.component.html',
 	styleUrl: './books.component.scss',
