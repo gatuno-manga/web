@@ -1,8 +1,8 @@
 <div class="latest-reads-container">
 	<header class="page-header">
 		<div class="header-content">
-			<h1 class="page-title">Últimas Leituras</h1>
-			<p class="page-subtitle">Livros que você leu recentemente</p>
+			<h1 class="page-title">Histórico de Leitura</h1>
+			<p class="page-subtitle">Capítulos que você leu recentemente</p>
 		</div>
 
 		<div class="header-actions">
@@ -14,44 +14,57 @@
 			>
 				<app-icons name="eye" size="24" />
 			</button>
-
-			<button
-				class="action-btn"
-				(click)="toggleViewMode()"
-				[title]="viewMode() === 'grid' ? 'Mudar para lista' : 'Mudar para grade'"
-			>
-				<app-icons [name]="viewMode() === 'grid' ? 'list' : 'grid'" size="24" />
-			</button>
 		</div>
 	</header>
 
 	@if (isLoading()) {
 		<div class="loading-state">
-			<div class="skeleton-grid" [class.list-mode]="viewMode() === 'list'">
-				@for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
-					<div class="skeleton-item">
-						<div class="skeleton-cover placeholder"></div>
-						<div class="skeleton-text placeholder"></div>
-					</div>
+			<div class="skeleton-list">
+				@for (i of [1, 2, 3, 4, 5]; track $index) {
+					<div class="skeleton-item placeholder"></div>
 				}
 			</div>
 		</div>
 	} @else {
-		@if (filteredBooks().length > 0) {
-			<div class="books-container" [class]="viewMode()">
-				@for (item of filteredBooks(); track item.book.id) {
-					<app-item-book
-						[book]="item.book"
-						[type]="viewMode()"
-						[progress]="item.progress"
-						[canRemove]="true"
-						(remove)="removeProgress(item.book.id)"
-					/>
+		@if (historyEntries().length > 0) {
+			<div class="history-timeline">
+				@for (group of groupedHistory(); track group.date) {
+					<div class="date-group">
+						<h2 class="group-date">{{ group.date }}</h2>
+						<div class="entries-list">
+							@for (entry of group.entries; track entry.progressId) {
+								<div class="history-item">
+									<div class="item-cover" [routerLink]="['/books', entry.bookId]">
+										@if (entry.bookBlurHash) {
+											<app-blurhash [hash]="entry.bookBlurHash" class="blur-bg" />
+										}
+										<img [ngSrc]="entry.bookCover" width="60" height="90" [alt]="entry.bookTitle" />
+									</div>
+									<div class="item-info">
+										<a [routerLink]="['/books', entry.bookId]" class="book-title">{{ entry.bookTitle }}</a>
+										<a [routerLink]="['/books', entry.bookId, 'chapters', entry.chapter.id]" class="chapter-title">
+											{{ entry.chapter.title }}
+										</a>
+										<span class="read-time">{{ formatTime(entry.updatedAt) }}</span>
+									</div>
+									<div class="item-actions">
+										<button class="remove-btn" (click)="removeProgress(entry.progressId, entry.chapter.id)" title="Remover do histórico">
+											<app-icons name="trash" size="18" />
+										</button>
+										<a [routerLink]="['/books', entry.bookId, 'chapters', entry.chapter.id]" class="resume-btn">
+											Retomar
+										</a>
+									</div>
+								</div>
+							}
+						</div>
+					</div>
 				}
 			</div>
 		} @else {
 			<div class="empty-state">
-				<p>Você ainda não começou a ler nenhum livro.</p>
+				<app-icons name="clock" size="64" />
+				<p>Seu histórico de leitura está vazio.</p>
 				<a routerLink="/books" class="explore-btn">Explorar livros</a>
 			</div>
 		}

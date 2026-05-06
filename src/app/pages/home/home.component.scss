@@ -142,7 +142,8 @@
   .carousel-dots {
     position: absolute;
     bottom: 50px;
-    left: 40px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     gap: 12px;
     z-index: 2;
@@ -170,7 +171,7 @@
   max-width: 1500px;
   margin: 80px auto;
   width: 100%;
-  padding: 0 40px;
+  padding: 0 20px;
 
   .section-header {
     display: flex;

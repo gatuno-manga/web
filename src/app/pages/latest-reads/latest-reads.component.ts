@@ -1,32 +1,39 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, signal, inject, computed, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { ReadingProgressService } from '@core/services/reading-progress.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { BookList, Chapterlist } from '@models/book.models';
-import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
+import { BookBasic, Chapterlist } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { firstValueFrom } from 'rxjs';
+import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 
-interface BookWithProgress {
-	book: BookList;
-	progress: {
-		currentChapterTitle?: string;
-		nextChapterTitle?: string;
-		nextChapterId?: string;
-		pageIndex?: number;
+export interface HistoryEntry {
+	progressId: string;
+	bookId: string;
+	bookTitle: string;
+	bookCover: string;
+	bookBlurHash?: string;
+	bookDominantColor?: string;
+	sensitiveContent: any[];
+	chapter: {
+		id: string;
+		title: string;
+		index: number;
 	};
+	pageIndex: number;
 	updatedAt: Date;
 }
 
 @Component({
 	selector: 'app-latest-reads',
 	standalone: true,
-	imports: [CommonModule, RouterModule, ItemBookComponent, IconsComponent],
+	imports: [CommonModule, RouterModule, IconsComponent, NgOptimizedImage, BlurhashComponent],
 	templateUrl: './latest-reads.component.html',
 	styleUrl: './latest-reads.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LatestReadsComponent implements OnInit {
 	private bookService = inject(BookService);
@@ -34,25 +41,21 @@ export class LatestReadsComponent implements OnInit {
 	private metaService = inject(MetaDataService);
 	private sensitiveContentService = inject(SensitiveContentService);
 
-	allBooksWithProgress = signal<BookWithProgress[]>([]);
+	historyEntries = signal<HistoryEntry[]>([]);
 	isLoading = signal(true);
-	viewMode = signal<'grid' | 'list'>('grid');
 	showSensitiveContent = signal(false);
 
-	filteredBooks = computed(() => {
-		const books = this.allBooksWithProgress();
-		const allowedIds = this.sensitiveContentService.getContentAllow();
+	filteredHistory = computed(() => {
+		const entries = this.historyEntries();
+		const allowedNames = this.sensitiveContentService.allowContentSignal();
 
-		return books.filter((item) => {
-			// Se o filtro estiver desativado, remove livros com conteúdo sensível
-			// (Seguindo a lógica do BookService)
+		return entries.filter((entry) => {
 			if (!this.showSensitiveContent()) {
-				const bookSensitive = (item.book as any).sensitiveContent || [];
+				const bookSensitive = entry.sensitiveContent || [];
 				if (bookSensitive.length > 0) {
 					return bookSensitive.every(
 						(sc: any) =>
-							allowedIds.includes(sc.id) ||
-							allowedIds.includes(sc.name),
+							allowedNames.includes(sc.name),
 					);
 				}
 			}
@@ -60,134 +63,135 @@ export class LatestReadsComponent implements OnInit {
 		});
 	});
 
+	groupedHistory = computed(() => {
+		const groups = new Map<string, HistoryEntry[]>();
+		for (const entry of this.filteredHistory()) {
+			const dateStr = this.formatDateGroup(entry.updatedAt);
+			if (!groups.has(dateStr)) {
+				groups.set(dateStr, []);
+			}
+			groups.get(dateStr)!.push(entry);
+		}
+		return Array.from(groups.entries()).map(([date, entries]) => ({ date, entries }));
+	});
+
 	ngOnInit() {
 		this.setMetaData();
-		this.loadLatestReads();
+		this.loadHistory();
 	}
 
 	private setMetaData() {
 		this.metaService.setMetaData({
-			title: 'Últimas Leituras',
-			description: 'Veja os livros que você começou a ler recentemente.',
+			title: 'Histórico de Leitura',
+			description: 'Veja os capítulos que você leu recentemente.',
 		});
-	}
-
-	toggleViewMode() {
-		this.viewMode.update((mode) => (mode === 'grid' ? 'list' : 'grid'));
 	}
 
 	toggleSensitiveContent() {
 		this.showSensitiveContent.update((v) => !v);
 	}
 
-	async removeProgress(bookId: string) {
+	async removeProgress(progressId: string, chapterId: string) {
 		try {
-			// Buscar todos os capítulos desse livro que têm progresso
-			const progress = await this.readingProgressService.getAllProgress();
-			const bookProgress = progress.filter((p) => p.bookId === bookId);
-
-			for (const p of bookProgress) {
-				await this.readingProgressService.deleteProgress(p.chapterId);
-			}
-
-			// Atualizar lista local
-			this.allBooksWithProgress.update((list) =>
-				list.filter((item) => item.book.id !== bookId),
+			await this.readingProgressService.deleteProgress(chapterId);
+			this.historyEntries.update((list) =>
+				list.filter((item) => item.progressId !== progressId),
 			);
 		} catch (err) {
 			console.error('Erro ao remover progresso:', err);
 		}
 	}
 
-	private async loadLatestReads() {
+	private async loadHistory() {
 		this.isLoading.set(true);
 		try {
 			const progress = await this.readingProgressService.getAllProgress();
 			if (progress && progress.length > 0) {
-				// Agrupar progressos por livro para pegar o mais recente de cada um
-				const latestByBook = new Map<string, any>();
-				for (const p of progress) {
-					const existing = latestByBook.get(p.bookId);
-					if (
-						!existing ||
-						new Date(p.updatedAt).getTime() >
-							new Date(existing.updatedAt).getTime()
-					) {
-						latestByBook.set(p.bookId, p);
-					}
-				}
+				const sortedProgress = progress
+					.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+					.slice(0, 100);
 
-				const sortedLatest = Array.from(latestByBook.values()).sort(
-					(a, b) =>
-						new Date(b.updatedAt).getTime() -
-						new Date(a.updatedAt).getTime(),
-				);
+				const results: HistoryEntry[] = [];
+				const bookCache = new Map<string, BookBasic>();
+				const chapterCache = new Map<string, Chapterlist[]>();
 
-				const results: BookWithProgress[] = [];
-
-				for (const p of sortedLatest) {
+				for (const p of sortedProgress) {
 					try {
-						const bookBasic = await firstValueFrom(
-							this.bookService.getBook(p.bookId),
-						);
+						let bookBasic = bookCache.get(p.bookId);
+						if (!bookBasic) {
+							bookBasic = await firstValueFrom(
+								this.bookService.getBook(p.bookId),
+							);
+							if (bookBasic) bookCache.set(p.bookId, bookBasic);
+						}
+
 						if (bookBasic) {
-							// Buscar capítulos para encontrar o título e o próximo
-							const chaptersPage = await firstValueFrom(
-								this.bookService.getChapters(p.bookId, {
-									limit: 500,
-								}),
-							);
-							const chapters = chaptersPage.data;
+							let chapters = chapterCache.get(p.bookId);
+							if (!chapters) {
+								const chaptersPage = await firstValueFrom(
+									this.bookService.getChapters(p.bookId, {
+										limit: 500,
+									}),
+								);
+								chapters = chaptersPage.data;
+								chapterCache.set(p.bookId, chapters);
+							}
 
-							const currentIndex = chapters.findIndex(
-								(c) => c.id === p.chapterId,
-							);
-							const currentChapter = chapters[currentIndex];
-							const nextChapter = chapters[currentIndex + 1];
+							const currentChapter = chapters.find((c) => c.id === p.chapterId);
+							
+							if (currentChapter) {
+								const index = currentChapter.index + 1;
+								const chapterTitle = currentChapter.title 
+									? `Cap. ${index}: ${currentChapter.title}` 
+									: `Capítulo ${index}`;
 
-							const formatChapter = (c: Chapterlist | undefined) => {
-								if (!c) return undefined;
-								const index = c.index + 1;
-								return c.title ? `Cap. ${index}: ${c.title}` : `Capítulo ${index}`;
-							};
-
-							results.push({
-								book: {
-									id: bookBasic.id,
-									title: bookBasic.title,
-									cover: bookBasic.cover,
-									description: bookBasic.description,
-									tags: bookBasic.tags,
-									scrapingStatus: bookBasic.scrapingStatus,
-									blurHash: bookBasic.blurHash,
-									dominantColor: bookBasic.dominantColor,
-									metadata: bookBasic.metadata,
-									// biome-ignore lint/suspicious/noExplicitAny: needed for filtering
-									sensitiveContent: (bookBasic as any)
-										.sensitiveContent,
-								} as any,
-								progress: {
-									currentChapterTitle: formatChapter(currentChapter),
-									nextChapterTitle: formatChapter(nextChapter),
-									nextChapterId: nextChapter?.id,
+								results.push({
+									progressId: p.id,
+									bookId: bookBasic.id,
+									bookTitle: bookBasic.title,
+									bookCover: bookBasic.cover,
+									bookBlurHash: bookBasic.blurHash,
+									bookDominantColor: bookBasic.dominantColor,
+									sensitiveContent: bookBasic.sensitiveContent,
+									chapter: {
+										id: currentChapter.id,
+										title: chapterTitle,
+										index: currentChapter.index,
+									},
 									pageIndex: p.pageIndex,
-								},
-								updatedAt: new Date(p.updatedAt),
-							});
+									updatedAt: new Date(p.updatedAt),
+								});
+							}
 						}
 					} catch (err) {
-						console.error(
-							`Erro ao carregar livro ${p.bookId}:`,
-							err,
-						);
+						console.error(`Erro ao carregar histórico para o livro ${p.bookId}:`, err);
 					}
 				}
-				this.allBooksWithProgress.set(results);
+				this.historyEntries.set(results);
 			}
 		} catch (e) {
-			console.error('Erro ao carregar últimas leituras:', e);
+			console.error('Erro ao carregar histórico:', e);
 		} finally {
 			this.isLoading.set(false);
 		}
 	}
+
+	formatDateGroup(d: Date): string {
+		const now = new Date();
+		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+		const diff = today.getTime() - target.getTime();
+		const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+		
+		if (days === 0) return 'Hoje';
+		if (days === 1) return 'Ontem';
+		
+		const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+		return target.toLocaleDateString('pt-BR', options);
+	}
+
+	formatTime(d: Date): string {
+		return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+	}
 }
+

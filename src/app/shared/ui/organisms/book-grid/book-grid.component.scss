@@ -1,28 +1,48 @@
 .books-container {
-	display: grid;
+	display: flex;
+	flex-wrap: wrap;
 	width: 100%;
 	max-width: 1500px;
 	margin: 0 auto;
 	user-select: none;
-	gap: 30px;
+	gap: 20px;
+	padding: 20px;
+	justify-content: center;
 
 	// --- grid & cover (padrão) ---
 	&.grid, &.cover {
-		grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-		justify-items: center;
+		app-item-book {
+			width: 250px;
+		}
 	}
 
-	// --- list: alinhado à esquerda ---
+	// --- list: 2 colunas no máximo ---
 	&.list {
-		grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
 		gap: 20px;
+		padding: 20px;
+		
+		app-item-book {
+			width: 100%;
+		}
+	}
+
+	@media (max-width: 900px) {
+		&.list {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	@media (max-width: 768px) {
+		padding: 15px;
 		gap: 15px;
 
 		&.grid, &.cover {
-			grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+			app-item-book {
+				width: calc(50% - 10px);
+				max-width: 180px;
+			}
 		}
 
 		&.list {
