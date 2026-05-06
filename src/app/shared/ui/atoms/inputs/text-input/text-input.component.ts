@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, forwardRef, input, viewChild, output, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, forwardRef, input, viewChild, output, model, computed } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ControlValueAccessor } from '@angular/forms';
@@ -35,6 +35,12 @@ export class TextInputComponent implements ControlValueAccessor {
 	leftIconInput = input<string | null>(null, { alias: 'leftIcon' });
 	leftIconClick = input<(() => void) | undefined>();
 	rightIconClick = input<(() => void) | undefined>();
+
+	// Password strength and rules (safe defaults for base component)
+	showStrength = input<boolean>(false);
+	showRules = input<boolean>(false);
+	passwordRequirements = computed(() => [] as { label: string; met: boolean }[]);
+	strengthScore = computed(() => 0);
 
 	isFocused = false;
 	firstLostFocus = false;
@@ -167,6 +173,22 @@ export class TextInputComponent implements ControlValueAccessor {
 export class PasswordInputComponent extends TextInputComponent {
 	showPassword = false;
 	private _passwordRightIcon = 'eye';
+
+	override passwordRequirements = computed(() => {
+		const val = this.value();
+		return [
+			{ label: 'Mínimo de 8 caracteres', met: val.length >= 8 },
+			{ label: 'Uma letra maiúscula', met: /[A-Z]/.test(val) },
+			{ label: 'Um número', met: /[0-9]/.test(val) },
+			{ label: 'Um símbolo (@, #, !, etc)', met: /[^A-Za-z0-9]/.test(val) }
+		];
+	});
+
+	override strengthScore = computed(() => {
+		const val = this.value();
+		if (!val) return 0;
+		return this.passwordRequirements().filter(r => r.met).length;
+	});
 
 	override get passwordRightIcon(): string {
 		return this._passwordRightIcon;

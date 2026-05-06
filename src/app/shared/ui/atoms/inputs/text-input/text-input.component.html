@@ -41,6 +41,29 @@
         />
     }
   </div>
+
+	@if (type() === 'password') {
+		@if (showStrength()) {
+			<div class="strength-meter" [attr.data-score]="strengthScore()">
+				<div class="strength-bar"></div>
+				<div class="strength-bar"></div>
+				<div class="strength-bar"></div>
+				<div class="strength-bar"></div>
+			</div>
+		}
+
+		@if (showRules()) {
+			<div class="password-rules">
+				@for (rule of passwordRequirements(); track rule.label) {
+					<div class="rule-item" [class.met]="rule.met">
+						<app-icons [name]="rule.met ? 'check' : 'close'" [size]="'14px'" />
+						<span>{{ rule.label }}</span>
+					</div>
+				}
+			</div>
+		}
+	}
+
   <div class="error-messages" [style.--error-count]="errorMessages().length">
     @for (item of errorMessages(); track $index) {
       <span class="error-message">{{ item }}</span>

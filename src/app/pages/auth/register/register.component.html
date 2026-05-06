@@ -17,6 +17,8 @@
 		leftIcon="lock"
 		[errors]="this.form.get('password')?.errors"
 		[touched]="this.form.get('password')?.touched ?? false"
+		[showStrength]="true"
+		[showRules]="true"
 	/>
 	<app-input
 		formControlName="confirmPassword"

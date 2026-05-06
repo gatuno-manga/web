@@ -56,6 +56,56 @@ app-icons.clickable {
 	cursor: pointer;
 }
 
+.strength-meter {
+	display: flex;
+	gap: 4px;
+	margin-top: 8px;
+	height: 4px;
+	width: 100%;
+
+	.strength-bar {
+		flex: 1;
+		background-color: var(--secondary-color);
+		border-radius: 2px;
+		transition: background-color 0.3s ease;
+	}
+
+	&[data-score="1"] .strength-bar:nth-child(1) { background-color: var(--dark-red); }
+	&[data-score="2"] .strength-bar:nth-child(-n+2) { background-color: var(--orange); }
+	&[data-score="3"] .strength-bar:nth-child(-n+3) { background-color: var(--orange); }
+	&[data-score="4"] .strength-bar:nth-child(-n+4) { background-color: var(--primary-color); }
+}
+
+.password-rules {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-top: 12px;
+	padding-left: 4px;
+
+	.rule-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 0.8rem;
+		color: var(--white-muted);
+		transition: color 0.3s ease;
+
+		app-icons {
+			transition: transform 0.2s ease;
+		}
+
+		&.met {
+			color: var(--primary-color);
+			font-weight: 500;
+
+			app-icons {
+				transform: scale(1.1);
+			}
+		}
+	}
+}
+
 .error-messages {
 	--error-count: 0;
 	$line-height: 1.6rem;
