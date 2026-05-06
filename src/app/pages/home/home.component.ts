@@ -1,7 +1,9 @@
-import { Component, OnInit, signal, computed, inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, OnDestroy, effect } from '@angular/core';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { BookService } from '@core/services/book.service';
 import { ReadingProgressService } from '@core/services/reading-progress.service';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { TagsService } from '@core/services/tags.service';
 import { BookList } from '@models/book.models';
 import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
 import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
@@ -21,6 +23,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   private metaService = inject(MetaDataService);
   private bookService = inject(BookService);
   private readingProgressService = inject(ReadingProgressService);
+  private sensitiveContentService = inject(SensitiveContentService);
+  private tagsService = inject(TagsService);
 
   featuredBooks = signal<BookList[]>([]);
   continueReadingBooks = signal<BookList[]>([]);
@@ -36,13 +40,21 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.setMetaData();
+
+    // Re-load books whenever global filters change
+    effect(() => {
+      // Accessing signals to register dependency
+      this.sensitiveContentService.allowContentSignal();
+      this.tagsService.excludedTagsSignal();
+      
+      this.loadFeaturedBooks();
+      this.loadLatestUpdated();
+      this.loadRecentlyAdded();
+    });
   }
 
   ngOnInit() {
-    this.loadFeaturedBooks();
     this.loadContinueReading();
-    this.loadLatestUpdated();
-    this.loadRecentlyAdded();
     this.startCarousel();
   }
 

@@ -9,6 +9,7 @@ import {
 	ElementRef,
 	AfterViewInit,
 	NgZone,
+	effect,
 } from '@angular/core';
 import { LocalStorageService } from '@core/services/local-storage.service';
 import { BookService } from '@core/services/book.service';
@@ -31,6 +32,7 @@ import { SelectCycleComponent } from '@ui/atoms/select/select-cycle.component';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { DownloadService } from '@core/services/download.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { TagsService } from '@core/services/tags.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NetworkStatusService } from '@core/services/network-status.service';
 import { BookFilterComponent } from '@features/books/components/book-filter/book-filter.component';
@@ -73,9 +75,22 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private metaService = inject(MetaDataService);
 	private downloadService = inject(DownloadService);
 	private sensitiveContentService = inject(SensitiveContentService);
+	private tagsService = inject(TagsService);
 	private modalService = inject(ModalNotificationService);
 	private networkStatus = inject(NetworkStatusService);
 	private ngZone = inject(NgZone);
+
+	constructor() {
+		// Re-load books when global filters change
+		effect(() => {
+			this.sensitiveContentService.allowContentSignal();
+			this.tagsService.excludedTagsSignal();
+			
+			this.ngZone.run(() => {
+				this.loadBooks();
+			});
+		});
+	}
 
 	books: BookList[] = [];
 	currentPage = 1;

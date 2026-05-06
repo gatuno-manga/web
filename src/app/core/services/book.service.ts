@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, NgZone } from '@angular/core';
+import { inject, Injectable, NgZone } from '@angular/core';
 import {
 	Book,
 	BookBasic,
@@ -20,6 +20,7 @@ import { SensitiveContentService } from './sensitive-content.service';
 import { UserTokenService } from './user-token.service';
 import { BookWebsocketService } from './book-websocket.service';
 import { DownloadService } from './download.service';
+import { TagsService } from './tags.service';
 import { Observable, firstValueFrom, from, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '@environments/environment';
@@ -29,6 +30,7 @@ import { environment } from '@environments/environment';
 })
 export class BookService {
 	private readonly apiUrl = '/api';
+	private readonly tagsService = inject(TagsService);
 
 	constructor(
 		private readonly http: HttpClient,
@@ -60,6 +62,10 @@ export class BookService {
 			opts.sensitiveContent =
 				this.sensitiveContentService.getContentAllow();
 
+		if (!opts.excludeTags) {
+			opts.excludeTags = this.tagsService.excludedTagsSignal();
+		}
+
 		if (
 			!this.userTokenService.hasValidAccessToken &&
 			!this.userTokenService.hasValidRefreshToken
@@ -85,6 +91,18 @@ export class BookService {
 		filter: BookFilterInput,
 		fields: string[] = ['id', 'title', 'cover'],
 	): Observable<PaginatedBookResponse> {
+		const gqlFilter = { ...filter };
+
+		// Auto-apply user preferences if not explicitly overridden
+		if (!gqlFilter.sensitiveContent) {
+			const allowed = this.sensitiveContentService.getContentAllow();
+			gqlFilter.sensitiveContent = allowed.length > 0 ? ['safe', ...allowed] : ['safe'];
+		}
+
+		if (!gqlFilter.excludeTags) {
+			gqlFilter.excludeTags = this.tagsService.excludedTagsSignal();
+		}
+
 		const queryFields = fields.filter((f) => f !== 'cover');
 		if (fields.includes('cover')) {
 			queryFields.push(
@@ -110,7 +128,7 @@ export class BookService {
 		return this.http
 			.post<{ data: { books: PaginatedBookResponse } }>('graphql', {
 				query,
-				variables: { filter },
+				variables: { filter: gqlFilter },
 			})
 			.pipe(
 				map((response) => {
@@ -164,6 +182,7 @@ export class BookService {
 				// Recarrega as preferências se estiver offline, ignorando estado do token
 				const allowedContent =
 					this.sensitiveContentService.getContentAllow();
+				const globalExcludedTags = this.tagsService.excludedTagsSignal();
 
 				filteredBooks = filteredBooks.filter((book) => {
 					// Se o livro não tem conteúdo sensível, é permitido
@@ -182,6 +201,14 @@ export class BookService {
 
 					return isAllowed;
 				});
+
+				// 1.1 Filtrar por Tags Excluídas Globalmente
+				if (globalExcludedTags.length > 0) {
+					filteredBooks = filteredBooks.filter(book => {
+						const bookTagIds = (book.tags || []).map(t => t.id);
+						return !globalExcludedTags.some(id => bookTagIds.includes(id));
+					});
+				}
 
 				// 2. Filtrar por Pesquisa (Título)
 				if (opts.search) {
