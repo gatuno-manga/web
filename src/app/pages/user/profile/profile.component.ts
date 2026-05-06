@@ -1,4 +1,4 @@
-import { Component, inject, input, computed, effect } from '@angular/core';
+import { Component, inject, input, computed, effect, signal } from '@angular/core';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 import { AuthService } from '@core/services/auth.service';
@@ -12,10 +12,11 @@ import {
 	ReactiveFormsModule,
 	Validators,
 } from '@angular/forms';
+import { FileInputComponent } from '@ui/molecules/file-input/file-input.component';
 
 @Component({
 	selector: 'app-profile',
-	imports: [ReactiveFormsModule, ButtonComponent, TextInputComponent],
+	imports: [ReactiveFormsModule, ButtonComponent, TextInputComponent, FileInputComponent],
 	templateUrl: './profile.component.html',
 	styleUrl: './profile.component.scss',
 })
@@ -30,6 +31,8 @@ export class ProfileComponent {
 	profileSignal = this.userService.profileSignal;
 	profileForm: FormGroup;
 	isLoading = false;
+	isAvatarLoading = signal(false);
+	isBannerLoading = signal(false);
 
 	showPage = computed(() => {
 		const q = this.globalSearchQuery().toLowerCase();
@@ -87,31 +90,29 @@ export class ProfileComponent {
 		});
 	}
 
-	onAvatarSelected(event: Event): void {
-		const input = event.target as HTMLInputElement;
-		if (input.files?.length) {
-			this.isLoading = true;
-			this.userService.uploadAvatar(input.files[0]).subscribe({
+	onAvatarSelected(file: File | null): void {
+		if (file) {
+			this.isAvatarLoading.set(true);
+			this.userService.uploadAvatar(file).subscribe({
 				next: () => {
-					this.isLoading = false;
+					this.isAvatarLoading.set(false);
 				},
 				error: () => {
-					this.isLoading = false;
+					this.isAvatarLoading.set(false);
 				},
 			});
 		}
 	}
 
-	onBannerSelected(event: Event): void {
-		const input = event.target as HTMLInputElement;
-		if (input.files?.length) {
-			this.isLoading = true;
-			this.userService.uploadBanner(input.files[0]).subscribe({
+	onBannerSelected(file: File | null): void {
+		if (file) {
+			this.isBannerLoading.set(true);
+			this.userService.uploadBanner(file).subscribe({
 				next: () => {
-					this.isLoading = false;
+					this.isBannerLoading.set(false);
 				},
 				error: () => {
-					this.isLoading = false;
+					this.isBannerLoading.set(false);
 				},
 			});
 		}
@@ -125,3 +126,4 @@ export class ProfileComponent {
 		});
 	}
 }
+

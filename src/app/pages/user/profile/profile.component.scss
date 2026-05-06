@@ -33,62 +33,15 @@ h1 {
 		margin-top: 0;
 	}
 
-	.image-preview {
+	app-file-input {
+		display: block;
 		margin-bottom: 1.5rem;
-		background: rgba(255, 255, 255, 0.05);
-		border-radius: 8px;
-		overflow: hidden;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-
-		img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-		}
-
-		.placeholder-box {
-			width: 100%;
-			height: 100%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			color: rgba(255, 255, 255, 0.3);
-			font-size: 0.875rem;
-		}
-	}
-
-	.banner-preview {
-		height: 200px;
-		width: 100%;
-	}
-
-	.avatar-preview {
-		width: 120px;
-		height: 120px;
-		border-radius: 50%;
-
-		.avatar-placeholder {
-			background: var(--primary-color);
-			color: var(--white);
-			font-size: 1.75rem;
-			font-weight: 500;
-		}
 	}
 
 	.form-group {
 		margin-bottom: 2rem;
 		display: flex;
 		flex-direction: column;
-
-		label {
-			font-size: 0.875rem;
-			font-weight: 400;
-			margin-bottom: 0.5rem;
-			color: rgba(255, 255, 255, 0.7);
-		}
 	}
 
 	.form-actions {

@@ -9,35 +9,29 @@
 			<form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
 				
 				<div class="form-section">
-					<h3>Banner</h3>
-					<div class="image-preview banner-preview">
-						@if (profileSignal()?.profileBannerUrl) {
-							<img [src]="profileSignal()?.profileBannerUrl" alt="Banner Preview">
-						} @else {
-							<div class="placeholder-box banner-placeholder">Sem Banner</div>
-						}
-					</div>
-					<div class="form-group">
-						<label for="banner">Alterar Banner</label>
-						<input type="file" id="banner" (change)="onBannerSelected($event)" accept="image/*">
-					</div>
+					<h3>Banner do Perfil</h3>
+					<app-file-input
+						id="banner-input"
+						label="Alterar Banner"
+						variant="banner"
+						[initialPreviewUrl]="profileSignal()?.profileBannerUrl ?? null"
+						[isLoading]="isBannerLoading()"
+						(fileSelected)="onBannerSelected($event)"
+						[maxSize]="5"
+					/>
 				</div>
 
 				<div class="form-section">
-					<h3>Avatar</h3>
-					<div class="image-preview avatar-preview">
-						@if (profileSignal()?.profileImageUrl) {
-							<img [src]="profileSignal()?.profileImageUrl" alt="Avatar Preview">
-						} @else {
-							<div class="placeholder-box avatar-placeholder">
-								{{ profileSignal()?.userName?.substring(0, 2)?.toUpperCase() }}
-							</div>
-						}
-					</div>
-					<div class="form-group">
-						<label for="avatar">Alterar Foto de Perfil</label>
-						<input type="file" id="avatar" (change)="onAvatarSelected($event)" accept="image/*">
-					</div>
+					<h3>Foto de Perfil</h3>
+					<app-file-input
+						id="avatar-input"
+						label="Alterar Avatar"
+						variant="avatar"
+						[initialPreviewUrl]="profileSignal()?.profileImageUrl ?? null"
+						[isLoading]="isAvatarLoading()"
+						(fileSelected)="onAvatarSelected($event)"
+						[maxSize]="2"
+					/>
 				</div>
 
 				<div class="form-section">

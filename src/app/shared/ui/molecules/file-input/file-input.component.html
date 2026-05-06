@@ -1,0 +1,52 @@
+<div
+	class="file-input-container"
+	[id]="id()"
+	[class.dragging]="isDragging()"
+	[class.loading]="isLoading()"
+	[class.has-preview]="previewUrl()"
+	[class.has-error]="errorMessage()"
+	[class]="'variant-' + variant()"
+	(dragover)="onDragOver($event)"
+	(dragleave)="onDragLeave($event)"
+	(drop)="onDrop($event)"
+	(paste)="onPaste($event)"
+	(click)="triggerInput()"
+>
+	<input
+		#input
+		type="file"
+		[id]="id() + '-hidden'"
+		[accept]="accept()"
+		(change)="onFileChange($event)"
+		style="display: none"
+	/>
+
+	@if (isLoading()) {
+		<div class="loader-overlay">
+			<div class="shimmer"></div>
+			<app-icons name="loader" class="spin-icon" />
+			<span>Carregando...</span>
+		</div>
+	}
+
+	@if (previewUrl() && !isLoading()) {
+		<div class="preview-wrapper">
+			<img [src]="previewUrl()" alt="Preview" class="preview-image" />
+			<div class="remove-btn" (click)="removeFile($event)" title="Remover arquivo">
+				<app-icons name="trash" size="18px" />
+			</div>
+		</div>
+	} @else if (!isLoading()) {
+		<div class="drop-zone">
+			<app-icons [name]="variant() === 'avatar' ? 'user' : 'upload'" size="32px" />
+			<span class="label-text">{{ label() }}</span>
+			<span class="hint-text">Arraste ou cole aqui</span>
+		</div>
+	}
+
+	@if (errorMessage()) {
+		<div class="error-tooltip">
+			{{ errorMessage() }}
+		</div>
+	}
+</div>
