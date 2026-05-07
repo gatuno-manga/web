@@ -40,6 +40,10 @@ app.get(
 /**
  * Handle all other requests by rendering the Angular application.
  */
+app.get('/api/**', (req, res) => {
+	res.status(404).send('API endpoint not handled by frontend server');
+});
+
 app.get('**', (req, res, next) => {
 	const { protocol, originalUrl, baseUrl, headers } = req;
 	const host = headers.host || 'localhost:4000';
