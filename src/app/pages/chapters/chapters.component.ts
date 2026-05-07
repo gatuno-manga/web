@@ -39,6 +39,7 @@ import { AsideComponent } from '@ui/organisms/aside/aside.component';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { SettingsService } from '@core/services/settings.service';
 import { NotificationSeverity } from '@core/services/notification';
+import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
 import { ReaderSettingsNotificationComponent } from '@ui/molecules/notification/custom-components';
 import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
 import { BookWebsocketService } from '@core/services/book-websocket.service';
@@ -98,6 +99,7 @@ type ChapterLoadFailureDiagnostic = {
 		RouterModule,
 		NgClass,
 		DecimalPipe,
+		ChapterIndexPipe,
 		ButtonComponent,
 		AsideComponent,
 		ImageReaderComponent,

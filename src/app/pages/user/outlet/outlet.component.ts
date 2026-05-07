@@ -6,6 +6,7 @@ import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 import { AuthService } from '@core/services/auth.service';
 import { SearchService } from '@core/services/search.service';
+import { UserTokenService } from '@core/services/user-token.service';
 
 @Component({
 	selector: 'app-outlet',
@@ -23,6 +24,7 @@ export class OutletComponent {
 	private readonly authService = inject(AuthService);
 	private readonly router = inject(Router);
 	readonly searchService = inject(SearchService);
+	readonly userTokenService = inject(UserTokenService);
 
 	logout(): void {
 		this.authService.logout().subscribe({

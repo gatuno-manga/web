@@ -7,6 +7,7 @@ export interface ReaderSettings {
 	contrast?: number;
 	invert?: number;
 	nightMode?: boolean;
+	decimalSeparator?: string;
 
 	// Text Reader Settings
 	fontSize?: number;
@@ -35,6 +36,7 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
 	contrast: 100,
 	invert: 0,
 	nightMode: false,
+	decimalSeparator: ',',
 	fontSize: 18,
 	fontFamily: 'system-ui, -apple-system, sans-serif',
 	lineHeight: 1.8,

@@ -30,23 +30,32 @@
 				<span>Leituras</span>
 			</a>
 
-			<hr />
+			@if (userTokenService.hasValidAccessTokenSignal()) {
+				<hr />
 
-			<a routerLink="profile" routerLinkActive="active">
-				<app-icons name="user" size="24" />
-				<span>Perfil</span>
-			</a>
-			<a routerLink="security" routerLinkActive="active">
-				<app-icons name="lock" size="24" />
-				<span>Seguranca</span>
-			</a>
+				<a routerLink="profile" routerLinkActive="active">
+					<app-icons name="user" size="24" />
+					<span>Perfil</span>
+				</a>
+				<a routerLink="security" routerLinkActive="active">
+					<app-icons name="lock" size="24" />
+					<span>Seguranca</span>
+				</a>
+			}
 		</nav>
 
 		<div class="footer">
-			<app-button (click)="logout()" rounded="large">
-				<span>Sair</span>
-				<app-icons name="arrow-right" size="24" />
-			</app-button>
+			@if (userTokenService.hasValidAccessTokenSignal()) {
+				<app-button (click)="logout()" rounded="large">
+					<span>Sair</span>
+					<app-icons name="arrow-right" size="24" />
+				</app-button>
+			} @else {
+				<app-button routerLink="/auth/login" rounded="large">
+					<span>Entrar</span>
+					<app-icons name="user" size="24" />
+				</app-button>
+			}
 		</div>
 	</aside>
 

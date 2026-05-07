@@ -113,6 +113,15 @@
 	}
 }
 
+.custom-separator-input {
+	width: 100%;
+	margin-top: 8px;
+
+	app-input {
+		width: 100%;
+	}
+}
+
 .spacing-slider-group {
 	display: flex;
 	align-items: center;

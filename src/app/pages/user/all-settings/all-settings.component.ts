@@ -5,6 +5,7 @@ import { ReadingsComponent } from '../readings/readings.component';
 import { ProfileComponent } from '../profile/profile.component';
 import { SecurityComponent } from '../security/security.component';
 import { MetaDataService } from '@core/services/meta-data.service';
+import { UserTokenService } from '@core/services/user-token.service';
 
 @Component({
 	selector: 'app-all-settings',
@@ -22,6 +23,7 @@ import { MetaDataService } from '@core/services/meta-data.service';
 })
 export class AllSettingsComponent {
 	private readonly metaService = inject(MetaDataService);
+	public readonly userTokenService = inject(UserTokenService);
 
 	constructor() {
 		this.metaService.setMetaData({

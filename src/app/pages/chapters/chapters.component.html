@@ -1,7 +1,7 @@
 @if (chapter(); as currentChapter) {
 	<div id="header" class="header">
 		<div class="title">
-			<h1>Capítulo {{ currentChapter.index | number: '1.0-0' : 'pt-BR' }}</h1>
+			<h1>Capítulo {{ currentChapter.index | chapterIndex }}</h1>
 			@if (currentChapter.title) {
 				<h2>{{ currentChapter.title }}</h2>
 			}
@@ -13,7 +13,7 @@
 				</a>
 			}
 			<a class="index" (click)="backPage()" aria-label="Ir para a página do livro">
-				{{ currentChapter.index | number: '1.0-0' : 'pt-BR' }}/{{
+				{{ currentChapter.index | chapterIndex }}/{{
 					currentChapter.totalChapters | number: '1.0-0' : 'pt-BR'
 				}}
 			</a>
@@ -146,7 +146,7 @@
 				<app-icons name="file" size="22" />
 				{{
 					currentChapter.title ||
-						'Capítulo ' + (currentChapter.index | number)
+						'Capítulo ' + (currentChapter.index | chapterIndex)
 				}}
 			</h1>
 		}
@@ -158,7 +158,7 @@
 			</a>
 		}
 		<a class="index" (click)="backPage()">
-			{{ chapter()?.index || 0 | number }}/{{
+			{{ chapter()?.index | chapterIndex }}/{{
 				chapter()?.totalChapters || 0
 			}}
 		</a>

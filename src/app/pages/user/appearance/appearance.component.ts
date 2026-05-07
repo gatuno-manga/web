@@ -7,15 +7,17 @@ import {
 	signal,
 	OnInit,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { SearchService } from '@core/services/search.service';
 import { LocalStorageService } from '@core/services/local-storage.service';
 import { ThemeService, AppTheme } from '@core/services/theme.service';
+import { SettingsService } from '@core/services/settings.service';
 import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,
+	ReaderSettings,
 } from '@models/settings.models';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
 import { FormsModule } from '@angular/forms';
@@ -27,6 +29,7 @@ import { FormsModule } from '@angular/forms';
 		TextInputComponent,
 		SelectComponent,
 		FormsModule,
+		CommonModule,
 	],
 	templateUrl: './appearance.component.html',
 	styleUrl: './appearance.component.scss',
@@ -36,12 +39,23 @@ export class AppearanceComponent implements OnInit {
 	private readonly metaService = inject(MetaDataService);
 	private readonly searchService = inject(SearchService);
 	private readonly localStorage = inject(LocalStorageService);
+	private readonly settingsService = inject(SettingsService);
 	public readonly themeService = inject(ThemeService);
 
 	isListView = input<boolean>(false);
 	private globalSearchQuery = this.searchService.query;
 
 	bookSettings = signal<BookListSettings>(DEFAULT_BOOK_LIST_SETTINGS);
+	readerSettings = signal<ReaderSettings>(this.settingsService.getSettings());
+
+	decimalSeparatorOptions = [
+		{ value: ',', label: 'Vírgula (,)' },
+		{ value: '.', label: 'Ponto (.)' },
+		{ value: 'custom', label: 'Personalizado' },
+	];
+
+	customDecimalSeparator = '';
+	isCustomDecimal = false;
 
 	themes: { value: AppTheme; label: string }[] = [
 		{ value: 'light', label: 'Claro' },
@@ -64,6 +78,43 @@ export class AppearanceComponent implements OnInit {
 		);
 		if (saved) {
 			this.bookSettings.set(saved);
+		}
+		this.refreshReaderSettings();
+	}
+
+	private refreshReaderSettings() {
+		const settings = this.settingsService.getSettings();
+		this.readerSettings.set(settings);
+		const currentSeparator = settings.decimalSeparator || ',';
+		if (currentSeparator !== ',' && currentSeparator !== '.') {
+			this.isCustomDecimal = true;
+			this.customDecimalSeparator = currentSeparator;
+		} else {
+			this.isCustomDecimal = false;
+			this.customDecimalSeparator = '';
+		}
+	}
+
+	get selectedDecimalOption() {
+		if (this.isCustomDecimal) return 'custom';
+		return this.readerSettings().decimalSeparator || ',';
+	}
+
+	onDecimalSeparatorChange(value: string) {
+		if (value === 'custom') {
+			this.isCustomDecimal = true;
+		} else {
+			this.isCustomDecimal = false;
+			this.settingsService.setDecimalSeparator(value);
+			this.refreshReaderSettings();
+		}
+	}
+
+	onCustomDecimalSeparatorChange(value: string) {
+		this.customDecimalSeparator = value;
+		if (this.isCustomDecimal && value) {
+			this.settingsService.setDecimalSeparator(value);
+			this.readerSettings.set(this.settingsService.getSettings());
 		}
 	}
 

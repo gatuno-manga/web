@@ -14,8 +14,10 @@ import {
 	output,
 	ChangeDetectionStrategy,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser, DecimalPipe } from '@angular/common';
 import { BookService } from '@core/services/book.service';
+import { SettingsService } from '@core/services/settings.service';
 import {
 	Book,
 	BookBasic,
@@ -43,6 +45,7 @@ import { ImageViewerComponent } from '@ui/organisms/image-viewer/image-viewer.co
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { SavedPagesService } from '@core/services/saved-pages.service';
 import { SavedPage } from '@models/saved-page.models';
+import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
 import {
 	BookEditModalComponent,
 	BookEditSaveEvent,
@@ -81,6 +84,7 @@ interface ModulesLoad {
 	imports: [
 		RouterModule,
 		DecimalPipe,
+		ChapterIndexPipe,
 		IconsComponent,
 		ButtonComponent,
 		ImageViewerComponent,

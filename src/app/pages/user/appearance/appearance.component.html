@@ -63,6 +63,38 @@
 			</div>
 		</div>
 
+		<div class="settings-group">
+			<h2>Exibição de Capítulos</h2>
+			<p class="group-description">Configure como os números dos capítulos aparecem para você.</p>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<label>Separador Decimal</label>
+					<span>Escolha o caractere que separa os inteiros dos decimais nos capítulos (ex: 1.5 ou 1,5).</span>
+				</div>
+				<div class="setting-control column">
+					<app-select
+						[options]="decimalSeparatorOptions"
+						[ngModel]="selectedDecimalOption"
+						(valueChange)="onDecimalSeparatorChange($event)"
+						placeholder="Escolha o separador"
+					/>
+					@if (isCustomDecimal) {
+						<div class="custom-separator-input" style="width: 100%; margin-top: 8px;">
+							<app-input
+								type="text"
+								placeholder="Digite o separador (ex: . , -)"
+								[(value)]="customDecimalSeparator"
+								(valueChange)="onCustomDecimalSeparatorChange($event)"
+								maxlength="3"
+								[showLabel]="false"
+							/>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+
 		<div class="placeholder">
 			<p>Mais opções de aparência estarão disponíveis em breve.</p>
 		</div>

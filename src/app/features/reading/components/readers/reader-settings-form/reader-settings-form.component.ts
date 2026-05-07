@@ -7,6 +7,7 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 
 @Component({
 	selector: 'app-reader-settings-form',
@@ -18,6 +19,7 @@ import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
 		SelectComponent,
 		ButtonComponent,
 		SwitchComponent,
+		TextInputComponent,
 	],
 	templateUrl: './reader-settings-form.component.html',
 	styleUrls: ['./reader-settings-form.component.scss'],
@@ -45,7 +47,16 @@ export class ReaderSettingsFormComponent implements OnInit {
 		textAlign: 'justify',
 	};
 
-	viewFilter: 'all' | 'pages' | 'filters' | 'sidebar' | 'text' = 'all';
+	viewFilter: 'all' | 'pages' | 'filters' | 'appearance' | 'text' = 'all';
+
+	decimalSeparatorOptions = [
+		{ value: ',', label: 'Vírgula (,)' },
+		{ value: '.', label: 'Ponto (.)' },
+		{ value: 'custom', label: 'Personalizado' },
+	];
+
+	customDecimalSeparator = '';
+	isCustomDecimal = false;
 
 	fontFamilyOptions = [
 		{ value: 'system-ui, -apple-system, sans-serif', label: 'Sans Serif' },
@@ -66,13 +77,44 @@ export class ReaderSettingsFormComponent implements OnInit {
 
 	private refreshLocalSettings() {
 		this.settings = { ...this.settingsService.getSettings() };
+		const currentSeparator = this.settings.decimalSeparator || ',';
+		if (currentSeparator !== ',' && currentSeparator !== '.') {
+			this.isCustomDecimal = true;
+			this.customDecimalSeparator = currentSeparator;
+		} else {
+			this.isCustomDecimal = false;
+			this.customDecimalSeparator = '';
+		}
+	}
+
+	get selectedDecimalOption() {
+		if (this.isCustomDecimal) return 'custom';
+		return this.settings.decimalSeparator || ',';
+	}
+
+	onDecimalSeparatorChange(value: string) {
+		if (value === 'custom') {
+			this.isCustomDecimal = true;
+			this.settings = { ...this.settingsService.getSettings() };
+		} else {
+			this.isCustomDecimal = false;
+			this.settingsService.setDecimalSeparator(value);
+			this.refreshLocalSettings();
+		}
+	}
+
+	onCustomDecimalSeparatorChange(value: string) {
+		this.customDecimalSeparator = value;
+		if (this.isCustomDecimal && value) {
+			this.settingsService.setDecimalSeparator(value);
+		}
 	}
 
 	get showSidebar() {
 		return (
 			this.flatMode ||
 			this.viewFilter === 'all' ||
-			this.viewFilter === 'sidebar'
+			this.viewFilter === 'appearance'
 		);
 	}
 
@@ -105,7 +147,7 @@ export class ReaderSettingsFormComponent implements OnInit {
 		);
 	}
 
-	setView(filter: 'all' | 'pages' | 'filters' | 'sidebar' | 'text') {
+	setView(filter: 'all' | 'pages' | 'filters' | 'appearance' | 'text') {
 		this.viewFilter = filter;
 	}
 
@@ -207,6 +249,6 @@ export class ReaderSettingsFormComponent implements OnInit {
 
 	resetSettings(): void {
 		this.settingsService.resetSettings();
-		this.settings = { ...this.settingsService.getSettings() };
+		this.refreshLocalSettings();
 	}
 }

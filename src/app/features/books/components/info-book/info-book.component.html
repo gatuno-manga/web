@@ -136,7 +136,7 @@
 										size="16"
 										class="content-type-icon"
 									/>
-									<h2>capítulo {{ chapter.index | number: '1.0-5' : 'pt-BR' }}</h2>
+									<h2>capítulo {{ chapter.index | chapterIndex }}</h2>
 								</div>
 								@if (chapter.title) {
 									<h3>{{ chapter.title }}</h3>
@@ -438,7 +438,7 @@
 							</div>
 						}
 						<div class="info">
-							<span>Cap. {{ savedPage.chapter.index | number: '1.0-5' : 'pt-BR' }} - Pág. {{ savedPage.page.index | number: '1.0-5' : 'pt-BR' }}</span>
+							<span>Cap. {{ savedPage.chapter.index | chapterIndex }} - Pág. {{ savedPage.page.index | number: '1.0-5' : 'pt-BR' }}</span>
 							@if (savedPage.comment) {
 								<span class="description">"{{ savedPage.comment }}"</span>
 							}

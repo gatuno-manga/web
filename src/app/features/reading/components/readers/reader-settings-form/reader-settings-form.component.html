@@ -51,13 +51,13 @@
 				}
 
 				<app-button
-					[variant]="viewFilter === 'sidebar' ? 'primary' : 'outline'"
+					[variant]="viewFilter === 'appearance' ? 'primary' : 'outline'"
 					role="tab"
-					[attr.aria-selected]="viewFilter === 'sidebar'"
+					[attr.aria-selected]="viewFilter === 'appearance'"
 					class="selector-btn"
-					(click)="setView('sidebar')"
+					(click)="setView('appearance')"
 				>
-					Interface
+					Aparência
 				</app-button>
 			</div>
 		}
@@ -65,7 +65,7 @@
 		<!-- Grupo: Barra Lateral / Interface -->
 		@if(showSidebar) {
 		<section class="settings-group">
-			<h3 class="group-title">Interface</h3>
+			<h3 class="group-title">Aparência</h3>
 			<p class="group-desc">Ajustes da barra lateral e navegação</p>
 
 			<div class="setting-item column">
@@ -108,6 +108,36 @@
 					]"
 					placeholder="Escolha a posição"
 				/>
+			</div>
+
+			<div class="setting-item column">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="hash" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Separador Decimal</h3>
+						<p>Caractere que separa os decimais nos capítulos</p>
+					</div>
+				</div>
+				<app-select
+					[ngModel]="selectedDecimalOption"
+					(valueChange)="onDecimalSeparatorChange($event)"
+					[options]="decimalSeparatorOptions"
+					placeholder="Escolha o separador"
+				/>
+				@if (isCustomDecimal) {
+					<div class="custom-separator-input">
+						<app-input
+							type="text"
+							placeholder="Digite o separador (ex: . , -)"
+							[(value)]="customDecimalSeparator"
+							(valueChange)="onCustomDecimalSeparatorChange($event)"
+							maxlength="3"
+							[showLabel]="false"
+						/>
+					</div>
+				}
 			</div>
 		</section>
 		}

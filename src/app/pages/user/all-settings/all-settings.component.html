@@ -5,7 +5,10 @@
 		<app-filter [isListView]="true" />
 		<app-appearance [isListView]="true" />
 		<app-readings [isListView]="true" />
-		<app-profile [isListView]="true" />
-		<app-security [isListView]="true" />
+		
+		@if (userTokenService.hasValidAccessTokenSignal()) {
+			<app-profile [isListView]="true" />
+			<app-security [isListView]="true" />
+		}
 	</div>
 </div>

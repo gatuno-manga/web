@@ -135,6 +135,10 @@ export class SettingsService {
 		this.updateSettings({ letterSpacing });
 	}
 
+	setDecimalSeparator(decimalSeparator: string): void {
+		this.updateSettings({ decimalSeparator });
+	}
+
 	toggleBrightness150(): void {
 		const current = this.getSettings();
 		const newValue = current.brightness === 150 ? 100 : 150;
