@@ -64,15 +64,32 @@ export class LatestReadsComponent implements OnInit {
 	});
 
 	groupedHistory = computed(() => {
-		const groups = new Map<string, HistoryEntry[]>();
+		const dateGroups = new Map<string, Map<string, HistoryEntry[]>>();
+
 		for (const entry of this.filteredHistory()) {
 			const dateStr = this.formatDateGroup(entry.updatedAt);
-			if (!groups.has(dateStr)) {
-				groups.set(dateStr, []);
+
+			if (!dateGroups.has(dateStr)) {
+				dateGroups.set(dateStr, new Map<string, HistoryEntry[]>());
 			}
-			groups.get(dateStr)!.push(entry);
+
+			const bookGroups = dateGroups.get(dateStr)!;
+			if (!bookGroups.has(entry.bookId)) {
+				bookGroups.set(entry.bookId, []);
+			}
+			bookGroups.get(entry.bookId)!.push(entry);
 		}
-		return Array.from(groups.entries()).map(([date, entries]) => ({ date, entries }));
+
+		return Array.from(dateGroups.entries()).map(([date, booksMap]) => ({
+			date,
+			books: Array.from(booksMap.entries()).map(([_, chapters]) => ({
+				bookId: chapters[0].bookId,
+				bookTitle: chapters[0].bookTitle,
+				bookCover: chapters[0].bookCover,
+				bookBlurHash: chapters[0].bookBlurHash,
+				chapters,
+			})),
+		}));
 	});
 
 	ngOnInit() {

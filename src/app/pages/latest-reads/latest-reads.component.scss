@@ -85,13 +85,18 @@
 
 	.item-cover {
 		position: relative;
-		width: 60px;
-		height: 90px;
+		width: 120px;
+		height: 180px;
 		flex-shrink: 0;
-		border-radius: 6px;
+		border-radius: 8px;
 		overflow: hidden;
 		cursor: pointer;
-		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+
+		@media (max-width: 600px) {
+			width: 100px;
+			height: 150px;
+		}
 
 		img {
 			width: 100%;
@@ -106,17 +111,17 @@
 		}
 	}
 
-	.item-info {
+	.item-content {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: 12px;
 		min-width: 0;
 
 		.book-title {
 			color: var(--white);
 			font-weight: 600;
-			font-size: 1.1rem;
+			font-size: 1.2rem;
 			text-decoration: none;
 			white-space: nowrap;
 			overflow: hidden;
@@ -127,19 +132,64 @@
 			}
 		}
 
-		.chapter-title {
-			color: var(--primary-color);
-			font-size: 0.9rem;
-			text-decoration: none;
+		.chapters-list {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			max-height: 140px;
+			overflow-y: auto;
+			padding-right: 4px;
 
-			&:hover {
-				text-decoration: underline;
+			/* Scrollbar styling */
+			&::-webkit-scrollbar {
+				width: 4px;
+			}
+
+			&::-webkit-scrollbar-track {
+				background: rgba(255, 255, 255, 0.05);
+				border-radius: 10px;
+			}
+
+			&::-webkit-scrollbar-thumb {
+				background: var(--primary-color);
+				border-radius: 10px;
+				opacity: 0.5;
 			}
 		}
 
-		.read-time {
-			color: var(--white-muted);
-			font-size: 0.8rem;
+		.chapter-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 4px 8px;
+			background: rgba(255, 255, 255, 0.02);
+			border-radius: 6px;
+			gap: 10px;
+
+			.chapter-info {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				min-width: 0;
+			}
+
+			.chapter-title {
+				color: var(--primary-color);
+				font-size: 0.9rem;
+				text-decoration: none;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+
+			.read-time {
+				color: var(--white-muted);
+				font-size: 0.75rem;
+			}
 		}
 	}
 
@@ -147,6 +197,7 @@
 		display: flex;
 		align-items: center;
 		gap: 10px;
+		flex-shrink: 0;
 
 		.remove-btn {
 			background: transparent;
@@ -166,9 +217,9 @@
 		.resume-btn {
 			background: var(--primary-color);
 			color: white;
-			padding: 8px 16px;
+			padding: 6px 14px;
 			border-radius: 6px;
-			font-size: 0.85rem;
+			font-size: 0.8rem;
 			font-weight: 600;
 			text-decoration: none;
 			transition: filter 0.2s;
@@ -223,7 +274,7 @@
 	.history-item {
 		gap: 12px;
 		
-		.item-info .book-title {
+		.item-content .book-title {
 			font-size: 1rem;
 		}
 

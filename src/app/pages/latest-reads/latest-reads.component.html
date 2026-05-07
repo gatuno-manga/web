@@ -32,28 +32,38 @@
 					<div class="date-group">
 						<h2 class="group-date">{{ group.date }}</h2>
 						<div class="entries-list">
-							@for (entry of group.entries; track entry.progressId) {
+							@for (book of group.books; track book.bookId) {
 								<div class="history-item">
-									<div class="item-cover" [routerLink]="['/books', entry.bookId]">
-										@if (entry.bookBlurHash) {
-											<app-blurhash [hash]="entry.bookBlurHash" class="blur-bg" />
+									<div class="item-cover" [routerLink]="['/books', book.bookId]">
+										@if (book.bookBlurHash) {
+											<app-blurhash [hash]="book.bookBlurHash" class="blur-bg" />
 										}
-										<img [ngSrc]="entry.bookCover" width="60" height="90" [alt]="entry.bookTitle" />
+										<img [ngSrc]="book.bookCover" width="120" height="180" [alt]="book.bookTitle" />
 									</div>
-									<div class="item-info">
-										<a [routerLink]="['/books', entry.bookId]" class="book-title">{{ entry.bookTitle }}</a>
-										<a [routerLink]="['/books', entry.bookId, 'chapters', entry.chapter.id]" class="chapter-title">
-											{{ entry.chapter.title }}
-										</a>
-										<span class="read-time">{{ formatTime(entry.updatedAt) }}</span>
-									</div>
-									<div class="item-actions">
-										<button class="remove-btn" (click)="removeProgress(entry.progressId, entry.chapter.id)" title="Remover do histórico">
-											<app-icons name="trash" size="18" />
-										</button>
-										<a [routerLink]="['/books', entry.bookId, 'chapters', entry.chapter.id]" class="resume-btn">
-											Retomar
-										</a>
+									<div class="item-content">
+										<a [routerLink]="['/books', book.bookId]" class="book-title">{{ book.bookTitle }}</a>
+										<div class="chapters-list">
+											@for (entry of book.chapters; track entry.progressId; let first = $first) {
+												<div class="chapter-row">
+													<div class="chapter-info">
+														<a [routerLink]="['/books', entry.bookId, 'chapters', entry.chapter.id]" class="chapter-title">
+															{{ entry.chapter.title }}
+														</a>
+														<span class="read-time">{{ formatTime(entry.updatedAt) }}</span>
+													</div>
+													<div class="item-actions">
+														<button class="remove-btn" (click)="removeProgress(entry.progressId, entry.chapter.id)" title="Remover do histórico">
+															<app-icons name="trash" size="18" />
+														</button>
+														@if (first) {
+															<a [routerLink]="['/books', entry.bookId, 'chapters', entry.chapter.id]" class="resume-btn">
+																Retomar
+															</a>
+														}
+													</div>
+												</div>
+											}
+										</div>
 									</div>
 								</div>
 							}
