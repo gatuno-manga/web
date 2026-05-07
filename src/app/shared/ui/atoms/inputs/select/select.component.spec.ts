@@ -1,10 +1,23 @@
 import { ElementRef } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { SelectComponent } from './select.component';
 
 describe('SelectComponent (smoke)', () => {
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [SelectComponent],
+            providers: [
+                {
+                    provide: ElementRef,
+                    useValue: { nativeElement: document.createElement('div') }
+                }
+            ]
+        }).compileComponents();
+    });
+
     it('should be instantiable', () => {
-        const host = { nativeElement: document.createElement('div') } as ElementRef<HTMLElement>;
-        const c = new SelectComponent(host);
-        expect(c).toBeTruthy();
+        const fixture = TestBed.createComponent(SelectComponent);
+        const component = fixture.componentInstance;
+        expect(component).toBeTruthy();
     });
 });

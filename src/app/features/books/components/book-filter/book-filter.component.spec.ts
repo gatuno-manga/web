@@ -5,6 +5,7 @@ import { SensitiveContentService } from '@core/services/sensitive-content.servic
 import { NotificationService } from '@core/services/notification.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { of } from 'rxjs';
+import { signal } from '@angular/core';
 
 describe('BookFilterComponent', () => {
     let component: BookFilterComponent;
@@ -14,7 +15,11 @@ describe('BookFilterComponent', () => {
 
     beforeEach(async () => {
         const tagsSpy = jasmine.createSpyObj('TagsService', ['getTags']);
+        tagsSpy.excludedTagsSignal = signal([]);
+
         const sensitiveSpy = jasmine.createSpyObj('SensitiveContentService', ['getSensitiveContent', 'getContentAllow']);
+        sensitiveSpy.allowContentSignal = signal([]);
+
         const notificationSpy = jasmine.createSpyObj('NotificationService', ['notify']);
         const modalSpy = jasmine.createSpyObj('ModalNotificationService', ['close']);
 

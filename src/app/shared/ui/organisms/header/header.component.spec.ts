@@ -12,7 +12,10 @@ describe('HeaderComponent', () => {
 	let component: HeaderComponent;
 	let fixture: ComponentFixture<HeaderComponent>;
 	const mockLocation = { back: jasmine.createSpy('back') };
-	const mockThemeService = { currentTheme: signal('dark') };
+	const mockThemeService = { 
+		currentTheme: signal('dark'),
+		hasUserSelectedTheme: signal(true)
+	};
 	const mockUserTokenService = {
 		hasValidAccessToken: true,
 		isAdmin: true,

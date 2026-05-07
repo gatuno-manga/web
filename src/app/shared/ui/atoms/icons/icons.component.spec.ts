@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
-import { SharedTestingModule } from '../../../testing/shared-testing.module';
+import { SharedTestingModule } from '@testing/shared-testing.module';
 import { IconRegistryService } from '@core/services/icon-registry.service';
 
 import { IconsComponent } from './icons.component';

@@ -71,6 +71,7 @@ describe('InfoBookComponent', () => {
 
 		mockContextMenuService = {
 			open: jasmine.createSpy('open'),
+			state: signal({ isOpen: false, items: [], x: 0, y: 0 })
 		};
 
 		mockUserTokenService = {

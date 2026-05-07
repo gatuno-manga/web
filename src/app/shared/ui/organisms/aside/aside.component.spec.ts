@@ -26,29 +26,29 @@ describe('AsideComponent', () => {
   });
 
   it('toggle/open/close should change isOpen', () => {
-    component.isOpen = false;
+    component.isOpen.set(false);
     component.toggle();
-    expect(component.isOpen).toBeTrue();
+    expect(component.isOpen()).toBeTrue();
     component.close();
-    expect(component.isOpen).toBeFalse();
+    expect(component.isOpen()).toBeFalse();
     component.open();
-    expect(component.isOpen).toBeTrue();
+    expect(component.isOpen()).toBeTrue();
   });
 
   it('getDragTransform returns correct values for closed/open and direction', () => {
-    component.position = 'right';
-    (component as any).isDragging = false; // private but accessible in TS tests via cast
-    component.isOpen = false;
-    expect(component.getDragTransform()).toBe('translateX(100%)');
+    fixture.componentRef.setInput('position', 'right');
+    (component as any).isDragging.set(false);
+    component.isOpen.set(false);
+    expect(component.dragTransform()).toBe('translateX(100%)');
 
-    component.isOpen = true;
-    expect(component.getDragTransform()).toBe('translateX(0)');
+    component.isOpen.set(true);
+    expect(component.dragTransform()).toBe('translateX(0)');
   });
 
   it('handleKeyboardEvent with ctrl/meta + b toggles', () => {
-    component.isOpen = false;
+    component.isOpen.set(false);
     const ev = new KeyboardEvent('keydown', { key: 'b', ctrlKey: true });
     component.handleKeyboardEvent(ev as KeyboardEvent);
-    expect(component.isOpen).toBeTrue();
+    expect(component.isOpen()).toBeTrue();
   });
 });

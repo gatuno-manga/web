@@ -8,6 +8,7 @@ import { DownloadService } from './download.service';
 import { tag, SensitiveContentResponse, Author } from '@models/book.models';
 import { OfflineBook } from '@models/offline.models';
 import { of } from 'rxjs';
+import { signal } from '@angular/core';
 
 describe('BookService', () => {
   let service: BookService;
@@ -84,6 +85,7 @@ describe('BookService', () => {
   beforeEach(() => {
     const downloadSpy = jasmine.createSpyObj('DownloadService', ['getAllBooks']);
     const sensitiveSpy = jasmine.createSpyObj('SensitiveContentService', ['getContentAllow']);
+    sensitiveSpy.allowContentSignal = signal([]);
     const userTokenSpy = jasmine.createSpyObj('UserTokenService', [], { hasValidAccessToken: false, hasValidRefreshToken: false });
     const websocketSpy = jasmine.createSpyObj('BookWebsocketService', ['connect', 'disconnect']);
 

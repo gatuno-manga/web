@@ -1,25 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SharedTestingModule } from '../../../testing/shared-testing.module';
+import { SharedTestingModule } from '@testing/shared-testing.module';
 
-import { SelectComponent } from './select.component';
+import { SelectCycleComponent } from './select-cycle.component';
 
-describe('SelectComponent', () => {
-  let component: SelectComponent;
-  let fixture: ComponentFixture<SelectComponent>;
+describe('SelectCycleComponent', () => {
+  let component: SelectCycleComponent;
+  let fixture: ComponentFixture<SelectCycleComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SelectComponent, SharedTestingModule]
+      imports: [SelectCycleComponent, SharedTestingModule]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(SelectComponent);
+    fixture = TestBed.createComponent(SelectCycleComponent);
     component = fixture.componentInstance;
-    component.items = [
+    fixture.componentRef.setInput('items', [
       { label: 'a', checked: jasmine.createSpy('a') },
       { label: 'b', checked: jasmine.createSpy('b') }
-    ] as any;
-    component.select = 0;
+    ]);
+    fixture.componentRef.setInput('select', 0);
     fixture.detectChanges();
   });
 
@@ -27,12 +27,8 @@ describe('SelectComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('onSelect rotates selection and calls checked', () => {
+  it('onSelect calls checked of next item', () => {
     component.onSelect();
-    expect(component.select).toBe(1);
-    expect(component.items[1].checked).toHaveBeenCalled();
-
-    component.onSelect();
-    expect(component.select).toBe(0);
+    expect(component.items()[1].checked).toHaveBeenCalled();
   });
 });

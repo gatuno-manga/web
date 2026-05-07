@@ -5,6 +5,7 @@ import { SensitiveContentService } from './sensitive-content.service';
 import { UserTokenService } from './user-token.service';
 import { DownloadService } from './download.service';
 import { OfflineBook } from '@models/offline.models';
+import { signal } from '@angular/core';
 
 describe('TagsService', () => {
   let service: TagsService;
@@ -57,6 +58,7 @@ describe('TagsService', () => {
   beforeEach(() => {
     const downloadSpy = jasmine.createSpyObj('DownloadService', ['getAllBooks']);
     const sensitiveSpy = jasmine.createSpyObj('SensitiveContentService', ['getContentAllow']);
+    sensitiveSpy.allowContentSignal = signal([]);
     const userTokenSpy = jasmine.createSpyObj('UserTokenService', [], { hasValidAccessToken: false });
 
     TestBed.configureTestingModule({

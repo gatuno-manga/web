@@ -1,11 +1,19 @@
 import { TestBed } from '@angular/core/testing';
-import { SharedTestingModule } from '../testing/shared-testing.module';
+import { SharedTestingModule } from '@testing/shared-testing.module';
 import { AppComponent } from './app.component';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { signal } from '@angular/core';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
+    const sensitiveSpy = jasmine.createSpyObj('SensitiveContentService', ['getContentAllow']);
+    sensitiveSpy.allowContentSignal = signal([]);
+
     await TestBed.configureTestingModule({
       imports: [AppComponent, SharedTestingModule],
+      providers: [
+        { provide: SensitiveContentService, useValue: sensitiveSpy }
+      ]
     }).compileComponents();
   });
 
@@ -14,6 +22,7 @@ describe('AppComponent', () => {
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
+
   it('should render overlay-notification component', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
