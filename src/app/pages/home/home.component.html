@@ -1,1 +1,83 @@
-<p>Por enquanto não temos uma home</p>
+<div class="home-container">
+  <!-- Featured Carousel -->
+  @if (featuredBooks().length > 0) {
+    <section class="featured-carousel-section">
+      <div class="carousel-track">
+        @for (book of featuredBooks(); track book.id; let i = $index) {
+          <div class="carousel-item" [class.active]="i === currentFeaturedIndex()">
+            <div class="item-background">
+              @if (book.blurHash) {
+                <app-blurhash [hash]="book.blurHash" class="bg-blur" />
+              }
+              <img [ngSrc]="book.cover" fill priority [alt]="book.title" class="bg-image" />
+              <div class="gradient-overlay"></div>
+            </div>
+            
+            <div class="item-content">
+              <div class="cover-container">
+                <img [ngSrc]="book.cover" [alt]="book.title" width="298" height="453" priority />
+              </div>
+              <div class="info-container">
+                <h1>{{ book.title }}</h1>
+                <p class="description">{{ book.description }}</p>
+                <div class="actions">
+                  <a [routerLink]="['/books', book.id]" class="btn-primary">Ler agora</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      
+      <div class="carousel-dots">
+        @for (dot of featuredBooks(); track $index; let i = $index) {
+          <button (click)="setFeatured(i)" [class.active]="i === currentFeaturedIndex()"></button>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Continue Reading Section -->
+  @if (continueReadingBooks().length > 0) {
+    <section class="home-section continue-reading">
+      <h2 class="section-title">Continue a sua leitura</h2>
+      <div class="horizontal-scroll">
+        @for (book of continueReadingBooks(); track book.id) {
+          <div class="book-item-wrapper">
+            <app-item-book [book]="book" type="grid" />
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Latest Updated Section -->
+  <section class="home-section latest-updates">
+    <div class="section-header">
+      <h2 class="section-title">Atualizações Recentes</h2>
+      <a routerLink="/books" [queryParams]="{ orderBy: 'updatedAt', order: 'DESC' }" class="view-more">Ver tudo</a>
+    </div>
+    
+		<app-book-grid 
+			[books]="latestUpdatedBooks()" 
+			[isLoading]="isLoadingGrid()" 
+			type="grid" 
+			[skeletonCount]="6"
+		/>
+  </section>
+
+  <!-- Recently Added Section -->
+  <section class="home-section recently-added">
+    <div class="section-header">
+      <h2 class="section-title">Novidades no Gatuno</h2>
+      <a routerLink="/books" [queryParams]="{ orderBy: 'createdAt', order: 'DESC' }" class="view-more">Ver tudo</a>
+    </div>
+    
+		<app-book-grid 
+			[books]="recentlyAddedBooks()" 
+			[isLoading]="isLoadingRecentlyAdded()" 
+			type="grid" 
+			[skeletonCount]="6"
+		/>
+  </section>
+</div>

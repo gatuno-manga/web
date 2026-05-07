@@ -8,17 +8,23 @@
       "@testing/*": [
         "testing/*"
       ],
-      "@components/*": [
-        "app/components/*"
+      "@core/*": [
+        "app/core/*"
       ],
-      "@guards/*": [
-        "app/guards/*"
+      "@constants/*": [
+        "app/core/constants/*"
       ],
-      "@interceptor/*": [
-        "app/interceptor/*"
+      "@shared/*": [
+        "app/shared/*"
+      ],
+      "@features/*": [
+        "app/features/*"
+      ],
+      "@ui/*": [
+        "app/shared/ui/*"
       ],
       "@models/*": [
-        "app/models/*"
+        "app/core/models/*"
       ],
       "@pages/*": [
         "app/pages/*"

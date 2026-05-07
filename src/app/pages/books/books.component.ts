@@ -9,31 +9,34 @@ import {
 	ElementRef,
 	AfterViewInit,
 	NgZone,
+	effect,
 } from '@angular/core';
-import { LocalStorageService } from '../../service/local-storage.service';
-import { BookService } from '../../service/book.service';
+import { LocalStorageService } from '@core/services/local-storage.service';
+import { BookService } from '@core/services/book.service';
 import {
 	BookList,
 	BookPageOptions,
 	ScrapingStatus,
 	TypeBook,
 	BookFilterInput,
-} from '../../models/book.models';
+} from '@models/book.models';
 import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,
-} from '../../models/settings.models';
+} from '@models/settings.models';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { ItemBookComponent } from '../../components/item-book/item-book.component';
-import { Page } from '../../models/miscellaneous.models';
+import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
+import { Page } from '@models/miscellaneous.models';
 
-import { SelectComponent } from '../../components/select/select.component';
-import { MetaDataService } from '../../service/meta-data.service';
-import { DownloadService } from '../../service/download.service';
-import { SensitiveContentService } from '../../service/sensitive-content.service';
-import { ModalNotificationService } from '../../service/modal-notification.service';
-import { NetworkStatusService } from '../../service/network-status.service';
-import { BookFilterComponent } from '../../components/book-filter/book-filter.component';
+import { SelectCycleComponent } from '@ui/atoms/select/select-cycle.component';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { DownloadService } from '@core/services/download.service';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { TagsService } from '@core/services/tags.service';
+import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { NetworkStatusService } from '@core/services/network-status.service';
+import { BookFilterComponent } from '@features/books/components/book-filter/book-filter.component';
+import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
 
 interface BookQueryParams {
 	page?: string;
@@ -57,9 +60,9 @@ interface BookQueryParams {
 	selector: 'app-books',
 	imports: [
 		RouterModule,
-		ItemBookComponent,
-		SelectComponent,
+		SelectCycleComponent,
 		BookFilterComponent,
+		BookGridComponent,
 	],
 	templateUrl: './books.component.html',
 	styleUrl: './books.component.scss',
@@ -72,9 +75,22 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private metaService = inject(MetaDataService);
 	private downloadService = inject(DownloadService);
 	private sensitiveContentService = inject(SensitiveContentService);
+	private tagsService = inject(TagsService);
 	private modalService = inject(ModalNotificationService);
 	private networkStatus = inject(NetworkStatusService);
 	private ngZone = inject(NgZone);
+
+	constructor() {
+		// Re-load books when global filters change
+		effect(() => {
+			this.sensitiveContentService.allowContentSignal();
+			this.tagsService.excludedTagsSignal();
+			
+			this.ngZone.run(() => {
+				this.loadBooks();
+			});
+		});
+	}
 
 	books: BookList[] = [];
 	currentPage = 1;

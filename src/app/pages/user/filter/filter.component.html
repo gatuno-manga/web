@@ -4,61 +4,34 @@
 		<p class="subtitle">Filtre os resultados que voce gostaria que aparesseesm ou nao na sua listegem de livros</p>
 	}
 
-	@if (filteredTags().length > 0 || tagSearchQuery()) {
-		<div class="filter-section">
-			<h2>Tags</h2>
-			<div class="search-box">
-				<app-input
-					type="text"
-					placeholder="Filtrar tags..."
-					[showLabel]="false"
-					[value]="tagSearchQuery()"
-					(input)="tagSearchQuery.set($any($event.target).value)"
-					leftIcon="search"
-				/>
-			</div>
-			<div class="grid">
-				@for (tag of filteredTags(); track tag.id) {
-					<div class="card">
-						<app-switch [value]="isTagSelected(tag.id)" (valueChange)="toggleTag(tag.id)">
-							{{ tag.name }}
-						</app-switch>
-					</div>
-				}
-				@if (filteredTags().length === 0 && tagSearchQuery()) {
-					<div class="no-results">Nenhuma tag encontrada.</div>
-				}
-			</div>
-		</div>
-	}
+	<div class="filter-section">
+		<h2>Tags</h2>
+		<app-multi-select-tags
+			[options]="tagsList()"
+			[(selectedIds)]="selectedTags"
+			placeholderSearch="Filtrar tags..."
+			[limitDisplay]="100"
+			[groupSelectedAtTop]="true"
+		/>
+	</div>
 
-	@if (filteredBookTypes().length > 0) {
-		<div class="filter-section">
-			<h2>Tipos de livros</h2>
-			<div class="grid">
-				@for (type of filteredBookTypes(); track type.id) {
-					<div class="card">
-						<app-switch [value]="isBookTypeSelected(type.id)" (valueChange)="toggleBookType(type.id)">
-							{{ type.name }}
-						</app-switch>
-					</div>
-				}
-			</div>
-		</div>
-	}
+	<div class="filter-section">
+		<h2>Tipos de livros</h2>
+		<app-multi-select-tags
+			[options]="bookTypesList()"
+			[(selectedIds)]="selectedBookTypes"
+			placeholderSearch="Filtrar tipos..."
+			[groupSelectedAtTop]="true"
+		/>
+	</div>
 
-	@if (filteredSensitiveContent().length > 0) {
-		<div class="filter-section">
-			<h2>Conteudos sensiveis</h2>
-			<div class="grid">
-				@for (content of filteredSensitiveContent(); track content.id) {
-					<div class="card">
-						<app-switch [value]="allowContent().includes(content.name)" (valueChange)="toggleContentAllow(content)">
-							{{ content.name }}
-						</app-switch>
-					</div>
-				}
-			</div>
-		</div>
-	}
+	<div class="filter-section">
+		<h2>Conteudos sensiveis</h2>
+		<app-multi-select-tags
+			[options]="sensitiveContentList()"
+			[(selectedIds)]="allowContentIds"
+			placeholderSearch="Filtrar conteúdos..."
+			[groupSelectedAtTop]="true"
+		/>
+	</div>
 </section>

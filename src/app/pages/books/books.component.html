@@ -11,7 +11,7 @@
 
 <div class="controller">
 	<div class="mode-switch">
-		<app-select
+		<app-select-cycle
 			[items]="viewModeList"
 			[select]="getViewModeIndex()"
 			[disabled]="isOfflineMode"
@@ -37,30 +37,14 @@
 		</div>
 	}
 	<div class="view-options">
-		<app-select [items]="selectList" [select]="selectListItem()" />
+		<app-select-cycle [items]="selectList" [select]="selectListItem()" />
 	</div>
 </div>
-<div id="books" [class]="bookOptions">
-	@if (isLoading() && books.length === 0) {
-		@for (i of [].constructor(10); track $index) {
-			<div class="book-card-skeleton" [class]="bookOptions">
-				<div class="cover-skeleton placeholder"></div>
-				<div class="info-skeleton">
-					<div class="skeleton-text title"></div>
-					<div class="skeleton-text subtitle"></div>
-				</div>
-			</div>
-		}
-	} @else {
-		@for (book of books; track book.id; let i = $index) {
-			<app-item-book [book]="book" [type]="bookOptions" [priority]="i < 8" />
-		} @empty {
-			<div class="no-books">
-				<p>Nenhum livro disponível.</p>
-			</div>
-		}
-	}
-</div>
+<app-book-grid
+	[books]="books"
+	[isLoading]="isLoading()"
+	[type]="bookOptions"
+/>
 
 @if (listSettings.listMode === 'infinite-scroll') {
 	<div #scrollAnchor class="scroll-anchor">

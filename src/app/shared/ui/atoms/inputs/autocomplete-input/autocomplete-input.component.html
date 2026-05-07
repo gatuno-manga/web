@@ -1,0 +1,42 @@
+<div class="autocomplete-container" [id]="id()">
+	<div class="input-field" [class.focused]="isOpen()">
+		@if (leftIcon()) {
+			<app-icons [name]="leftIcon()!" class="left-icon" />
+		}
+		<input
+			type="text"
+			[id]="id() + '-input'"
+			[placeholder]="placeholder()"
+			[value]="value()"
+			(input)="onInput($event)"
+			(focus)="onFocus()"
+			(blur)="onBlur()"
+			autocomplete="off"
+		/>
+		@if (isLoading()) {
+			<app-icons name="loader" class="spin-icon" />
+		}
+	</div>
+
+	@if (isOpen() && options().length > 0) {
+		<div class="autocomplete-dropdown">
+			@for (option of options(); track option.id) {
+				<div class="option-item" (click)="selectOption(option)">
+					@if (option.image) {
+						<img [src]="option.image" alt="Option Thumb" class="option-image" />
+					}
+					<div class="option-content">
+						<span class="option-label">{{ option.label }}</span>
+						@if (option.description) {
+							<span class="option-description">{{ option.description }}</span>
+						}
+					</div>
+				</div>
+			}
+		</div>
+	} @else if (isOpen() && value().length >= 2 && !isLoading() && options().length === 0) {
+		<div class="autocomplete-dropdown no-results">
+			Nenhum resultado encontrado
+		</div>
+	}
+</div>

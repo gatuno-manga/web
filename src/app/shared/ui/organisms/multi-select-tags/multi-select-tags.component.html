@@ -1,0 +1,54 @@
+<div class="multi-select-tags">
+	<div class="search-box">
+		<app-input
+			type="text"
+			[placeholder]="placeholderSearch()"
+			[showLabel]="false"
+			[value]="searchQuery()"
+			(input)="searchQuery.set($any($event.target).value)"
+			leftIcon="search"
+		/>
+	</div>
+
+	<div class="badges-container">
+		<!-- Render Filtered Items -->
+		@for (tag of filteredOptions(); track tag.id) {
+			<div
+				class="badge"
+				[class.selected]="isTagSelected(tag.id)"
+				[class.excluded]="isTagExcluded(tag.id)"
+				(click)="toggleTag(tag.id)"
+			>
+				@if (isTagExcluded(tag.id)) {
+					<app-icons name="close" size="10px" />
+				}
+				{{ tag.name }}
+			</div>
+		}
+
+		<!-- Render Active Items that are NOT in current filter (keep them visible) -->
+		@for (tag of activeItemsNotInFilter(); track tag.id) {
+			<div
+				class="badge"
+				[class.selected]="isTagSelected(tag.id)"
+				[class.excluded]="isTagExcluded(tag.id)"
+				(click)="toggleTag(tag.id)"
+			>
+				@if (isTagExcluded(tag.id)) {
+					<app-icons name="close" size="10px" />
+				}
+				{{ tag.name }}
+			</div>
+		}
+
+		@if (filteredOptions().length === 0 && searchQuery()) {
+			<div class="no-tags">Nenhuma opção encontrada.</div>
+		}
+	</div>
+
+	@if (maxSelection()) {
+		<div class="selection-info">
+			Limite: {{ selectedIds().length + excludedIds().length }} / {{ maxSelection() }}
+		</div>
+	}
+</div>

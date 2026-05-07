@@ -1,0 +1,25 @@
+<div class="aside-container" [class.open]="isOpen()">
+	@if (isOpen()) {
+	<div class="aside-overlay" (click)="close()"></div>
+	}
+	<div
+		class="aside-content"
+		[class.position-right]="position() === 'right'"
+		[class.position-left]="position() === 'left'"
+		[style.transform]="dragTransform()"
+		[style.top.px]="topOffset()"
+		[style.right.px]="position() === 'right' ? 0 : null"
+		[style.left.px]="position() === 'left' ? 0 : null"
+		[style.width.px]="asideWidth()"
+	>
+		<div class="aside-header">
+			<app-icons
+				name="close"
+				class="close-icon"
+				size="32"
+				(click)="close()"
+			/>
+		</div>
+		<ng-content></ng-content>
+	</div>
+</div>

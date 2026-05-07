@@ -1,0 +1,24 @@
+<div class="prompt-modal-content" role="dialog" aria-labelledby="prompt-title">
+	<div class="settings-header">
+		<h2 id="prompt-title">{{ title() }}</h2>
+		@if (message()) {
+			<p class="subtitle">{{ message() }}</p>
+		}
+	</div>
+	<div class="settings-body">
+		<div class="setting-item column">
+			<app-text-area
+				id="prompt-input"
+				[ngModel]="inputValue()"
+				(ngModelChange)="inputValue.set($event)"
+				[placeholder]="placeholder()"
+				[rows]="3"
+				aria-describedby="prompt-title"
+			></app-text-area>
+		</div>
+	</div>
+	<div class="settings-footer">
+		<app-button (click)="cancel()" variant="text">Cancelar</app-button>
+		<app-button (click)="confirm()" variant="primary">Confirmar</app-button>
+	</div>
+</div>

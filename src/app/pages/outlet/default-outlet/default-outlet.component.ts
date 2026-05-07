@@ -9,9 +9,9 @@ import {
 	Inject,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { HeaderComponent } from '../../../components/header/header.component';
+import { HeaderComponent } from '@ui/organisms/header/header.component';
 import { RouterModule, RouterOutlet } from '@angular/router';
-import { HeaderStateService } from '../../../service/header-state.service';
+import { HeaderStateService } from '@core/services/header-state.service';
 import { SideNavComponent } from './side-nav/side-nav.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
 

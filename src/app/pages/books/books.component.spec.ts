@@ -1,10 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { BooksComponent } from './books.component';
-import { BookService } from '../../service/book.service';
-import { SensitiveContentService } from '../../service/sensitive-content.service';
+import { BookService } from '@core/services/book.service';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { of } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { signal } from '@angular/core';
+import { TagsService } from '@core/services/tags.service';
+import { NetworkStatusService } from '@core/services/network-status.service';
 
 describe('BooksComponent', () => {
 	let component: BooksComponent;
@@ -18,8 +21,15 @@ describe('BooksComponent', () => {
 		]);
 		const sensitiveServiceSpy = jasmine.createSpyObj(
 			'SensitiveContentService',
-			['getContentAllow'],
+			['getContentAllow', 'setContentAllow'],
 		);
+		(sensitiveServiceSpy as any).allowContentSignal = signal([]);
+
+		const tagsServiceSpy = jasmine.createSpyObj('TagsService', ['getTags']);
+		(tagsServiceSpy as any).excludedTagsSignal = signal([]);
+
+		const networkStatusSpy = jasmine.createSpyObj('NetworkStatusService', ['isOffline']);
+		networkStatusSpy.isOffline.and.returnValue(false);
 
 		await TestBed.configureTestingModule({
 			imports: [BooksComponent, SharedTestingModule],
@@ -29,6 +39,8 @@ describe('BooksComponent', () => {
 					provide: SensitiveContentService,
 					useValue: sensitiveServiceSpy,
 				},
+				{ provide: TagsService, useValue: tagsServiceSpy },
+				{ provide: NetworkStatusService, useValue: networkStatusSpy },
 				{
 					provide: ActivatedRoute,
 					useValue: {

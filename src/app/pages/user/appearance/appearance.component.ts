@@ -7,17 +7,17 @@ import {
 	signal,
 	OnInit,
 } from '@angular/core';
-import { MetaDataService } from '../../../service/meta-data.service';
-import { SearchService } from '../../../service/search.service';
-import { LocalStorageService } from '../../../service/local-storage.service';
-import { ThemeService, AppTheme } from '../../../service/theme.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { SearchService } from '@core/services/search.service';
+import { LocalStorageService } from '@core/services/local-storage.service';
+import { ThemeService, AppTheme } from '@core/services/theme.service';
 import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,
-} from '../../../models/settings.models';
-import { ButtonComponent } from '../../../components/inputs/button/button.component';
-import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
-import { SelectComponent } from '../../../components/inputs/select/select.component';
+} from '@models/settings.models';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
+import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
 import { FormsModule } from '@angular/forms';
 
 @Component({

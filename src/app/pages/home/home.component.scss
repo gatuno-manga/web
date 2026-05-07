@@ -1,0 +1,308 @@
+.home-container {
+  background-color: var(--black);
+  min-height: 100vh;
+  color: var(--white);
+  padding-bottom: 80px;
+}
+
+// Featured Carousel
+.featured-carousel-section {
+  position: relative;
+  height: 700px;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 40px;
+  
+  .carousel-track {
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+
+  .carousel-item {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+    visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .item-background {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    
+    .bg-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(15px) brightness(0.3);
+      transform: scale(1.1);
+    }
+
+    .bg-blur {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.6;
+    }
+
+    .gradient-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to bottom, 
+        rgba(0,0,0,0.2) 0%, 
+        rgba(0,0,0,0.7) 60%, 
+        var(--black) 100%
+      );
+    }
+  }
+
+  .item-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 60px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 40px;
+
+    .cover-container {
+      flex-shrink: 0;
+      width: 300px;
+      height: 450px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .info-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 24px;
+      flex: 1;
+
+      h1 {
+        font-family: 'Inknut Antiqua', serif;
+        font-size: 3rem;
+        margin: 0;
+        line-height: 1.2;
+        color: var(--white);
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      }
+
+      .description {
+        font-family: 'Inknut Antiqua', serif;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: rgba(255,255,255,0.8);
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        max-width: 700px;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 14px 40px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1rem;
+        display: inline-block;
+        width: fit-content;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgb(from var(--primary-color) r g b / 0.3);
+
+        &:hover {
+          transform: translateY(-3px);
+          filter: brightness(1.1);
+          box-shadow: 0 8px 25px rgb(from var(--primary-color) r g b / 0.5);
+        }
+      }
+    }
+  }
+
+  .carousel-dots {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 2;
+
+    button {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: rgba(255,255,255,0.2);
+      border: none;
+      cursor: pointer;
+      transition: all 0.4s ease;
+
+      &.active {
+        background-color: var(--primary-color);
+        width: 35px;
+        border-radius: 5px;
+      }
+    }
+  }
+}
+
+// Home Sections
+.home-section {
+  max-width: 1500px;
+  margin: 80px auto;
+  width: 100%;
+  padding: 0 20px;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 15px;
+
+    .view-more {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .section-title {
+    font-family: 'Inknut Antiqua', serif;
+    font-size: 1.5rem;
+    margin: 0;
+    color: var(--white);
+  }
+}
+
+// Continue Reading Horizontal Scroll
+.horizontal-scroll {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 10px 0 20px;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .book-item-wrapper {
+    flex: 0 0 200px;
+    scroll-snap-align: start;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 1200px) {
+  .featured-carousel-section {
+    height: 600px;
+    .item-content {
+      gap: 40px;
+      .cover-container { width: 250px; height: 380px; }
+      .info-container h1 { font-size: 2.2rem; }
+    }
+  }
+}
+@media (max-width: 992px) {
+  .featured-carousel-section {
+    height: 650px;
+    padding: 40px 0;
+
+    .item-content {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+      padding: 0 20px;
+
+      .cover-container {
+        width: 180px;
+        height: 270px;
+      }
+
+      .info-container {
+        align-items: center;
+        gap: 15px;
+
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        .description {
+          -webkit-line-clamp: 3;
+          font-size: 0.95rem;
+        }
+      }
+    }
+
+    .carousel-dots {
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 30px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .featured-carousel-section {
+    height: 550px;
+  }
+
+  .books-grid {
+  }
+}
+
+@media (max-width: 576px) {
+  .home-section .section-title {
+    font-size: 1.2rem;
+  }
+}

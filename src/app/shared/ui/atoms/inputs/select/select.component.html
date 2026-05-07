@@ -1,0 +1,59 @@
+<div
+  class="custom-select"
+  [class.disabled]="isDisabled"
+  [class.is-open]="isOpen"
+  >
+  @if (isOpen) {
+    <div class="overlay" (click)="closeDropdown()"></div>
+  }
+
+  <div
+    class="select-trigger"
+    (click)="toggleDropdown()"
+    [class.open]="isOpen"
+    [class.has-value]="value"
+    >
+		<div class="trigger-content">
+			@if (leftIcon()) {
+				<app-icons [name]="leftIcon()!" class="left-icon" />
+			}
+    	<span class="selected-value">{{ getSelectedLabel() }}</span>
+		</div>
+    <app-icons [name]="chevronIcon()" class="arrow" [class.rotate]="isOpen" />
+  </div>
+
+  @if (isOpen) {
+    <div class="select-dropdown">
+			@if (searchable()) {
+				<div class="search-bar" (click)="$event.stopPropagation()">
+					<app-icons name="search" size="16px" />
+					<input
+						type="text"
+						[placeholder]="'Pesquisar...'"
+						[ngModel]="searchQuery()"
+						(ngModelChange)="searchQuery.set($event)"
+						(input)="onSearchInput($event)"
+						autofocus
+					/>
+				</div>
+			}
+
+			<div class="options-list">
+				@for (option of filteredOptions(); track option.value) {
+					<div
+						class="select-option"
+						(click)="selectOption(option)"
+						[class.selected]="option.value === value"
+						>
+						<span class="option-label">{{ option.label }}</span>
+						@if (option.value === value) {
+							<app-icons name="check" size="16px" class="check-icon" />
+						}
+					</div>
+				} @empty {
+					<div class="no-options">Nenhum resultado encontrado</div>
+				}
+			</div>
+    </div>
+  }
+</div>

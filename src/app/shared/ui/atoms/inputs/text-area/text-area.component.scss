@@ -1,0 +1,135 @@
+.input {
+	position: relative;
+	padding: 0.75rem;
+	min-height: 50px;
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	background-color: var(--secondary-color);
+	border: none;
+	border-radius: 0.75rem; // 12px
+	transition: all 0.3s ease-in-out;
+
+	&.label {
+		margin-top: 1.5rem;
+	}
+	&.focused {
+		box-shadow: 0 0 1rem var(--secondary-color);
+		outline: 1px solid var(--primary-color);
+	}
+
+	&.has-left-icon {
+		padding-left: 0.75rem;
+	}
+}
+
+.left-icon {
+	margin-top: 8px;
+	color: var(--white-muted);
+}
+
+.input-wrapper {
+	display: flex;
+	position: relative;
+	width: 100%;
+	flex-direction: column;
+}
+
+textarea {
+	width: 100%;
+	padding: 8px 24px 8px 0; // Space for clear button
+	background-color: transparent;
+	outline: none;
+	border: none;
+	font-family: inherit;
+	font-size: inherit;
+	color: inherit;
+	min-height: 60px;
+	line-height: 1.5;
+	overflow-y: auto;
+	transition: height 0.2s ease;
+
+	&::-webkit-scrollbar {
+		width: 4px;
+	}
+	&::-webkit-scrollbar-thumb {
+		background: var(--primary-color);
+		border-radius: 10px;
+	}
+}
+
+label {
+	display: block;
+	position: absolute;
+	font-weight: 500;
+	z-index: 2;
+	transition: all 0.3s ease-in-out;
+	top: 16px;
+	left: 0;
+	pointer-events: none;
+	color: var(--white-muted);
+}
+
+label.ative,
+textarea:focus + label {
+	top: -2.5rem;
+	left: 0;
+	transform: translateY(0);
+	color: var(--white);
+
+	&.icons {
+		left: -40px;
+	}
+}
+
+.clear-btn {
+	position: absolute;
+	right: 0;
+	top: 8px;
+	cursor: pointer;
+	padding: 4px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(255, 255, 255, 0.1);
+	transition: background-color 0.2s;
+
+	&:hover {
+		background-color: rgba(255, 255, 255, 0.2);
+	}
+}
+
+.char-counter {
+	position: absolute;
+	bottom: 8px;
+	right: 12px;
+	font-size: 0.7rem;
+	color: var(--white-muted);
+	pointer-events: none;
+	background-color: var(--secondary-color);
+	padding: 2px 4px;
+	border-radius: 4px;
+}
+
+.error-messages {
+	--error-count: 0;
+	$line-height: 1.6rem;
+
+	height: calc(var(--error-count) * #{$line-height});
+	transition: 0.3s;
+	display: flex;
+	flex-direction: column;
+	margin-top: 10px;
+
+	&[style*='--error-count: 0'] {
+		margin-top: 0;
+	}
+
+	.error-message {
+		line-height: $line-height;
+		font-size: 0.9rem;
+		margin-left: 0.5rem;
+		color: var(--dark-red);
+	}
+}

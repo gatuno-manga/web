@@ -7,13 +7,13 @@ import {
 	NgZone,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { TagsService } from '../../../service/tags.service';
-import { Tag } from '../../../models/tags.models';
-import { ListCheckboxComponent } from '../../../components/inputs/list-checkbox/list-checkbox.component';
-import { ListCheckboxItem } from '../../../components/inputs/list-checkbox/list-checkbox.type';
-import { ButtonComponent } from '../../../components/inputs/button/button.component';
-import { IconsComponent } from '../../../components/icons/icons.component';
-import { MetaDataService } from '../../../service/meta-data.service';
+import { TagsService } from '@core/services/tags.service';
+import { Tag } from '@models/tags.models';
+import { ListCheckboxComponent } from '@ui/atoms/inputs/list-checkbox/list-checkbox.component';
+import { ListCheckboxItem } from '@ui/atoms/inputs/list-checkbox/list-checkbox.type';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { MetaDataService } from '@core/services/meta-data.service';
 
 @Component({
 	selector: 'app-tags',

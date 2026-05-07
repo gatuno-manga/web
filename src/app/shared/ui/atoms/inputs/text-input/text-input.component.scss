@@ -1,0 +1,129 @@
+.input {
+	position: relative;
+	padding: 0 0.75rem;
+	height: 42px;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	background-color: var(--secondary-color);
+	border: none;
+	border-radius: 0.75rem; // 12px
+	transition: all 0.3s ease-in-out;
+
+	&.label {
+		margin-top: 1.5rem;
+	}
+	&.focused {
+		box-shadow: 0 0 1rem var(--secondary-color);
+		outline: 1px solid var(--primary-color);
+	}
+}
+.input-wrapper {
+	display: flex;
+	position: relative;
+	width: 100%;
+}
+input {
+	width: 100%;
+	padding: 8px;
+	background-color: transparent;
+	outline: none;
+	border: none;
+}
+label {
+	display: block;
+	position: absolute;
+	font-weight: 500;
+	z-index: 2;
+	transition: all 0.3s ease-in-out;
+	top: 50%;
+	transform: translateY(-50%);
+	left: 0rem;
+	pointer-events: none;
+}
+label.ative,
+input:focus + label {
+	top: -2.5rem;
+	left: 0;
+	transform: translateY(0);
+
+	&.icons {
+		left: -40px;
+	}
+}
+
+app-icons.clickable {
+	cursor: pointer;
+}
+
+.strength-meter {
+	display: flex;
+	gap: 4px;
+	margin-top: 8px;
+	height: 4px;
+	width: 100%;
+
+	.strength-bar {
+		flex: 1;
+		background-color: var(--secondary-color);
+		border-radius: 2px;
+		transition: background-color 0.3s ease;
+	}
+
+	&[data-score="1"] .strength-bar:nth-child(1) { background-color: var(--dark-red); }
+	&[data-score="2"] .strength-bar:nth-child(-n+2) { background-color: var(--orange); }
+	&[data-score="3"] .strength-bar:nth-child(-n+3) { background-color: var(--orange); }
+	&[data-score="4"] .strength-bar:nth-child(-n+4) { background-color: var(--primary-color); }
+}
+
+.password-rules {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-top: 12px;
+	padding-left: 4px;
+
+	.rule-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 0.8rem;
+		color: var(--white-muted);
+		transition: color 0.3s ease;
+
+		app-icons {
+			transition: transform 0.2s ease;
+		}
+
+		&.met {
+			color: var(--primary-color);
+			font-weight: 500;
+
+			app-icons {
+				transform: scale(1.1);
+			}
+		}
+	}
+}
+
+.error-messages {
+	--error-count: 0;
+	$line-height: 1.6rem;
+
+	height: calc(var(--error-count) * #{$line-height});
+	transition: 0.3s;
+	display: flex;
+	flex-direction: column;
+	margin-top: 10px;
+
+	// Remove margin-top when error-count is 0
+	&[style*='--error-count: 0'] {
+		margin-top: 0;
+	}
+
+	.error-message {
+		line-height: $line-height;
+		font-size: 0.9rem;
+		margin-left: 0.5rem;
+	}
+}

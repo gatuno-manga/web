@@ -1,0 +1,72 @@
+<div class="input-container">
+  <div
+    class="input"
+		[ngClass]="{
+			label: showLabel() && (isFocused || touched() || value()),
+			focused: isFocused
+		}"
+    >
+    @if (leftIconInput()) {
+      <app-icons
+        [name]="leftIconInput()!"
+        (click)="onLeftIconClick($event)"
+        [ngClass]="{ clickable: !!leftIconClick() }"
+        />
+    }
+    <div class="input-wrapper">
+      <input
+        #input
+        [id]="id()"
+        [type]="type() === 'password' ? passwordInputType : type()"
+        [value]="value()"
+        [placeholder]="!showLabel() ? placeholder() : ''"
+        (input)="onInput($event)"
+        (blur)="onBlur(value()); isFocused = false"
+        (focus)="onFocus()"
+        />
+      @if (showLabel()) {
+        <label
+          [for]="id()"
+          [ngClass]="{ ative: touched() || value(), icons: leftIconInput() }"
+          >
+          {{ placeholder() }}
+        </label>
+      }
+    </div>
+    @if (rightIconInput() || (type() === 'password')) {
+      <app-icons
+        [ngClass]="{ 'right-icon': true, clickable: !!rightIconClick() || type() === 'password' }"
+        [name]="type() === 'password' ? passwordRightIcon : rightIconInput()!"
+        (click)="onRightIconClick($event)"
+        />
+    }
+  </div>
+
+	@if (type() === 'password') {
+		@if (showStrength()) {
+			<div class="strength-meter" [attr.data-score]="strengthScore()">
+				<div class="strength-bar"></div>
+				<div class="strength-bar"></div>
+				<div class="strength-bar"></div>
+				<div class="strength-bar"></div>
+			</div>
+		}
+
+		@if (showRules()) {
+			<div class="password-rules">
+				@for (rule of passwordRequirements(); track rule.label) {
+					<div class="rule-item" [class.met]="rule.met">
+						<app-icons [name]="rule.met ? 'check' : 'close'" [size]="'14px'" />
+						<span>{{ rule.label }}</span>
+					</div>
+				}
+			</div>
+		}
+	}
+
+  <div class="error-messages" [style.--error-count]="errorMessages().length">
+    @for (item of errorMessages(); track $index) {
+      <span class="error-message">{{ item }}</span>
+    }
+  </div>
+</div>

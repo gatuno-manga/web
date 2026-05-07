@@ -1,13 +1,13 @@
 <aside class="side-nav">
 	<div class="nav-header">
 		<button class="close-btn" (click)="onClose()" aria-label="Fechar menu">
-			<app-icons name="close" size="24" />
+			<app-icons name="close" size="20" />
 		</button>
 		<div class="brand">
 			<app-icons
 				id="logo"
 				name="logo"
-				size="48"
+				size="36"
 				[class.dark-theme]="isDarkTheme()"
 			/>
 			<h1 class="title">Gatuno</h1>
@@ -20,10 +20,12 @@
 				@for (item of group.items; track item.label) {
 					<a
 						[routerLink]="item.route"
+						routerLinkActive="active"
+						[routerLinkActiveOptions]="{ exact: item.route === '/' }"
 						class="nav-item"
 						(click)="onClose()"
 					>
-						<app-icons [name]="item.icon" size="24" />
+						<app-icons [name]="item.icon" size="22" />
 						<span class="label">{{ item.label }}</span>
 					</a>
 				}

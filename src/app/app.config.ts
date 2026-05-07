@@ -16,8 +16,8 @@ import {
 	withFetch,
 	withInterceptors,
 } from '@angular/common/http';
-import { HttpClientRequestInterceptor } from './interceptor/http-client-request.interceptor';
-import { httpClientResponseInterceptor } from './interceptor/http-client-response.interceptor';
+import { HttpClientRequestInterceptor } from '@core/interceptors/http-client-request.interceptor';
+import { httpClientResponseInterceptor } from '@core/interceptors/http-client-response.interceptor';
 import { importProvidersFrom } from '@angular/core';
 import { provideServiceWorker } from '@angular/service-worker';
 import { NgxEchartsModule } from 'ngx-echarts';

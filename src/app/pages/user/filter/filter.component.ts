@@ -6,22 +6,24 @@ import {
 	OnInit,
 	input,
 	computed,
+	effect,
 } from '@angular/core';
-import { SensitiveContentResponse } from '../../../models/book.models';
-import { SensitiveContentService } from '../../../service/sensitive-content.service';
-import { MetaDataService } from '../../../service/meta-data.service';
-import { DownloadService } from '../../../service/download.service';
-import { TagsService } from '../../../service/tags.service';
-import { Tag } from '../../../models/tags.models';
-import { TextInputComponent } from '../../../components/inputs/text-input/text-input.component';
-import { SwitchComponent } from '../../../components/inputs/switch/switch.component';
-import { SearchService } from '../../../service/search.service';
+import { SensitiveContentResponse } from '@models/book.models';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { DownloadService } from '@core/services/download.service';
+import { TagsService } from '@core/services/tags.service';
+import { Tag } from '@models/tags.models';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
+import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
+import { SearchService } from '@core/services/search.service';
 import { finalize } from 'rxjs/operators';
+import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';
 
 @Component({
 	selector: 'app-filter',
 	standalone: true,
-	imports: [TextInputComponent, SwitchComponent],
+	imports: [MultiSelectTagsComponent],
 	templateUrl: './filter.component.html',
 	styleUrl: './filter.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,7 +41,9 @@ export class FilterComponent implements OnInit {
 	sensitiveContentList = signal<SensitiveContentResponse[]>([
 		{ id: '1', name: 'safe' },
 	]);
-	allowContent = signal<string[]>([]);
+	allowContentIds = signal<string[]>([]);
+	private isInitialized = signal<boolean>(false);
+	private initialAllowedNames: string[] = [];
 
 	tagsList = signal<Tag[]>([]);
 	selectedTags = signal<string[]>([]);
@@ -83,17 +87,50 @@ export class FilterComponent implements OnInit {
 	});
 
 	ngOnInit() {
-		this.allowContent.set(this.sensitiveContentService.getContentAllow());
+		this.initialAllowedNames = this.sensitiveContentService.getContentAllow();
+		this.selectedTags.set(this.tagsService.excludedTagsSignal());
 		this.loadSensitiveContent();
 		this.loadTags();
 		this.setMetaData();
 	}
 
-	loadTags() {
-		this.tagsService.getAllTags().subscribe({
+	constructor() {
+		effect(() => {
+			if (!this.isInitialized()) return;
+			
+			const ids = this.allowContentIds();
+			const names = this.sensitiveContentList()
+				.filter(c => ids.includes(c.id))
+				.map(c => c.name);
+			
+			// Sincroniza globalmente com o serviço usando os nomes
+			this.sensitiveContentService.setContentAllow(names);
+			
+			// Recarrega as tags baseadas no novo conteúdo permitido
+			this.loadTags(names);
+		});
+
+		effect(() => {
+			const excluded = this.selectedTags();
+			this.tagsService.setExcludedTags(excluded);
+		});
+	}
+
+	loadTags(allowedNames?: string[]) {
+		const sensitiveContent = allowedNames || this.sensitiveContentService.getContentAllow();
+		this.tagsService.getTags({ sensitiveContent }).subscribe({
 			next: (tags) => this.tagsList.set(tags),
 			error: (err) => console.error('Error loading tags', err),
 		});
+	}
+
+	private mapNamesToIds() {
+		const ids = this.sensitiveContentList()
+			.filter(c => this.initialAllowedNames.includes(c.name))
+			.map(c => c.id);
+		
+		this.allowContentIds.set(ids);
+		this.isInitialized.set(true);
 	}
 
 	loadSensitiveContent() {
@@ -107,6 +144,7 @@ export class FilterComponent implements OnInit {
 						...current,
 						...list,
 					]);
+					this.mapNamesToIds();
 				},
 				error: async () => {
 					try {
@@ -135,6 +173,8 @@ export class FilterComponent implements OnInit {
 							'Error loading offline sensitive content',
 							e,
 						);
+					} finally {
+						this.mapNamesToIds();
 					}
 				},
 			});
@@ -145,44 +185,5 @@ export class FilterComponent implements OnInit {
 			title: 'Filtro',
 			description: 'Gerencie suas preferências de conteúdo sensível.',
 		});
-	}
-
-	toggleContentAllow(content: SensitiveContentResponse): void {
-		this.allowContent.update((current) => {
-			const name = content.name;
-			const index = current.indexOf(name);
-			const newList = [...current];
-			if (index > -1) {
-				newList.splice(index, 1);
-			} else {
-				newList.push(name);
-			}
-			this.sensitiveContentService.setContentAllow(newList);
-			return newList;
-		});
-	}
-
-	isTagSelected(tagId: string): boolean {
-		return this.selectedTags().includes(tagId);
-	}
-
-	toggleTag(tagId: string): void {
-		this.selectedTags.update((current) =>
-			current.includes(tagId)
-				? current.filter((id) => id !== tagId)
-				: [...current, tagId],
-		);
-	}
-
-	isBookTypeSelected(typeId: string): boolean {
-		return this.selectedBookTypes().includes(typeId);
-	}
-
-	toggleBookType(typeId: string): void {
-		this.selectedBookTypes.update((current) =>
-			current.includes(typeId)
-				? current.filter((id) => id !== typeId)
-				: [...current, typeId],
-		);
 	}
 }

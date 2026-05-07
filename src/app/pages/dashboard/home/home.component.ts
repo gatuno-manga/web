@@ -8,18 +8,18 @@ import {
 	NgZone,
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { IconsComponent } from '../../../components/icons/icons.component';
-import { DashboardService } from '../../../service/dashboard.service';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { DashboardService } from '@core/services/dashboard.service';
 import {
 	DashboardOverview,
 	DashboardProgress,
 	QueueStats,
 	QueueJobInfo,
-} from '../../../models/dashboard.models';
+} from '@models/dashboard.models';
 import { RouterModule } from '@angular/router';
-import { MetaDataService } from '../../../service/meta-data.service';
-import { BookWebsocketService } from '../../../service/book-websocket.service';
-import { UserTokenService } from '../../../service/user-token.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { BookWebsocketService } from '@core/services/book-websocket.service';
+import { UserTokenService } from '@core/services/user-token.service';
 import { Subscription } from 'rxjs';
 import { NgxEchartsDirective } from 'ngx-echarts';
 import { EChartsOption } from 'echarts';

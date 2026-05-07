@@ -25,32 +25,32 @@ import {
 	ContentType,
 	Page,
 	ImageMetadata,
-} from '../../models/book.models';
+} from '@models/book.models';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { IconsComponent } from '../../components/icons/icons.component';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { DecimalPipe, NgClass } from '@angular/common';
-import { ChapterService } from '../../service/chapter.service';
-import { BookService } from '../../service/book.service';
-import { UserTokenService } from '../../service/user-token.service';
-import { ModalNotificationService } from '../../service/modal-notification.service';
-import { NotificationService } from '../../service/notification.service';
-import { ButtonComponent } from '../../components/inputs/button/button.component';
-import { AsideComponent } from '../../components/aside/aside.component';
-import { MetaDataService } from '../../service/meta-data.service';
-import { SettingsService } from '../../service/settings.service';
-import { NotificationSeverity } from 'app/service/notification';
-import { ReaderSettingsNotificationComponent } from '@components/notification/custom-components';
-import { PromptModalComponent } from '@components/notification/custom-components/prompt-modal/prompt-modal.component';
-import { BookWebsocketService } from '../../service/book-websocket.service';
-import { DownloadService } from '../../service/download.service';
-import { UnifiedReadingProgressService } from '../../service/unified-reading-progress.service';
-import { NetworkStatusService } from '../../service/network-status.service';
+import { ChapterService } from '@core/services/chapter.service';
+import { BookService } from '@core/services/book.service';
+import { UserTokenService } from '@core/services/user-token.service';
+import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { NotificationService } from '@core/services/notification.service';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { AsideComponent } from '@ui/organisms/aside/aside.component';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { SettingsService } from '@core/services/settings.service';
+import { NotificationSeverity } from '@core/services/notification';
+import { ReaderSettingsNotificationComponent } from '@ui/molecules/notification/custom-components';
+import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
+import { BookWebsocketService } from '@core/services/book-websocket.service';
+import { DownloadService } from '@core/services/download.service';
+import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
+import { NetworkStatusService } from '@core/services/network-status.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { fromEvent, lastValueFrom } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
-import { ContextMenuService } from '../../service/context-menu.service';
-import { ContextMenuItem } from '../../models/context-menu.models';
-import { SavedPagesService } from '../../service/saved-pages.service';
+import { ContextMenuService } from '@core/services/context-menu.service';
+import { ContextMenuItem } from '@models/context-menu.models';
+import { SavedPagesService } from '@core/services/saved-pages.service';
 import {
 	ImageReaderComponent,
 	TextReaderComponent,
@@ -58,10 +58,10 @@ import {
 	ReadingProgressEvent,
 	TextProgressEvent,
 	DocumentProgressEvent,
-} from '../../components/readers';
-import { HeaderStateService } from '../../service/header-state.service';
-import { ChapterCommentsComponent } from '../../components/chapter-comments/chapter-comments.component';
-import { BlurhashComponent } from '../../components/blurhash/blurhash.component';
+} from '@features/reading/components/readers';
+import { HeaderStateService } from '@core/services/header-state.service';
+import { ChapterCommentsComponent } from '@features/reading/components/chapter-comments/chapter-comments.component';
+import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 
 type ChapterLoadOrigin =
 	| 'route'
