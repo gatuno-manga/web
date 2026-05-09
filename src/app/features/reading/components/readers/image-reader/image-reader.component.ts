@@ -60,6 +60,7 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	@Input() bookBlurHash?: string;
 	@Input() bookDominantColor?: string;
 	@Input() bookMetadata?: ImageMetadata;
+	@Input() isBlurred = false;
 	@Output() progressChange = new EventEmitter<ReadingProgressEvent>();
 	@Output() contextMenu = new EventEmitter<ContextMenuEvent>();
 

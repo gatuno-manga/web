@@ -30,6 +30,10 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { ChapterService } from '@core/services/chapter.service';
+import { WakeLockService } from '@core/services/wake-lock.service';
+import { VisibilityPrivacyService } from '@core/services/visibility-privacy.service';
+import { FullscreenService } from '@core/services/fullscreen.service';
+import { HighlightService } from '@core/services/highlight.service';
 import { BookService } from '@core/services/book.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
@@ -124,6 +128,10 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private readingProgressService = inject(UnifiedReadingProgressService);
 	private contextMenuService = inject(ContextMenuService);
 	private savedPagesService = inject(SavedPagesService);
+	private wakeLockService = inject(WakeLockService);
+	public privacyService = inject(VisibilityPrivacyService);
+	private fullscreenService = inject(FullscreenService);
+	private highlightService = inject(HighlightService);
 	private router = inject(Router);
 	private platformId = inject(PLATFORM_ID);
 	private networkStatus = inject(NetworkStatusService);
@@ -175,12 +183,35 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		if (s.grayScale) parts.push('grayscale(100%)');
 		if (s.invert != null && s.invert > 0)
 			parts.push(`invert(${s.invert}%)`);
+
+		// Apply CSS blur for non-image readers (Text/Document)
+		if (this.privacyService.isBlurred() && !this.isImageReader()) {
+			parts.push('blur(40px)');
+		}
+
 		return parts.length > 0 ? parts.join(' ') : 'none';
+	});
+
+	isBlurred = computed(() => this.privacyService.isBlurred());
+	isImageReader = computed(() => {
+		const chapter = this.chapter();
+		return !chapter?.contentType || chapter?.contentType === 'image';
 	});
 
 	admin = this.userTokenService.isAdminSignal;
 
 	constructor() {
+		effect(() => {
+			const s = this.settings();
+			if (isPlatformBrowser(this.platformId)) {
+				if (s.keepAwake) {
+					this.wakeLockService.request();
+				} else {
+					this.wakeLockService.release();
+				}
+			}
+		});
+
 		effect(() => {
 			const currentModal = this.notificationService.modal();
 			const isChapterLoadErrorModal =
@@ -605,6 +636,22 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 				? event.scrollPercentage
 				: ((event.pageIndex + 1) / event.totalPages) * 100;
 		this.updateProgressState(event.pageIndex, percent);
+	}
+
+
+	unblur() {
+		this.privacyService.unblurManually();
+	}
+
+	onTextSelection() {
+		const ranges = this.highlightService.getSelectionRanges();
+		if (ranges.length > 0) {
+			this.highlightService.createHighlight('reading-selection', ranges);
+		}
+	}
+
+	clearHighlights() {
+		this.highlightService.clearAllHighlights();
 	}
 
 	getContentType(): ContentType {

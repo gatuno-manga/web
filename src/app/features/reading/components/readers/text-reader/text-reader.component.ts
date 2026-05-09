@@ -23,6 +23,7 @@ import { throttleTime } from 'rxjs/operators';
 import { ContentFormat } from '@models/book.models';
 import { MarkdownComponent } from 'ngx-markdown';
 import { SettingsService } from '@core/services/settings.service';
+import { HighlightService } from '@core/services/highlight.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 export interface TextProgressEvent {
@@ -53,7 +54,11 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	private platformId = inject(PLATFORM_ID);
 	private destroyRef = inject(DestroyRef);
 	private settingsService = inject(SettingsService);
+	private highlightService = inject(HighlightService);
 	private sanitizer = inject(DomSanitizer);
+
+	private intersectionObserver: IntersectionObserver | null = null;
+	private lastIntersectingElement: Element | null = null;
 
 	settings = toSignal(this.settingsService.settings$, {
 		initialValue: this.settingsService.getSettings(),
@@ -104,6 +109,8 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 
 		if (isPlatformBrowser(this.platformId)) {
 			this.setupScrollListener();
+			this.setupSelectionListener();
+			setTimeout(() => this.setupIntersectionObserver(), 500);
 
 			// Restore initial position after render
 			if (this.initialScrollPercentage > 0) {
@@ -126,7 +133,9 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	ngOnDestroy() {
-		// Cleanup handled by takeUntilDestroyed
+		if (this.intersectionObserver) {
+			this.intersectionObserver.disconnect();
+		}
 	}
 
 	private calculateWordCount() {
@@ -149,6 +158,61 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe(() => this.onScroll());
+	}
+
+	private setupSelectionListener() {
+		fromEvent(document, 'selectionchange')
+			.pipe(
+				throttleTime(200, undefined, { leading: true, trailing: true }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe(() => {
+				const ranges = this.highlightService.getSelectionRanges();
+				if (ranges.length > 0) {
+					this.highlightService.createHighlight('reading-selection', ranges);
+				}
+			});
+	}
+
+	private setupIntersectionObserver() {
+		if (!isPlatformBrowser(this.platformId)) return;
+
+		const container = this.contentRef()?.nativeElement;
+		if (!container) return;
+
+		const elements = container.querySelectorAll(
+			'p, h1, h2, h3, h4, h5, h6, li, pre',
+		);
+		if (elements.length === 0) return;
+
+		const options = {
+			root: null,
+			rootMargin: '-10% 0px -10% 0px',
+			threshold: 0.1,
+		};
+
+		this.intersectionObserver = new IntersectionObserver((entries) => {
+			let bestEntry: IntersectionObserverEntry | null = null;
+
+			for (const entry of entries) {
+				if (entry.isIntersecting) {
+					if (
+						!bestEntry ||
+						entry.intersectionRatio > bestEntry.intersectionRatio
+					) {
+						bestEntry = entry;
+					}
+				}
+			}
+
+			if (bestEntry) {
+				this.lastIntersectingElement = bestEntry.target;
+			}
+		}, options);
+
+		for (const el of Array.from(elements) as Element[]) {
+			this.intersectionObserver?.observe(el);
+		}
 	}
 
 	private onScroll() {

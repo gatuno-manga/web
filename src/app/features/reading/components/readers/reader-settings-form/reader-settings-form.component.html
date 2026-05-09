@@ -59,7 +59,112 @@
 				>
 					Aparência
 				</app-button>
+
+				<app-button
+					[variant]="viewFilter === 'privacy' ? 'primary' : 'outline'"
+					role="tab"
+					[attr.aria-selected]="viewFilter === 'privacy'"
+					class="selector-btn"
+					(click)="setView('privacy')"
+				>
+					Privacidade
+				</app-button>
 			</div>
+		}
+
+		<!-- Grupo: Privacidade & Avançado -->
+		@if(showPrivacySettings) {
+		<section class="settings-group">
+			<h3 class="group-title">Privacidade & Avançado</h3>
+			<p class="group-desc">Recursos do navegador e privacidade</p>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="sun" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Manter Tela Ligada</h3>
+						<p>Evita que o dispositivo desligue a tela durante a leitura</p>
+					</div>
+				</div>
+				<app-switch
+					[value]="settings.keepAwake ?? false"
+					(change)="onKeepAwakeToggle()"
+				/>
+			</div>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="eye-off" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Borrar ao sair</h3>
+						<p>Borra a tela automaticamente ao mudar de aba</p>
+					</div>
+				</div>
+				<app-switch
+					[value]="settings.privacyBlurOnHide ?? false"
+					(change)="onPrivacyBlurOnHideToggle()"
+				/>
+			</div>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="clock" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Borrar por inatividade</h3>
+						<p>Borra a tela se não houver interação por um tempo</p>
+					</div>
+				</div>
+				<app-switch
+					[value]="settings.privacyBlurOnIdle ?? false"
+					(change)="onPrivacyBlurOnIdleToggle()"
+				/>
+			</div>
+
+			@if (settings.privacyBlurOnIdle) {
+				<div class="setting-item column">
+					<div class="setting-info">
+						<div class="setting-text">
+							<h3>Tempo de Inatividade ({{ settings.idleTimeoutSeconds }} seg)</h3>
+						</div>
+					</div>
+					<div class="spacing-slider-group">
+						<input
+							type="range"
+							class="spacing-slider"
+							min="20"
+							max="300"
+							step="10"
+							[ngModel]="settings.idleTimeoutSeconds ?? 60"
+							(ngModelChange)="onIdleTimeoutChange($event)"
+						/>
+					</div>
+				</div>
+			}
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<div class="setting-icon">
+						<app-icons name="smartphone" size="24" />
+					</div>
+					<div class="setting-text">
+						<h3>Alternar Tela Cheia</h3>
+						<p>Entrar ou sair do modo de tela cheia</p>
+					</div>
+				</div>
+				<app-button
+					[variant]="fullscreenService.isFullscreen() ? 'primary' : 'outline'"
+					(click)="toggleFullscreen()"
+				>
+					{{ fullscreenService.isFullscreen() ? 'Sair' : 'Entrar' }}
+				</app-button>
+			</div>
+		</section>
 		}
 
 		<!-- Grupo: Barra Lateral / Interface -->

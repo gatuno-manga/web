@@ -3,6 +3,11 @@
 	width: 100%;
 }
 
+::highlight(reading-selection) {
+	background-color: var(--primary-color);
+	color: var(--app-text-color);
+}
+
 .text-reader-container {
 	max-width: 800px;
 	margin: 0 auto;

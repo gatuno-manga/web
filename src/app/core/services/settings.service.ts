@@ -175,4 +175,23 @@ export class SettingsService {
 			});
 		}
 	}
+
+	toggleKeepAwake(): void {
+		const current = this.getSettings();
+		this.updateSettings({ keepAwake: !current.keepAwake });
+	}
+
+	togglePrivacyBlurOnHide(): void {
+		const current = this.getSettings();
+		this.updateSettings({ privacyBlurOnHide: !current.privacyBlurOnHide });
+	}
+
+	togglePrivacyBlurOnIdle(): void {
+		const current = this.getSettings();
+		this.updateSettings({ privacyBlurOnIdle: !current.privacyBlurOnIdle });
+	}
+
+	setIdleTimeoutSeconds(seconds: number): void {
+		this.updateSettings({ idleTimeoutSeconds: seconds });
+	}
 }

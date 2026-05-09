@@ -30,10 +30,11 @@
 
 	<div
 		class="pages"
-		[style.filter]="filterStyle()"
 		[class.aside-left]="settings().asidePosition === 'left'"
 		[class.aside-right]="settings().asidePosition === 'right'"
 		(dblclick)="onPagesDoubleClick($event)"
+		(mouseup)="onTextSelection()"
+		(touchend)="onTextSelection()"
 	>
 		<!-- Progress bar for all content types -->
 		<div
@@ -57,40 +58,50 @@
 			}
 		</div>
 
-		<!-- Content switching based on type -->
-		@switch (currentChapter.contentType) {
-			@case ('text') {
-				<app-text-reader
-					[content]="currentChapter.content || ''"
-					[format]="currentChapter.contentFormat || 'markdown'"
-					[initialScrollPercentage]="
-						savedPageIndex() > 0 ? (savedPageIndex() / 10) * 100 : 0
-					"
-					(progressChange)="onTextProgress($event)"
-				/>
+		<div
+			class="chapter-content"
+			[class.is-blurred]="isBlurred()"
+			[class.is-image]="isImageReader()"
+			[style.filter]="filterStyle()"
+		>
+			<!-- Content switching based on type -->
+			@switch (currentChapter.contentType) {
+				@case ('text') {
+					<app-text-reader
+						[content]="currentChapter.content || ''"
+						[format]="currentChapter.contentFormat || 'markdown'"
+						[initialScrollPercentage]="
+							savedPageIndex() > 0 ? (savedPageIndex() / 10) * 100 : 0
+						"
+						(progressChange)="onTextProgress($event)"
+					/>
+				}
+				@case ('document') {
+					<app-document-reader
+						[src]="currentChapter.documentPath || ''"
+						[format]="currentChapter.documentFormat || 'pdf'"
+						[initialPage]="savedPageIndex() + 1"
+						(pageChange)="onDocumentProgress($event)"
+					/>
+				}
+				@default {
+					<app-image-reader
+						[pages]="currentChapter.pages"
+						[showPageNumbers]="settings().showPageNumbers"
+						[bookBlurHash]="bookBlurHash()"
+						[bookDominantColor]="bookDominantColor()"
+						[bookMetadata]="bookMetadata()"
+						[isBlurred]="privacyService.isBlurred()"
+						(progressChange)="onImageProgress($event)"
+						(contextMenu)="
+							onContextMenu($event.event, $event.page, $event.index)
+						"
+					/>
+				}
+
 			}
-			@case ('document') {
-				<app-document-reader
-					[src]="currentChapter.documentPath || ''"
-					[format]="currentChapter.documentFormat || 'pdf'"
-					[initialPage]="savedPageIndex() + 1"
-					(pageChange)="onDocumentProgress($event)"
-				/>
-			}
-			@default {
-				<app-image-reader
-					[pages]="currentChapter.pages"
-					[showPageNumbers]="settings().showPageNumbers"
-					[bookBlurHash]="bookBlurHash()"
-					[bookDominantColor]="bookDominantColor()"
-					[bookMetadata]="bookMetadata()"
-					(progressChange)="onImageProgress($event)"
-					(contextMenu)="
-						onContextMenu($event.event, $event.page, $event.index)
-					"
-				/>
-			}
-		}
+		</div>
+
 
 		<div class="next-chapter-zone" (touchend)="onZoneTouch($event)"></div>
 	</div>

@@ -6,9 +6,35 @@
 	position: relative;
 	display: block;
 	width: 100%;
-	overflow: hidden;
+	overflow: visible; // Allow the pseudo-element to overlap
 	transition: background-color 0.3s ease;
 	margin: 0 auto;
+
+	&.is-blurred {
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: -30px; // Half overlap
+			left: 0;
+			right: 0;
+			height: 60px; // Total height of the transition blur
+			backdrop-filter: blur(15px);
+			-webkit-backdrop-filter: blur(15px);
+			z-index: 10;
+			pointer-events: none;
+			mask-image: linear-gradient(
+				to bottom,
+				transparent,
+				black 20%,
+				black 80%,
+				transparent
+			);
+		}
+
+		&:last-child::after {
+			display: none; // No intersection on the last page
+		}
+	}
 
 	.blur-placeholder {
 		position: absolute;
@@ -67,6 +93,12 @@
 		&.loaded {
 			opacity: 1;
 			transform: translateY(0);
+		}
+
+		&.hidden {
+			opacity: 0 !important;
+			pointer-events: none;
+			transform: none !important;
 		}
 	}
 }

@@ -15,6 +15,12 @@ export interface ReaderSettings {
 	lineHeight?: number;
 	letterSpacing?: number;
 	textAlign?: 'left' | 'center' | 'right' | 'justify';
+
+	// Browser API Settings
+	keepAwake?: boolean;
+	privacyBlurOnHide?: boolean;
+	privacyBlurOnIdle?: boolean;
+	idleTimeoutSeconds?: number;
 }
 
 export interface BookListSettings {
@@ -42,4 +48,8 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
 	lineHeight: 1.8,
 	letterSpacing: 0,
 	textAlign: 'justify',
+	keepAwake: false,
+	privacyBlurOnHide: false,
+	privacyBlurOnIdle: false,
+	idleTimeoutSeconds: 60,
 };

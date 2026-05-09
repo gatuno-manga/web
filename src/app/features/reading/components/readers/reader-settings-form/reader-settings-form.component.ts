@@ -2,6 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '@core/services/settings.service';
+import { FullscreenService } from '@core/services/fullscreen.service';
 import { ReaderSettings } from '@models/settings.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
@@ -30,6 +31,7 @@ export class ReaderSettingsFormComponent implements OnInit {
 	@Input() flatMode = false;
 
 	private settingsService = inject(SettingsService);
+	fullscreenService = inject(FullscreenService);
 
 	settings: ReaderSettings = {
 		grayScale: false,
@@ -45,9 +47,13 @@ export class ReaderSettingsFormComponent implements OnInit {
 		lineHeight: 1.8,
 		letterSpacing: 0,
 		textAlign: 'justify',
+		keepAwake: false,
+		privacyBlurOnHide: false,
+		privacyBlurOnIdle: false,
+		idleTimeoutSeconds: 60,
 	};
 
-	viewFilter: 'all' | 'pages' | 'filters' | 'appearance' | 'text' = 'all';
+	viewFilter: 'all' | 'pages' | 'filters' | 'appearance' | 'text' | 'privacy' = 'all';
 
 	decimalSeparatorOptions = [
 		{ value: ',', label: 'Vírgula (,)' },
@@ -147,7 +153,15 @@ export class ReaderSettingsFormComponent implements OnInit {
 		);
 	}
 
-	setView(filter: 'all' | 'pages' | 'filters' | 'appearance' | 'text') {
+	get showPrivacySettings() {
+		return (
+			this.flatMode ||
+			this.viewFilter === 'all' ||
+			this.viewFilter === 'privacy'
+		);
+	}
+
+	setView(filter: 'all' | 'pages' | 'filters' | 'appearance' | 'text' | 'privacy') {
 		this.viewFilter = filter;
 	}
 
@@ -191,6 +205,36 @@ export class ReaderSettingsFormComponent implements OnInit {
 	onNightModeToggle(eventOrValue: Event | boolean): void {
 		this.settingsService.toggleNightMode();
 		this.refreshLocalSettings();
+	}
+
+	onKeepAwakeToggle(): void {
+		this.settingsService.toggleKeepAwake();
+		this.refreshLocalSettings();
+	}
+
+	onPrivacyBlurOnHideToggle(): void {
+		this.settingsService.togglePrivacyBlurOnHide();
+		this.refreshLocalSettings();
+	}
+
+	onPrivacyBlurOnIdleToggle(): void {
+		this.settingsService.togglePrivacyBlurOnIdle();
+		this.refreshLocalSettings();
+	}
+
+	onIdleTimeoutChange(value: number | string): void {
+		const seconds =
+			typeof value === 'number'
+				? value
+				: Number.parseInt(String(value), 10);
+		if (!Number.isNaN(seconds)) {
+			this.settingsService.setIdleTimeoutSeconds(seconds);
+			this.refreshLocalSettings();
+		}
+	}
+
+	toggleFullscreen(): void {
+		this.fullscreenService.toggleFullscreen();
 	}
 
 	onTextSettingChange(field?: keyof ReaderSettings, value?: unknown) {
