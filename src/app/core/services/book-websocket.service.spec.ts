@@ -75,7 +75,7 @@ describe('BookWebsocketService', () => {
 			NetworkStatusService,
 		) as jasmine.SpyObj<NetworkStatusService>;
 
-		// @ts-expect-error - spy on protected method
+		// spy on protected method
 		spyOn<any>(service, 'createSocket').and.returnValue(mockSocket);
 	});
 
@@ -113,9 +113,9 @@ describe('BookWebsocketService', () => {
 		it('should return isConnected state from signal', () => {
 			expect(service.isConnected()).toBe(false);
 			// Simula conexão
-			service.transitionTo(WebSocketConnectionState.CONNECTING);
-			service.transitionTo(WebSocketConnectionState.CONNECTED);
-			service._connected.set(true);
+			(service as any).transitionTo(WebSocketConnectionState.CONNECTING);
+			(service as any).transitionTo(WebSocketConnectionState.CONNECTED);
+			(service as any)._connected.set(true);
 			expect(service.isConnected()).toBe(true);
 		});
 
@@ -133,7 +133,7 @@ describe('BookWebsocketService', () => {
 			expect(emissionCount).toBe(1);
 			expect(lastValue).toBeFalse();
 
-			service._connected.set(true);
+			(service as any)._connected.set(true);
 			TestBed.flushEffects();
 
 			expect(emissionCount).toBe(2);
@@ -144,7 +144,7 @@ describe('BookWebsocketService', () => {
 
 		it('should call createSocket when connect() is called', () => {
 			service.connect();
-			expect(service.createSocket).toHaveBeenCalled();
+			expect((service as any).createSocket).toHaveBeenCalled();
 			expect(service.connectionState()).toBe(
 				WebSocketConnectionState.CONNECTING,
 			);
@@ -154,7 +154,7 @@ describe('BookWebsocketService', () => {
 	describe('Room Subscriptions', () => {
 		beforeEach(() => {
 			// Mock connection for subscription tests
-			service._connected.set(true);
+			(service as any)._connected.set(true);
 			(service as any).socket = mockSocket;
 		});
 

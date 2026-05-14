@@ -85,7 +85,7 @@ describe('ReadingProgressSyncService', () => {
 		});
 
 		service = TestBed.inject(ReadingProgressSyncService);
-		// @ts-expect-error - spy on protected method
+		// spy on protected method
 		spyOn<any>(service, 'createSocket').and.returnValue(mockSocket);
 
 		httpMock = TestBed.inject(HttpTestingController);
@@ -125,8 +125,8 @@ describe('ReadingProgressSyncService', () => {
 		mockSocket.connected = true;
 		(service as any).socket = mockSocket;
 		// Transição válida via CONNECTING
-		service.transitionTo(WebSocketConnectionState.CONNECTING);
-		service.transitionTo(WebSocketConnectionState.CONNECTED);
+		(service as any).transitionTo(WebSocketConnectionState.CONNECTING);
+		(service as any).transitionTo(WebSocketConnectionState.CONNECTED);
 
 		const progressData = {
 			chapterId: 'c1',
@@ -152,7 +152,7 @@ describe('ReadingProgressSyncService', () => {
 	it('should save progress locally and register background sync if disconnected', fakeAsync(() => {
 		mockSocket.connected = false;
 		(service as any).socket = null;
-		service.transitionTo(WebSocketConnectionState.DISCONNECTED);
+		(service as any).transitionTo(WebSocketConnectionState.DISCONNECTED);
 		backgroundSyncServiceSpy.register.and.returnValue(Promise.resolve());
 		localProgressServiceSpy.enqueueSync.and.returnValue(Promise.resolve());
 
@@ -200,10 +200,10 @@ describe('ReadingProgressSyncService', () => {
 	});
 
 	it('should update sync status correctly', () => {
-		service.updateSyncStatus({ syncing: true });
+		(service as any).updateSyncStatus({ syncing: true });
 		expect(service.syncStatus().syncing).toBeTrue();
 
-		service.updateSyncStatus({ pendingChanges: 5 });
+		(service as any).updateSyncStatus({ pendingChanges: 5 });
 		expect(service.syncStatus().pendingChanges).toBe(5);
 		expect(service.syncStatus().syncing).toBeTrue(); // Should preserve previous values
 	});
