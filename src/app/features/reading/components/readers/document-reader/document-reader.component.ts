@@ -1,34 +1,32 @@
-import {
-	Component,
-	Input,
-	Output,
-	EventEmitter,
-	OnInit,
-	AfterViewInit,
-	OnDestroy,
-	ElementRef,
-	ViewChildren,
-	QueryList,
-	inject,
-	PLATFORM_ID,
-	signal,
-	DestroyRef,
-	ChangeDetectionStrategy,
-	Type,
-	HostListener,
-	OnChanges,
-	SimpleChanges,
-} from '@angular/core';
 import { isPlatformBrowser, NgComponentOutlet } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { fromEvent } from 'rxjs';
-import { throttleTime } from 'rxjs/operators';
-import { PDFDocumentProxy } from 'ng2-pdf-viewer';
-import { DocumentFormat } from '@models/book.models';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import {
+	AfterViewInit,
+	ChangeDetectionStrategy,
+	Component,
+	DestroyRef,
+	ElementRef,
+	EventEmitter,
+	Input,
+	inject,
+	OnChanges,
+	OnDestroy,
+	OnInit,
+	Output,
+	PLATFORM_ID,
+	QueryList,
+	SimpleChanges,
+	signal,
+	Type,
+	ViewChildren,
+} from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ContextMenuService } from '@core/services/context-menu.service';
 import { SettingsService } from '@core/services/settings.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { DocumentFormat } from '@models/book.models';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { PDFDocumentProxy } from 'ng2-pdf-viewer';
+import { fromEvent } from 'rxjs';
+import { throttleTime } from 'rxjs/operators';
 
 export interface DocumentProgressEvent {
 	pageIndex: number;
@@ -360,7 +358,7 @@ export class DocumentReaderComponent
 		this.isLoading.set(false);
 	}
 
-	onContextMenu(event: MouseEvent, pageNumber: number) {
+	onContextMenu(event: MouseEvent, _pageNumber: number) {
 		event.preventDefault();
 		this.contextMenuService.open(event, [
 			{

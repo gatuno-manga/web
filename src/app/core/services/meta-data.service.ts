@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
 import { Meta, MetaDefinition, Title } from '@angular/platform-browser';
+import { NavigationEnd, Router } from '@angular/router';
 
 interface MetaDataOptions {
 	title?: string;

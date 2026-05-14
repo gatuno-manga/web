@@ -1,6 +1,10 @@
-import { Injectable, Inject } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { WINDOW } from '@core/tokens/window.token';
-import { logConnectionEvent, logWebSocketError, LogLevel } from '@shared/utils/websocket-logger.utils';
+import {
+	LogLevel,
+	logConnectionEvent,
+	logWebSocketError,
+} from '@shared/utils/websocket-logger.utils';
 
 /**
  * Serviço especializado no registro de Background Sync do Service Worker.
@@ -34,7 +38,7 @@ export class BackgroundSyncRegistrationService {
 			const registration = await navigator.serviceWorker.ready;
 			// Usando 'any' pois SyncManager não está no tipo padrão de ServiceWorkerRegistration em todos os ambientes
 			await (registration as any).sync.register(tagName);
-			
+
 			logConnectionEvent(
 				this.serviceName,
 				'sync',

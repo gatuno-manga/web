@@ -6,16 +6,16 @@ import {
 	HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { AuthQueueService } from '@core/services/auth-queue.service';
+import { UserTokenService } from '@core/services/user-token.service';
 import {
-	Observable,
 	catchError,
 	filter,
+	Observable,
 	switchMap,
 	take,
 	throwError,
 } from 'rxjs';
-import { UserTokenService } from '@core/services/user-token.service';
-import { AuthQueueService } from '@core/services/auth-queue.service';
 
 export const httpClientResponseInterceptor: HttpInterceptorFn = (req, next) => {
 	const userTokenService = inject(UserTokenService);
@@ -45,31 +45,45 @@ const handle401Error = (
 	authQueue: AuthQueueService,
 ): Observable<HttpEvent<unknown>> => {
 	if (!authQueue.isRefreshing) {
-		console.log('[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...');
+		console.log(
+			'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...',
+		);
 		authQueue.startRefreshing();
 
 		return tokenService.refreshTokens().pipe(
 			catchError((err) => {
-				console.error('[GATUNO_INTERCEPTOR] Erro no refreshTokens:', err);
-				
+				console.error(
+					'[GATUNO_INTERCEPTOR] Erro no refreshTokens:',
+					err,
+				);
+
 				// Só remove tokens se for um erro de autenticação (401 ou 403)
 				// Erros de rede (0) ou servidor (500) não devem deslogar o usuário
-				if (err instanceof HttpErrorResponse && (err.status === 401 || err.status === 403)) {
-					console.warn('[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.');
+				if (
+					err instanceof HttpErrorResponse &&
+					(err.status === 401 || err.status === 403)
+				) {
+					console.warn(
+						'[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.',
+					);
 					tokenService.removeTokens(true);
 				} else {
-					console.warn('[GATUNO_INTERCEPTOR] Falha temporária no refresh. Mantendo sessão.');
+					console.warn(
+						'[GATUNO_INTERCEPTOR] Falha temporária no refresh. Mantendo sessão.',
+					);
 				}
 
 				authQueue.notifyFailure(err);
 				return throwError(() => err);
 			}),
 			switchMap((tokens) => {
-				if (!tokens || !tokens.accessToken) {
+				if (!tokens?.accessToken) {
 					console.error(
 						'[GATUNO_INTERCEPTOR] Token de acesso ausente na resposta de refresh. Encerrando sessão.',
 					);
-					const err = new Error('Missing accessToken in refresh response');
+					const err = new Error(
+						'Missing accessToken in refresh response',
+					);
 					tokenService.removeTokens(true);
 					authQueue.notifyFailure(err);
 					return throwError(() => err);
@@ -83,15 +97,23 @@ const handle401Error = (
 		);
 	}
 
-	console.log('[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...');
+	console.log(
+		'[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...',
+	);
 	return authQueue.token$.pipe(
-		filter((token): token is string => token !== null || authQueue.hasFailed),
+		filter(
+			(token): token is string => token !== null || authQueue.hasFailed,
+		),
 		take(1),
 		switchMap((token) => {
 			if (authQueue.hasFailed) {
-				return throwError(() => new Error('Falha na renovação do token (fila)'));
+				return throwError(
+					() => new Error('Falha na renovação do token (fila)'),
+				);
 			}
-			console.log('[GATUNO_INTERCEPTOR] Retentando requisição enfileirada...');
+			console.log(
+				'[GATUNO_INTERCEPTOR] Retentando requisição enfileirada...',
+			);
 			return next(addToken(req, token as string));
 		}),
 	);

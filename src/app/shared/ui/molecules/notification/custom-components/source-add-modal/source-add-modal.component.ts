@@ -1,13 +1,13 @@
-import { Component, Input, signal, computed, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import {
 	CdkDragDrop,
-	moveItemInArray,
 	DragDropModule,
+	moveItemInArray,
 } from '@angular/cdk/drag-drop';
+import { Component, computed, Input, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 
 export interface SourceAddSaveEvent {
 	urls: string[];
@@ -58,7 +58,9 @@ export class SourceAddModalComponent implements OnInit {
 				return false;
 			}
 		} catch {
-			this.urlError.set('URL inválida. Exemplo: https://example.com/manga');
+			this.urlError.set(
+				'URL inválida. Exemplo: https://example.com/manga',
+			);
 			return false;
 		}
 
@@ -124,7 +126,7 @@ export class SourceAddModalComponent implements OnInit {
 	urlTransform(url: string): string {
 		try {
 			return new URL(url).hostname;
-		} catch (e) {
+		} catch (_e) {
 			return url;
 		}
 	}

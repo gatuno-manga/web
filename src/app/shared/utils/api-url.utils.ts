@@ -65,7 +65,10 @@ const resolveSafeBrowserApiBaseUrl = (
 		}
 
 		// Evita mixed content quando o app roda em HTTPS.
-		if (parsedOrigin.protocol === 'https:' && parsedBaseUrl.protocol === 'http:') {
+		if (
+			parsedOrigin.protocol === 'https:' &&
+			parsedBaseUrl.protocol === 'http:'
+		) {
 			return `${parsedOrigin.origin}/api`;
 		}
 

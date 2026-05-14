@@ -1,41 +1,37 @@
 import {
+	AfterViewInit,
 	Component,
-	signal,
+	ElementRef,
+	effect,
+	inject,
+	NgZone,
 	OnDestroy,
 	OnInit,
-	inject,
-	computed,
+	signal,
 	ViewChild,
-	ElementRef,
-	AfterViewInit,
-	NgZone,
-	effect,
 } from '@angular/core';
-import { LocalStorageService } from '@core/services/local-storage.service';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
+import { DownloadService } from '@core/services/download.service';
+import { LocalStorageService } from '@core/services/local-storage.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { NetworkStatusService } from '@core/services/network-status.service';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { TagsService } from '@core/services/tags.service';
+import { BookFilterComponent } from '@features/books/components/book-filter/book-filter.component';
 import {
+	BookFilterInput,
 	BookList,
 	BookPageOptions,
 	ScrapingStatus,
 	TypeBook,
-	BookFilterInput,
 } from '@models/book.models';
 import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,
 } from '@models/settings.models';
-import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
-import { Page } from '@models/miscellaneous.models';
-
 import { SelectCycleComponent } from '@ui/atoms/select/select-cycle.component';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { DownloadService } from '@core/services/download.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { TagsService } from '@core/services/tags.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { NetworkStatusService } from '@core/services/network-status.service';
-import { BookFilterComponent } from '@features/books/components/book-filter/book-filter.component';
 import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
 
 interface BookQueryParams {
@@ -85,7 +81,7 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 		effect(() => {
 			this.sensitiveContentService.allowContentSignal();
 			this.tagsService.excludedTagsSignal();
-			
+
 			this.ngZone.run(() => {
 				this.loadBooks();
 			});
@@ -107,7 +103,9 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private observer: IntersectionObserver | null = null;
 
 	private _scrollAnchor?: ElementRef;
-	@ViewChild('scrollAnchor') set scrollAnchor(element: ElementRef | undefined) {
+	@ViewChild('scrollAnchor') set scrollAnchor(element:
+		| ElementRef
+		| undefined) {
 		this._scrollAnchor = element;
 		if (element && this.observer) {
 			this.observer.disconnect();
@@ -424,10 +422,18 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.pagesToShow = this.getPagesToShow();
 
 			// Manually trigger a check if the anchor is visible after loading
-			if (this.hasNextPage && this.listSettings.listMode === 'infinite-scroll') {
+			if (
+				this.hasNextPage &&
+				this.listSettings.listMode === 'infinite-scroll'
+			) {
 				setTimeout(() => {
-					if (this.scrollAnchor && !this.isLoading() && this.hasNextPage) {
-						const rect = this.scrollAnchor.nativeElement.getBoundingClientRect();
+					if (
+						this.scrollAnchor &&
+						!this.isLoading() &&
+						this.hasNextPage
+					) {
+						const rect =
+							this.scrollAnchor.nativeElement.getBoundingClientRect();
 						const isInView = rect.top <= window.innerHeight + 200;
 						if (isInView) this.loadMore();
 					}
@@ -458,11 +464,13 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			tags: this.filterOptions.tags,
 			tagsLogic: this.filterOptions.tagsLogic?.toUpperCase() as any,
 			excludeTags: this.filterOptions.excludeTags,
-			excludeTagsLogic: this.filterOptions.excludeTagsLogic?.toUpperCase() as any,
+			excludeTagsLogic:
+				this.filterOptions.excludeTagsLogic?.toUpperCase() as any,
 			authors: this.filterOptions.authors,
 			authorsLogic: this.filterOptions.authorsLogic?.toUpperCase() as any,
 			publication: this.filterOptions.publication,
-			publicationOperator: this.filterOptions.publicationOperator?.toUpperCase() as any,
+			publicationOperator:
+				this.filterOptions.publicationOperator?.toUpperCase() as any,
 			orderBy: this.filterOptions.orderBy
 				?.replace(/[A-Z]/g, '_$&')
 				.toUpperCase() as any,
@@ -498,18 +506,29 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 				this.isLoading.set(false);
 
 				// Manually trigger a check if the anchor is visible after loading
-				if (this.hasNextPage && this.listSettings.listMode === 'infinite-scroll') {
+				if (
+					this.hasNextPage &&
+					this.listSettings.listMode === 'infinite-scroll'
+				) {
 					setTimeout(() => {
-						if (this.scrollAnchor && !this.isLoading() && this.hasNextPage) {
-							const rect = this.scrollAnchor.nativeElement.getBoundingClientRect();
-							const isInView = rect.top <= window.innerHeight + 200;
+						if (
+							this.scrollAnchor &&
+							!this.isLoading() &&
+							this.hasNextPage
+						) {
+							const rect =
+								this.scrollAnchor.nativeElement.getBoundingClientRect();
+							const isInView =
+								rect.top <= window.innerHeight + 200;
 							if (isInView) this.loadMore();
 						}
 					}, 100);
 				}
 			},
 			error: () => {
-				console.log('Online GraphQL load failed, falling back to offline view');
+				console.log(
+					'Online GraphQL load failed, falling back to offline view',
+				);
 				this.viewMode = 'offline';
 				this.loadOfflineBooks();
 			},
@@ -521,10 +540,15 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 		pages.add(1);
 		pages.add(this.lastPage);
 
-		const isMobile = typeof window !== 'undefined' && window.innerWidth < 600;
+		const isMobile =
+			typeof window !== 'undefined' && window.innerWidth < 600;
 		const range = isMobile ? 1 : 2;
 
-		for (let i = this.currentPage - range; i <= this.currentPage + range; i++) {
+		for (
+			let i = this.currentPage - range;
+			i <= this.currentPage + range;
+			i++
+		) {
 			if (i > 1 && i < this.lastPage) {
 				pages.add(i);
 			}

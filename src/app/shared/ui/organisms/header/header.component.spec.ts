@@ -1,20 +1,19 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Location } from '@angular/common';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
-
-import { HeaderComponent } from './header.component';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { ThemeService } from '@core/services/theme.service';
 import { UserTokenService } from '@core/services/user-token.service';
+import { HeaderComponent } from './header.component';
 
 describe('HeaderComponent', () => {
 	let component: HeaderComponent;
 	let fixture: ComponentFixture<HeaderComponent>;
 	const mockLocation = { back: jasmine.createSpy('back') };
-	const mockThemeService = { 
+	const mockThemeService = {
 		currentTheme: signal('dark'),
-		hasUserSelectedTheme: signal(true)
+		hasUserSelectedTheme: signal(true),
 	};
 	const mockUserTokenService = {
 		hasValidAccessToken: true,

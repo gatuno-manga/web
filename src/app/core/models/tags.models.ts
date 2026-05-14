@@ -1,8 +1,8 @@
 export interface Tag {
-    id: string;
-    name: string;
-    description: string;
+	id: string;
+	name: string;
+	description: string;
 }
 export interface TagsPageOptions {
-    sensitiveContent?: string[];
+	sensitiveContent?: string[];
 }

@@ -5,23 +5,23 @@ import {
 	ReactiveFormsModule,
 	Validators,
 } from '@angular/forms';
-import { startAuthentication } from '@simplewebauthn/browser';
-import { AuthService } from '@core/services/auth.service';
-import {
-	PasswordInputComponent,
-	TextInputComponent,
-} from '@ui/atoms/inputs/text-input/text-input.component';
-import { MfaInputComponent } from '@ui/atoms/inputs/mfa-input/mfa-input.component';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { AuthService } from '@core/services/auth.service';
 import { MetaDataService } from '@core/services/meta-data.service';
-import { firstValueFrom } from 'rxjs';
 import {
 	isAuthTokensResponse,
 	isMfaChallengeResponse,
 	loginResponse,
 } from '@models/user.models';
+import { startAuthentication } from '@simplewebauthn/browser';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { MfaInputComponent } from '@ui/atoms/inputs/mfa-input/mfa-input.component';
+import {
+	PasswordInputComponent,
+	TextInputComponent,
+} from '@ui/atoms/inputs/text-input/text-input.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
 	selector: 'app-login',

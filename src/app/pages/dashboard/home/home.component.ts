@@ -1,28 +1,28 @@
-import {
-	Component,
-	OnInit,
-	OnDestroy,
-	inject,
-	PLATFORM_ID,
-	ChangeDetectorRef,
-	NgZone,
-} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import {
+	ChangeDetectorRef,
+	Component,
+	inject,
+	NgZone,
+	OnDestroy,
+	OnInit,
+	PLATFORM_ID,
+} from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { BookWebsocketService } from '@core/services/book-websocket.service';
 import { DashboardService } from '@core/services/dashboard.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { UserTokenService } from '@core/services/user-token.service';
 import {
 	DashboardOverview,
 	DashboardProgress,
-	QueueStats,
 	QueueJobInfo,
+	QueueStats,
 } from '@models/dashboard.models';
-import { RouterModule } from '@angular/router';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { BookWebsocketService } from '@core/services/book-websocket.service';
-import { UserTokenService } from '@core/services/user-token.service';
-import { Subscription } from 'rxjs';
-import { NgxEchartsDirective } from 'ngx-echarts';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { EChartsOption } from 'echarts';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { Subscription } from 'rxjs';
 
 @Component({
 	selector: 'app-home',
@@ -111,19 +111,19 @@ export class HomeComponent implements OnInit, OnDestroy {
 		}
 
 		this.wsSubscriptions.push(
-			this.wsService.bookCreated$.subscribe((book) => {
+			this.wsService.bookCreated$.subscribe((_book) => {
 				this.loadDashboardData();
 			}),
 
-			this.wsService.chaptersUpdated$.subscribe((data) => {
+			this.wsService.chaptersUpdated$.subscribe((_data) => {
 				this.loadDashboardData();
 			}),
 
-			this.wsService.chapterScrapingCompleted$.subscribe((data) => {
+			this.wsService.chapterScrapingCompleted$.subscribe((_data) => {
 				this.loadDashboardData();
 			}),
 
-			this.wsService.chaptersFix$.subscribe((data) => {
+			this.wsService.chaptersFix$.subscribe((_data) => {
 				// Chapter fix event
 			}),
 		);

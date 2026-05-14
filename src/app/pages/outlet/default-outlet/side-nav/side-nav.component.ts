@@ -1,14 +1,14 @@
 import {
 	ChangeDetectionStrategy,
 	Component,
-	output,
-	inject,
 	computed,
+	inject,
+	output,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { UserTokenService } from '@core/services/user-token.service';
 import { ThemeService } from '@core/services/theme.service';
+import { UserTokenService } from '@core/services/user-token.service';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 interface NavItem {
 	label: string;

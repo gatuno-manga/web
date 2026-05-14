@@ -1,6 +1,18 @@
-import { Component, ElementRef, forwardRef, input, viewChild, output, model, computed, ChangeDetectionStrategy, effect, AfterViewInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { NgClass } from '@angular/common';
+import {
+	AfterViewInit,
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	ElementRef,
+	effect,
+	forwardRef,
+	input,
+	model,
+	output,
+	viewChild,
+} from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
@@ -16,13 +28,13 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 	standalone: true,
 	templateUrl: './text-area.component.html',
 	styleUrl: './text-area.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 	focus = output<void>();
 	blur = output<void>();
 	textareaRef = viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
-	
+
 	id = input<string>();
 	placeholder = input<string>('');
 	rows = input<number>(3);
@@ -33,31 +45,31 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 	leftIcon = input<string | null>(null);
 	clearable = input<boolean>(false);
 	allowResize = input<boolean>(true);
-	
+
 	errors = input<any>(null);
 	touched = input<boolean>(false);
-	
+
 	value = model<string>('');
-	
+
 	characterCount = computed(() => this.value()?.length || 0);
 
 	isFocused = false;
 	firstLostFocus = false;
-	
+
 	inputErrorMessages: {
 		[key: string]: string;
 	} = {
-			required: 'Este campo é obrigatório',
-			minlength: 'Não pode ser menor que {{requiredLength}} caracteres',
-			maxlength: 'Não pode ser maior que {{requiredLength}} caracteres',
-		}
+		required: 'Este campo é obrigatório',
+		minlength: 'Não pode ser menor que {{requiredLength}} caracteres',
+		maxlength: 'Não pode ser maior que {{requiredLength}} caracteres',
+	};
 
 	constructor() {
 		effect(() => {
 			const expand = this.autoExpand();
 			if (expand) {
 				// Re-evaluate whenever value changes to adjust height
-				this.value(); 
+				this.value();
 				setTimeout(() => this.adjustHeight(), 0);
 			}
 		});
@@ -74,7 +86,7 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 		this.focus.emit();
 	}
 
-	onBlur(value: string): void {
+	onBlur(_value: string): void {
 		this.isFocused = false;
 		this.firstLostFocus = true;
 		this.blur.emit();
@@ -92,7 +104,7 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 		this.onTouched = fn;
 	}
 
-	setDisabledState?(isDisabled: boolean): void {}
+	setDisabledState?(_isDisabled: boolean): void {}
 
 	onInput(event: Event): void {
 		const target = event.target as HTMLTextAreaElement;
@@ -122,29 +134,38 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 
 	errorMessages(): string[] {
 		const errorsValue = this.errors();
-		if (errorsValue && this.firstLostFocus && (this.touched() || this.firstLostFocus)) {
+		if (
+			errorsValue &&
+			this.firstLostFocus &&
+			(this.touched() || this.firstLostFocus)
+		) {
 			const errorKeys = Object.keys(errorsValue);
 			if (errorKeys.length > 0) {
-				const messages = errorKeys.map(key => {
+				const messages = errorKeys.map((key) => {
 					const message = this.inputErrorMessages[key];
 
 					if (message) {
-						if (typeof errorsValue[key] === 'object' && errorsValue[key] !== null) {
+						if (
+							typeof errorsValue[key] === 'object' &&
+							errorsValue[key] !== null
+						) {
 							for (const prop in errorsValue[key]) {
-								if (errorsValue[key].hasOwnProperty(prop)) {
-									return message.replace(`{{${prop}}}`, errorsValue[key][prop] || '');
+								if (Object.hasOwn(errorsValue[key], prop)) {
+									return message.replace(
+										`{{${prop}}}`,
+										errorsValue[key][prop] || '',
+									);
 								}
 							}
 						}
 						return message;
-					}
-					else if (typeof errorsValue[key] === 'string') {
+					} else if (typeof errorsValue[key] === 'string') {
 						return errorsValue[key];
 					}
 
-					return 'error ' + key;
+					return `error ${key}`;
 				});
-				return messages.filter(msg => msg !== '');
+				return messages.filter((msg) => msg !== '');
 			}
 		}
 		return [];

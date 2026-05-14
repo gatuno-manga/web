@@ -1,30 +1,26 @@
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
+	computed,
 	inject,
 	input,
-	signal,
-	computed,
-	DestroyRef,
 	OnInit,
-	ChangeDetectionStrategy,
+	signal,
 	WritableSignal,
 } from '@angular/core';
-import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { filter, switchMap } from 'rxjs/operators';
-import { MarkdownComponent } from 'ngx-markdown';
-
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { Router, RouterModule } from '@angular/router';
 import { ChapterCommentsService } from '@core/services/chapter-comments.service';
-import { UserTokenService } from '@core/services/user-token.service';
-import { UserService } from '@core/services/user.service';
-import { NotificationService } from '@core/services/notification.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
-import {
-	ChapterCommentNode,
-} from '@models/book.models';
+import { NotificationService } from '@core/services/notification.service';
+import { UserService } from '@core/services/user.service';
+import { UserTokenService } from '@core/services/user-token.service';
+import { ChapterCommentNode } from '@models/book.models';
 import { Page as PaginatedResponse } from '@models/miscellaneous.models';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { MarkdownComponent } from 'ngx-markdown';
+import { filter, switchMap } from 'rxjs/operators';
 
 type FlattenedComment = {
 	comment: ChapterCommentNode;
@@ -53,7 +49,6 @@ export class ChapterCommentsComponent implements OnInit {
 	private notificationService = inject(NotificationService);
 	private modalNotificationService = inject(ModalNotificationService);
 	private router = inject(Router);
-	private destroyRef = inject(DestroyRef);
 
 	chapterId = input.required<string>();
 
@@ -63,7 +58,7 @@ export class ChapterCommentsComponent implements OnInit {
 	commentsRootPage = signal<number>(1);
 	commentsRootLimit = signal<number>(10);
 	repliesMaxDepth = signal<number>(4);
-	
+
 	newCommentContent = signal<string>('');
 	activeReplyParentId = signal<string | null>(null);
 	replyDrafts: WritableSignal<Record<string, string>> = signal({});
@@ -425,7 +420,8 @@ export class ChapterCommentsComponent implements OnInit {
 	}
 
 	private getEditorValue(targetId: string): string {
-		if (targetId === 'new-comment-textarea') return this.newCommentContent();
+		if (targetId === 'new-comment-textarea')
+			return this.newCommentContent();
 		if (targetId === 'edit-comment-textarea') return this.editingDraft();
 		if (targetId.startsWith('reply-comment-')) {
 			const commentId = targetId.replace('reply-comment-', '');

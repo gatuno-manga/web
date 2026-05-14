@@ -1,19 +1,19 @@
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class FullscreenService {
 	private platformId = inject(PLATFORM_ID);
-	
+
 	isFullscreen = signal<boolean>(false);
 	isSupported = signal<boolean>(false);
 
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
 			this.isSupported.set(!!document.fullscreenEnabled);
-			
+
 			document.addEventListener('fullscreenchange', () => {
 				this.isFullscreen.set(!!document.fullscreenElement);
 			});
@@ -37,7 +37,7 @@ export class FullscreenService {
 
 	async enterFullscreen(element?: HTMLElement) {
 		if (!this.isSupported() || document.fullscreenElement) return;
-		
+
 		try {
 			const target = element || document.documentElement;
 			await target.requestFullscreen();

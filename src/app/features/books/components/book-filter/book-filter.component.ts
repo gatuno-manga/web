@@ -1,36 +1,35 @@
+import { CommonModule } from '@angular/common';
 import {
-	Component,
-	OnInit,
-	signal,
-	inject,
-	computed,
-	input,
-	output,
 	ChangeDetectionStrategy,
-	effect,
+	Component,
+	computed,
+	inject,
+	input,
+	OnInit,
+	output,
+	signal,
 } from '@angular/core';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
-import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
+import { FormsModule } from '@angular/forms';
+import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { NotificationService } from '@core/services/notification.service';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { TagsService } from '@core/services/tags.service';
 import {
 	BookPageOptions,
-	TypeBook,
-	TagResponse,
 	SensitiveContentResponse,
+	TagResponse,
+	TypeBook,
 } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { TagsService } from '@core/services/tags.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { NotificationService } from '@core/services/notification.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 import {
 	RandomFilterModalComponent,
 	RandomFilterResult,
 } from '@ui/molecules/notification/custom-components/random-filter-modal/random-filter-modal.component';
-import { Observable, tap } from 'rxjs';
 import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';
+import { Observable, tap } from 'rxjs';
 
 interface ActiveFilter {
 	id: string;
@@ -61,8 +60,6 @@ export class BookFilterComponent implements OnInit {
 	private notificationService = inject(NotificationService);
 	private modalService = inject(ModalNotificationService);
 
-	constructor() {}
-
 	initialFilters = input<Partial<BookPageOptions>>();
 	filtersChange = output<Partial<BookPageOptions>>();
 
@@ -78,11 +75,11 @@ export class BookFilterComponent implements OnInit {
 	// API Data
 	availableTags = signal<TagResponse[]>([]);
 	private allSensitiveContent = signal<SensitiveContentResponse[]>([]);
-	
+
 	availableSensitiveContent = computed(() => {
 		const all = this.allSensitiveContent();
 		const allowedNames = this.sensitiveContentService.allowContentSignal();
-		
+
 		const filtered = all.filter((c) => allowedNames.includes(c.name));
 
 		// Adicionar categoria "safe" manualmente (não vem da API)
@@ -160,13 +157,13 @@ export class BookFilterComponent implements OnInit {
 
 	displayTagsForComponent = computed(() => {
 		const excludedGlobal = new Set(this.tagsService.excludedTagsSignal());
-		return this.availableTags().filter(t => !excludedGlobal.has(t.id));
+		return this.availableTags().filter((t) => !excludedGlobal.has(t.id));
 	});
 
 	displayTags = computed(() => {
 		const query = this.tagSearchQuery().toLowerCase();
 		const tags = this.displayTagsForComponent();
-		
+
 		if (!query) return tags.slice(0, 15);
 		return tags
 			.filter((tag) => tag.name.toLowerCase().includes(query))
@@ -447,7 +444,7 @@ export class BookFilterComponent implements OnInit {
 	}
 
 	onPublicationYearChange(value: string) {
-		const year = Number.parseInt(value);
+		const year = Number.parseInt(value, 10);
 		if (!Number.isNaN(year)) {
 			this.publicationYear.set(year);
 		} else {
@@ -521,7 +518,9 @@ export class BookFilterComponent implements OnInit {
 		// Ensure global exclusions are always included in the emission
 		const globalExcluded = this.tagsService.excludedTagsSignal();
 		const currentExcluded = this.excludedTags();
-		const allExcluded = Array.from(new Set([...currentExcluded, ...globalExcluded]));
+		const allExcluded = Array.from(
+			new Set([...currentExcluded, ...globalExcluded]),
+		);
 
 		if (allExcluded.length > 0) {
 			filters.excludeTags = allExcluded;

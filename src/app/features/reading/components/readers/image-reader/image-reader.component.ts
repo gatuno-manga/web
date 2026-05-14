@@ -1,28 +1,27 @@
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
-	Component,
-	Input,
-	Output,
-	EventEmitter,
-	ElementRef,
-	ViewChildren,
-	QueryList,
-	OnInit,
-	OnDestroy,
 	AfterViewInit,
-	inject,
-	PLATFORM_ID,
-	DestroyRef,
 	ChangeDetectionStrategy,
 	ChangeDetectorRef,
+	Component,
+	DestroyRef,
+	ElementRef,
+	EventEmitter,
+	Input,
+	inject,
+	OnDestroy,
+	OnInit,
+	Output,
+	PLATFORM_ID,
+	QueryList,
+	ViewChildren,
 } from '@angular/core';
-import { isPlatformBrowser, CommonModule } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { SettingsService } from '@core/services/settings.service';
+import { ImageMetadata, Page } from '@models/book.models';
+import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { fromEvent } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
-import { Page, ImageMetadata } from '@models/book.models';
-import { SettingsService } from '@core/services/settings.service';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 
 export interface ReadingProgressEvent {
 	pageIndex: number;

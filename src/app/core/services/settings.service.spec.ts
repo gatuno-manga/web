@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { SettingsService } from './settings.service';
-import { LocalStorageService } from './local-storage.service';
 import { DEFAULT_SETTINGS } from '@models/settings.models';
+import { LocalStorageService } from './local-storage.service';
+import { SettingsService } from './settings.service';
 
 describe('SettingsService', () => {
 	let service: SettingsService;
@@ -37,12 +37,17 @@ describe('SettingsService', () => {
 
 	it('should initialize with saved settings from local storage', () => {
 		const savedSettings = { ...DEFAULT_SETTINGS, grayScale: true };
-		const localStorageSpy = jasmine.createSpyObj('LocalStorageService', ['get', 'set']);
+		const localStorageSpy = jasmine.createSpyObj('LocalStorageService', [
+			'get',
+			'set',
+		]);
 		localStorageSpy.get.and.returnValue(savedSettings);
 
 		const newService = new SettingsService(localStorageSpy);
 		expect(newService.getSettings().grayScale).toBeTrue();
-		expect(newService.getSettings().asidePosition).toBe(DEFAULT_SETTINGS.asidePosition);
+		expect(newService.getSettings().asidePosition).toBe(
+			DEFAULT_SETTINGS.asidePosition,
+		);
 	});
 
 	it('should update settings and persist to local storage', () => {

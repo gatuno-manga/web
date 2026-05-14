@@ -4,21 +4,20 @@ import { SharedTestingModule } from '@testing/shared-testing.module';
 import { HomeComponent } from './home.component';
 
 describe('HomeComponent', () => {
-  let component: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
+	let component: HomeComponent;
+	let fixture: ComponentFixture<HomeComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [HomeComponent, SharedTestingModule]
-    })
-      .compileComponents();
+	beforeEach(async () => {
+		await TestBed.configureTestingModule({
+			imports: [HomeComponent, SharedTestingModule],
+		}).compileComponents();
 
-    fixture = TestBed.createComponent(HomeComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+		fixture = TestBed.createComponent(HomeComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	it('should create', () => {
+		expect(component).toBeTruthy();
+	});
 });

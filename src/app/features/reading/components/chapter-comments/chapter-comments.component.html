@@ -56,7 +56,7 @@
 						Imagem
 					</button>
 				</div>
-				<button class="btn-publish" (click)="submitComment()">
+				<button type="button" class="btn-publish" (click)="submitComment()">
 					Publicar Comentário
 				</button>
 			</div>
@@ -64,7 +64,7 @@
 	</div>
 
 	<div class="chapter-comments__filters-wrapper">
-		<button class="filter-toggle" (click)="showFilters.set(!showFilters())">
+		<button type="button" class="filter-toggle" (click)="showFilters.set(!showFilters())">
 			<app-icons name="settings" size="18" />
 			Configurações
 		</button>
@@ -172,8 +172,8 @@
 										<button type="button" (click)="insertImage('edit-comment-textarea')">Imagem</button>
 									</div>
 									<div class="chapter-comments__actions">
-										<button (click)="saveEdit(item.comment.id)">Salvar</button>
-										<button (click)="cancelEdit()">Cancelar</button>
+										<button type="button" (click)="saveEdit(item.comment.id)">Salvar</button>
+										<button type="button" (click)="cancelEdit()">Cancelar</button>
 									</div>
 								</div>
 							</div>
@@ -185,12 +185,12 @@
 						}
 
 						<div class="chapter-comments__actions">
-							<button class="btn-reply" (click)="setReplyParent(item.comment.id)">
+							<button type="button" class="btn-reply" (click)="setReplyParent(item.comment.id)">
 								Responder
 							</button>
 							@if (canEditComment(item.comment) && !item.comment.isDeleted) {
-								<button (click)="startEdit(item.comment)">Editar</button>
-								<button (click)="deleteComment(item.comment.id)">Excluir</button>
+								<button type="button" (click)="startEdit(item.comment)">Editar</button>
+								<button type="button" (click)="deleteComment(item.comment.id)">Excluir</button>
 							}
 						</div>
 
@@ -212,8 +212,8 @@
 										<button type="button" (click)="insertImage('reply-comment-' + item.comment.id)">Imagem</button>
 									</div>
 									<div class="chapter-comments__actions">
-										<button (click)="submitReply(item.comment.id)">Enviar resposta</button>
-										<button (click)="setReplyParent(null)">Cancelar</button>
+										<button type="button" (click)="submitReply(item.comment.id)">Enviar resposta</button>
+										<button type="button" (click)="setReplyParent(null)">Cancelar</button>
 									</div>
 								</div>
 							</div>

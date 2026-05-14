@@ -1,18 +1,20 @@
 import { Component } from '@angular/core';
+import {
+	ConfirmationNotificationComponent,
+	ProgressNotificationComponent,
+	SuccessDetailsNotificationComponent,
+} from '@ui/molecules/notification/custom-components/index';
 import { NotificationService } from '../notification.service';
 import { NotificationSeverity } from './notification-strategy.interface';
-import { ConfirmationNotificationComponent } from '@ui/molecules/notification/custom-components/index';
-import { ProgressNotificationComponent } from '@ui/molecules/notification/custom-components/index';
-import { SuccessDetailsNotificationComponent } from '@ui/molecules/notification/custom-components/index';
 
 /**
  * Componente de exemplo demonstrando o uso do NotificationService
  * com o padrão Factory Method e componentes personalizados
  */
 @Component({
-    selector: 'app-notification-example',
-    standalone: true,
-    template: `
+	selector: 'app-notification-example',
+	standalone: true,
+	template: `
         <div class="examples">
             <h2>Exemplos de Notificações</h2>
 
@@ -37,7 +39,8 @@ import { SuccessDetailsNotificationComponent } from '@ui/molecules/notification/
             </section>
         </div>
     `,
-    styles: [`
+	styles: [
+		`
         .examples {
             padding: 20px;
         }
@@ -67,119 +70,120 @@ import { SuccessDetailsNotificationComponent } from '@ui/molecules/notification/
         button:hover {
             background: #0056b3;
         }
-    `]
+    `,
+	],
 })
 export class NotificationExampleComponent {
-    constructor(private notificationService: NotificationService) {}
+	constructor(private notificationService: NotificationService) {}
 
-    // ==========================================
-    // Exemplos básicos - Toast
-    // ==========================================
+	// ==========================================
+	// Exemplos básicos - Toast
+	// ==========================================
 
-    showSuccess(): void {
-        this.notificationService.success('Operação realizada com sucesso!');
-    }
+	showSuccess(): void {
+		this.notificationService.success('Operação realizada com sucesso!');
+	}
 
-    showError(): void {
-        this.notificationService.error('Ocorreu um erro');
-    }
+	showError(): void {
+		this.notificationService.error('Ocorreu um erro');
+	}
 
-    showWarning(): void {
-        this.notificationService.warning('Atenção necessária');
-    }
+	showWarning(): void {
+		this.notificationService.warning('Atenção necessária');
+	}
 
-    // ==========================================
-    // Diferentes severidades
-    // ==========================================
+	// ==========================================
+	// Diferentes severidades
+	// ==========================================
 
-    showSimpleError(): void {
-        this.notificationService.error('Preencha todos os campos');
-    }
+	showSimpleError(): void {
+		this.notificationService.error('Preencha todos os campos');
+	}
 
-    showCriticalError(): void {
-        this.notificationService.critical(
-            'Dados corrompidos! Ação necessária.',
-            'ERRO CRÍTICO'
-        );
-    }
+	showCriticalError(): void {
+		this.notificationService.critical(
+			'Dados corrompidos! Ação necessária.',
+			'ERRO CRÍTICO',
+		);
+	}
 
-    // ==========================================
-    // 🎨 NOVOS: Componentes Personalizados
-    // ==========================================
+	// ==========================================
+	// 🎨 NOVOS: Componentes Personalizados
+	// ==========================================
 
-    showCustomConfirmation(): void {
-        this.notificationService.notify({
-            message: '', // Não usado quando há componente personalizado
-            level: 'warning',
-            severity: NotificationSeverity.CRITICAL,
-            component: ConfirmationNotificationComponent,
-            componentData: {
-                title: 'Confirmar Exclusão',
-                message: 'Você está prestes a excluir os seguintes itens:',
-                details: [
-                    'Livro: "O Senhor dos Anéis"',
-                    '15 capítulos',
-                    '3 comentários de usuários'
-                ],
-                showWarning: true
-            }
-        });
-    }
+	showCustomConfirmation(): void {
+		this.notificationService.notify({
+			message: '', // Não usado quando há componente personalizado
+			level: 'warning',
+			severity: NotificationSeverity.CRITICAL,
+			component: ConfirmationNotificationComponent,
+			componentData: {
+				title: 'Confirmar Exclusão',
+				message: 'Você está prestes a excluir os seguintes itens:',
+				details: [
+					'Livro: "O Senhor dos Anéis"',
+					'15 capítulos',
+					'3 comentários de usuários',
+				],
+				showWarning: true,
+			},
+		});
+	}
 
-    showCustomProgress(): void {
-        // Simula um progresso
-        let progress = 0;
+	showCustomProgress(): void {
+		// Simula um progresso
+		let progress = 0;
 
-        const strategy = this.notificationService.notify({
-            message: '',
-            level: 'info',
-            severity: NotificationSeverity.HIGH,
-            dismissible: false,
-            component: ProgressNotificationComponent,
-            componentData: {
-                title: 'Upload de Arquivos',
-                progress: 0,
-                statusMessage: 'Iniciando upload...',
-                currentItem: 'arquivo1.pdf'
-            }
-        });
+		const strategy = this.notificationService.notify({
+			message: '',
+			level: 'info',
+			severity: NotificationSeverity.HIGH,
+			dismissible: false,
+			component: ProgressNotificationComponent,
+			componentData: {
+				title: 'Upload de Arquivos',
+				progress: 0,
+				statusMessage: 'Iniciando upload...',
+				currentItem: 'arquivo1.pdf',
+			},
+		});
 
-        // Simula atualização de progresso
-        const interval = setInterval(() => {
-            progress += 10;
+		// Simula atualização de progresso
+		const interval = setInterval(() => {
+			progress += 10;
 
-            if (progress > 100) {
-                clearInterval(interval);
-                strategy.dismiss();
-                this.showCustomSuccess();
-                return;
-            }
+			if (progress > 100) {
+				clearInterval(interval);
+				strategy.dismiss();
+				this.showCustomSuccess();
+				return;
+			}
 
-            // Atualiza a notificação (em implementação real,
-            // você teria um método para atualizar o componente)
-        }, 500);
-    }
+			// Atualiza a notificação (em implementação real,
+			// você teria um método para atualizar o componente)
+		}, 500);
+	}
 
-    showCustomSuccess(): void {
-        this.notificationService.notify({
-            message: '',
-            level: 'success',
-            severity: NotificationSeverity.HIGH,
-            component: SuccessDetailsNotificationComponent,
-            componentData: {
-                title: 'Upload Concluído!',
-                message: 'Todos os arquivos foram enviados com sucesso.',
-                items: [
-                    'documento1.pdf (2.3 MB)',
-                    'imagem.jpg (1.1 MB)',
-                    'planilha.xlsx (856 KB)'
-                ],
-                itemsTitle: 'Arquivos enviados',
-                actionLabel: 'Ver Arquivos',
-                actionCallback: () => {
-                    console.log('Navegar para arquivos...');
-                }
-            }
-        });
-    }
+	showCustomSuccess(): void {
+		this.notificationService.notify({
+			message: '',
+			level: 'success',
+			severity: NotificationSeverity.HIGH,
+			component: SuccessDetailsNotificationComponent,
+			componentData: {
+				title: 'Upload Concluído!',
+				message: 'Todos os arquivos foram enviados com sucesso.',
+				items: [
+					'documento1.pdf (2.3 MB)',
+					'imagem.jpg (1.1 MB)',
+					'planilha.xlsx (856 KB)',
+				],
+				itemsTitle: 'Arquivos enviados',
+				actionLabel: 'Ver Arquivos',
+				actionCallback: () => {
+					console.log('Navegar para arquivos...');
+				},
+			},
+		});
+	}
 }

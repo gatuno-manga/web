@@ -1,19 +1,19 @@
-import {
-	Component,
-	signal,
-	inject,
-	PLATFORM_ID,
-	ChangeDetectorRef,
-	NgZone,
-} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import {
+	ChangeDetectorRef,
+	Component,
+	inject,
+	NgZone,
+	PLATFORM_ID,
+	signal,
+} from '@angular/core';
+import { MetaDataService } from '@core/services/meta-data.service';
 import { TagsService } from '@core/services/tags.service';
 import { Tag } from '@models/tags.models';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { ListCheckboxComponent } from '@ui/atoms/inputs/list-checkbox/list-checkbox.component';
 import { ListCheckboxItem } from '@ui/atoms/inputs/list-checkbox/list-checkbox.type';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { MetaDataService } from '@core/services/meta-data.service';
 
 @Component({
 	selector: 'app-tags',

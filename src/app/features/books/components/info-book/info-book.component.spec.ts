@@ -1,22 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Subject, of, EMPTY } from 'rxjs';
-import { provideRouter } from '@angular/router';
-import { signal, WritableSignal, LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
+import { LOCALE_ID, signal, WritableSignal } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { EMPTY, of, Subject } from 'rxjs';
 
 import { InfoBookComponent } from './info-book.component';
 
 registerLocaleData(localePt, 'pt-BR');
+
 import { BookService } from '@core/services/book.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { ScrapingStatus } from '@models/book.models';
-import { ContextMenuService } from '@core/services/context-menu.service';
-import { UserTokenService } from '@core/services/user-token.service';
-import { DownloadService } from '@core/services/download.service';
 import { ChapterService } from '@core/services/chapter.service';
-import { SavedPagesService } from '@core/services/saved-pages.service';
+import { ContextMenuService } from '@core/services/context-menu.service';
+import { DownloadService } from '@core/services/download.service';
+import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NotificationService } from '@core/services/notification.service';
+import { SavedPagesService } from '@core/services/saved-pages.service';
+import { UserTokenService } from '@core/services/user-token.service';
+import { ScrapingStatus } from '@models/book.models';
 
 describe('InfoBookComponent', () => {
 	let component: InfoBookComponent;
@@ -71,7 +72,7 @@ describe('InfoBookComponent', () => {
 
 		mockContextMenuService = {
 			open: jasmine.createSpy('open'),
-			state: signal({ isOpen: false, items: [], x: 0, y: 0 })
+			state: signal({ isOpen: false, items: [], x: 0, y: 0 }),
 		};
 
 		mockUserTokenService = {
@@ -207,7 +208,7 @@ describe('InfoBookComponent', () => {
 	it('selectCover should show modal and call selectCover', (done) => {
 		// make modal.show call the confirmation callback immediately
 		mockModalService.show.and.callFake(
-			(title: string, msg: string, buttons: any[]) => {
+			(_title: string, _msg: string, buttons: any[]) => {
 				// call the 'Sim' button callback (assumed to be second)
 				if (buttons?.[1] && typeof buttons[1].callback === 'function') {
 					buttons[1].callback();

@@ -1,5 +1,5 @@
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 
 @Injectable({
 	providedIn: 'root',
@@ -7,17 +7,20 @@ import { isPlatformBrowser } from '@angular/common';
 export class WakeLockService {
 	private platformId = inject(PLATFORM_ID);
 	private wakeLock: any = null;
-	
+
 	isSupported = signal<boolean>(false);
 	isActive = signal<boolean>(false);
 
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
 			this.isSupported.set('wakeLock' in navigator);
-			
+
 			// Re-acquire wake lock when page becomes visible again
 			document.addEventListener('visibilitychange', async () => {
-				if (this.wakeLock !== null && document.visibilityState === 'visible') {
+				if (
+					this.wakeLock !== null &&
+					document.visibilityState === 'visible'
+				) {
 					await this.request();
 				}
 			});
@@ -30,7 +33,7 @@ export class WakeLockService {
 		try {
 			this.wakeLock = await (navigator as any).wakeLock.request('screen');
 			this.isActive.set(true);
-			
+
 			this.wakeLock.addEventListener('release', () => {
 				this.isActive.set(false);
 			});

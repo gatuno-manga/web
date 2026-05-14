@@ -1,14 +1,14 @@
+import { CommonModule } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
+	computed,
+	ElementRef,
 	input,
 	output,
 	signal,
-	computed,
-	ChangeDetectionStrategy,
-	ElementRef,
 	viewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
@@ -98,7 +98,7 @@ export class FileInputComponent {
 		this.errorMessage.set(null);
 		this.fileSelected.emit(null);
 		if (this.inputRef()) {
-			this.inputRef()!.nativeElement.value = '';
+			this.inputRef()?.nativeElement.value = '';
 		}
 	}
 

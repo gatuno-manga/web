@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { NotificationService } from '@core/services/notification.service';
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
+import { NotificationService } from '@core/services/notification.service';
 
 import { OverlayNotificationComponent } from './overlay-notification.component';
 

@@ -1,11 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import {
-	ToastNotification,
-	NotificationType,
-} from '@models/notification.models';
-import { NotificationService } from './notification.service';
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
+import { NotificationType } from '@models/notification.models';
+import { NotificationService } from './notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class ToastNotificationService {

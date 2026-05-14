@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 import {
-	NotificationConfig,
-	NotificationComponentData,
-	NotificationSeverity,
-	NotificationResult,
-	NotificationVisualType,
-	NotificationLevel,
-	OverlayNotification,
-	NOTIFICATION_CONSTANTS,
-} from './notification-strategy.interface';
-import {
-	ToastNotification,
-	ModalNotification,
 	ModalButton,
+	ModalNotification,
+	ToastNotification,
 } from '@models/notification.models';
+import {
+	NOTIFICATION_CONSTANTS,
+	NotificationComponentData,
+	NotificationConfig,
+	NotificationLevel,
+	NotificationResult,
+	NotificationSeverity,
+	NotificationVisualType,
+	OverlayNotification,
+} from './notification-strategy.interface';
 
 /**
  * Factory para criação de objetos de notificação.

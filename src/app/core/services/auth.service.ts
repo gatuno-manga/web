@@ -8,8 +8,8 @@ import {
 	registerRequest,
 } from '@models/user.models';
 import { tap } from 'rxjs';
-import { UserTokenService } from './user-token.service';
 import { UnifiedReadingProgressService } from './unified-reading-progress.service';
+import { UserTokenService } from './user-token.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -31,7 +31,10 @@ export class AuthService {
 			.pipe(
 				tap(({ body }) => {
 					if (body && isAuthTokensResponse(body)) {
-						this.userTokenService.setTokens(body.accessToken, body.csrfToken);
+						this.userTokenService.setTokens(
+							body.accessToken,
+							body.csrfToken,
+						);
 						this.readingProgressService.onUserLogin();
 					}
 				}),
@@ -51,7 +54,10 @@ export class AuthService {
 			.pipe(
 				tap(({ body }) => {
 					if (body?.accessToken) {
-						this.userTokenService.setTokens(body.accessToken, body.csrfToken);
+						this.userTokenService.setTokens(
+							body.accessToken,
+							body.csrfToken,
+						);
 						this.readingProgressService.onUserLogin();
 					}
 				}),
@@ -81,7 +87,10 @@ export class AuthService {
 			.pipe(
 				tap(({ body }) => {
 					if (body && isAuthTokensResponse(body)) {
-						this.userTokenService.setTokens(body.accessToken, body.csrfToken);
+						this.userTokenService.setTokens(
+							body.accessToken,
+							body.csrfToken,
+						);
 						this.readingProgressService.onUserLogin();
 					}
 				}),
@@ -113,7 +122,10 @@ export class AuthService {
 			.pipe(
 				tap(({ body }) => {
 					if (body) {
-						this.userTokenService.setTokens(body.accessToken, body.csrfToken);
+						this.userTokenService.setTokens(
+							body.accessToken,
+							body.csrfToken,
+						);
 						// Sincroniza o histórico de leitura após o registro
 						this.readingProgressService.onUserLogin();
 					}

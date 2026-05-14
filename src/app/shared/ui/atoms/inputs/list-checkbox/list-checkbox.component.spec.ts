@@ -3,21 +3,20 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ListCheckboxComponent } from './list-checkbox.component';
 
 describe('ListCheckboxComponent', () => {
-  let component: ListCheckboxComponent;
-  let fixture: ComponentFixture<ListCheckboxComponent>;
+	let component: ListCheckboxComponent;
+	let fixture: ComponentFixture<ListCheckboxComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ListCheckboxComponent]
-    })
-    .compileComponents();
+	beforeEach(async () => {
+		await TestBed.configureTestingModule({
+			imports: [ListCheckboxComponent],
+		}).compileComponents();
 
-    fixture = TestBed.createComponent(ListCheckboxComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+		fixture = TestBed.createComponent(ListCheckboxComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	it('should create', () => {
+		expect(component).toBeTruthy();
+	});
 });

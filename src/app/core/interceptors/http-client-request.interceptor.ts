@@ -1,9 +1,9 @@
+import { isPlatformBrowser } from '@angular/common';
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { environment } from '@environments/environment';
 import { CookieService } from '@core/services/cookie.service';
 import { CsrfService } from '@core/services/csrf.service';
+import { environment } from '@environments/environment';
 import { buildApiUrl } from '@shared/utils/api-url.utils';
 
 const DEVICE_ID_STORAGE_KEY = 'gatuno-device-id';
@@ -24,7 +24,7 @@ const resolveBrowserDeviceId = (): string => {
 
 const resolveBrowserDeviceName = (): string => {
 	const nav = window.navigator as Navigator & {
-		userAgentData?: { platform?: string; };
+		userAgentData?: { platform?: string };
 	};
 	return nav.userAgentData?.platform || nav.platform || 'web';
 };

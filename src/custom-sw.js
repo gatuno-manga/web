@@ -29,10 +29,15 @@ async function syncReadingProgress() {
 				const success = await sendProgress(item);
 				if (success) {
 					await removeFromQueue(db, item.chapterId);
-					console.log(`[SW] Successfully synced chapter: ${item.chapterId}`);
+					console.log(
+						`[SW] Successfully synced chapter: ${item.chapterId}`,
+					);
 				}
 			} catch (err) {
-				console.error(`[SW] Failed to sync chapter ${item.chapterId}:`, err);
+				console.error(
+					`[SW] Failed to sync chapter ${item.chapterId}:`,
+					err,
+				);
 			}
 		}
 	} catch (err) {

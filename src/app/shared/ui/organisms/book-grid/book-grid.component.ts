@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BookList } from '@models/book.models';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
+import { BookList } from '@models/book.models';
 
 @Component({
 	selector: 'app-book-grid',

@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Page } from '@models/miscellaneous.models';
+import { Injectable } from '@angular/core';
 import {
 	ChapterCommentNode,
 	ChapterCommentsPageOptions,
 } from '@models/book.models';
+import { Page } from '@models/miscellaneous.models';
+import { Observable } from 'rxjs';
 
 @Injectable({
 	providedIn: 'root',

@@ -1,5 +1,5 @@
-import { Injectable, PLATFORM_ID, inject, signal, effect } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { SettingsService } from './settings.service';
 
 @Injectable({
@@ -8,9 +8,9 @@ import { SettingsService } from './settings.service';
 export class VisibilityPrivacyService {
 	private platformId = inject(PLATFORM_ID);
 	private settingsService = inject(SettingsService);
-	
+
 	private idleTimer: any;
-	
+
 	isBlurred = signal<boolean>(false);
 	isInactive = signal<boolean>(false);
 
@@ -37,16 +37,22 @@ export class VisibilityPrivacyService {
 	}
 
 	private setupIdleListener() {
-		const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
-		
+		const activityEvents = [
+			'mousedown',
+			'mousemove',
+			'keypress',
+			'scroll',
+			'touchstart',
+		];
+
 		const resetTimer = () => {
 			if (this.isInactive()) {
 				this.isInactive.set(false);
 				this.updateBlurState();
 			}
-			
+
 			clearTimeout(this.idleTimer);
-			
+
 			const settings = this.settingsService.getSettings();
 			if (settings.privacyBlurOnIdle) {
 				const timeout = (settings.idleTimeoutSeconds || 60) * 1000;
@@ -57,7 +63,7 @@ export class VisibilityPrivacyService {
 			}
 		};
 
-		activityEvents.forEach(event => {
+		activityEvents.forEach((event) => {
 			document.addEventListener(event, resetTimer, { passive: true });
 		});
 
@@ -66,12 +72,15 @@ export class VisibilityPrivacyService {
 
 	private updateBlurState() {
 		const settings = this.settingsService.getSettings();
-		const shouldBlur = !!((settings.privacyBlurOnHide && document.visibilityState === 'hidden') ||
-						   (settings.privacyBlurOnIdle && this.isInactive()));
-		
+		const shouldBlur = !!(
+			(settings.privacyBlurOnHide &&
+				document.visibilityState === 'hidden') ||
+			(settings.privacyBlurOnIdle && this.isInactive())
+		);
+
 		this.isBlurred.set(shouldBlur);
 	}
-	
+
 	unblurManually() {
 		this.isBlurred.set(false);
 		// If unblurred manually, we might want to reset the idle timer

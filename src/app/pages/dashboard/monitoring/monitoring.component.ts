@@ -1,29 +1,29 @@
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
 	Component,
-	OnInit,
-	OnDestroy,
-	signal,
-	inject,
 	computed,
+	inject,
+	OnDestroy,
+	OnInit,
+	PLATFORM_ID,
+	signal,
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Subscription, interval } from 'rxjs';
-import { PLATFORM_ID } from '@angular/core';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { RouterModule } from '@angular/router';
 import { BookWebsocketService } from '@core/services/book-websocket.service';
 import { DashboardService } from '@core/services/dashboard.service';
 import {
-	QueueStats,
-	QueueCounts,
-	RecentQueueEvent,
-} from '@models/dashboard.models';
-import {
-	UpdateStartedEvent,
 	UpdateCompletedEvent,
 	UpdateFailedEvent,
+	UpdateStartedEvent,
 } from '@models/book-events.model';
-import { RouterModule } from '@angular/router';
+import {
+	QueueCounts,
+	QueueStats,
+	RecentQueueEvent,
+} from '@models/dashboard.models';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { interval, Subscription } from 'rxjs';
 
 const EMPTY_COUNTS: QueueCounts = {
 	waiting: 0,

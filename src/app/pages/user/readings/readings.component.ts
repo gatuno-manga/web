@@ -1,6 +1,6 @@
 import {
-	Component,
 	ChangeDetectionStrategy,
+	Component,
 	inject,
 	input,
 } from '@angular/core';

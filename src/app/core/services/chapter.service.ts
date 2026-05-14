@@ -1,6 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Chapter } from '@models/book.models';
-import { HttpClient } from '@angular/common/http';
 
 interface BatchReadResult {
 	chapterId: string;

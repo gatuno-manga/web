@@ -1,12 +1,12 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, Input, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SettingsService } from '@core/services/settings.service';
 import { FullscreenService } from '@core/services/fullscreen.service';
+import { SettingsService } from '@core/services/settings.service';
 import { ReaderSettings } from '@models/settings.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
 import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 
@@ -53,7 +53,13 @@ export class ReaderSettingsFormComponent implements OnInit {
 		idleTimeoutSeconds: 60,
 	};
 
-	viewFilter: 'all' | 'pages' | 'filters' | 'appearance' | 'text' | 'privacy' = 'all';
+	viewFilter:
+		| 'all'
+		| 'pages'
+		| 'filters'
+		| 'appearance'
+		| 'text'
+		| 'privacy' = 'all';
 
 	decimalSeparatorOptions = [
 		{ value: ',', label: 'Vírgula (,)' },
@@ -161,7 +167,9 @@ export class ReaderSettingsFormComponent implements OnInit {
 		);
 	}
 
-	setView(filter: 'all' | 'pages' | 'filters' | 'appearance' | 'text' | 'privacy') {
+	setView(
+		filter: 'all' | 'pages' | 'filters' | 'appearance' | 'text' | 'privacy',
+	) {
 		this.viewFilter = filter;
 	}
 
@@ -187,22 +195,22 @@ export class ReaderSettingsFormComponent implements OnInit {
 		this.refreshLocalSettings();
 	}
 
-	onBrightnessToggle(eventOrValue: Event | boolean): void {
+	onBrightnessToggle(_eventOrValue: Event | boolean): void {
 		this.settingsService.toggleBrightness150();
 		this.refreshLocalSettings();
 	}
 
-	onContrastToggle(eventOrValue: Event | boolean): void {
+	onContrastToggle(_eventOrValue: Event | boolean): void {
 		this.settingsService.toggleContrast150();
 		this.refreshLocalSettings();
 	}
 
-	onInvertToggle(eventOrValue: Event | boolean): void {
+	onInvertToggle(_eventOrValue: Event | boolean): void {
 		this.settingsService.toggleInvert();
 		this.refreshLocalSettings();
 	}
 
-	onNightModeToggle(eventOrValue: Event | boolean): void {
+	onNightModeToggle(_eventOrValue: Event | boolean): void {
 		this.settingsService.toggleNightMode();
 		this.refreshLocalSettings();
 	}

@@ -1,16 +1,16 @@
 import { CommonModule } from '@angular/common';
 import {
-	Component,
-	OnInit,
-	ChangeDetectorRef,
 	ChangeDetectionStrategy,
-	input,
-	inject,
+	ChangeDetectorRef,
+	Component,
 	computed,
+	inject,
+	input,
+	OnInit,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { startRegistration } from '@simplewebauthn/browser';
-import { firstValueFrom } from 'rxjs';
+import { AccountSecurityService } from '@core/services/account-security.service';
+import { SearchService } from '@core/services/search.service';
 import {
 	ActiveSession,
 	AuditLogItem,
@@ -18,12 +18,12 @@ import {
 	MfaStatusResponse,
 	PasskeySummary,
 } from '@models/account-security.models';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
-import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
+import { startRegistration } from '@simplewebauthn/browser';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { AccountSecurityService } from '@core/services/account-security.service';
-import { SearchService } from '@core/services/search.service';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
 	selector: 'app-security',

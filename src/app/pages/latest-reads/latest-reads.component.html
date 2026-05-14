@@ -52,7 +52,7 @@
 														<span class="read-time">{{ formatTime(entry.updatedAt) }}</span>
 													</div>
 													<div class="item-actions">
-														<button class="remove-btn" (click)="removeProgress(entry.progressId, entry.chapter.id)" title="Remover do histórico">
+														<button type="button" class="remove-btn" (click)="removeProgress(entry.progressId, entry.chapter.id)" title="Remover do histórico">
 															<app-icons name="trash" size="18" />
 														</button>
 														@if (first) {

@@ -1,22 +1,34 @@
-import { Component, inject, input, computed, effect, signal } from '@angular/core';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
-import { AuthService } from '@core/services/auth.service';
-import { Router } from '@angular/router';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { SearchService } from '@core/services/search.service';
-import { UserService } from '@core/services/user.service';
+import {
+	Component,
+	computed,
+	effect,
+	inject,
+	input,
+	signal,
+} from '@angular/core';
 import {
 	FormBuilder,
 	FormGroup,
 	ReactiveFormsModule,
 	Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '@core/services/auth.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { SearchService } from '@core/services/search.service';
+import { UserService } from '@core/services/user.service';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 import { FileInputComponent } from '@ui/molecules/file-input/file-input.component';
 
 @Component({
 	selector: 'app-profile',
-	imports: [ReactiveFormsModule, ButtonComponent, TextInputComponent, FileInputComponent],
+	imports: [
+		ReactiveFormsModule,
+		ButtonComponent,
+		TextInputComponent,
+		FileInputComponent,
+	],
 	templateUrl: './profile.component.html',
 	styleUrl: './profile.component.scss',
 })
@@ -126,4 +138,3 @@ export class ProfileComponent {
 		});
 	}
 }
-

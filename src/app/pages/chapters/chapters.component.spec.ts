@@ -1,12 +1,12 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
-import { of, ReplaySubject } from 'rxjs';
-import { SharedTestingModule } from '@testing/shared-testing.module';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { BookService } from '@core/services/book.service';
+import { DownloadService } from '@core/services/download.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NotificationService } from '@core/services/notification.service';
-import { DownloadService } from '@core/services/download.service';
-import { BookService } from '@core/services/book.service';
-import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { SharedTestingModule } from '@testing/shared-testing.module';
+import { of, ReplaySubject } from 'rxjs';
 
 import { ChaptersComponent } from './chapters.component';
 
@@ -239,7 +239,9 @@ describe('ChaptersComponent', () => {
 
 		await TestBed.configureTestingModule({
 			imports: [ChaptersComponent, SharedTestingModule],
-			providers: [{ provide: ActivatedRoute, useValue: mockActivatedRoute }],
+			providers: [
+				{ provide: ActivatedRoute, useValue: mockActivatedRoute },
+			],
 		}).compileComponents();
 
 		const bookService = TestBed.inject(BookService);
@@ -258,7 +260,3 @@ describe('ChaptersComponent', () => {
 		expect(newComponent.bookBlurHash()).toBe('test-hash');
 	});
 });
-
-
-
-

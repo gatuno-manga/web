@@ -1,11 +1,21 @@
-import { ChangeDetectionStrategy, Component, ElementRef, forwardRef, input, viewChild, output, model, computed } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { ControlValueAccessor } from '@angular/forms';
 import { NgClass } from '@angular/common';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	ElementRef,
+	forwardRef,
+	input,
+	model,
+	output,
+	viewChild,
+} from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
-	selector: 'app-input[type="text"], app-input[type="email"], app-input[type="number"]',
+	selector:
+		'app-input[type="text"], app-input[type="email"], app-input[type="number"]',
 	imports: [IconsComponent, NgClass],
 	providers: [
 		{
@@ -17,13 +27,13 @@ import { NgClass } from '@angular/common';
 	standalone: true,
 	templateUrl: './text-input.component.html',
 	styleUrl: './text-input.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextInputComponent implements ControlValueAccessor {
 	focus = output<void>();
 	blur = output<void>();
 	inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
-	
+
 	id = input<string>();
 	type = input<string>('text');
 	placeholder = input<string>('');
@@ -39,7 +49,9 @@ export class TextInputComponent implements ControlValueAccessor {
 	// Password strength and rules (safe defaults for base component)
 	showStrength = input<boolean>(false);
 	showRules = input<boolean>(false);
-	passwordRequirements = computed(() => [] as { label: string; met: boolean }[]);
+	passwordRequirements = computed(
+		() => [] as { label: string; met: boolean }[],
+	);
 	strengthScore = computed(() => 0);
 
 	isFocused = false;
@@ -56,14 +68,15 @@ export class TextInputComponent implements ControlValueAccessor {
 	inputErrorMessages: {
 		[key: string]: string;
 	} = {
-			required: 'Este campo é obrigatório',
-			email: 'Insira um endereço de e-mail válido',
-			minlength: 'Não pode ser menor que {{requiredLength}} caracteres',
-			maxlength: 'Não pode ser maior que {{requiredLength}} caracteres',
-			minUppercase: 'Deve conter pelo menos {{requiredLength}} letra(s) maiúscula(s)',
-			minNumber: 'Deve conter pelo menos {{requiredLength}} número(s)',
-			minSymbol: 'Deve conter pelo menos {{requiredLength}} símbolo(s)',
-		}
+		required: 'Este campo é obrigatório',
+		email: 'Insira um endereço de e-mail válido',
+		minlength: 'Não pode ser menor que {{requiredLength}} caracteres',
+		maxlength: 'Não pode ser maior que {{requiredLength}} caracteres',
+		minUppercase:
+			'Deve conter pelo menos {{requiredLength}} letra(s) maiúscula(s)',
+		minNumber: 'Deve conter pelo menos {{requiredLength}} número(s)',
+		minSymbol: 'Deve conter pelo menos {{requiredLength}} símbolo(s)',
+	};
 
 	onLeftIconClick(event: MouseEvent): void {
 		event.stopPropagation();
@@ -86,13 +99,13 @@ export class TextInputComponent implements ControlValueAccessor {
 		this.focus.emit();
 	}
 
-	onBlur(value: string): void {
+	onBlur(_value: string): void {
 		this.isFocused = false;
 		this.firstLostFocus = true;
 		this.blur.emit();
 	}
 
-	setDisabledState?(isDisabled: boolean): void {}
+	setDisabledState?(_isDisabled: boolean): void {}
 
 	onTouchedInternal(): void {
 		this.onTouched();
@@ -126,29 +139,38 @@ export class TextInputComponent implements ControlValueAccessor {
 
 	errorMessages(): string[] {
 		const errorsValue = this.errors();
-		if (errorsValue && this.firstLostFocus && (this.touched() || this.firstLostFocus)) {
+		if (
+			errorsValue &&
+			this.firstLostFocus &&
+			(this.touched() || this.firstLostFocus)
+		) {
 			const errorKeys = Object.keys(errorsValue);
 			if (errorKeys.length > 0) {
-				const messages = errorKeys.map(key => {
+				const messages = errorKeys.map((key) => {
 					const message = this.inputErrorMessages[key];
 
 					if (message) {
-						if (typeof errorsValue[key] === 'object' && errorsValue[key] !== null) {
+						if (
+							typeof errorsValue[key] === 'object' &&
+							errorsValue[key] !== null
+						) {
 							for (const prop in errorsValue[key]) {
-								if (errorsValue[key].hasOwnProperty(prop)) {
-									return message.replace(`{{${prop}}}`, errorsValue[key][prop] || '');
+								if (Object.hasOwn(errorsValue[key], prop)) {
+									return message.replace(
+										`{{${prop}}}`,
+										errorsValue[key][prop] || '',
+									);
 								}
 							}
 						}
 						return message;
-					}
-					else if (typeof errorsValue[key] === 'string') {
+					} else if (typeof errorsValue[key] === 'string') {
 						return errorsValue[key];
 					}
 
-					return 'error ' + key;
+					return `error ${key}`;
 				});
-				return messages.filter(msg => msg !== '');
+				return messages.filter((msg) => msg !== '');
 			}
 		}
 		return [];
@@ -168,7 +190,7 @@ export class TextInputComponent implements ControlValueAccessor {
 	standalone: true,
 	templateUrl: './text-input.component.html',
 	styleUrl: './text-input.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PasswordInputComponent extends TextInputComponent {
 	showPassword = false;
@@ -180,14 +202,17 @@ export class PasswordInputComponent extends TextInputComponent {
 			{ label: 'Mínimo de 8 caracteres', met: val.length >= 8 },
 			{ label: 'Uma letra maiúscula', met: /[A-Z]/.test(val) },
 			{ label: 'Um número', met: /[0-9]/.test(val) },
-			{ label: 'Um símbolo (@, #, !, etc)', met: /[^A-Za-z0-9]/.test(val) }
+			{
+				label: 'Um símbolo (@, #, !, etc)',
+				met: /[^A-Za-z0-9]/.test(val),
+			},
 		];
 	});
 
 	override strengthScore = computed(() => {
 		const val = this.value();
 		if (!val) return 0;
-		return this.passwordRequirements().filter(r => r.met).length;
+		return this.passwordRequirements().filter((r) => r.met).length;
 	});
 
 	override get passwordRightIcon(): string {
@@ -206,7 +231,10 @@ export class PasswordInputComponent extends TextInputComponent {
 			inputEl.type = this.showPassword ? 'text' : 'password';
 			this._passwordRightIcon = this.showPassword ? 'eye' : 'eye-close';
 			inputEl.focus();
-			inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length);
+			inputEl.setSelectionRange(
+				inputEl.value.length,
+				inputEl.value.length,
+			);
 		}
 	}
 
@@ -214,8 +242,3 @@ export class PasswordInputComponent extends TextInputComponent {
 		return this.showPassword ? 'text' : 'password';
 	}
 }
-
-
-
-
-

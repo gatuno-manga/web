@@ -1,8 +1,6 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-	"organizeImports": {
-		"enabled": true
-	},
+	"$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {
 		"enabled": true,
 		"rules": {
@@ -30,16 +28,17 @@
 			"trailingCommas": "all"
 		}
 	},
+	"html": {
+		"parser": {
+			"interpolation": true
+		}
+	},
 	"files": {
-		"ignore": [
-			"dist/**",
-			"node_modules/**",
-			".angular/**"
-		]
+		"includes": ["**", "!**/dist", "!**/node_modules", "!**/.angular"]
 	},
 	"overrides": [
 		{
-			"include": ["**/*.spec.ts", "**/*.e2e-spec.ts"],
+			"includes": ["**/*.spec.ts", "**/*.e2e-spec.ts"],
 			"linter": {
 				"rules": {
 					"suspicious": {

@@ -1,22 +1,24 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ReadingProgressSyncService, SyncStatus } from './reading-progress-sync.service';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { UserTokenService } from './user-token.service';
-import { ReadingProgressService } from './reading-progress.service';
-import { NetworkStatusService } from './network-status.service';
-import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
+import {
+	HttpClientTestingModule,
+	HttpTestingController,
+} from '@angular/common/http/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ENVIRONMENT } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
 import { WebSocketConnectionState } from '@models/websocket-state.model';
-import { Subject, of } from 'rxjs';
-import * as socketIo from 'socket.io-client';
+import { Subject } from 'rxjs';
+import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
+import { NetworkStatusService } from './network-status.service';
+import { ReadingProgressService } from './reading-progress.service';
+import { ReadingProgressSyncService } from './reading-progress-sync.service';
+import { UserTokenService } from './user-token.service';
 
 describe('ReadingProgressSyncService', () => {
 	let service: ReadingProgressSyncService;
 	let httpMock: HttpTestingController;
-	let userTokenServiceSpy: jasmine.SpyObj<UserTokenService>;
+	let _userTokenServiceSpy: jasmine.SpyObj<UserTokenService>;
 	let localProgressServiceSpy: jasmine.SpyObj<ReadingProgressService>;
-	let networkStatusServiceSpy: jasmine.SpyObj<NetworkStatusService>;
+	let _networkStatusServiceSpy: jasmine.SpyObj<NetworkStatusService>;
 	let backgroundSyncServiceSpy: jasmine.SpyObj<BackgroundSyncRegistrationService>;
 	let mockSocket: any;
 
@@ -49,16 +51,18 @@ describe('ReadingProgressSyncService', () => {
 			accessToken: 'mock-token',
 			hasValidAccessToken: true,
 		});
-		const localProgressSpy = jasmine.createSpyObj('ReadingProgressService', [
-			'saveProgress',
-			'getProgress',
-			'enqueueSync',
-			'getCurrentUserId',
-		]);
-		const networkStatusSpy = jasmine.createSpyObj('NetworkStatusService', [], {
-			wentOffline$: new Subject<void>(),
-			wentOnline$: new Subject<void>(),
-		});
+		const localProgressSpy = jasmine.createSpyObj(
+			'ReadingProgressService',
+			['saveProgress', 'getProgress', 'enqueueSync', 'getCurrentUserId'],
+		);
+		const networkStatusSpy = jasmine.createSpyObj(
+			'NetworkStatusService',
+			[],
+			{
+				wentOffline$: new Subject<void>(),
+				wentOnline$: new Subject<void>(),
+			},
+		);
 		const backgroundSyncSpy = jasmine.createSpyObj(
 			'BackgroundSyncRegistrationService',
 			['register'],
@@ -81,17 +85,17 @@ describe('ReadingProgressSyncService', () => {
 		});
 
 		service = TestBed.inject(ReadingProgressSyncService);
-		// @ts-ignore - spy on protected method
+		// @ts-expect-error - spy on protected method
 		spyOn<any>(service, 'createSocket').and.returnValue(mockSocket);
 
 		httpMock = TestBed.inject(HttpTestingController);
-		userTokenServiceSpy = TestBed.inject(
+		_userTokenServiceSpy = TestBed.inject(
 			UserTokenService,
 		) as jasmine.SpyObj<UserTokenService>;
 		localProgressServiceSpy = TestBed.inject(
 			ReadingProgressService,
 		) as jasmine.SpyObj<ReadingProgressService>;
-		networkStatusServiceSpy = TestBed.inject(
+		_networkStatusServiceSpy = TestBed.inject(
 			NetworkStatusService,
 		) as jasmine.SpyObj<NetworkStatusService>;
 		backgroundSyncServiceSpy = TestBed.inject(
@@ -121,8 +125,8 @@ describe('ReadingProgressSyncService', () => {
 		mockSocket.connected = true;
 		(service as any).socket = mockSocket;
 		// Transição válida via CONNECTING
-		service['transitionTo'](WebSocketConnectionState.CONNECTING);
-		service['transitionTo'](WebSocketConnectionState.CONNECTED);
+		service.transitionTo(WebSocketConnectionState.CONNECTING);
+		service.transitionTo(WebSocketConnectionState.CONNECTED);
 
 		const progressData = {
 			chapterId: 'c1',
@@ -148,7 +152,7 @@ describe('ReadingProgressSyncService', () => {
 	it('should save progress locally and register background sync if disconnected', fakeAsync(() => {
 		mockSocket.connected = false;
 		(service as any).socket = null;
-		service['transitionTo'](WebSocketConnectionState.DISCONNECTED);
+		service.transitionTo(WebSocketConnectionState.DISCONNECTED);
 		backgroundSyncServiceSpy.register.and.returnValue(Promise.resolve());
 		localProgressServiceSpy.enqueueSync.and.returnValue(Promise.resolve());
 
@@ -171,7 +175,7 @@ describe('ReadingProgressSyncService', () => {
 		expect(backgroundSyncServiceSpy.register).toHaveBeenCalledWith(
 			'sync-reading-progress',
 		);
-		
+
 		// Should also attempt HTTP sync
 		const req = httpMock.expectOne('users/me/reading-progress');
 		expect(req.request.method).toBe('POST');
@@ -196,10 +200,10 @@ describe('ReadingProgressSyncService', () => {
 	});
 
 	it('should update sync status correctly', () => {
-		service['updateSyncStatus']({ syncing: true });
+		service.updateSyncStatus({ syncing: true });
 		expect(service.syncStatus().syncing).toBeTrue();
 
-		service['updateSyncStatus']({ pendingChanges: 5 });
+		service.updateSyncStatus({ pendingChanges: 5 });
 		expect(service.syncStatus().pendingChanges).toBe(5);
 		expect(service.syncStatus().syncing).toBeTrue(); // Should preserve previous values
 	});

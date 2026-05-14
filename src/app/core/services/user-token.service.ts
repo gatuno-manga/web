@@ -1,30 +1,24 @@
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import {
-	Injectable,
-	inject,
-	PLATFORM_ID,
-	NgZone,
-	signal,
 	computed,
 	DestroyRef,
+	Injectable,
+	inject,
+	NgZone,
+	PLATFORM_ID,
+	signal,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CookieService } from './cookie.service';
-import { CsrfService } from './csrf.service';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
 import { payloadToken, Role } from '@models/user.models';
-import { Observable, Subscription, throwError, timer, delay } from 'rxjs';
-import {
-	shareReplay,
-	tap,
-	finalize,
-	switchMap,
-	catchError,
-} from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode';
+import { Observable, Subscription, throwError, timer } from 'rxjs';
+import { catchError, finalize, shareReplay, tap } from 'rxjs/operators';
+import { CookieService } from './cookie.service';
+import { AuthSyncMessage, CrossTabSyncService } from './cross-tab-sync.service';
+import { CsrfService } from './csrf.service';
 import { NotificationService } from './notification.service';
-import { CrossTabSyncService, AuthSyncMessage } from './cross-tab-sync.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -73,7 +67,9 @@ export class UserTokenService {
 	});
 
 	public readonly accessTokenSignal = this._accessToken.asReadonly();
-	public readonly csrfTokenSignal = computed(() => this.csrfService.csrfToken);
+	public readonly csrfTokenSignal = computed(
+		() => this.csrfService.csrfToken,
+	);
 
 	public readonly hasValidAccessTokenSignal = computed(() => {
 		const decoded = this._decodedToken();
@@ -104,9 +100,11 @@ export class UserTokenService {
 	constructor() {
 		const initialToken = this.cookieService.get(this.ACCESSKEY, false);
 		this._accessToken.set(initialToken);
-		
+
 		if (isPlatformBrowser(this.platformId)) {
-			this.sessionMayExist = !!initialToken || localStorage.getItem(this.SESSION_INTENT_KEY) === 'true';
+			this.sessionMayExist =
+				!!initialToken ||
+				localStorage.getItem(this.SESSION_INTENT_KEY) === 'true';
 		}
 
 		this.initCrossTabSync();
@@ -230,16 +228,6 @@ export class UserTokenService {
 		return this.sessionMayExist;
 	}
 
-	private isTokenValid(token: string): boolean {
-		try {
-			const { exp } = jwtDecode<payloadToken>(token);
-			if (!exp) return false;
-			return exp > Math.floor(Date.now() / 1000);
-		} catch {
-			return false;
-		}
-	}
-
 	private scheduleAutoRefresh() {
 		if (!isPlatformBrowser(this.platformId) || !this.accessToken) return;
 		this.stopAutoRefresh();
@@ -260,19 +248,29 @@ export class UserTokenService {
 						timeToRefresh + jitter,
 					).subscribe(() => {
 						this.ngZone.run(() => {
-							const lock = localStorage.getItem(this.REFRESH_LOCK_KEY);
+							const lock = localStorage.getItem(
+								this.REFRESH_LOCK_KEY,
+							);
 							const now = Date.now();
 
-							if (lock && now - parseInt(lock, 10) < this.LOCK_TIMEOUT_MS) {
+							if (
+								lock &&
+								now - parseInt(lock, 10) < this.LOCK_TIMEOUT_MS
+							) {
 								return;
 							}
 
-							localStorage.setItem(this.REFRESH_LOCK_KEY, now.toString());
+							localStorage.setItem(
+								this.REFRESH_LOCK_KEY,
+								now.toString(),
+							);
 
 							this.refreshTokens()
 								.pipe(
 									finalize(() =>
-										localStorage.removeItem(this.REFRESH_LOCK_KEY),
+										localStorage.removeItem(
+											this.REFRESH_LOCK_KEY,
+										),
 									),
 								)
 								.subscribe({
@@ -292,7 +290,7 @@ export class UserTokenService {
 					});
 				});
 			}
-		} catch (e) {
+		} catch (_e) {
 			this.removeTokens(false);
 		}
 	}
@@ -304,25 +302,32 @@ export class UserTokenService {
 		}
 	}
 
-	refreshTokens(): Observable<{ accessToken: string; refreshToken?: string; csrfToken?: string; }> {
+	refreshTokens(): Observable<{
+		accessToken: string;
+		refreshToken?: string;
+		csrfToken?: string;
+	}> {
 		if (!this.refreshObservable) {
 			const csrfToken = this.csrfToken?.trim();
 
 			if (!csrfToken) {
 				return throwError(
-					() => new Error('CRITICAL: Token CSRF não encontrado para refresh'),
+					() =>
+						new Error(
+							'CRITICAL: Token CSRF não encontrado para refresh',
+						),
 				);
 			}
 
 			this.refreshObservable = this.http
-				.post<{ accessToken: string; refreshToken?: string; csrfToken?: string }>(
-					'/auth/refresh',
-					null,
-					{
-						withCredentials: true,
-						headers: { 'x-csrf-token': csrfToken },
-					},
-				)
+				.post<{
+					accessToken: string;
+					refreshToken?: string;
+					csrfToken?: string;
+				}>('/auth/refresh', null, {
+					withCredentials: true,
+					headers: { 'x-csrf-token': csrfToken },
+				})
 				.pipe(
 					tap((body) => {
 						if (body?.accessToken) {
@@ -341,10 +346,6 @@ export class UserTokenService {
 			}>;
 		}
 		return this.refreshObservable!;
-	}
-
-	private hasRole(role: Role): boolean {
-		return this.rolesSignal().includes(role);
 	}
 
 	get isAdmin(): boolean {

@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReaderSettingsNotificationComponent } from './reader-settings-notification.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SettingsService } from '@core/services/settings.service';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LocalStorageService } from '@core/services/local-storage.service';
+import { SettingsService } from '@core/services/settings.service';
+import { ReaderSettingsNotificationComponent } from './reader-settings-notification.component';
 
 describe('ReaderSettingsNotificationComponent', () => {
 	let component: ReaderSettingsNotificationComponent;

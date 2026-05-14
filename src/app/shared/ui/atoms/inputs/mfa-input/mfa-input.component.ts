@@ -1,10 +1,10 @@
 import {
+	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
 	forwardRef,
 	QueryList,
 	ViewChildren,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import {
 	ControlValueAccessor,

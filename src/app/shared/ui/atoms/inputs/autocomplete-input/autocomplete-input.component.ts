@@ -1,8 +1,19 @@
-import { ChangeDetectionStrategy, Component, ElementRef, forwardRef, inject, input, model, output, signal, viewChild, computed } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	forwardRef,
+	input,
+	model,
+	output,
+	signal,
+} from '@angular/core';
+import {
+	ControlValueAccessor,
+	FormsModule,
+	NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 
 export interface AutocompleteOption {
 	id: any;
@@ -40,7 +51,7 @@ export class AutocompleteInputComponent implements ControlValueAccessor {
 
 	value = model<string>('');
 	isOpen = signal(false);
-	
+
 	private onChange: (value: string) => void = () => {};
 	private onTouched: () => void = () => {};
 
@@ -85,5 +96,5 @@ export class AutocompleteInputComponent implements ControlValueAccessor {
 		this.onTouched = fn;
 	}
 
-	setDisabledState?(isDisabled: boolean): void {}
+	setDisabledState?(_isDisabled: boolean): void {}
 }

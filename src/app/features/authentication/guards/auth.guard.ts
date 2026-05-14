@@ -1,9 +1,9 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, CanMatchFn, Router, UrlTree } from '@angular/router';
+import { CanActivateFn, CanMatchFn, Router } from '@angular/router';
 import { UserTokenService } from '@core/services/user-token.service';
-import { Observable, of, catchError, map } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 
-export const isLoggedGuard: CanActivateFn = (route, state) => {
+export const isLoggedGuard: CanActivateFn = (_route, state) => {
 	const tokenService = inject(UserTokenService);
 	const router = inject(Router);
 
@@ -42,7 +42,7 @@ export const isNotLoggedGuard: CanActivateFn = () => {
 	return true;
 };
 
-export const isLoggedMatchGuard: CanMatchFn = (route, segments) => {
+export const isLoggedMatchGuard: CanMatchFn = (_route, _segments) => {
 	const tokenService = inject(UserTokenService);
 	const router = inject(Router);
 

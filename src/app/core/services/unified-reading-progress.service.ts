@@ -1,16 +1,19 @@
-import { Injectable, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Subject, Subscription } from 'rxjs';
+import { Inject, Injectable, OnDestroy, PLATFORM_ID } from '@angular/core';
+import { toObservable as signalToObservable } from '@angular/core/rxjs-interop';
+import {
+	RemoteReadingProgress,
+	SaveProgressDto,
+} from '@models/reading-progress-events.model';
+import { jwtDecode } from 'jwt-decode';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
-	ReadingProgressService,
 	ReadingProgress,
+	ReadingProgressService,
 } from './reading-progress.service';
 import { ReadingProgressSyncService } from './reading-progress-sync.service';
-import { RemoteReadingProgress, SaveProgressDto } from '@models/reading-progress-events.model';
 import { UserTokenService } from './user-token.service';
-import { jwtDecode } from 'jwt-decode';
-import { toObservable as signalToObservable } from '@angular/core/rxjs-interop';
 
 interface JwtPayload {
 	sub: string;
@@ -32,7 +35,6 @@ interface JwtPayload {
 export class UnifiedReadingProgressService implements OnDestroy {
 	private destroy$ = new Subject<void>();
 	private isBrowser: boolean;
-	private syncSubscription?: Subscription;
 
 	// Debounce para sincronização com API
 	private syncTimeout: ReturnType<typeof setTimeout> | null = null;

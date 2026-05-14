@@ -1,23 +1,23 @@
-import {
-    Component,
-    Input,
-    ChangeDetectionStrategy,
-    OnChanges,
-    SimpleChanges,
-    ViewChild,
-    ElementRef,
-    AfterViewInit,
-    OnDestroy
-} from '@angular/core';
-import { PdfViewerModule, PDFDocumentProxy } from 'ng2-pdf-viewer';
 import { CommonModule } from '@angular/common';
+import {
+	AfterViewInit,
+	ChangeDetectionStrategy,
+	Component,
+	ElementRef,
+	Input,
+	OnChanges,
+	OnDestroy,
+	SimpleChanges,
+	ViewChild,
+} from '@angular/core';
+import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer';
 
 @Component({
-    selector: 'app-pdf-page',
-    standalone: true,
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [PdfViewerModule, CommonModule],
-    template: `
+	selector: 'app-pdf-page',
+	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
+	imports: [PdfViewerModule, CommonModule],
+	template: `
         @if (isProxy(src)) {
             <canvas #pdfCanvas></canvas>
         } @else {
@@ -33,7 +33,8 @@ import { CommonModule } from '@angular/common';
             ></pdf-viewer>
         }
     `,
-    styles: [`
+	styles: [
+		`
         :host {
             display: block;
             width: 100%;
@@ -55,106 +56,111 @@ import { CommonModule } from '@angular/common';
                 border: none;
             }
         }
-    `]
+    `,
+	],
 })
 export class PdfPageComponent implements OnChanges, AfterViewInit, OnDestroy {
-    @Input() src: string | PDFDocumentProxy = '';
-    @Input() page: number = 1;
-    @Input() onLoadComplete?: (pdf: PDFDocumentProxy) => void;
-    @Input() onError?: (error: unknown) => void;
+	@Input() src: string | PDFDocumentProxy = '';
+	@Input() page: number = 1;
+	@Input() onLoadComplete?: (pdf: PDFDocumentProxy) => void;
+	@Input() onError?: (error: unknown) => void;
 
-    @ViewChild('pdfCanvas') canvasRef?: ElementRef<HTMLCanvasElement>;
-    private renderTask: { cancel: () => void; promise: Promise<void> } | null = null;
+	@ViewChild('pdfCanvas') canvasRef?: ElementRef<HTMLCanvasElement>;
+	private renderTask: { cancel: () => void; promise: Promise<void> } | null =
+		null;
 
-    isProxy(src: string | PDFDocumentProxy): src is PDFDocumentProxy {
-        return typeof src !== 'string' && src !== null && 'numPages' in src;
-    }
+	isProxy(src: string | PDFDocumentProxy): src is PDFDocumentProxy {
+		return typeof src !== 'string' && src !== null && 'numPages' in src;
+	}
 
-    ngOnChanges(changes: SimpleChanges) {
-        if (this.isProxy(this.src) && (changes['src'] || changes['page'])) {
-            this.renderCanvasPage();
-        }
-    }
+	ngOnChanges(changes: SimpleChanges) {
+		if (this.isProxy(this.src) && (changes.src || changes.page)) {
+			this.renderCanvasPage();
+		}
+	}
 
-    ngAfterViewInit() {
-        if (this.isProxy(this.src)) {
-            this.renderCanvasPage();
-        }
-    }
+	ngAfterViewInit() {
+		if (this.isProxy(this.src)) {
+			this.renderCanvasPage();
+		}
+	}
 
-    ngOnDestroy() {
-        if (this.renderTask) {
-            this.renderTask.cancel();
-        }
-    }
+	ngOnDestroy() {
+		if (this.renderTask) {
+			this.renderTask.cancel();
+		}
+	}
 
-    async renderCanvasPage() {
-        if (!this.isProxy(this.src) || !this.canvasRef) return;
+	async renderCanvasPage() {
+		if (!this.isProxy(this.src) || !this.canvasRef) return;
 
-        // Cancel previous render
-        if (this.renderTask) {
-            this.renderTask.cancel();
-        }
+		// Cancel previous render
+		if (this.renderTask) {
+			this.renderTask.cancel();
+		}
 
-        const pdf = this.src as PDFDocumentProxy;
-        const pageNumber = this.page;
+		const pdf = this.src as PDFDocumentProxy;
+		const pageNumber = this.page;
 
-        try {
-            const page = await pdf.getPage(pageNumber);
-            const canvas = this.canvasRef.nativeElement;
-            const context = canvas.getContext('2d');
+		try {
+			const page = await pdf.getPage(pageNumber);
+			const canvas = this.canvasRef.nativeElement;
+			const context = canvas.getContext('2d');
 
-            if (!context) return;
+			if (!context) return;
 
-            // Use the container width to calculate scale
-            // We want high quality, so we render at higher scale if possible
-            // But for performance, let's start with a reasonable scale calculation
-            const containerWidth = canvas.parentElement?.clientWidth || window.innerWidth;
-            const unscaledViewport = page.getViewport({ scale: 1 });
-            const scale = containerWidth / unscaledViewport.width;
+			// Use the container width to calculate scale
+			// We want high quality, so we render at higher scale if possible
+			// But for performance, let's start with a reasonable scale calculation
+			const containerWidth =
+				canvas.parentElement?.clientWidth || window.innerWidth;
+			const unscaledViewport = page.getViewport({ scale: 1 });
+			const scale = containerWidth / unscaledViewport.width;
 
-            // Limit max scale to avoid huge canvases
-            const finalScale = Math.min(scale * 1.5, 3.0);
+			// Limit max scale to avoid huge canvases
+			const finalScale = Math.min(scale * 1.5, 3.0);
 
-            const viewport = page.getViewport({ scale: finalScale });
+			const viewport = page.getViewport({ scale: finalScale });
 
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+			canvas.height = viewport.height;
+			canvas.width = viewport.width;
 
-            // Adjust CSS width to match container
-            canvas.style.width = '100%';
-            canvas.style.height = 'auto';
+			// Adjust CSS width to match container
+			canvas.style.width = '100%';
+			canvas.style.height = 'auto';
 
-            const renderContext = {
-                canvasContext: context,
-                viewport: viewport
-            };
+			const renderContext = {
+				canvasContext: context,
+				viewport: viewport,
+			};
 
-            this.renderTask = page.render(renderContext);
-            await this.renderTask.promise;
+			this.renderTask = page.render(renderContext);
+			await this.renderTask.promise;
 
-            if (this.onLoadComplete) {
-                // Call load complete for consistency, though we passed the proxy in
-                this.onLoadComplete(pdf);
-            }
+			if (this.onLoadComplete) {
+				// Call load complete for consistency, though we passed the proxy in
+				this.onLoadComplete(pdf);
+			}
+		} catch (error: unknown) {
+			if (
+				(error as { name?: string })?.name !==
+				'RenderingCancelledException'
+			) {
+				console.error('Page render error:', error);
+				this.handleError(error);
+			}
+		}
+	}
 
-        } catch (error: unknown) {
-            if ((error as { name?: string })?.name !== 'RenderingCancelledException') {
-                console.error('Page render error:', error);
-                this.handleError(error);
-            }
-        }
-    }
+	handleLoadComplete(pdf: PDFDocumentProxy) {
+		if (this.onLoadComplete) {
+			this.onLoadComplete(pdf);
+		}
+	}
 
-    handleLoadComplete(pdf: PDFDocumentProxy) {
-        if (this.onLoadComplete) {
-            this.onLoadComplete(pdf);
-        }
-    }
-
-    handleError(error: unknown) {
-        if (this.onError) {
-            this.onError(error);
-        }
-    }
+	handleError(error: unknown) {
+		if (this.onError) {
+			this.onError(error);
+		}
+	}
 }

@@ -1,19 +1,17 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { isPlatformBrowser } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
-	inject,
-	signal,
-	OnInit,
-	OnDestroy,
-	PLATFORM_ID,
 	Inject,
+	inject,
+	PLATFORM_ID,
+	signal,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { HeaderComponent } from '@ui/organisms/header/header.component';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { HeaderStateService } from '@core/services/header-state.service';
+import { HeaderComponent } from '@ui/organisms/header/header.component';
 import { SideNavComponent } from './side-nav/side-nav.component';
-import { BreakpointObserver } from '@angular/cdk/layout';
 
 @Component({
 	selector: 'app-default-outlet',
@@ -25,15 +23,9 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 export class DefaultOutletComponent {
 	protected headerState = inject(HeaderStateService);
 	private breakpointObserver = inject(BreakpointObserver);
-	private isBrowser: boolean;
 
 	sidebarOpen = signal(false);
 	isLargeScreen = signal(false);
-
-	private readonly SWIPE_THRESHOLD = 60;
-	private readonly EDGE_THRESHOLD = 40;
-	private touchStartX = 0;
-	private touchStartY = 0;
 
 	constructor(@Inject(PLATFORM_ID) platformId: object) {
 		this.isBrowser = isPlatformBrowser(platformId);

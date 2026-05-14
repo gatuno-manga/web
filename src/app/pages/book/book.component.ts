@@ -1,41 +1,31 @@
+import { NgOptimizedImage } from '@angular/common';
 import {
-	Component,
-	signal,
-	OnInit,
-	OnDestroy,
-	inject,
-	NgZone,
-	ChangeDetectorRef,
 	ChangeDetectionStrategy,
+	Component,
 	computed,
+	inject,
+	OnDestroy,
+	OnInit,
+	signal,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import {
-	BookBasic,
-	Chapterlist,
-	ScrapingStatus,
-} from '@models/book.models';
 import { BookService } from '@core/services/book.service';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { NgOptimizedImage } from '@angular/common';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { UserTokenService } from '@core/services/user-token.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
-import { AsideComponent } from '@ui/organisms/aside/aside.component';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
-import { MarkdownComponent } from 'ngx-markdown';
 import { BookWebsocketService } from '@core/services/book-websocket.service';
+import { ChapterService } from '@core/services/chapter.service';
 import { DownloadService } from '@core/services/download.service';
 import { DownloadManagerService } from '@core/services/download-manager.service';
-import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
-import { ChapterService } from '@core/services/chapter.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { Subscription, firstValueFrom } from 'rxjs';
-
-import { NotificationService } from '@core/services/notification.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
+import { NotificationService } from '@core/services/notification.service';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
+import { UserTokenService } from '@core/services/user-token.service';
+import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
+import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
 	BookDownloadModalComponent,
 	BookDownloadResult,
@@ -44,6 +34,9 @@ import {
 	BookEditModalComponent,
 	BookEditSaveEvent,
 } from '@ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component';
+import { AsideComponent } from '@ui/organisms/aside/aside.component';
+import { MarkdownComponent } from 'ngx-markdown';
+import { firstValueFrom, Subscription } from 'rxjs';
 
 @Component({
 	selector: 'app-book',
@@ -96,8 +89,6 @@ export class BookComponent implements OnInit, OnDestroy {
 	private metaService = inject(MetaDataService);
 	private modalService = inject(ModalNotificationService);
 	private notificationService = inject(NotificationService);
-	private ngZone = inject(NgZone);
-	private cdr = inject(ChangeDetectorRef);
 	private bookService = inject(BookService);
 	private activatedRoute = inject(ActivatedRoute);
 	private router = inject(Router);
@@ -132,10 +123,14 @@ export class BookComponent implements OnInit, OnDestroy {
 				}
 
 				// Security check: Verify if book's sensitive content is allowed
-				if (!this.sensitiveContentService.isAllowed(book.sensitiveContent)) {
+				if (
+					!this.sensitiveContentService.isAllowed(
+						book.sensitiveContent,
+					)
+				) {
 					this.notificationService.error(
 						'Conteúdo restrito',
-						'Este livro contém conteúdo que você restringiu em suas configurações.'
+						'Este livro contém conteúdo que você restringiu em suas configurações.',
 					);
 					this.router.navigate(['/books']);
 					return;
@@ -188,7 +183,7 @@ export class BookComponent implements OnInit, OnDestroy {
 							relativeTo: this.activatedRoute,
 						});
 					}
-				} catch (e) {
+				} catch (_e) {
 					this.router.navigate(['../'], {
 						relativeTo: this.activatedRoute,
 					});
@@ -348,7 +343,9 @@ export class BookComponent implements OnInit, OnDestroy {
 
 	getAuthorNames(): string {
 		return (
-			this.book()?.authors?.map((author) => author.name).join(', ') || ''
+			this.book()
+				?.authors?.map((author) => author.name)
+				.join(', ') || ''
 		);
 	}
 	filterByTag(tagId: string) {
@@ -381,7 +378,9 @@ export class BookComponent implements OnInit, OnDestroy {
 	onBookEditSave(event: BookEditSaveEvent) {
 		this.bookService.updateBook(event.id, event.data).subscribe({
 			next: () => {
-				this.notificationService.success('Livro atualizado com sucesso!');
+				this.notificationService.success(
+					'Livro atualizado com sucesso!',
+				);
 				this.refreshBook();
 			},
 			error: (err) => {
@@ -540,7 +539,9 @@ export class BookComponent implements OnInit, OnDestroy {
 				next: (response) => {
 					this.modalService.close();
 					this.book.update((curr) =>
-						curr ? { ...curr, autoUpdate: response.autoUpdate } : curr,
+						curr
+							? { ...curr, autoUpdate: response.autoUpdate }
+							: curr,
 					);
 					this.notificationService.success(
 						`Atualizações automáticas ${enabled ? 'ativadas' : 'desativadas'} com sucesso.`,
@@ -570,26 +571,6 @@ export class BookComponent implements OnInit, OnDestroy {
 			this.lastReadChapterId = progress.chapterId;
 			this.lastReadPage = progress.pageIndex;
 		}
-	}
-
-	private loadFirstChapter() {
-		const bookId = this.book()?.id;
-		if (!bookId) return;
-
-		this.bookService.getAllChapters(bookId).subscribe({
-			next: (chapters: Chapterlist[]) => {
-				if (chapters && chapters.length > 0) {
-					// Ordena por índice e guarda a lista
-					this.sortedChapters = [...chapters].sort(
-						(a, b) => a.index - b.index,
-					);
-					this.firstChapterId = this.sortedChapters[0].id;
-				}
-			},
-			error: (err) => {
-				console.error('Erro ao carregar capítulos:', err);
-			},
-		});
 	}
 
 	async continueReading() {
@@ -728,7 +709,8 @@ export class BookComponent implements OnInit, OnDestroy {
 	async checkBookDownloaded() {
 		const bookId = this.book()?.id;
 		if (!bookId) return;
-		const isDownloaded = await this.downloadService.isBookDownloaded(bookId);
+		const isDownloaded =
+			await this.downloadService.isBookDownloaded(bookId);
 		this.isBookDownloaded.set(isDownloaded);
 	}
 
@@ -912,12 +894,7 @@ export class BookComponent implements OnInit, OnDestroy {
 
 		// Usar o DownloadManagerService para download em background
 		// O download continua mesmo se o usuário navegar para outra página
-		this.downloadManager.startDownload(
-			b.id,
-			b.title,
-			format,
-			chapterIds,
-		);
+		this.downloadManager.startDownload(b.id, b.title, format, chapterIds);
 
 		this.notificationService.info(
 			'Download iniciado em background. Você pode navegar para outras páginas.',
@@ -1002,10 +979,7 @@ export class BookComponent implements OnInit, OnDestroy {
 
 				for (const fullChapter of fullChapters) {
 					// Baixar capítulo individualmente para salvar no banco local
-					await this.downloadService.downloadChapter(
-						b,
-						fullChapter,
-					);
+					await this.downloadService.downloadChapter(b, fullChapter);
 					downloadedCount++;
 				}
 

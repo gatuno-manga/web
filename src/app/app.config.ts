@@ -1,28 +1,27 @@
 import {
-	ApplicationConfig,
-	LOCALE_ID,
-	provideZoneChangeDetection,
-	isDevMode,
-} from '@angular/core';
-import { provideRouter, withRouterConfig } from '@angular/router';
-
-import { routes } from './app.routes';
-import {
-	provideClientHydration,
-	withEventReplay,
-} from '@angular/platform-browser';
-import {
 	provideHttpClient,
 	withFetch,
 	withInterceptors,
 } from '@angular/common/http';
+import {
+	ApplicationConfig,
+	importProvidersFrom,
+	isDevMode,
+	LOCALE_ID,
+	provideZoneChangeDetection,
+} from '@angular/core';
+import {
+	provideClientHydration,
+	withEventReplay,
+} from '@angular/platform-browser';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideRouter, withRouterConfig } from '@angular/router';
+import { provideServiceWorker } from '@angular/service-worker';
 import { HttpClientRequestInterceptor } from '@core/interceptors/http-client-request.interceptor';
 import { httpClientResponseInterceptor } from '@core/interceptors/http-client-response.interceptor';
-import { importProvidersFrom } from '@angular/core';
-import { provideServiceWorker } from '@angular/service-worker';
 import { NgxEchartsModule } from 'ngx-echarts';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideMarkdown } from 'ngx-markdown';
+import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
 	providers: [

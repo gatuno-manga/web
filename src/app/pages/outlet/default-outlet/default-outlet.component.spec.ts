@@ -1,9 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SharedTestingModule } from '@testing/shared-testing.module';
 import { signal } from '@angular/core';
-
-import { DefaultOutletComponent } from './default-outlet.component';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HeaderStateService } from '@core/services/header-state.service';
+import { SharedTestingModule } from '@testing/shared-testing.module';
+import { DefaultOutletComponent } from './default-outlet.component';
 
 describe('DefaultOutletComponent', () => {
 	let component: DefaultOutletComponent;

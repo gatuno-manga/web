@@ -1,7 +1,14 @@
 {
-  "$schema": "https://unpkg.com/knip@latest/schema.json",
-  "project": ["src/**/*.ts"],
-  "entry": ["src/main.ts", "src/main.server.ts", "src/server.ts"],
-  "ignore": ["**/*.spec.ts", "src/test.ts"],
-  "ignoreDependencies": ["@angular-devkit/build-angular", "karma", "jasmine-core", "karma-jasmine", "karma-chrome-launcher", "karma-coverage"]
+	"$schema": "https://unpkg.com/knip@latest/schema.json",
+	"project": ["src/**/*.ts"],
+	"entry": ["src/main.ts", "src/main.server.ts", "src/server.ts"],
+	"ignore": ["**/*.spec.ts", "src/test.ts"],
+	"ignoreDependencies": [
+		"@angular-devkit/build-angular",
+		"karma",
+		"jasmine-core",
+		"karma-jasmine",
+		"karma-chrome-launcher",
+		"karma-coverage"
+	]
 }

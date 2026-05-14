@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { DEFAULT_SETTINGS, ReaderSettings } from '@models/settings.models';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
-import { ReaderSettings, DEFAULT_SETTINGS } from '@models/settings.models';
 
 const MIN_LINE_HEIGHT = 1;
 const MAX_LINE_HEIGHT = 3;
@@ -73,7 +73,9 @@ export class SettingsService {
 	}
 
 	private loadSettings(): ReaderSettings {
-		const saved = this.localStorageService.get<ReaderSettings>(this.SETTINGS_KEY);
+		const saved = this.localStorageService.get<ReaderSettings>(
+			this.SETTINGS_KEY,
+		);
 		if (saved) {
 			try {
 				const mergedSettings = {
@@ -102,10 +104,7 @@ export class SettingsService {
 	}
 
 	private saveSettings(settings: ReaderSettings): void {
-		this.localStorageService.set(
-			this.SETTINGS_KEY,
-			settings,
-		);
+		this.localStorageService.set(this.SETTINGS_KEY, settings);
 	}
 
 	resetSettings(): void {

@@ -1,16 +1,16 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
 	Component,
-	HostListener,
-	OnInit,
-	OnDestroy,
-	input,
-	PLATFORM_ID,
-	inject,
-	signal,
 	computed,
+	HostListener,
+	inject,
+	input,
+	OnDestroy,
+	OnInit,
 	output,
+	PLATFORM_ID,
+	signal,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
@@ -122,27 +122,23 @@ export class AsideComponent implements OnInit, OnDestroy {
 
 		if (!this.isOpen()) {
 			if (this.position() === 'right') {
-				this.dragOffset.set(Math.max(
-					-this.asideWidth(),
-					Math.min(0, deltaX),
-				));
+				this.dragOffset.set(
+					Math.max(-this.asideWidth(), Math.min(0, deltaX)),
+				);
 			} else {
-				this.dragOffset.set(Math.max(
-					0,
-					Math.min(this.asideWidth(), deltaX),
-				));
+				this.dragOffset.set(
+					Math.max(0, Math.min(this.asideWidth(), deltaX)),
+				);
 			}
 		} else {
 			if (this.position() === 'right') {
-				this.dragOffset.set(Math.max(
-					0,
-					Math.min(this.asideWidth(), deltaX),
-				));
+				this.dragOffset.set(
+					Math.max(0, Math.min(this.asideWidth(), deltaX)),
+				);
 			} else {
-				this.dragOffset.set(Math.max(
-					-this.asideWidth(),
-					Math.min(0, deltaX),
-				));
+				this.dragOffset.set(
+					Math.max(-this.asideWidth(), Math.min(0, deltaX)),
+				);
 			}
 		}
 	}
@@ -201,7 +197,7 @@ export class AsideComponent implements OnInit, OnDestroy {
 	}
 
 	toggle() {
-		this.isOpen.update(v => !v);
+		this.isOpen.update((v) => !v);
 	}
 
 	open() {
@@ -238,4 +234,3 @@ export class AsideComponent implements OnInit, OnDestroy {
 		return isOpen ? 'translateX(0)' : 'translateX(-100%)';
 	});
 }
-

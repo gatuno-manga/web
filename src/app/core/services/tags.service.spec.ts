@@ -1,157 +1,182 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { TagsService } from './tags.service';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { SensitiveContentService } from './sensitive-content.service';
-import { UserTokenService } from './user-token.service';
-import { DownloadService } from './download.service';
-import { OfflineBook } from '@models/offline.models';
+import {
+	HttpClientTestingModule,
+	HttpTestingController,
+} from '@angular/common/http/testing';
 import { signal } from '@angular/core';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { OfflineBook } from '@models/offline.models';
+import { DownloadService } from './download.service';
+import { SensitiveContentService } from './sensitive-content.service';
+import { TagsService } from './tags.service';
+import { UserTokenService } from './user-token.service';
 
 describe('TagsService', () => {
-  let service: TagsService;
-  let httpMock: HttpTestingController;
-  let downloadServiceSpy: jasmine.SpyObj<DownloadService>;
-  let sensitiveContentServiceSpy: jasmine.SpyObj<SensitiveContentService>;
-  let userTokenServiceSpy: jasmine.SpyObj<UserTokenService>;
+	let service: TagsService;
+	let httpMock: HttpTestingController;
+	let downloadServiceSpy: jasmine.SpyObj<DownloadService>;
+	let sensitiveContentServiceSpy: jasmine.SpyObj<SensitiveContentService>;
+	let _userTokenServiceSpy: jasmine.SpyObj<UserTokenService>;
 
-  const mockBlob = new Blob([''], { type: 'image/jpeg' });
+	const mockBlob = new Blob([''], { type: 'image/jpeg' });
 
-  const mockOfflineBooks: OfflineBook[] = [
-    {
-      id: '1',
-      title: 'Book A',
-      cover: mockBlob,
-      description: '',
-      publication: 2023,
-      authors: [],
-      tags: [{ id: 't1', name: 'Action' }, { id: 't2', name: 'Comedy' }],
-      sensitiveContent: [],
-      totalChapters: 1,
-      updatedAt: new Date()
-    },
-    {
-      id: '2',
-      title: 'Book B',
-      cover: mockBlob,
-      description: '',
-      publication: 2023,
-      authors: [],
-      tags: [{ id: 't2', name: 'Comedy' }, { id: 't3', name: 'Drama' }],
-      sensitiveContent: [{ id: 'sc1', name: 'Gore' }],
-      totalChapters: 1,
-      updatedAt: new Date()
-    },
-    {
-        id: '3',
-        title: 'Book C',
-        cover: mockBlob,
-        description: '',
-        publication: 2023,
-        authors: [],
-        tags: undefined as any, // Missing tags
-        sensitiveContent: [],
-        totalChapters: 1,
-        updatedAt: new Date()
-    }
-  ];
+	const mockOfflineBooks: OfflineBook[] = [
+		{
+			id: '1',
+			title: 'Book A',
+			cover: mockBlob,
+			description: '',
+			publication: 2023,
+			authors: [],
+			tags: [
+				{ id: 't1', name: 'Action' },
+				{ id: 't2', name: 'Comedy' },
+			],
+			sensitiveContent: [],
+			totalChapters: 1,
+			updatedAt: new Date(),
+		},
+		{
+			id: '2',
+			title: 'Book B',
+			cover: mockBlob,
+			description: '',
+			publication: 2023,
+			authors: [],
+			tags: [
+				{ id: 't2', name: 'Comedy' },
+				{ id: 't3', name: 'Drama' },
+			],
+			sensitiveContent: [{ id: 'sc1', name: 'Gore' }],
+			totalChapters: 1,
+			updatedAt: new Date(),
+		},
+		{
+			id: '3',
+			title: 'Book C',
+			cover: mockBlob,
+			description: '',
+			publication: 2023,
+			authors: [],
+			tags: undefined as any, // Missing tags
+			sensitiveContent: [],
+			totalChapters: 1,
+			updatedAt: new Date(),
+		},
+	];
 
-  beforeEach(() => {
-    const downloadSpy = jasmine.createSpyObj('DownloadService', ['getAllBooks']);
-    const sensitiveSpy = jasmine.createSpyObj('SensitiveContentService', ['getContentAllow']);
-    sensitiveSpy.allowContentSignal = signal([]);
-    const userTokenSpy = jasmine.createSpyObj('UserTokenService', [], { hasValidAccessToken: false });
+	beforeEach(() => {
+		const downloadSpy = jasmine.createSpyObj('DownloadService', [
+			'getAllBooks',
+		]);
+		const sensitiveSpy = jasmine.createSpyObj('SensitiveContentService', [
+			'getContentAllow',
+		]);
+		sensitiveSpy.allowContentSignal = signal([]);
+		const userTokenSpy = jasmine.createSpyObj('UserTokenService', [], {
+			hasValidAccessToken: false,
+		});
 
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [
-        TagsService,
-        { provide: DownloadService, useValue: downloadSpy },
-        { provide: SensitiveContentService, useValue: sensitiveSpy },
-        { provide: UserTokenService, useValue: userTokenSpy }
-      ]
-    });
+		TestBed.configureTestingModule({
+			imports: [HttpClientTestingModule],
+			providers: [
+				TagsService,
+				{ provide: DownloadService, useValue: downloadSpy },
+				{ provide: SensitiveContentService, useValue: sensitiveSpy },
+				{ provide: UserTokenService, useValue: userTokenSpy },
+			],
+		});
 
-    service = TestBed.inject(TagsService);
-    httpMock = TestBed.inject(HttpTestingController);
-    downloadServiceSpy = TestBed.inject(DownloadService) as jasmine.SpyObj<DownloadService>;
-    sensitiveContentServiceSpy = TestBed.inject(SensitiveContentService) as jasmine.SpyObj<SensitiveContentService>;
-    userTokenServiceSpy = TestBed.inject(UserTokenService) as jasmine.SpyObj<UserTokenService>;
+		service = TestBed.inject(TagsService);
+		httpMock = TestBed.inject(HttpTestingController);
+		downloadServiceSpy = TestBed.inject(
+			DownloadService,
+		) as jasmine.SpyObj<DownloadService>;
+		sensitiveContentServiceSpy = TestBed.inject(
+			SensitiveContentService,
+		) as jasmine.SpyObj<SensitiveContentService>;
+		_userTokenServiceSpy = TestBed.inject(
+			UserTokenService,
+		) as jasmine.SpyObj<UserTokenService>;
 
-    downloadServiceSpy.getAllBooks.and.returnValue(Promise.resolve(mockOfflineBooks));
-  });
+		downloadServiceSpy.getAllBooks.and.returnValue(
+			Promise.resolve(mockOfflineBooks),
+		);
+	});
 
-  afterEach(() => {
-    httpMock.verify();
-  });
+	afterEach(() => {
+		httpMock.verify();
+	});
 
-  describe('getTags', () => {
-    it('should return tags from visible books only (Offline Fallback)', fakeAsync(() => {
-        // Arrange: Block Gore, so Book B is hidden. Tags from Book B should not appear unless also in Book A.
-        sensitiveContentServiceSpy.getContentAllow.and.returnValue([]); // Block all sensitive
-        
-        let resultTags: any[] = [];
-        
-        // Act
-        service.getTags({}).subscribe(tags => {
-            resultTags = tags;
-        });
+	describe('getTags', () => {
+		it('should return tags from visible books only (Offline Fallback)', fakeAsync(() => {
+			// Arrange: Block Gore, so Book B is hidden. Tags from Book B should not appear unless also in Book A.
+			sensitiveContentServiceSpy.getContentAllow.and.returnValue([]); // Block all sensitive
 
-        const req = httpMock.expectOne(req => req.url.includes('tags'));
-        req.flush('Error', { status: 500, statusText: 'Server Error' });
-        
-        tick(); // Resolve Promise from DownloadService
+			let resultTags: any[] = [];
 
-        // Assert
-        // Book A is visible: tags t1(Action), t2(Comedy)
-        // Book B is hidden (Gore): tags t2(Comedy), t3(Drama)
-        // Book C is visible: tags undefined
-        // Expected: Action, Comedy. Drama should be excluded.
-        
-        expect(resultTags.length).toBe(2);
-        expect(resultTags.find(t => t.name === 'Action')).toBeTruthy();
-        expect(resultTags.find(t => t.name === 'Comedy')).toBeTruthy();
-        expect(resultTags.find(t => t.name === 'Drama')).toBeUndefined();
-    }));
+			// Act
+			service.getTags({}).subscribe((tags) => {
+				resultTags = tags;
+			});
 
-    it('should include tags from allowed sensitive books (Offline Fallback)', fakeAsync(() => {
-        // Arrange: Allow Gore. Book B becomes visible.
-        sensitiveContentServiceSpy.getContentAllow.and.returnValue(['Gore']);
-        
-        let resultTags: any[] = [];
+			const req = httpMock.expectOne((req) => req.url.includes('tags'));
+			req.flush('Error', { status: 500, statusText: 'Server Error' });
 
-        // Act
-        service.getTags({}).subscribe(tags => {
-            resultTags = tags;
-        });
+			tick(); // Resolve Promise from DownloadService
 
-        const req = httpMock.expectOne(req => req.url.includes('tags'));
-        req.flush('Error', { status: 500, statusText: 'Server Error' });
+			// Assert
+			// Book A is visible: tags t1(Action), t2(Comedy)
+			// Book B is hidden (Gore): tags t2(Comedy), t3(Drama)
+			// Book C is visible: tags undefined
+			// Expected: Action, Comedy. Drama should be excluded.
 
-        tick();
+			expect(resultTags.length).toBe(2);
+			expect(resultTags.find((t) => t.name === 'Action')).toBeTruthy();
+			expect(resultTags.find((t) => t.name === 'Comedy')).toBeTruthy();
+			expect(resultTags.find((t) => t.name === 'Drama')).toBeUndefined();
+		}));
 
-        // Assert
-        // All books visible.
-        // Expected: Action, Comedy, Drama.
-        
-        expect(resultTags.length).toBe(3);
-        expect(resultTags.find(t => t.name === 'Drama')).toBeTruthy();
-    }));
+		it('should include tags from allowed sensitive books (Offline Fallback)', fakeAsync(() => {
+			// Arrange: Allow Gore. Book B becomes visible.
+			sensitiveContentServiceSpy.getContentAllow.and.returnValue([
+				'Gore',
+			]);
 
-    it('should handle undefined tags safely (Offline Fallback)', fakeAsync(() => {
-        sensitiveContentServiceSpy.getContentAllow.and.returnValue([]);
-        
-        let resultTags: any[] = [];
+			let resultTags: any[] = [];
 
-        service.getTags({}).subscribe(tags => {
-            resultTags = tags;
-        });
+			// Act
+			service.getTags({}).subscribe((tags) => {
+				resultTags = tags;
+			});
 
-        const req = httpMock.expectOne(req => req.url.includes('tags'));
-        req.flush('Error', { status: 500, statusText: 'Server Error' });
+			const req = httpMock.expectOne((req) => req.url.includes('tags'));
+			req.flush('Error', { status: 500, statusText: 'Server Error' });
 
-        tick();
+			tick();
 
-        expect(resultTags.length).toBe(2); // Should not crash on Book C
-    }));
-  });
+			// Assert
+			// All books visible.
+			// Expected: Action, Comedy, Drama.
+
+			expect(resultTags.length).toBe(3);
+			expect(resultTags.find((t) => t.name === 'Drama')).toBeTruthy();
+		}));
+
+		it('should handle undefined tags safely (Offline Fallback)', fakeAsync(() => {
+			sensitiveContentServiceSpy.getContentAllow.and.returnValue([]);
+
+			let resultTags: any[] = [];
+
+			service.getTags({}).subscribe((tags) => {
+				resultTags = tags;
+			});
+
+			const req = httpMock.expectOne((req) => req.url.includes('tags'));
+			req.flush('Error', { status: 500, statusText: 'Server Error' });
+
+			tick();
+
+			expect(resultTags.length).toBe(2); // Should not crash on Book C
+		}));
+	});
 });

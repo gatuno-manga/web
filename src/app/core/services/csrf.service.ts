@@ -1,5 +1,5 @@
-import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { CookieService } from './cookie.service';
 
 @Injectable({
@@ -39,12 +39,12 @@ export class CsrfService {
 		this._csrfToken.set(null);
 		if (isPlatformBrowser(this.platformId)) {
 			localStorage.removeItem(this.CSRF_KEY);
-			
+
 			this.cookieService.delete('csrfToken', false);
-			
+
 			const hostname = window.location.hostname;
 			const parts = hostname.split('.');
-			
+
 			const domainsToTry = [hostname, `.${hostname}`];
 			if (parts.length > 2) {
 				domainsToTry.push(`.${parts.slice(-2).join('.')}`);

@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ReaderSettingsFormComponent } from './reader-settings-form.component';
-import { SettingsService } from '@core/services/settings.service';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LocalStorageService } from '@core/services/local-storage.service';
+import { SettingsService } from '@core/services/settings.service';
+import { ReaderSettingsFormComponent } from './reader-settings-form.component';
 
 describe('ReaderSettingsFormComponent', () => {
 	let component: ReaderSettingsFormComponent;

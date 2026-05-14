@@ -96,7 +96,7 @@
 								</app-button>
 								@if (showOptionsDropdown()) {
 									<div class="options-dropdown">
-										<button (click)="saveOffline()">
+										<button type="button" (click)="saveOffline()">
 											<app-icons name="smartphone" />
 											<span>Salvar no app</span>
 										</button>
@@ -109,17 +109,17 @@
 												<span>Excluir download</span>
 											</button>
 										}
-										<button (click)="shareBook()">
+										<button type="button" (click)="shareBook()">
 											<app-icons name="share" />
 											<span>Compartilhar</span>
 										</button>
 										@if (admin()) {
-											<button (click)="forceCheckUpdates()">
+											<button type="button" (click)="forceCheckUpdates()">
 												<app-icons name="refresh-ccw-dot" />
 												<span>Forçar atualização</span>
 											</button>
 										}
-										<button (click)="downloadFiles()">
+										<button type="button" (click)="downloadFiles()">
 											<app-icons name="download" />
 											<span>Baixar arquivos</span>
 										</button>

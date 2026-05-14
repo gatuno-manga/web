@@ -1,101 +1,118 @@
-import { ChangeDetectionStrategy, Component, ElementRef, input, output, forwardRef, inject, signal, computed } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	ElementRef,
+	forwardRef,
+	inject,
+	input,
+	output,
+	signal,
+} from '@angular/core';
+import {
+	ControlValueAccessor,
+	FormsModule,
+	NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 export type SelectOption = { value: any; label: string };
 
 @Component({
-    selector: 'app-select',
-    standalone: true,
-    imports: [IconsComponent, FormsModule],
-    templateUrl: './select.component.html',
-    styleUrls: ['./select.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [
-        {
-            provide: NG_VALUE_ACCESSOR,
-            useExisting: forwardRef(() => SelectComponent),
-            multi: true
-        }
-    ],
-    host: {
-        '[class.select-open]': 'isOpen'
-    }
+	selector: 'app-select',
+	standalone: true,
+	imports: [IconsComponent, FormsModule],
+	templateUrl: './select.component.html',
+	styleUrls: ['./select.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
+	providers: [
+		{
+			provide: NG_VALUE_ACCESSOR,
+			useExisting: forwardRef(() => SelectComponent),
+			multi: true,
+		},
+	],
+	host: {
+		'[class.select-open]': 'isOpen',
+	},
 })
 export class SelectComponent implements ControlValueAccessor {
-    placeholder = input<string>('Selecione uma opção');
-    options = input<{ value: string; label: string }[]>([]);
-    name = input<string>('');
-    searchable = input<boolean>(false);
-    leftIcon = input<string | null>(null);
-    chevronIcon = input<string>('chevron-down');
-    
-    valueChange = output<string>();
-    change = output<string>();
+	placeholder = input<string>('Selecione uma opção');
+	options = input<{ value: string; label: string }[]>([]);
+	name = input<string>('');
+	searchable = input<boolean>(false);
+	leftIcon = input<string | null>(null);
+	chevronIcon = input<string>('chevron-down');
 
-    value: string = '';
-    isOpen: boolean = false;
-    isDisabled: boolean = false;
-    
-    searchQuery = signal<string>('');
+	valueChange = output<string>();
+	change = output<string>();
 
-    filteredOptions = computed(() => {
-        const query = this.searchQuery().toLowerCase();
-        if (!query) return this.options();
-        return this.options().filter(opt => opt.label.toLowerCase().includes(query));
-    });
+	value: string = '';
+	isOpen: boolean = false;
+	isDisabled: boolean = false;
 
-    private host = inject(ElementRef<HTMLElement>);
+	searchQuery = signal<string>('');
 
-    private onChange: (value: string) => void = () => {};
-    private onTouched: () => void = () => {};
+	filteredOptions = computed(() => {
+		const query = this.searchQuery().toLowerCase();
+		if (!query) return this.options();
+		return this.options().filter((opt) =>
+			opt.label.toLowerCase().includes(query),
+		);
+	});
 
-    writeValue(value: string): void {
-        this.value = value || '';
-    }
+	private host = inject(ElementRef<HTMLElement>);
 
-    registerOnChange(fn: (value: string) => void): void {
-        this.onChange = fn;
-    }
+	private onChange: (value: string) => void = () => {};
+	private onTouched: () => void = () => {};
 
-    registerOnTouched(fn: () => void): void {
-        this.onTouched = fn;
-    }
+	writeValue(value: string): void {
+		this.value = value || '';
+	}
 
-    setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
-    }
+	registerOnChange(fn: (value: string) => void): void {
+		this.onChange = fn;
+	}
 
-    toggleDropdown(): void {
-        if (!this.isDisabled) {
-            this.isOpen = !this.isOpen;
-            if (this.isOpen) {
-                this.searchQuery.set(''); // Reset search on open
-                this.onTouched();
-            }
-        }
-    }
+	registerOnTouched(fn: () => void): void {
+		this.onTouched = fn;
+	}
 
-    selectOption(option: { value: string; label: string }): void {
-        this.valueChange.emit(option.value);
-        this.change.emit(option.value);
-        this.host.nativeElement.dispatchEvent(new CustomEvent('change', { detail: option.value, bubbles: true }));
-        this.value = option.value;
-        this.onChange(this.value);
-        this.isOpen = false;
-    }
+	setDisabledState(isDisabled: boolean): void {
+		this.isDisabled = isDisabled;
+	}
 
-    getSelectedLabel(): string {
-        const selected = this.options().find(opt => opt.value === this.value);
-        return selected ? selected.label : this.placeholder();
-    }
+	toggleDropdown(): void {
+		if (!this.isDisabled) {
+			this.isOpen = !this.isOpen;
+			if (this.isOpen) {
+				this.searchQuery.set(''); // Reset search on open
+				this.onTouched();
+			}
+		}
+	}
 
-    closeDropdown(): void {
-        this.isOpen = false;
-    }
-    
-    onSearchInput(event: Event) {
-        event.stopPropagation(); // Prevent closing dropdown
-    }
+	selectOption(option: { value: string; label: string }): void {
+		this.valueChange.emit(option.value);
+		this.change.emit(option.value);
+		this.host.nativeElement.dispatchEvent(
+			new CustomEvent('change', { detail: option.value, bubbles: true }),
+		);
+		this.value = option.value;
+		this.onChange(this.value);
+		this.isOpen = false;
+	}
+
+	getSelectedLabel(): string {
+		const selected = this.options().find((opt) => opt.value === this.value);
+		return selected ? selected.label : this.placeholder();
+	}
+
+	closeDropdown(): void {
+		this.isOpen = false;
+	}
+
+	onSearchInput(event: Event) {
+		event.stopPropagation(); // Prevent closing dropdown
+	}
 }
-

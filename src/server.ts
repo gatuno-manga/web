@@ -1,9 +1,9 @@
-import { APP_BASE_HREF } from '@angular/common';
-import { CommonEngine, isMainModule } from '@angular/ssr/node';
-import express from 'express';
-import cookieParser from 'cookie-parser';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { APP_BASE_HREF } from '@angular/common';
+import { CommonEngine, isMainModule } from '@angular/ssr/node';
+import cookieParser from 'cookie-parser';
+import express from 'express';
 import bootstrap from './main.server';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
@@ -40,7 +40,7 @@ app.get(
 /**
  * Handle all other requests by rendering the Angular application.
  */
-app.get('/api/**', (req, res) => {
+app.get('/api/**', (_req, res) => {
 	res.status(404).send('API endpoint not handled by frontend server');
 });
 

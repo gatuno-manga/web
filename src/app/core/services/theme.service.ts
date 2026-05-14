@@ -1,7 +1,15 @@
-import { effect, Inject, Injectable, PLATFORM_ID, Renderer2, RendererFactory2, signal } from "@angular/core";
-import { CookieService } from "./cookie.service";
-import { isPlatformBrowser } from "@angular/common";
-import { LocalStorageService } from "./local-storage.service";
+import { isPlatformBrowser } from '@angular/common';
+import {
+	effect,
+	Inject,
+	Injectable,
+	PLATFORM_ID,
+	Renderer2,
+	RendererFactory2,
+	signal,
+} from '@angular/core';
+import { CookieService } from './cookie.service';
+import { LocalStorageService } from './local-storage.service';
 
 const THEME_KEY = 'theme';
 
@@ -23,7 +31,9 @@ export class ThemeService {
 	) {
 		this.renderer = this.rendererFactory.createRenderer(null, null);
 		if (isPlatformBrowser(this.platformId)) {
-			const savedTheme = this.localStorageService.get(THEME_KEY) as AppTheme | null;
+			const savedTheme = this.localStorageService.get(
+				THEME_KEY,
+			) as AppTheme | null;
 			const htmlTheme = document?.documentElement?.getAttribute(
 				'data-theme',
 			) as AppTheme | null;
@@ -34,7 +44,11 @@ export class ThemeService {
 
 			effect(() => {
 				const theme = this.currentTheme();
-				this.renderer.setAttribute(document.documentElement, 'data-theme', theme);
+				this.renderer.setAttribute(
+					document.documentElement,
+					'data-theme',
+					theme,
+				);
 				this.localStorageService.set(THEME_KEY, theme);
 				this.cookieService.set(THEME_KEY, theme, false, { path: '/' });
 			});

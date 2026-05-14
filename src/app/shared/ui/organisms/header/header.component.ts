@@ -8,9 +8,9 @@ import {
 	output,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ThemeService } from '@core/services/theme.service';
 import { UserTokenService } from '@core/services/user-token.service';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
 	selector: 'app-header',

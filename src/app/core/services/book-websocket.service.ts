@@ -1,39 +1,38 @@
-import { Injectable, OnDestroy, Inject, signal, computed } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { BookEvents } from '@constants/book-events.constants';
 import { ENVIRONMENT, Environment } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
-import { UserTokenService } from './user-token.service';
-import { NetworkStatusService } from './network-status.service';
-import { BookEvents } from '@constants/book-events.constants';
 import {
 	BookEvent,
 	ChapterEvent,
+	ClientToServerEvents,
 	CoverEvent,
 	NewChaptersEvent,
 	ScrapingEvent,
+	ServerToClientEvents,
 	SubscriptionResponse,
 	SubscriptionsListResponse,
 	UpdateCompletedEvent,
 	UpdateFailedEvent,
 	UpdateStartedEvent,
-	ServerToClientEvents,
-	ClientToServerEvents,
 } from '@models/book-events.model';
 import {
-	WebSocketConnectionState,
 	isValidTransition,
+	WebSocketConnectionState,
 } from '@models/websocket-state.model';
 import { buildWebSocketUrl, UrlConfig } from '@shared/utils/api-url.utils';
 import { getSocketConfig } from '@shared/utils/socket-config.utils';
 import {
+	LogLevel,
 	logConnectionEvent,
 	logStateTransition,
 	logWebSocketError,
-	LogLevel,
 } from '@shared/utils/websocket-logger.utils';
-import { isPlatformBrowser } from '@angular/common';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { io, Socket } from 'socket.io-client';
+import { NetworkStatusService } from './network-status.service';
+import { UserTokenService } from './user-token.service';
 
 /**
  * Service para gerenciar conexões WebSocket e receber eventos em tempo real
@@ -87,7 +86,7 @@ export class BookWebsocketService implements OnDestroy {
 	// Observables públicos (compatibilidade e eventos)
 	public readonly connected$ = toObservable(this._connected);
 	public readonly connectionState$ = toObservable(this._connectionState);
-	
+
 	public bookCreated$ = this.bookCreatedSubject.asObservable();
 	public bookUpdated$ = this.bookUpdatedSubject.asObservable();
 	public bookNewChapters$ = this.bookNewChaptersSubject.asObservable();

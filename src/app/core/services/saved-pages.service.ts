@@ -1,9 +1,7 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CreateSavedPageDto } from '@models/saved-page.models';
+import { Injectable } from '@angular/core';
+import { CreateSavedPageDto, SavedPage } from '@models/saved-page.models';
 import { map } from 'rxjs/operators';
-
-import { SavedPage } from '@models/saved-page.models';
 
 @Injectable({
 	providedIn: 'root',

@@ -1,12 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import {
-	ModalButton,
-	ModalNotification,
-	NotificationType,
-} from '@models/notification.models';
-import { NotificationService } from './notification.service';
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
+import { ModalButton, NotificationType } from '@models/notification.models';
+import { NotificationService } from './notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class ModalNotificationService {

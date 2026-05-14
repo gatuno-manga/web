@@ -1,36 +1,31 @@
+import { CommonModule } from '@angular/common';
 import {
-	Component,
 	ChangeDetectionStrategy,
+	Component,
+	computed,
 	inject,
 	input,
-	computed,
-	signal,
 	OnInit,
+	signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { LocalStorageService } from '@core/services/local-storage.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { SearchService } from '@core/services/search.service';
-import { LocalStorageService } from '@core/services/local-storage.service';
-import { ThemeService, AppTheme } from '@core/services/theme.service';
 import { SettingsService } from '@core/services/settings.service';
+import { AppTheme, ThemeService } from '@core/services/theme.service';
 import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,
 	ReaderSettings,
 } from '@models/settings.models';
-import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
-import { FormsModule } from '@angular/forms';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 
 @Component({
 	selector: 'app-appearance',
 	standalone: true,
-	imports: [
-		TextInputComponent,
-		SelectComponent,
-		FormsModule,
-		CommonModule,
-	],
+	imports: [TextInputComponent, SelectComponent, FormsModule, CommonModule],
 	templateUrl: './appearance.component.html',
 	styleUrl: './appearance.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,9 +68,8 @@ export class AppearanceComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		const saved = this.localStorage.get<BookListSettings>(
-			'book-list-settings',
-		);
+		const saved =
+			this.localStorage.get<BookListSettings>('book-list-settings');
 		if (saved) {
 			this.bookSettings.set(saved);
 		}

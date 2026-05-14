@@ -1,7 +1,7 @@
-import { Component, inject, effect } from '@angular/core';
-import { NotificationService } from '@core/services/notification.service';
-import { BodyScrollService } from '@core/services/body-scroll.service';
 import { NgComponentOutlet } from '@angular/common';
+import { Component, effect, inject } from '@angular/core';
+import { BodyScrollService } from '@core/services/body-scroll.service';
+import { NotificationService } from '@core/services/notification.service';
 
 @Component({
 	selector: 'app-overlay-notification',

@@ -1,38 +1,37 @@
-import { Injectable, Inject, OnDestroy, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { io, Socket } from 'socket.io-client';
-import { Subject, firstValueFrom, Subscription, fromEvent, of } from 'rxjs';
-import { map, timeout, catchError, take } from 'rxjs/operators';
+import { Inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { ENVIRONMENT, Environment } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
-import { UserTokenService } from './user-token.service';
 import {
-	ReadingProgressService,
-	ReadingProgress,
-} from './reading-progress.service';
-import { NetworkStatusService } from './network-status.service';
+	ReadingProgressClientToServerEvents,
+	ReadingProgressServerToClientEvents,
+	RemoteReadingProgress,
+	SaveProgressDto,
+	SyncReadingProgressDto,
+	SyncResponse,
+} from '@models/reading-progress-events.model';
 import {
-	WebSocketConnectionState,
 	isValidTransition,
+	WebSocketConnectionState,
 } from '@models/websocket-state.model';
 import { buildWebSocketUrl, UrlConfig } from '@shared/utils/api-url.utils';
 import { getSocketConfig } from '@shared/utils/socket-config.utils';
 import {
+	LogLevel,
 	logConnectionEvent,
 	logStateTransition,
 	logWebSocketError,
-	LogLevel,
 } from '@shared/utils/websocket-logger.utils';
-import {
-	RemoteReadingProgress,
-	SaveProgressDto,
-	SyncConflict,
-	SyncResponse,
-	SyncReadingProgressDto,
-	ReadingProgressServerToClientEvents,
-	ReadingProgressClientToServerEvents,
-} from '@models/reading-progress-events.model';
+import { firstValueFrom, fromEvent, of, Subject, Subscription } from 'rxjs';
+import { catchError, map, take, timeout } from 'rxjs/operators';
+import { io, Socket } from 'socket.io-client';
 import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
+import { NetworkStatusService } from './network-status.service';
+import {
+	ReadingProgress,
+	ReadingProgressService,
+} from './reading-progress.service';
+import { UserTokenService } from './user-token.service';
 
 export interface SyncStatus {
 	connected: boolean;
@@ -346,16 +345,6 @@ export class ReadingProgressSyncService implements OnDestroy {
 	}
 
 	/**
-	 * Registra o evento de Background Sync no Service Worker
-	 * @deprecated Use BackgroundSyncRegistrationService instead
-	 */
-	private registerBackgroundSync(): void {
-		this.backgroundSyncService
-			.register('sync-reading-progress')
-			.catch(() => {});
-	}
-
-	/**
 	 * Obtém o progresso de um capítulo (local + remoto)
 	 */
 	async getProgress(chapterId: string): Promise<ReadingProgress | undefined> {
@@ -369,12 +358,14 @@ export class ReadingProgressSyncService implements OnDestroy {
 
 			try {
 				const responseData = await firstValueFrom(
-					fromEvent<any>(this.socket as any, 'progress:chapter:response')
-						.pipe(
-							take(1),
-							timeout(3000),
-							catchError(() => of({ progress: null })),
-						)
+					fromEvent<any>(
+						this.socket as any,
+						'progress:chapter:response',
+					).pipe(
+						take(1),
+						timeout(3000),
+						catchError(() => of({ progress: null })),
+					),
 				);
 
 				if (responseData.progress) {
@@ -386,11 +377,18 @@ export class ReadingProgressSyncService implements OnDestroy {
 					) {
 						const userId =
 							this.localProgressService.getCurrentUserId();
-						return this.remoteToLocal(responseData.progress, userId);
+						return this.remoteToLocal(
+							responseData.progress,
+							userId,
+						);
 					}
 				}
 			} catch (err) {
-				logWebSocketError(this.serviceName, err, 'Erro ao obter progresso remoto');
+				logWebSocketError(
+					this.serviceName,
+					err,
+					'Erro ao obter progresso remoto',
+				);
 			}
 		}
 

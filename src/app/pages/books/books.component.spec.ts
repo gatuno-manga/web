@@ -1,13 +1,13 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SharedTestingModule } from '@testing/shared-testing.module';
-import { BooksComponent } from './books.component';
-import { BookService } from '@core/services/book.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { of } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { TagsService } from '@core/services/tags.service';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
+import { BookService } from '@core/services/book.service';
 import { NetworkStatusService } from '@core/services/network-status.service';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { TagsService } from '@core/services/tags.service';
+import { SharedTestingModule } from '@testing/shared-testing.module';
+import { of } from 'rxjs';
+import { BooksComponent } from './books.component';
 
 describe('BooksComponent', () => {
 	let component: BooksComponent;
@@ -28,7 +28,9 @@ describe('BooksComponent', () => {
 		const tagsServiceSpy = jasmine.createSpyObj('TagsService', ['getTags']);
 		(tagsServiceSpy as any).excludedTagsSignal = signal([]);
 
-		const networkStatusSpy = jasmine.createSpyObj('NetworkStatusService', ['isOffline']);
+		const networkStatusSpy = jasmine.createSpyObj('NetworkStatusService', [
+			'isOffline',
+		]);
 		networkStatusSpy.isOffline.and.returnValue(false);
 
 		await TestBed.configureTestingModule({
@@ -53,7 +55,9 @@ describe('BooksComponent', () => {
 
 		fixture = TestBed.createComponent(BooksComponent);
 		component = fixture.componentInstance;
-		bookService = TestBed.inject(BookService) as jasmine.SpyObj<BookService>;
+		bookService = TestBed.inject(
+			BookService,
+		) as jasmine.SpyObj<BookService>;
 		sensitiveContentService = TestBed.inject(
 			SensitiveContentService,
 		) as jasmine.SpyObj<SensitiveContentService>;

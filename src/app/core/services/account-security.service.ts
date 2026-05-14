@@ -1,6 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
 import {
 	ActiveSession,
 	AuditHistoryResponse,
@@ -9,6 +8,7 @@ import {
 	MfaStatusResponse,
 	PasskeySummary,
 } from '@models/account-security.models';
+import { map } from 'rxjs/operators';
 
 @Injectable({
 	providedIn: 'root',

@@ -1,16 +1,16 @@
-import { Injectable, signal, inject, WritableSignal } from '@angular/core';
-import {
-	ToastNotification,
-	ModalNotification,
-} from '@models/notification.models';
+import { Injectable, inject, signal, WritableSignal } from '@angular/core';
 import { NotificationFactory } from '@core/services/notification/notification.factory';
 import {
+	NotificationComponentData,
 	NotificationConfig,
 	NotificationLevel,
 	NotificationSeverity,
-	NotificationComponentData,
 	OverlayNotification,
 } from '@core/services/notification/notification-strategy.interface';
+import {
+	ModalNotification,
+	ToastNotification,
+} from '@models/notification.models';
 
 /**
  * Handle retornado ao criar uma notificação.

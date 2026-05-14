@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TextReaderComponent } from './text-reader.component';
-import { provideMarkdown } from 'ngx-markdown';
 import { SettingsService } from '@core/services/settings.service';
+import { provideMarkdown } from 'ngx-markdown';
+import { TextReaderComponent } from './text-reader.component';
 
 describe('TextReaderComponent', () => {
 	let component: TextReaderComponent;

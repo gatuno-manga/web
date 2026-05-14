@@ -1,15 +1,15 @@
+import { CommonModule } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
+	computed,
 	input,
 	model,
 	signal,
-	computed,
-	ChangeDetectionStrategy,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 
 export interface MultiSelectOption {
 	id: string;
@@ -28,7 +28,7 @@ export class MultiSelectTagsComponent {
 	options = input.required<MultiSelectOption[]>();
 	selectedIds = model<string[]>([]);
 	excludedIds = model<string[]>([]);
-	
+
 	allowExclude = input<boolean>(false);
 	maxSelection = input<number | null>(null);
 	placeholderSearch = input<string>('Filtrar...');
@@ -43,13 +43,17 @@ export class MultiSelectTagsComponent {
 		const selected = new Set(this.selectedIds());
 		const excluded = new Set(this.excludedIds());
 
-		let filtered = query 
+		let filtered = query
 			? list.filter((opt) => opt.name.toLowerCase().includes(query))
 			: list;
 
 		if (this.groupSelectedAtTop()) {
-			const active = filtered.filter(opt => selected.has(opt.id) || excluded.has(opt.id));
-			const inactive = filtered.filter(opt => !selected.has(opt.id) && !excluded.has(opt.id));
+			const active = filtered.filter(
+				(opt) => selected.has(opt.id) || excluded.has(opt.id),
+			);
+			const inactive = filtered.filter(
+				(opt) => !selected.has(opt.id) && !excluded.has(opt.id),
+			);
 			filtered = [...active, ...inactive];
 		}
 
@@ -59,12 +63,15 @@ export class MultiSelectTagsComponent {
 	// Items that are selected/excluded but NOT in the current filtered list
 	activeItemsNotInFilter = computed(() => {
 		if (this.groupSelectedAtTop()) return []; // Already handled in filteredOptions
-		
+
 		const filteredSet = new Set(this.filteredOptions().map((o) => o.id));
-		const activeSet = new Set([...this.selectedIds(), ...this.excludedIds()]);
-		
+		const activeSet = new Set([
+			...this.selectedIds(),
+			...this.excludedIds(),
+		]);
+
 		return this.options().filter(
-			(opt) => activeSet.has(opt.id) && !filteredSet.has(opt.id)
+			(opt) => activeSet.has(opt.id) && !filteredSet.has(opt.id),
 		);
 	});
 

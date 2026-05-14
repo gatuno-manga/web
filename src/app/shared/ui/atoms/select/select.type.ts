@@ -1,4 +1,4 @@
 export type SelectItem = {
-    icon: string;
-    checked: () => void;
+	icon: string;
+	checked: () => void;
 };

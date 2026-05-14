@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
 import {
 	DashboardOverview,
 	DashboardProgress,
 	QueueStats,
 } from '@models/dashboard.models';
+import { Observable } from 'rxjs';
 
 @Injectable({
 	providedIn: 'root',

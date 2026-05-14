@@ -1,72 +1,65 @@
-import {
-	Component,
-	ElementRef,
-	OnInit,
-	OnDestroy,
-	inject,
-	signal,
-	viewChild,
-	ChangeDetectionStrategy,
-	ChangeDetectorRef,
-	computed,
-	DestroyRef,
-	effect,
-	AfterViewInit,
-	PLATFORM_ID,
-	afterNextRender,
-	Injector,
-	ViewChild,
-	NgZone,
-} from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { DecimalPipe, isPlatformBrowser, NgClass } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
-	Chapter,
-	ContentType,
-	Page,
-	ImageMetadata,
-} from '@models/book.models';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { DecimalPipe, NgClass } from '@angular/common';
-import { ChapterService } from '@core/services/chapter.service';
-import { WakeLockService } from '@core/services/wake-lock.service';
-import { VisibilityPrivacyService } from '@core/services/visibility-privacy.service';
-import { FullscreenService } from '@core/services/fullscreen.service';
-import { HighlightService } from '@core/services/highlight.service';
-import { BookService } from '@core/services/book.service';
-import { UserTokenService } from '@core/services/user-token.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { NotificationService } from '@core/services/notification.service';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { AsideComponent } from '@ui/organisms/aside/aside.component';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { SettingsService } from '@core/services/settings.service';
-import { NotificationSeverity } from '@core/services/notification';
-import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
-import { ReaderSettingsNotificationComponent } from '@ui/molecules/notification/custom-components';
-import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
-import { BookWebsocketService } from '@core/services/book-websocket.service';
-import { DownloadService } from '@core/services/download.service';
-import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
-import { NetworkStatusService } from '@core/services/network-status.service';
+	AfterViewInit,
+	afterNextRender,
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
+	Component,
+	computed,
+	DestroyRef,
+	ElementRef,
+	effect,
+	Injector,
+	inject,
+	NgZone,
+	OnDestroy,
+	OnInit,
+	PLATFORM_ID,
+	signal,
+	ViewChild,
+	viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { fromEvent, lastValueFrom } from 'rxjs';
-import { throttleTime } from 'rxjs/operators';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { BookService } from '@core/services/book.service';
+import { BookWebsocketService } from '@core/services/book-websocket.service';
+import { ChapterService } from '@core/services/chapter.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
-import { ContextMenuItem } from '@models/context-menu.models';
+import { DownloadService } from '@core/services/download.service';
+import { HeaderStateService } from '@core/services/header-state.service';
+import { HighlightService } from '@core/services/highlight.service';
+import { MetaDataService } from '@core/services/meta-data.service';
+import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { NetworkStatusService } from '@core/services/network-status.service';
+import { NotificationSeverity } from '@core/services/notification';
+import { NotificationService } from '@core/services/notification.service';
 import { SavedPagesService } from '@core/services/saved-pages.service';
+import { SettingsService } from '@core/services/settings.service';
+import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
+import { UserTokenService } from '@core/services/user-token.service';
+import { VisibilityPrivacyService } from '@core/services/visibility-privacy.service';
+import { WakeLockService } from '@core/services/wake-lock.service';
+import { ChapterCommentsComponent } from '@features/reading/components/chapter-comments/chapter-comments.component';
 import {
-	ImageReaderComponent,
-	TextReaderComponent,
+	DocumentProgressEvent,
 	DocumentReaderComponent,
+	ImageReaderComponent,
 	ReadingProgressEvent,
 	TextProgressEvent,
-	DocumentProgressEvent,
+	TextReaderComponent,
 } from '@features/reading/components/readers';
-import { HeaderStateService } from '@core/services/header-state.service';
-import { ChapterCommentsComponent } from '@features/reading/components/chapter-comments/chapter-comments.component';
+import { Chapter, ContentType, ImageMetadata, Page } from '@models/book.models';
+import { ContextMenuItem } from '@models/context-menu.models';
+import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
+import { ReaderSettingsNotificationComponent } from '@ui/molecules/notification/custom-components';
+import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
+import { AsideComponent } from '@ui/organisms/aside/aside.component';
+import { fromEvent, lastValueFrom } from 'rxjs';
+import { throttleTime } from 'rxjs/operators';
 
 type ChapterLoadOrigin =
 	| 'route'
@@ -130,7 +123,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private savedPagesService = inject(SavedPagesService);
 	private wakeLockService = inject(WakeLockService);
 	public privacyService = inject(VisibilityPrivacyService);
-	private fullscreenService = inject(FullscreenService);
 	private highlightService = inject(HighlightService);
 	private router = inject(Router);
 	private platformId = inject(PLATFORM_ID);
@@ -638,7 +630,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.updateProgressState(event.pageIndex, percent);
 	}
 
-
 	unblur() {
 		this.privacyService.unblurManually();
 	}
@@ -962,7 +953,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private lastTapTime = 0;
 
 	onZoneTouch(event: TouchEvent) {
-		const currentTime = new Date().getTime();
+		const currentTime = Date.now();
 		const tapLength = currentTime - this.lastTapTime;
 
 		if (tapLength < 300 && tapLength > 0) {

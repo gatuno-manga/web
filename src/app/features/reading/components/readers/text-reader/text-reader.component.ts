@@ -1,30 +1,30 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
-	Component,
-	Input,
-	Output,
-	EventEmitter,
-	ElementRef,
-	OnInit,
-	OnDestroy,
-	inject,
-	PLATFORM_ID,
-	DestroyRef,
 	ChangeDetectionStrategy,
+	Component,
+	computed,
+	DestroyRef,
+	ElementRef,
+	EventEmitter,
+	Input,
+	inject,
+	OnChanges,
+	OnDestroy,
+	OnInit,
+	Output,
+	PLATFORM_ID,
+	SimpleChanges,
 	signal,
 	viewChild,
-	computed,
-	OnChanges,
-	SimpleChanges,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { fromEvent } from 'rxjs';
-import { throttleTime } from 'rxjs/operators';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { HighlightService } from '@core/services/highlight.service';
+import { SettingsService } from '@core/services/settings.service';
 import { ContentFormat } from '@models/book.models';
 import { MarkdownComponent } from 'ngx-markdown';
-import { SettingsService } from '@core/services/settings.service';
-import { HighlightService } from '@core/services/highlight.service';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { fromEvent } from 'rxjs';
+import { throttleTime } from 'rxjs/operators';
 
 export interface TextProgressEvent {
 	pageIndex: number;
@@ -58,7 +58,6 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	private sanitizer = inject(DomSanitizer);
 
 	private intersectionObserver: IntersectionObserver | null = null;
-	private lastIntersectingElement: Element | null = null;
 
 	settings = toSignal(this.settingsService.settings$, {
 		initialValue: this.settingsService.getSettings(),
@@ -169,7 +168,10 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 			.subscribe(() => {
 				const ranges = this.highlightService.getSelectionRanges();
 				if (ranges.length > 0) {
-					this.highlightService.createHighlight('reading-selection', ranges);
+					this.highlightService.createHighlight(
+						'reading-selection',
+						ranges,
+					);
 				}
 			});
 	}

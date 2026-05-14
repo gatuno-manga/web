@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ThemeService, AppTheme } from '@core/services/theme.service';
+import { AppTheme, ThemeService } from '@core/services/theme.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
@@ -12,7 +12,12 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 export class ThemeSetupModalComponent {
 	public themeService = inject(ThemeService);
 
-	themes: { id: AppTheme; label: string; icon: string; description: string }[] = [
+	themes: {
+		id: AppTheme;
+		label: string;
+		icon: string;
+		description: string;
+	}[] = [
 		{
 			id: 'light',
 			label: 'Claro',

@@ -31,7 +31,7 @@
       
       <div class="carousel-dots">
         @for (dot of featuredBooks(); track $index; let i = $index) {
-          <button (click)="setFeatured(i)" [class.active]="i === currentFeaturedIndex()"></button>
+          <button type="button" (click)="setFeatured(i)" [class.active]="i === currentFeaturedIndex()"></button>
         }
       </div>
     </section>

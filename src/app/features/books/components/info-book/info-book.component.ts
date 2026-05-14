@@ -1,51 +1,51 @@
 import {
-	Component,
-	ElementRef,
-	ViewChild,
+	CdkDragDrop,
+	DragDropModule,
+	moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import { DecimalPipe, isPlatformBrowser } from '@angular/common';
+import {
 	AfterViewInit,
-	signal,
-	OnDestroy,
-	inject,
-	PLATFORM_ID,
-	NgZone,
-	ChangeDetectorRef,
-	computed,
-	input,
-	output,
 	ChangeDetectionStrategy,
+	Component,
+	computed,
+	ElementRef,
+	inject,
+	input,
+	NgZone,
+	OnDestroy,
+	output,
+	PLATFORM_ID,
+	signal,
+	ViewChild,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { isPlatformBrowser, DecimalPipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { SettingsService } from '@core/services/settings.service';
+import { ChapterService } from '@core/services/chapter.service';
+import { ContextMenuService } from '@core/services/context-menu.service';
+import { DownloadService } from '@core/services/download.service';
+import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { NotificationSeverity } from '@core/services/notification';
+import { NotificationService } from '@core/services/notification.service';
+import { SavedPagesService } from '@core/services/saved-pages.service';
+import { UserTokenService } from '@core/services/user-token.service';
 import {
 	Book,
 	BookBasic,
 	BookDetail,
 	Chapterlist,
-	Cover,
-	ScrapingStatus,
-	UpdateBookDto,
-	ContentType,
 	ContentTypes,
+	Cover,
 	ImageMetadata,
+	ScrapingStatus,
 } from '@models/book.models';
-import { RouterModule } from '@angular/router';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { Subscription, firstValueFrom, fromEvent, throttleTime } from 'rxjs';
-import { DownloadService } from '@core/services/download.service';
-import { ChapterService } from '@core/services/chapter.service';
-import { DownloadStatus } from '@models/offline.models';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { ContextMenuService } from '@core/services/context-menu.service';
 import { ContextMenuItem } from '@models/context-menu.models';
-import { UserTokenService } from '@core/services/user-token.service';
-import { ImageViewerComponent } from '@ui/organisms/image-viewer/image-viewer.component';
-import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
-import { SavedPagesService } from '@core/services/saved-pages.service';
+import { DownloadStatus } from '@models/offline.models';
 import { SavedPage } from '@models/saved-page.models';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
 	BookEditModalComponent,
 	BookEditSaveEvent,
@@ -54,18 +54,13 @@ import {
 	CoverEditModalComponent,
 	CoverEditSaveEvent,
 } from '@ui/molecules/notification/custom-components/cover-edit-modal/cover-edit-modal.component';
+import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
 import {
 	SourceAddModalComponent,
 	SourceAddSaveEvent,
 } from '@ui/molecules/notification/custom-components/source-add-modal/source-add-modal.component';
-import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
-import { NotificationService } from '@core/services/notification.service';
-import { NotificationSeverity } from '@core/services/notification';
-import {
-	CdkDragDrop,
-	moveItemInArray,
-	DragDropModule,
-} from '@angular/cdk/drag-drop';
+import { ImageViewerComponent } from '@ui/organisms/image-viewer/image-viewer.component';
+import { firstValueFrom, fromEvent, Subscription, throttleTime } from 'rxjs';
 
 enum tab {
 	chapters = 0,
@@ -109,7 +104,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	private notificationService = inject(NotificationService);
 	private platformId = inject(PLATFORM_ID);
 	private ngZone = inject(NgZone);
-	private cdr = inject(ChangeDetectorRef);
 	private resizeObserver?: ResizeObserver;
 	private mutationObserver?: MutationObserver;
 
@@ -828,7 +822,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	urlTransform(url: string): string {
 		try {
 			return new URL(url).hostname;
-		} catch (e) {
+		} catch (_e) {
 			return url;
 		}
 	}
@@ -892,7 +886,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 									this.savedPagesService
 										.updateComment(savedPage.id, newComment)
 										.subscribe({
-											next: (updatedPage) => {
+											next: (_updatedPage) => {
 												// Update local state
 												this.savedPages.update(
 													(current) => {
@@ -1331,7 +1325,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 	}
 
-	openImageViewer(url: string, title: string, description = '', metadata?: ImageMetadata) {
+	openImageViewer(
+		url: string,
+		title: string,
+		description = '',
+		metadata?: ImageMetadata,
+	) {
 		this.viewerImageUrl.set(url);
 		this.viewerImageTitle.set(title);
 		this.viewerImageDescription.set(description);
@@ -1420,7 +1419,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	onBookEditSave(event: BookEditSaveEvent) {
 		this.bookService.updateBook(event.id, event.data).subscribe({
 			next: () => {
-				this.notificationService.success('Livro atualizado com sucesso!');
+				this.notificationService.success(
+					'Livro atualizado com sucesso!',
+				);
 				this.updated.emit();
 
 				// Recarrega dados das abas locais se já foram carregados
@@ -1811,7 +1812,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 										'Tarefa de captura de capa agendada.',
 										'Processando',
 									);
-									// O backend geralmente processa isso via job, 
+									// O backend geralmente processa isso via job,
 									// mas vamos recarregar para ver se já aparece algo
 									setTimeout(() => this.loadCovers(), 2000);
 								},

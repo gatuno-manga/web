@@ -1,22 +1,22 @@
 import { Component } from '@angular/core';
 import {
-	PasswordInputComponent,
-	TextInputComponent,
-} from '@ui/atoms/inputs/text-input/text-input.component';
-import {
+	AbstractControl,
 	FormBuilder,
 	FormGroup,
 	ReactiveFormsModule,
 	Validators,
-	AbstractControl,
 } from '@angular/forms';
-import { AuthService } from '@core/services/auth.service';
 import { Router, RouterModule } from '@angular/router';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { minUppercaseValidator } from '@shared/validators/min-uppercase.validator';
+import { AuthService } from '@core/services/auth.service';
+import { MetaDataService } from '@core/services/meta-data.service';
 import { minNumberValidator } from '@shared/validators/min-number.validator';
 import { minSymbolValidator } from '@shared/validators/min-symbol.validator';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { minUppercaseValidator } from '@shared/validators/min-uppercase.validator';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import {
+	PasswordInputComponent,
+	TextInputComponent,
+} from '@ui/atoms/inputs/text-input/text-input.component';
 
 @Component({
 	selector: 'app-register',
@@ -87,7 +87,7 @@ export class RegisterComponent {
 			password: this.form.get('password')?.value,
 		};
 		this.authService.register(data).subscribe({
-			next: (response) => {
+			next: (_response) => {
 				this.router.navigate(['/home']);
 			},
 			error: (error) => {

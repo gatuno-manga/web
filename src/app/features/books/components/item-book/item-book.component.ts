@@ -1,19 +1,25 @@
-import { Component, input, inject, signal, computed, output } from '@angular/core';
-
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import {
+	Component,
+	computed,
+	inject,
+	input,
+	output,
+	signal,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { BookList } from '@models/book.models';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
-import { NgOptimizedImage, CommonModule } from '@angular/common';
+import { BookService } from '@core/services/book.service';
+import { ChapterService } from '@core/services/chapter.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
 import { DownloadService } from '@core/services/download.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NotificationService } from '@core/services/notification.service';
-import { BookService } from '@core/services/book.service';
-import { ContextMenuItem } from '@models/context-menu.models';
-import { firstValueFrom } from 'rxjs';
-import { ChapterService } from '@core/services/chapter.service';
 import { UserTokenService } from '@core/services/user-token.service';
+import { BookList } from '@models/book.models';
+import { ContextMenuItem } from '@models/context-menu.models';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
 	selector: 'app-item-book',
@@ -68,7 +74,7 @@ export class ItemBookComponent {
 	truncatedDescription = computed(() => {
 		const desc = this.book()?.description?.toString() || '';
 		if (desc.length > 150) {
-			return desc.substring(0, 150) + '...';
+			return `${desc.substring(0, 150)}...`;
 		}
 		return desc;
 	});
@@ -76,7 +82,7 @@ export class ItemBookComponent {
 	truncatedTitle = computed(() => {
 		const title = this.book()?.title?.toString() || '';
 		if (title.length > 80) {
-			return title.substring(0, 80) + '...';
+			return `${title.substring(0, 80)}...`;
 		}
 		return title;
 	});
@@ -293,22 +299,24 @@ export class ItemBookComponent {
 					label: 'Corrigir',
 					type: 'danger',
 					callback: () => {
-						this.bookService.fixAllCovers(this.book().id).subscribe({
-							next: () => {
-								this.notificationService.success(
-									'Tarefa de correção de capas agendada.',
-									'Processando',
-								);
-								this.modalService.close();
-							},
-							error: (err) => {
-								console.error('Error fixing covers:', err);
-								this.notificationService.error(
-									'Erro ao agendar correção de capas.',
-								);
-								this.modalService.close();
-							},
-						});
+						this.bookService
+							.fixAllCovers(this.book().id)
+							.subscribe({
+								next: () => {
+									this.notificationService.success(
+										'Tarefa de correção de capas agendada.',
+										'Processando',
+									);
+									this.modalService.close();
+								},
+								error: (err) => {
+									console.error('Error fixing covers:', err);
+									this.notificationService.error(
+										'Erro ao agendar correção de capas.',
+									);
+									this.modalService.close();
+								},
+							});
 					},
 				},
 			],

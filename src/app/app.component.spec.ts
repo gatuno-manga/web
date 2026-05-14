@@ -1,33 +1,35 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { AppComponent } from './app.component';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { signal } from '@angular/core';
 
 describe('AppComponent', () => {
-  beforeEach(async () => {
-    const sensitiveSpy = jasmine.createSpyObj('SensitiveContentService', ['getContentAllow']);
-    sensitiveSpy.allowContentSignal = signal([]);
+	beforeEach(async () => {
+		const sensitiveSpy = jasmine.createSpyObj('SensitiveContentService', [
+			'getContentAllow',
+		]);
+		sensitiveSpy.allowContentSignal = signal([]);
 
-    await TestBed.configureTestingModule({
-      imports: [AppComponent, SharedTestingModule],
-      providers: [
-        { provide: SensitiveContentService, useValue: sensitiveSpy }
-      ]
-    }).compileComponents();
-  });
+		await TestBed.configureTestingModule({
+			imports: [AppComponent, SharedTestingModule],
+			providers: [
+				{ provide: SensitiveContentService, useValue: sensitiveSpy },
+			],
+		}).compileComponents();
+	});
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
+	it('should create the app', () => {
+		const fixture = TestBed.createComponent(AppComponent);
+		const app = fixture.componentInstance;
+		expect(app).toBeTruthy();
+	});
 
-  it('should render overlay-notification component', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    // overlay notification selector should be present
-    expect(compiled.querySelector('app-overlay-notification')).toBeTruthy();
-  });
+	it('should render overlay-notification component', () => {
+		const fixture = TestBed.createComponent(AppComponent);
+		fixture.detectChanges();
+		const compiled = fixture.nativeElement as HTMLElement;
+		// overlay notification selector should be present
+		expect(compiled.querySelector('app-overlay-notification')).toBeTruthy();
+	});
 });

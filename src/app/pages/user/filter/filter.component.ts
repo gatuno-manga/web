@@ -1,24 +1,22 @@
 import {
-	Component,
 	ChangeDetectionStrategy,
-	signal,
-	inject,
-	OnInit,
-	input,
+	Component,
 	computed,
 	effect,
+	inject,
+	input,
+	OnInit,
+	signal,
 } from '@angular/core';
-import { SensitiveContentResponse } from '@models/book.models';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { MetaDataService } from '@core/services/meta-data.service';
 import { DownloadService } from '@core/services/download.service';
-import { TagsService } from '@core/services/tags.service';
-import { Tag } from '@models/tags.models';
-import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
-import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
+import { MetaDataService } from '@core/services/meta-data.service';
 import { SearchService } from '@core/services/search.service';
-import { finalize } from 'rxjs/operators';
+import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { TagsService } from '@core/services/tags.service';
+import { SensitiveContentResponse } from '@models/book.models';
+import { Tag } from '@models/tags.models';
 import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';
+import { finalize } from 'rxjs/operators';
 
 @Component({
 	selector: 'app-filter',
@@ -87,7 +85,8 @@ export class FilterComponent implements OnInit {
 	});
 
 	ngOnInit() {
-		this.initialAllowedNames = this.sensitiveContentService.getContentAllow();
+		this.initialAllowedNames =
+			this.sensitiveContentService.getContentAllow();
 		this.selectedTags.set(this.tagsService.excludedTagsSignal());
 		this.loadSensitiveContent();
 		this.loadTags();
@@ -97,15 +96,15 @@ export class FilterComponent implements OnInit {
 	constructor() {
 		effect(() => {
 			if (!this.isInitialized()) return;
-			
+
 			const ids = this.allowContentIds();
 			const names = this.sensitiveContentList()
-				.filter(c => ids.includes(c.id))
-				.map(c => c.name);
-			
+				.filter((c) => ids.includes(c.id))
+				.map((c) => c.name);
+
 			// Sincroniza globalmente com o serviço usando os nomes
 			this.sensitiveContentService.setContentAllow(names);
-			
+
 			// Recarrega as tags baseadas no novo conteúdo permitido
 			this.loadTags(names);
 		});
@@ -117,7 +116,8 @@ export class FilterComponent implements OnInit {
 	}
 
 	loadTags(allowedNames?: string[]) {
-		const sensitiveContent = allowedNames || this.sensitiveContentService.getContentAllow();
+		const sensitiveContent =
+			allowedNames || this.sensitiveContentService.getContentAllow();
 		this.tagsService.getTags({ sensitiveContent }).subscribe({
 			next: (tags) => this.tagsList.set(tags),
 			error: (err) => console.error('Error loading tags', err),
@@ -126,9 +126,9 @@ export class FilterComponent implements OnInit {
 
 	private mapNamesToIds() {
 		const ids = this.sensitiveContentList()
-			.filter(c => this.initialAllowedNames.includes(c.name))
-			.map(c => c.id);
-		
+			.filter((c) => this.initialAllowedNames.includes(c.name))
+			.map((c) => c.id);
+
 		this.allowContentIds.set(ids);
 		this.isInitialized.set(true);
 	}

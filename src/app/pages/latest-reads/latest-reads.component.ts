@@ -1,14 +1,21 @@
-import { Component, OnInit, signal, inject, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	inject,
+	OnInit,
+	signal,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { ReadingProgressService } from '@core/services/reading-progress.service';
 import { MetaDataService } from '@core/services/meta-data.service';
+import { ReadingProgressService } from '@core/services/reading-progress.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { BookBasic, Chapterlist } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { firstValueFrom } from 'rxjs';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
+import { firstValueFrom } from 'rxjs';
 
 export interface HistoryEntry {
 	progressId: string;
@@ -30,7 +37,13 @@ export interface HistoryEntry {
 @Component({
 	selector: 'app-latest-reads',
 	standalone: true,
-	imports: [CommonModule, RouterModule, IconsComponent, NgOptimizedImage, BlurhashComponent],
+	imports: [
+		CommonModule,
+		RouterModule,
+		IconsComponent,
+		NgOptimizedImage,
+		BlurhashComponent,
+	],
 	templateUrl: './latest-reads.component.html',
 	styleUrl: './latest-reads.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,9 +66,8 @@ export class LatestReadsComponent implements OnInit {
 			if (!this.showSensitiveContent()) {
 				const bookSensitive = entry.sensitiveContent || [];
 				if (bookSensitive.length > 0) {
-					return bookSensitive.every(
-						(sc: any) =>
-							allowedNames.includes(sc.name),
+					return bookSensitive.every((sc: any) =>
+						allowedNames.includes(sc.name),
 					);
 				}
 			}
@@ -77,7 +89,7 @@ export class LatestReadsComponent implements OnInit {
 			if (!bookGroups.has(entry.bookId)) {
 				bookGroups.set(entry.bookId, []);
 			}
-			bookGroups.get(entry.bookId)!.push(entry);
+			bookGroups.get(entry.bookId)?.push(entry);
 		}
 
 		return Array.from(dateGroups.entries()).map(([date, booksMap]) => ({
@@ -125,7 +137,11 @@ export class LatestReadsComponent implements OnInit {
 			const progress = await this.readingProgressService.getAllProgress();
 			if (progress && progress.length > 0) {
 				const sortedProgress = progress
-					.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+					.sort(
+						(a, b) =>
+							new Date(b.updatedAt).getTime() -
+							new Date(a.updatedAt).getTime(),
+					)
 					.slice(0, 100);
 
 				const results: HistoryEntry[] = [];
@@ -154,12 +170,14 @@ export class LatestReadsComponent implements OnInit {
 								chapterCache.set(p.bookId, chapters);
 							}
 
-							const currentChapter = chapters.find((c) => c.id === p.chapterId);
-							
+							const currentChapter = chapters.find(
+								(c) => c.id === p.chapterId,
+							);
+
 							if (currentChapter) {
 								const index = currentChapter.index + 1;
-								const chapterTitle = currentChapter.title 
-									? `Cap. ${index}: ${currentChapter.title}` 
+								const chapterTitle = currentChapter.title
+									? `Cap. ${index}: ${currentChapter.title}`
 									: `Capítulo ${index}`;
 
 								results.push({
@@ -169,7 +187,8 @@ export class LatestReadsComponent implements OnInit {
 									bookCover: bookBasic.cover,
 									bookBlurHash: bookBasic.blurHash,
 									bookDominantColor: bookBasic.dominantColor,
-									sensitiveContent: bookBasic.sensitiveContent,
+									sensitiveContent:
+										bookBasic.sensitiveContent,
 									chapter: {
 										id: currentChapter.id,
 										title: chapterTitle,
@@ -181,7 +200,10 @@ export class LatestReadsComponent implements OnInit {
 							}
 						}
 					} catch (err) {
-						console.error(`Erro ao carregar histórico para o livro ${p.bookId}:`, err);
+						console.error(
+							`Erro ao carregar histórico para o livro ${p.bookId}:`,
+							err,
+						);
 					}
 				}
 				this.historyEntries.set(results);
@@ -195,20 +217,30 @@ export class LatestReadsComponent implements OnInit {
 
 	formatDateGroup(d: Date): string {
 		const now = new Date();
-		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		const today = new Date(
+			now.getFullYear(),
+			now.getMonth(),
+			now.getDate(),
+		);
 		const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
 		const diff = today.getTime() - target.getTime();
 		const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-		
+
 		if (days === 0) return 'Hoje';
 		if (days === 1) return 'Ontem';
-		
-		const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+
+		const options: Intl.DateTimeFormatOptions = {
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric',
+		};
 		return target.toLocaleDateString('pt-BR', options);
 	}
 
 	formatTime(d: Date): string {
-		return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+		return d.toLocaleTimeString('pt-BR', {
+			hour: '2-digit',
+			minute: '2-digit',
+		});
 	}
 }
-

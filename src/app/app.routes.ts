@@ -50,9 +50,9 @@ export const routes: Routes = [
 			{
 				path: 'latest-reads',
 				loadComponent: () =>
-					import(
-						'./pages/latest-reads/latest-reads.component'
-					).then((m) => m.LatestReadsComponent),
+					import('./pages/latest-reads/latest-reads.component').then(
+						(m) => m.LatestReadsComponent,
+					),
 				data: PRE_RENDER_CONFIG('latest-reads'),
 			},
 			{

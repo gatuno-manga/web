@@ -1,35 +1,34 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, NgZone } from '@angular/core';
+import { Injectable, inject, NgZone } from '@angular/core';
+import { environment } from '@environments/environment';
 import {
 	Book,
 	BookBasic,
 	BookDetail,
+	BookFilterInput,
 	BookList,
 	BookPageOptions,
 	ChapterCursorOptions,
 	ChapterCursorPage,
 	Chapterlist,
 	Cover,
-	UpdateBookDto,
-	ScrapingStatus,
-	BookFilterInput,
 	PaginatedBookResponse,
+	ScrapingStatus,
+	UpdateBookDto,
 } from '@models/book.models';
 import { Page } from '@models/miscellaneous.models';
-import { SensitiveContentService } from './sensitive-content.service';
-import { UserTokenService } from './user-token.service';
+import { firstValueFrom, from, Observable } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { BookWebsocketService } from './book-websocket.service';
 import { DownloadService } from './download.service';
+import { SensitiveContentService } from './sensitive-content.service';
 import { TagsService } from './tags.service';
-import { Observable, firstValueFrom, from, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { environment } from '@environments/environment';
+import { UserTokenService } from './user-token.service';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class BookService {
-	private readonly apiUrl = '/api';
 	private readonly tagsService = inject(TagsService);
 
 	constructor(
@@ -96,7 +95,8 @@ export class BookService {
 		// Auto-apply user preferences if not explicitly overridden
 		if (!gqlFilter.sensitiveContent) {
 			const allowed = this.sensitiveContentService.getContentAllow();
-			gqlFilter.sensitiveContent = allowed.length > 0 ? ['safe', ...allowed] : ['safe'];
+			gqlFilter.sensitiveContent =
+				allowed.length > 0 ? ['safe', ...allowed] : ['safe'];
 		}
 
 		if (!gqlFilter.excludeTags) {
@@ -182,7 +182,8 @@ export class BookService {
 				// Recarrega as preferências se estiver offline, ignorando estado do token
 				const allowedContent =
 					this.sensitiveContentService.getContentAllow();
-				const globalExcludedTags = this.tagsService.excludedTagsSignal();
+				const globalExcludedTags =
+					this.tagsService.excludedTagsSignal();
 
 				filteredBooks = filteredBooks.filter((book) => {
 					// Se o livro não tem conteúdo sensível, é permitido
@@ -204,9 +205,11 @@ export class BookService {
 
 				// 1.1 Filtrar por Tags Excluídas Globalmente
 				if (globalExcludedTags.length > 0) {
-					filteredBooks = filteredBooks.filter(book => {
-						const bookTagIds = (book.tags || []).map(t => t.id);
-						return !globalExcludedTags.some(id => bookTagIds.includes(id));
+					filteredBooks = filteredBooks.filter((book) => {
+						const bookTagIds = (book.tags || []).map((t) => t.id);
+						return !globalExcludedTags.some((id) =>
+							bookTagIds.includes(id),
+						);
 					});
 				}
 
