@@ -111,7 +111,9 @@ describe('CrossTabSyncService', () => {
 				oldValue: null,
 			});
 
-			storageEventListeners.forEach((listener) => listener(storageEvent));
+			storageEventListeners.forEach((listener) => {
+				listener(storageEvent);
+			});
 			tick();
 
 			expect(receivedMessages.length).toBe(1);
@@ -128,7 +130,9 @@ describe('CrossTabSyncService', () => {
 				oldValue: null,
 			});
 
-			storageEventListeners.forEach((listener) => listener(storageEvent));
+			storageEventListeners.forEach((listener) => {
+				listener(storageEvent);
+			});
 			tick();
 
 			expect(receivedMessages.length).toBe(0);
@@ -146,9 +150,9 @@ describe('CrossTabSyncService', () => {
 
 			// Não deve lançar erro
 			expect(() => {
-				storageEventListeners.forEach((listener) =>
-					listener(storageEvent),
-				);
+				storageEventListeners.forEach((listener) => {
+					listener(storageEvent);
+				});
 				tick();
 			}).not.toThrow();
 

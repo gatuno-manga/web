@@ -1,0 +1,1342 @@
+src/app/core/services/auth-queue.service.ts:32:24 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    30 │ 	}
+    31 │ 
+  > 32 │ 	notifyFailure(_error: any): void {
+       │ 	                      ^^^
+    33 │ 		this.hasError = true;
+    34 │ 		this.isRefreshingSubject.next(false);
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/background-sync-registration.service.ts:40:27 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    38 │ 			const registration = await navigator.serviceWorker.ready;
+    39 │ 			// Usando 'any' pois SyncManager não está no tipo padrão de ServiceWorkerRegistration em todos os ambientes
+  > 40 │ 			await (registration as any).sync.register(tagName);
+       │ 			                       ^^^
+    41 │ 
+    42 │ 			logConnectionEvent(
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/book-websocket.service.ts:271:46 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    269 │ 	 * Protegido para facilitar a substituição em testes unitários.
+    270 │ 	 */
+  > 271 │ 	protected createSocket(url: string, config: any): Socket<any, any> {
+        │ 	                                            ^^^
+    272 │ 		return io(url, config);
+    273 │ 	}
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/book-websocket.service.ts:271:59 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    269 │ 	 * Protegido para facilitar a substituição em testes unitários.
+    270 │ 	 */
+  > 271 │ 	protected createSocket(url: string, config: any): Socket<any, any> {
+        │ 	                                                         ^^^
+    272 │ 		return io(url, config);
+    273 │ 	}
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/book-websocket.service.ts:271:64 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    269 │ 	 * Protegido para facilitar a substituição em testes unitários.
+    270 │ 	 */
+  > 271 │ 	protected createSocket(url: string, config: any): Socket<any, any> {
+        │ 	                                                              ^^^
+    272 │ 		return io(url, config);
+    273 │ 	}
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/book.service.ts:137:41 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    135 │ 					const books = response.data.books;
+    136 │ 					// Mapear cover, blurHash e dominantColor da capa principal para o objeto BookList
+  > 137 │ 					books.data = books.data.map((book: any) => {
+        │ 					                                   ^^^
+    138 │ 						const mainCover =
+    139 │ 							book.covers?.find((c: any) => c.isMain) ||
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/book.service.ts:139:30 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    137 │ 					books.data = books.data.map((book: any) => {
+    138 │ 						const mainCover =
+  > 139 │ 							book.covers?.find((c: any) => c.isMain) ||
+        │ 							                      ^^^
+    140 │ 							book.covers?.[0];
+    141 │ 						if (mainCover) {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/csrf.service.ts:55:5 lint/suspicious/noDocumentCookie ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Direct assigning to document.cookie is not recommended.
+  
+    54 │ 			for (const domain of domainsToTry) {
+  > 55 │ 				document.cookie = `csrfToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+       │ 				^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    56 │ 			}
+    57 │ 			document.cookie = `csrfToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  
+  i Consider using the Cookie Store API.
+  
+
+src/app/core/services/csrf.service.ts:57:4 lint/suspicious/noDocumentCookie ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Direct assigning to document.cookie is not recommended.
+  
+    55 │ 				document.cookie = `csrfToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+    56 │ 			}
+  > 57 │ 			document.cookie = `csrfToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+       │ 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    58 │ 		}
+    59 │ 	}
+  
+  i Consider using the Cookie Store API.
+  
+
+src/app/core/services/download-manager.service.ts:219:19 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    217 │ 				'Download completo',
+    218 │ 			);
+  > 219 │ 		} catch (error: any) {
+        │ 		                ^^^
+    220 │ 			if (error.name === 'AbortError') {
+    221 │ 				// Já tratado no cancelDownload
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/highlight.service.ts:15:20 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    13 │ 		if (isPlatformBrowser(this.platformId)) {
+    14 │ 			this.isSupported.set(
+  > 15 │ 				typeof (CSS as any)?.highlights !== 'undefined',
+       │ 				               ^^^
+    16 │ 			);
+    17 │ 		}
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/highlight.service.ts:24:37 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    23 │ 		try {
+  > 24 │ 			const highlight = new (window as any).Highlight(...ranges);
+       │ 			                                 ^^^
+    25 │ 			(CSS as any).highlights.set(name, highlight);
+    26 │ 		} catch (err) {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/highlight.service.ts:25:12 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    23 │ 		try {
+    24 │ 			const highlight = new (window as any).Highlight(...ranges);
+  > 25 │ 			(CSS as any).highlights.set(name, highlight);
+       │ 			        ^^^
+    26 │ 		} catch (err) {
+    27 │ 			console.error(`Highlight API Error: ${err}`);
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/highlight.service.ts:33:11 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    31 │ 	clearHighlight(name: string) {
+    32 │ 		if (!this.isSupported()) return;
+  > 33 │ 		(CSS as any).highlights.delete(name);
+       │ 		        ^^^
+    34 │ 	}
+    35 │ 
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/highlight.service.ts:38:11 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    36 │ 	clearAllHighlights() {
+    37 │ 		if (!this.isSupported()) return;
+  > 38 │ 		(CSS as any).highlights.clear();
+       │ 		        ^^^
+    39 │ 	}
+    40 │ 
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/icon-registry.service.ts:31:14 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    29 │ 	getIcon(name: string): Observable<string> {
+    30 │ 		if (this.iconCache.has(name)) {
+  > 31 │ 			return of(this.iconCache.get(name)!);
+       │ 			          ^^^^^^^^^^^^^^^^^^^^^^^^^
+    32 │ 		}
+    33 │ 
+  
+
+src/app/core/services/icon-registry.service.ts:43:11 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    42 │ 		if (this.inFlightRequests.has(name)) {
+  > 43 │ 			return this.inFlightRequests.get(name)!;
+       │ 			       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    44 │ 		}
+    45 │ 
+  
+
+src/app/core/services/image.service.spec.ts:17:15 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    15 │ 		canvas.width = 2;
+    16 │ 		canvas.height = 2;
+  > 17 │ 		const ctx = canvas.getContext('2d')!;
+       │ 		            ^^^^^^^^^^^^^^^^^^^^^^^^
+    18 │ 		ctx.fillStyle = 'rgb(255,0,0)';
+    19 │ 		ctx.fillRect(0, 0, 2, 2);
+  
+
+src/app/core/services/local-storage.service.ts:16:26 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    14 │ 	}
+    15 │ 
+  > 16 │ 	set(key: string, value: any) {
+       │ 	                        ^^^
+    17 │ 		if (this.isBrowser) {
+    18 │ 			const stringValue =
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/reading-progress-sync.service.ts:268:46 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    266 │ 	 * Protegido para facilitar a substituição em testes unitários.
+    267 │ 	 */
+  > 268 │ 	protected createSocket(url: string, config: any): Socket<any, any> {
+        │ 	                                            ^^^
+    269 │ 		return io(url, config);
+    270 │ 	}
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/reading-progress-sync.service.ts:268:59 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    266 │ 	 * Protegido para facilitar a substituição em testes unitários.
+    267 │ 	 */
+  > 268 │ 	protected createSocket(url: string, config: any): Socket<any, any> {
+        │ 	                                                         ^^^
+    269 │ 		return io(url, config);
+    270 │ 	}
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/reading-progress-sync.service.ts:268:64 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    266 │ 	 * Protegido para facilitar a substituição em testes unitários.
+    267 │ 	 */
+  > 268 │ 	protected createSocket(url: string, config: any): Socket<any, any> {
+        │ 	                                                              ^^^
+    269 │ 		return io(url, config);
+    270 │ 	}
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/reading-progress-sync.service.ts:361:16 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    359 │ 			try {
+    360 │ 				const responseData = await firstValueFrom(
+  > 361 │ 					fromEvent<any>(
+        │ 					          ^^^
+    362 │ 						this.socket as any,
+    363 │ 						'progress:chapter:response',
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/reading-progress-sync.service.ts:362:22 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    360 │ 				const responseData = await firstValueFrom(
+    361 │ 					fromEvent<any>(
+  > 362 │ 						this.socket as any,
+        │ 						               ^^^
+    363 │ 						'progress:chapter:response',
+    364 │ 					).pipe(
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/reading-progress.service.ts:36:47 lint/complexity/noBannedTypes ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Don't use 'Object' as a type.
+  
+    34 │ 	private currentUserId: string = GUEST_USER_ID;
+    35 │ 
+  > 36 │ 	constructor(@Inject(PLATFORM_ID) platformId: Object) {
+       │ 	                                             ^^^^^^
+    37 │ 		this.isBrowser = isPlatformBrowser(platformId);
+    38 │ 		if (this.isBrowser) {
+  
+  i 'Object' accepts any non-nullish value, including non-object primitives like '123' and 'true'.
+    - If you want a type meaning "any arbitrary object", use 'object' instead.
+    - If you want a type meaning "any value", use 'unknown' instead.
+    - If you want a type meaning "an object whose properties cannot be used", use '{ [k: keyof any]: never }' or 'Record<keyof any, never>' instead.
+    - If you want a type meaning "an object that cannot contain any properties whatsoever", use '{ [uniqueSymbol]?: never }' with an unexported unique symbol in the same file.
+  
+  i If that's really what you want, use an inline disable comment.
+  
+
+src/app/core/services/theme.service.ts:27:44 lint/complexity/noBannedTypes ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Don't use 'Object' as a type.
+  
+    26 │ 	constructor(
+  > 27 │ 		@Inject(PLATFORM_ID) private platformId: Object,
+       │ 		                                         ^^^^^^
+    28 │ 		private rendererFactory: RendererFactory2,
+    29 │ 		private cookieService: CookieService,
+  
+  i 'Object' accepts any non-nullish value, including non-object primitives like '123' and 'true'.
+    - If you want a type meaning "any arbitrary object", use 'object' instead.
+    - If you want a type meaning "any value", use 'unknown' instead.
+    - If you want a type meaning "an object whose properties cannot be used", use '{ [k: keyof any]: never }' or 'Record<keyof any, never>' instead.
+    - If you want a type meaning "an object that cannot contain any properties whatsoever", use '{ [uniqueSymbol]?: never }' with an unexported unique symbol in the same file.
+  
+  i If that's really what you want, use an inline disable comment.
+  
+
+src/app/core/services/user-token.service.ts:180:4 lint/suspicious/noDocumentCookie ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Direct assigning to document.cookie is not recommended.
+  
+    178 │ 				document.cookie = `${this.ACCESSKEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+    179 │ 			}
+  > 180 │ 			document.cookie = `${this.ACCESSKEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        │ 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    181 │ 		}
+    182 │ 
+  
+  i Consider using the Cookie Store API.
+  
+
+src/app/core/services/user-token.service.ts:348:10 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    346 │ 			}>;
+    347 │ 		}
+  > 348 │ 		return this.refreshObservable!;
+        │ 		       ^^^^^^^^^^^^^^^^^^^^^^^
+    349 │ 	}
+    350 │ 
+  
+
+src/app/core/services/user-token.service.ts:178:5 lint/suspicious/noDocumentCookie ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Direct assigning to document.cookie is not recommended.
+  
+    177 │ 			for (const domain of domainsToTry) {
+  > 178 │ 				document.cookie = `${this.ACCESSKEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+        │ 				^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    179 │ 			}
+    180 │ 			document.cookie = `${this.ACCESSKEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  
+  i Consider using the Cookie Store API.
+  
+
+src/app/core/services/visibility-privacy.service.ts:12:21 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    10 │ 	private settingsService = inject(SettingsService);
+    11 │ 
+  > 12 │ 	private idleTimer: any;
+       │ 	                   ^^^
+    13 │ 
+    14 │ 	isBlurred = signal<boolean>(false);
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/wake-lock.service.ts:34:40 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    33 │ 		try {
+  > 34 │ 			this.wakeLock = await (navigator as any).wakeLock.request('screen');
+       │ 			                                    ^^^
+    35 │ 			this.isActive.set(true);
+    36 │ 
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/core/services/wake-lock.service.ts:9:20 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+     7 │ export class WakeLockService {
+     8 │ 	private platformId = inject(PLATFORM_ID);
+   > 9 │ 	private wakeLock: any = null;
+       │ 	                  ^^^
+    10 │ 
+    11 │ 	isSupported = signal<boolean>(false);
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/features/books/components/info-book/info-book.component.html:327:8 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    325 │ 						<div class="drag-placeholder" *cdkDragPlaceholder></div>
+    326 │ 						@if (cover.url && !coverImageErrors().has(cover.id)) {
+  > 327 │ 							<img
+        │ 							^^^^
+  > 328 │ 								[src]="cover.url"
+  > 329 │ 								[alt]="'Cover ' + cover.id"
+  > 330 │ 								(error)="onCoverImageError(cover.id)"
+  > 331 │ 							/>
+        │ 							^^
+    332 │ 						} @else {
+    333 │ 							<div class="cover-placeholder">
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/features/books/components/info-book/info-book.component.html:430:8 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    428 │ 					>
+    429 │ 						@if (savedPage.page.path) {
+  > 430 │ 							<img
+        │ 							^^^^
+  > 431 │ 								[src]="savedPage.page.path"
+  > 432 │ 								[alt]="'Page ' + savedPage.page.index"
+  > 433 │ 								loading="lazy"
+  > 434 │ 							/>
+        │ 							^^
+    435 │ 						} @else {
+    436 │ 							<div class="cover-placeholder">
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/features/books/components/info-book/info-book.component.ts:1819:22 lint/suspicious/noExplicitAny ━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    1817 │ 									setTimeout(() => this.loadCovers(), 2000);
+    1818 │ 								},
+  > 1819 │ 								error: (err: any) => {
+         │ 								             ^^^
+    1820 │ 									console.error('Error scraping cover:', err);
+    1821 │ 									this.notificationService.error(
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/features/books/components/item-book/item-book.component.html:21:5 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━
+
+  ! Provide an explicit type attribute for the button element.
+  
+    19 │ 		>
+    20 │ 			@if (canRemove()) {
+  > 21 │ 				<button
+       │ 				^^^^^^^
+  > 22 │ 					class="remove-btn"
+  > 23 │ 					(click)="onRemove($event)"
+  > 24 │ 					aria-label="Remover do histórico"
+  > 25 │ 					title="Remover do histórico"
+  > 26 │ 				>
+       │ 				^
+    27 │ 					<app-icons name="close" size="18" />
+    28 │ 				</button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/app/features/books/components/item-book/item-book.component.html:47:5 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    46 │ 			@if (isBlobUrl(book().cover)) {
+  > 47 │ 				<img
+       │ 				^^^^
+  > 48 │ 					[src]="book().cover"
+        ...
+  > 52 │ 					(error)="onImageError()"
+  > 53 │ 				/>
+       │ 				^^
+    54 │ 			} @else {
+    55 │ 				<img
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/features/books/components/item-book/item-book.component.html:55:5 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    53 │ 				/>
+    54 │ 			} @else {
+  > 55 │ 				<img
+       │ 				^^^^
+  > 56 │ 					[ngSrc]="book().cover"
+        ...
+  > 62 │ 					(error)="onImageError()"
+  > 63 │ 				/>
+       │ 				^^
+    64 │ 			}
+    65 │ 		</div>
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/features/reading/components/chapter-comments/chapter-comments.component.html:126:8 lint/a11y/useAltText ━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    124 │ 					<div class="chapter-comments__avatar" [class.small]="item.depth > 0">
+    125 │ 						@if (item.comment.profileImageUrl) {
+  > 126 │ 							<img
+        │ 							^^^^
+  > 127 │ 								[src]="item.comment.profileImageUrl"
+  > 128 │ 								[alt]="'Avatar de ' + item.comment.userName"
+  > 129 │ 							/>
+        │ 							^^
+    130 │ 						} @else {
+    131 │ 							<span>
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/features/reading/components/chapter-comments/chapter-comments.component.html:228:5 lint/a11y/useButtonType ━━━━━━━━━━
+
+  ! Provide an explicit type attribute for the button element.
+  
+    226 │ 		@if (commentsPage(); as pageInfo) {
+    227 │ 			<div class="chapter-comments__pagination">
+  > 228 │ 				<button
+        │ 				^^^^^^^
+  > 229 │ 					(click)="goToPreviousCommentsPage()"
+  > 230 │ 					[disabled]="pageInfo.metadata.page <= 1"
+  > 231 │ 				>
+        │ 				^
+    232 │ 					Anterior
+    233 │ 				</button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/app/features/reading/components/chapter-comments/chapter-comments.component.html:238:5 lint/a11y/useButtonType ━━━━━━━━━━
+
+  ! Provide an explicit type attribute for the button element.
+  
+    236 │ 					{{ pageInfo.metadata.lastPage }}
+    237 │ 				</span>
+  > 238 │ 				<button
+        │ 				^^^^^^^
+  > 239 │ 					(click)="goToNextCommentsPage()"
+  > 240 │ 					[disabled]="
+  > 241 │ 						pageInfo.metadata.page >= pageInfo.metadata.lastPage
+  > 242 │ 					"
+  > 243 │ 				>
+        │ 				^
+    244 │ 					Próxima
+    245 │ 				</button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/app/features/reading/components/readers/image-reader/image-reader.component.html:32:3 lint/a11y/useAltText ━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    30 │ 			}
+    31 │ 		</div>
+  > 32 │ 		<img
+       │ 		^^^^
+  > 33 │ 			[src]="page.path"
+        ...
+  > 40 │ 			[class.hidden]="isBlurred"
+  > 41 │ 		/>
+       │ 		^^
+    42 │ 		@if (showPageNumbers) {
+    43 │ 			<div class="page-number">{{ $index + 1 }}</div>
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/features/reading/components/readers/text-reader/text-reader.component.ts:60:10 lint/correctness/noUnusedPrivateClassMembers  FIXABLE  ━━━━━━━━━━
+
+  ! This private class member is defined but never used.
+  
+    58 │ 	private sanitizer = inject(DomSanitizer);
+    59 │ 
+  > 60 │ 	private lastIntersectingElement: Element | null = null;
+       │ 	        ^^^^^^^^^^^^^^^^^^^^^^^
+    61 │ 	private intersectionObserver: IntersectionObserver | null = null;
+    62 │ 
+  
+  i Unsafe fix: Remove unused declaration.
+  
+     57  57 │     private highlightService = inject(HighlightService);
+     58  58 │     private sanitizer = inject(DomSanitizer);
+     59     │ - 
+     60     │ - → private·lastIntersectingElement:·Element·|·null·=·null;
+     61  59 │     private intersectionObserver: IntersectionObserver | null = null;
+     62  60 │   
+  
+
+src/app/features/reading/components/readers/text-reader/text-reader.component.ts:99:3 suppressions/unused ━━━━━━━━━━━
+
+  ! Suppression comment has no effect. Remove the suppression or make sure you are suppressing the correct rule.
+  
+     98 │ 	ngOnChanges(changes: SimpleChanges): void {
+   > 99 │ 		// biome-ignore lint/complexity/useLiteralKeys: SimpleChanges has index signature and TS config requires bracket access (noPropertyAccessFromIndexSignature: true)
+        │ 		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    100 │ 		if (changes['content'] || changes['format']) {
+    101 │ 			this.updateSafeContent();
+  
+
+src/app/pages/auth/outlet/outlet.component.html:2:2 lint/a11y/useAnchorContent ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide screen reader accessible content when using a elements.
+  
+    1 │ <header>
+  > 2 │ 	<a [routerLink]="['/']">
+      │ 	^^^^^^^^^^^^^^^^^^^^^^^^
+  > 3 │ 		<app-icons name="arrow-left" size="36" />
+  > 4 │ 	</a>
+      │ 	^^^^
+    5 │ 	<app-icons name="logo" size="72" />
+    6 │ 	<div class="spacer"></div>
+  
+  i All links on a page should have content that is accessible to screen readers.
+  
+  i Accessible content refers to digital content that is designed and structured in a way that makes it easy for people with disabilities to access, understand, and interact with using assistive technologies.
+  
+  i Follow these links for more information,
+     WCAG 2.4.4
+     WCAG 4.1.2
+  
+
+src/app/pages/book/book.component.html:39:7 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    37 │ 							</div>
+    38 │ 						}
+  > 39 │ 						<img
+       │ 						^^^^
+  > 40 │ 							[ngSrc]="b.cover"
+        ...
+  > 47 │ 							(error)="onCoverImageError()"
+  > 48 │ 						/>
+       │ 						^^
+    49 │ 					} @else {
+    50 │ 						<div class="cover-placeholder">
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/pages/book/book.component.html:104:12 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide an explicit type attribute for the button element.
+  
+    102 │ 										</button>
+    103 │ 										@if (isBookDownloaded()) {
+  > 104 │ 											<button
+        │ 											^^^^^^^
+  > 105 │ 												(click)="deleteDownloadedBook()"
+  > 106 │ 												class="danger"
+  > 107 │ 											>
+        │ 											^
+    108 │ 												<app-icons name="trash" />
+    109 │ 												<span>Excluir download</span>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/app/pages/books/books.component.ts:470:68 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    468 │ 				this.filterOptions.excludeTagsLogic?.toUpperCase() as any,
+    469 │ 			authors: this.filterOptions.authors,
+  > 470 │ 			authorsLogic: this.filterOptions.authorsLogic?.toUpperCase() as any,
+        │ 			                                                                ^^^
+    471 │ 			publication: this.filterOptions.publication,
+    472 │ 			publicationOperator:
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/pages/books/books.component.ts:477:39 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    475 │ 				?.replace(/[A-Z]/g, '_$&')
+    476 │ 				.toUpperCase() as any,
+  > 477 │ 			order: this.filterOptions.order as any,
+        │ 			                                   ^^^
+    478 │ 		};
+    479 │ 
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/pages/books/books.component.ts:463:66 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    461 │ 			search: this.filterOptions.search,
+    462 │ 			sensitiveContent: allowedSensitiveContent,
+  > 463 │ 			type: this.filterOptions.type?.map((t) => t.toUpperCase()) as any,
+        │ 			                                                              ^^^
+    464 │ 			tags: this.filterOptions.tags,
+    465 │ 			tagsLogic: this.filterOptions.tagsLogic?.toUpperCase() as any,
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/pages/books/books.component.ts:465:62 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    463 │ 			type: this.filterOptions.type?.map((t) => t.toUpperCase()) as any,
+    464 │ 			tags: this.filterOptions.tags,
+  > 465 │ 			tagsLogic: this.filterOptions.tagsLogic?.toUpperCase() as any,
+        │ 			                                                          ^^^
+    466 │ 			excludeTags: this.filterOptions.excludeTags,
+    467 │ 			excludeTagsLogic:
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/pages/books/books.component.ts:468:59 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    466 │ 			excludeTags: this.filterOptions.excludeTags,
+    467 │ 			excludeTagsLogic:
+  > 468 │ 				this.filterOptions.excludeTagsLogic?.toUpperCase() as any,
+        │ 				                                                      ^^^
+    469 │ 			authors: this.filterOptions.authors,
+    470 │ 			authorsLogic: this.filterOptions.authorsLogic?.toUpperCase() as any,
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/pages/books/books.component.ts:473:62 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    471 │ 			publication: this.filterOptions.publication,
+    472 │ 			publicationOperator:
+  > 473 │ 				this.filterOptions.publicationOperator?.toUpperCase() as any,
+        │ 				                                                         ^^^
+    474 │ 			orderBy: this.filterOptions.orderBy
+    475 │ 				?.replace(/[A-Z]/g, '_$&')
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/pages/books/books.component.ts:476:23 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    474 │ 			orderBy: this.filterOptions.orderBy
+    475 │ 				?.replace(/[A-Z]/g, '_$&')
+  > 476 │ 				.toUpperCase() as any,
+        │ 				                  ^^^
+    477 │ 			order: this.filterOptions.order as any,
+    478 │ 		};
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/pages/chapters/chapters.component.html:167:4 lint/a11y/useAnchorContent ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide screen reader accessible content when using a elements.
+  
+    165 │ 	<div class="controls">
+    166 │ 		@if (chapter()?.previous; as prev) {
+  > 167 │ 			<a class="arrow" (click)="previousPage()">
+        │ 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 168 │ 				<app-icons name="arrow-left" size="16" />
+  > 169 │ 			</a>
+        │ 			^^^^
+    170 │ 		}
+    171 │ 		<a class="index" (click)="backPage()">
+  
+  i All links on a page should have content that is accessible to screen readers.
+  
+  i Accessible content refers to digital content that is designed and structured in a way that makes it easy for people with disabilities to access, understand, and interact with using assistive technologies.
+  
+  i Follow these links for more information,
+     WCAG 2.4.4
+     WCAG 4.1.2
+  
+
+src/app/pages/chapters/chapters.component.html:177:4 lint/a11y/useAnchorContent ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide screen reader accessible content when using a elements.
+  
+    175 │ 		</a>
+    176 │ 		@if (chapter()?.next; as next) {
+  > 177 │ 			<a class="arrow" (click)="nextPage()">
+        │ 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 178 │ 				<app-icons name="arrow-right" size="16" />
+  > 179 │ 			</a>
+        │ 			^^^^
+    180 │ 		}
+    181 │ 	</div>
+  
+  i All links on a page should have content that is accessible to screen readers.
+  
+  i Accessible content refers to digital content that is designed and structured in a way that makes it easy for people with disabilities to access, understand, and interact with using assistive technologies.
+  
+  i Follow these links for more information,
+     WCAG 2.4.4
+     WCAG 4.1.2
+  
+
+src/app/pages/dashboard/home/home.component.html:87:7 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    85 │ 				<div [routerLink]="['/books', item.id]" class="book">
+    86 │ 					<div class="book-image">
+  > 87 │ 						<img [src]="item.cover" [alt]="item.title" />
+       │ 						^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    88 │ 					</div>
+    89 │ 					<div class="book-title">{{ item.title }}</div>
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/pages/home/home.component.html:12:15 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    10 │                 <app-blurhash [hash]="book.blurHash" class="bg-blur" />
+    11 │               }
+  > 12 │               <img [ngSrc]="book.cover" fill priority [alt]="book.title" class="bg-image" />
+       │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    13 │               <div class="gradient-overlay"></div>
+    14 │             </div>
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/pages/home/home.component.html:18:17 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    16 │             <div class="item-content">
+    17 │               <div class="cover-container">
+  > 18 │                 <img [ngSrc]="book.cover" [alt]="book.title" width="298" height="453" priority />
+       │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    19 │               </div>
+    20 │               <div class="info-container">
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/pages/home/home.component.ts:53:29 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    52 │ 	currentFeaturedIndex = signal(0);
+  > 53 │ 	private carouselInterval?: any;
+       │ 	                           ^^^
+    54 │ 
+    55 │ 	constructor() {
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/pages/latest-reads/latest-reads.component.html:9:4 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide an explicit type attribute for the button element.
+  
+     8 │ 		<div class="header-actions">
+   > 9 │ 			<button
+       │ 			^^^^^^^
+  > 10 │ 				class="action-btn"
+  > 11 │ 				[class.active]="showSensitiveContent()"
+  > 12 │ 				(click)="toggleSensitiveContent()"
+  > 13 │ 				title="Filtrar conteúdo sensível"
+  > 14 │ 			>
+       │ 			^
+    15 │ 				<app-icons name="eye" size="24" />
+    16 │ 			</button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/app/pages/latest-reads/latest-reads.component.html:41:11 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    39 │ 											<app-blurhash [hash]="book.bookBlurHash" class="blur-bg" />
+    40 │ 										}
+  > 41 │ 										<img [ngSrc]="book.bookCover" width="120" height="180" [alt]="book.bookTitle" />
+       │ 										^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    42 │ 									</div>
+    43 │ 									<div class="item-content">
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/pages/latest-reads/latest-reads.component.ts:88:23 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    86 │ 			}
+    87 │ 
+  > 88 │ 			const bookGroups = dateGroups.get(dateStr)!;
+       │ 			                   ^^^^^^^^^^^^^^^^^^^^^^^^
+    89 │ 			if (!bookGroups.has(entry.bookId)) {
+    90 │ 				bookGroups.set(entry.bookId, []);
+  
+
+src/app/pages/latest-reads/latest-reads.component.ts:27:20 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    25 │ 	bookBlurHash?: string;
+    26 │ 	bookDominantColor?: string;
+  > 27 │ 	sensitiveContent: any[];
+       │ 	                  ^^^
+    28 │ 	chapter: {
+    29 │ 		id: string;
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/pages/latest-reads/latest-reads.component.ts:69:38 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    67 │ 				const bookSensitive = entry.sensitiveContent || [];
+    68 │ 				if (bookSensitive.length > 0) {
+  > 69 │ 					return bookSensitive.every((sc: any) =>
+       │ 					                                ^^^
+    70 │ 						allowedNames.includes(sc.name),
+    71 │ 					);
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/pages/public-user/public-user.component.html:12:6 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    10 │ 			<div class="public-user-page__avatar">
+    11 │ 				@if (user.profileImageUrl) {
+  > 12 │ 					<img [src]="user.profileImageUrl" [alt]="'Avatar de ' + user.userName" />
+       │ 					^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    13 │ 				} @else {
+    14 │ 					<span>{{ user.userName.slice(0, 2).toUpperCase() }}</span>
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/shared/ui/atoms/inputs/autocomplete-input/autocomplete-input.component.ts:19:6 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    18 │ export interface AutocompleteOption {
+  > 19 │ 	id: any;
+       │ 	    ^^^
+    20 │ 	label: string;
+    21 │ 	description?: string;
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/atoms/inputs/autocomplete-input/autocomplete-input.component.ts:91:23 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    89 │ 	}
+    90 │ 
+  > 91 │ 	registerOnChange(fn: any): void {
+       │ 	                     ^^^
+    92 │ 		this.onChange = fn;
+    93 │ 	}
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/atoms/inputs/autocomplete-input/autocomplete-input.component.ts:95:24 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    93 │ 	}
+    94 │ 
+  > 95 │ 	registerOnTouched(fn: any): void {
+       │ 	                      ^^^
+    96 │ 		this.onTouched = fn;
+    97 │ 	}
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/atoms/inputs/button/button.component.html:1:1 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide an explicit type attribute for the button element.
+  
+   > 1 │ <button
+       │ ^^^^^^^
+   > 2 │ 	#button
+   > 3 │ 	[id]="id()"
+   > 4 │ 	[type]="type()"
+        ...
+  > 17 │ 	"
+  > 18 │ >
+       │ ^
+    19 │ 	@if(leftIcon()){
+    20 │ 	<app-icons [name]="leftIcon()!" />
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/app/shared/ui/atoms/inputs/select/select.component.ts:19:37 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    17 │ import { IconsComponent } from '@ui/atoms/icons/icons.component';
+    18 │ 
+  > 19 │ export type SelectOption = { value: any; label: string };
+       │                                     ^^^
+    20 │ 
+    21 │ @Component({
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/atoms/inputs/text-area/text-area.component.ts:49:17 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    47 │ 	allowResize = input<boolean>(true);
+    48 │ 
+  > 49 │ 	errors = input<any>(null);
+       │ 	               ^^^
+    50 │ 	touched = input<boolean>(false);
+    51 │ 
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/atoms/inputs/text-input/text-input.component.ts:42:17 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    40 │ 	showLabel = input<boolean>(true);
+    41 │ 	value = model<string>('');
+  > 42 │ 	errors = input<any>(null);
+       │ 	               ^^^
+    43 │ 	touched = input<boolean>(false);
+    44 │ 	rightIconInput = input<string | null>(null, { alias: 'rightIcon' });
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/molecules/file-input/file-input.component.ts:136:37 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    135 │ 		// Validation: Size
+  > 136 │ 		if (this.maxSize() && file.size > this.maxSize()! * 1024 * 1024) {
+        │ 		                                  ^^^^^^^^^^^^^^^
+    137 │ 			const err = `O arquivo excede o tamanho máximo de ${this.maxSize()}MB.`;
+    138 │ 			this.errorMessage.set(err);
+  
+
+src/app/shared/ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component.ts:115:22 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    114 │ 		this.alternativeTitles.set([
+  > 115 │ 			...((this.book as any).alternativeTitle || []),
+        │ 			                  ^^^
+    116 │ 		]);
+    117 │ 		this.originalUrls.set([...((this.book as any).originalUrl || [])]);
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component.ts:117:44 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    115 │ 			...((this.book as any).alternativeTitle || []),
+    116 │ 		]);
+  > 117 │ 		this.originalUrls.set([...((this.book as any).originalUrl || [])]);
+        │ 		                                         ^^^
+    118 │ 
+    119 │ 		this.selectedTagIds.set(this.book.tags.map((t) => t.id));
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component.ts:245:43 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    243 │ 		// Array fields delta (deep compare simplified)
+    244 │ 		const currentAltTitles = this.alternativeTitles();
+  > 245 │ 		const originalAltTitles = (this.book as any).alternativeTitle || [];
+        │ 		                                        ^^^
+    246 │ 		if (
+    247 │ 			JSON.stringify(currentAltTitles) !==
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component.ts:254:38 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    253 │ 		const currentUrls = this.originalUrls();
+  > 254 │ 		const originalUrls = (this.book as any).originalUrl || [];
+        │ 		                                   ^^^
+    255 │ 		if (JSON.stringify(currentUrls) !== JSON.stringify(originalUrls)) {
+    256 │ 			updatedData.originalUrl = currentUrls;
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/molecules/notification/custom-components/cover-edit-modal/cover-edit-modal.component.html:13:5 lint/a11y/useAltText ━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+    11 │ 		<div class="cover-preview" (click)="triggerFileInput(fileInput)">
+    12 │ 			@if (hasImage() && !imageError()) {
+  > 13 │ 				<img
+       │ 				^^^^
+  > 14 │ 					[src]="previewUrl()"
+  > 15 │ 					[alt]="cover.title"
+  > 16 │ 					(error)="onImageError()"
+  > 17 │ 				/>
+       │ 				^^
+    18 │ 				<div class="upload-overlay">
+    19 │ 					<app-icons name="upload" />
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/shared/ui/organisms/context-menu/context-menu.component.ts:89:39 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    87 │ 	}
+    88 │ 
+  > 89 │ 	onItemClick(event: MouseEvent, item: any) {
+       │ 	                                     ^^^
+    90 │ 		event.stopPropagation();
+    91 │ 		if (item.disabled || item.type === 'separator') return;
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/app/shared/ui/organisms/header/header.component.html:7:3 lint/a11y/useAnchorContent ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide screen reader accessible content when using a elements.
+  
+     5 │ 			<app-icons name="list" size="24" />
+     6 │ 		</button>
+   > 7 │ 		<a id="logo" [routerLink]="['/']" [class.dark-theme]="isDarkTheme()">
+       │ 		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   > 8 │ 			<app-icons name="logo" size="48" />
+   > 9 │ 		</a>
+       │ 		^^^^
+    10 │ 		}
+    11 │ 	</nav>
+  
+  i All links on a page should have content that is accessible to screen readers.
+  
+  i Accessible content refers to digital content that is designed and structured in a way that makes it easy for people with disabilities to access, understand, and interact with using assistive technologies.
+  
+  i Follow these links for more information,
+     WCAG 2.4.4
+     WCAG 4.1.2
+  
+
+src/app/shared/ui/organisms/header/header.component.html:18:4 lint/a11y/useAnchorContent ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide screen reader accessible content when using a elements.
+  
+    16 │ 		@else{
+    17 │ 		<div class="icons">
+  > 18 │ 			<a [routerLink]="['/user']" class="user">
+       │ 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 19 │ 				<app-icons name="user" size="32" />
+  > 20 │ 			</a>
+       │ 			^^^^
+    21 │ 		</div>
+    22 │ 		}
+  
+  i All links on a page should have content that is accessible to screen readers.
+  
+  i Accessible content refers to digital content that is designed and structured in a way that makes it easy for people with disabilities to access, understand, and interact with using assistive technologies.
+  
+  i Follow these links for more information,
+     WCAG 2.4.4
+     WCAG 4.1.2
+  
+
+src/app/shared/ui/organisms/image-viewer/image-viewer.component.html:11:3 lint/a11y/useAltText ━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Provide a text alternative through the alt, aria-label, or aria-labelledby attribute.
+  
+     9 │ 	</button>
+    10 │ 	<div class="image-container">
+  > 11 │ 		<img [src]="imageUrl" [alt]="imageTitle" (load)="onImageLoad()" />
+       │ 		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    12 │ 		@if(imageTitle) {
+    13 │ 		<div class="image-title">{{ imageTitle }}</div>
+  
+  i Meaningful alternative text on elements helps users relying on screen readers to understand content's purpose within a page.
+  
+  i If the content is decorative, redundant, or obscured, consider hiding it from assistive technologies with the aria-hidden attribute.
+  
+
+src/app/shared/ui/organisms/multi-select-tags/multi-select-tags.component.ts:94:46 lint/style/noNonNullAssertion ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    92 │ 			// From Neutral to Selected
+    93 │ 			const totalActive = selected.length + excluded.length;
+  > 94 │ 			if (this.maxSelection() && totalActive >= this.maxSelection()!) {
+       │ 			                                          ^^^^^^^^^^^^^^^^^^^^
+    95 │ 				// Reached limit, maybe emit warning? For now just block.
+    96 │ 				return;
+  
+
+src/app/shared/ui/organisms/theme-setup-modal/theme-setup-modal.component.html:10:5 lint/a11y/useButtonType ━━━━━━━━━━
+
+  ! Provide an explicit type attribute for the button element.
+  
+     8 │ 		<div class="theme-options">
+     9 │ 			@for (theme of themes; track theme.id) {
+  > 10 │ 				<button
+       │ 				^^^^^^^
+  > 11 │ 					class="theme-card"
+  > 12 │ 					[class.selected]="themeService.currentTheme() === theme.id"
+  > 13 │ 					(click)="selectTheme(theme.id)"
+  > 14 │ 				>
+       │ 				^
+    15 │ 					<div class="icon-container">
+    16 │ 						<app-icons [name]="theme.icon" />
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+Checked 301 files in 79ms. No fixes applied.
+Found 85 warnings.

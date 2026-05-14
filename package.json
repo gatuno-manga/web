@@ -7,6 +7,8 @@
 		"start:docker": "ng serve --host 0.0.0.0 --poll 2000",
 		"prebuild": "node generate-env.ts",
 		"build": "ng build",
+		"lint": "biome check . && secretlint \"**/*\"",
+		"check:dead-code": "knip",
 		"watch": "ng build --watch --configuration development",
 		"test": "ng test",
 		"test:headless": "ng test --browsers=ChromeHeadlessCI --watch=false",
@@ -48,6 +50,8 @@
 		"@angular-devkit/build-angular": "^21.0.1",
 		"@angular/cli": "^21.0.1",
 		"@angular/compiler-cli": "^21.0.1",
+		"@biomejs/biome": "^2.4.15",
+		"@secretlint/secretlint-rule-preset-recommend": "^13.0.0",
 		"@types/express": "^4.17.17",
 		"@types/jasmine": "~5.1.0",
 		"@types/node": "^24.0.0",
@@ -58,7 +62,8 @@
 		"karma-coverage": "~2.2.0",
 		"karma-jasmine": "~5.1.0",
 		"karma-jasmine-html-reporter": "~2.1.0",
-		"knip": "^6.11.0",
+		"knip": "^6.13.1",
+		"secretlint": "^13.0.0",
 		"typescript": "~5.9.3"
 	}
 }

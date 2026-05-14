@@ -7,6 +7,14 @@
 			"recommended": true,
 			"style": {
 				"useImportType": "off"
+			},
+			"complexity": {
+				"useLiteralKeys": "off"
+			},
+			"a11y": {
+				"useAltText": "warn",
+				"useButtonType": "warn",
+				"useAnchorContent": "warn"
 			}
 		}
 	},
@@ -34,7 +42,13 @@
 		}
 	},
 	"files": {
-		"includes": ["**", "!**/dist", "!**/node_modules", "!**/.angular"]
+		"includes": [
+			"**",
+			"!**/dist",
+			"!**/node_modules",
+			"!**/.angular",
+			"!**/coverage"
+		]
 	},
 	"overrides": [
 		{

@@ -40,7 +40,7 @@ export class DownloadService {
 
 	constructor(
 		private http: HttpClient,
-		@Inject(PLATFORM_ID) private platformId: Object,
+		@Inject(PLATFORM_ID) private platformId: object,
 	) {
 		if (isPlatformBrowser(this.platformId)) {
 			this.dbPromise = openDB<GatunoOfflineDB>('GatunoOfflineDB', 1, {
