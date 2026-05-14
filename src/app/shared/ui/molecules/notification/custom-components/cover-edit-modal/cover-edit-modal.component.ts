@@ -44,7 +44,7 @@ export class CoverEditModalComponent implements OnInit, OnChanges {
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if (changes.cover && this.cover) {
+		if (changes['cover'] && this.cover) {
 			this.editedTitle.set(this.cover.title || '');
 			this.previewUrl.set(this.cover.url || null);
 			this.selectedFile.set(null);

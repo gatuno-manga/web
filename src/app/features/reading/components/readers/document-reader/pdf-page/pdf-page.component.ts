@@ -74,7 +74,7 @@ export class PdfPageComponent implements OnChanges, AfterViewInit, OnDestroy {
 	}
 
 	ngOnChanges(changes: SimpleChanges) {
-		if (this.isProxy(this.src) && (changes.src || changes.page)) {
+		if (this.isProxy(this.src) && (changes['src'] || changes['page'])) {
 			this.renderCanvasPage();
 		}
 	}

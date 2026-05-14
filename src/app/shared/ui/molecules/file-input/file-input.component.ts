@@ -97,8 +97,9 @@ export class FileInputComponent {
 		this.localPreviewUrl.set(null);
 		this.errorMessage.set(null);
 		this.fileSelected.emit(null);
-		if (this.inputRef()) {
-			this.inputRef()?.nativeElement.value = '';
+		const input = this.inputRef();
+		if (input) {
+			input.nativeElement.value = '';
 		}
 	}
 

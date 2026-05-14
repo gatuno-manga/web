@@ -26,6 +26,7 @@ export class DefaultOutletComponent {
 
 	sidebarOpen = signal(false);
 	isLargeScreen = signal(false);
+	isBrowser = false;
 
 	constructor(@Inject(PLATFORM_ID) platformId: object) {
 		this.isBrowser = isPlatformBrowser(platformId);
