@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 
 export interface MultiSelectOption {
@@ -19,7 +20,13 @@ export interface MultiSelectOption {
 @Component({
 	selector: 'app-multi-select-tags',
 	standalone: true,
-	imports: [CommonModule, FormsModule, TextInputComponent, IconsComponent],
+	imports: [
+		CommonModule,
+		FormsModule,
+		TextInputComponent,
+		IconsComponent,
+		ButtonComponent,
+	],
 	templateUrl: './multi-select-tags.component.html',
 	styleUrl: './multi-select-tags.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
