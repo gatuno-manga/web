@@ -122,12 +122,16 @@ $page-size: 1200px;
 				border-radius: inherit;
 				object-fit: cover;
 				opacity: 0;
-				transition: opacity 0.5s ease-in-out;
+				transition: opacity 0.5s ease-in-out, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 				position: relative;
 				z-index: 2;
 
 				&.loaded {
 					opacity: 1;
+				}
+
+				&:hover {
+					transform: scale(1.05);
 				}
 			}
 
@@ -332,6 +336,17 @@ $page-size: 1200px;
 				color: var(--app-text-color);
 				text-transform: capitalize;
 				cursor: pointer;
+				transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s, box-shadow 0.2s;
+
+				&:hover {
+					transform: translateY(-2px);
+					opacity: 0.9;
+					box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+				}
+
+				&:active {
+					transform: scale(0.95);
+				}
 			}
 			.tag {
 				background-color: var(--primary-color);

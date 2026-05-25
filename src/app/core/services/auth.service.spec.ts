@@ -166,13 +166,23 @@ describe('AuthService', () => {
 	});
 
 	describe('passkeys', () => {
-		it('beginPasskeyAuthentication should call options endpoint', () => {
+		it('beginPasskeyAuthentication should call options endpoint with email', () => {
 			service.beginPasskeyAuthentication('test@example.com').subscribe();
 			const req = httpMock.expectOne(
 				'/auth/passkeys/authenticate/options',
 			);
 			expect(req.request.method).toBe('POST');
 			expect(req.request.body).toEqual({ email: 'test@example.com' });
+			req.flush({});
+		});
+
+		it('beginPasskeyAuthentication should call options endpoint without email', () => {
+			service.beginPasskeyAuthentication().subscribe();
+			const req = httpMock.expectOne(
+				'/auth/passkeys/authenticate/options',
+			);
+			expect(req.request.method).toBe('POST');
+			expect(req.request.body).toEqual({});
 			req.flush({});
 		});
 
@@ -183,7 +193,7 @@ describe('AuthService', () => {
 			};
 
 			service
-				.verifyPasskeyAuthentication('test@example.com', { id: 'cred' })
+				.verifyPasskeyAuthentication({ id: 'cred' }, 'test@example.com')
 				.subscribe((_response) => {
 					expect(userTokenServiceSpy.setTokens).toHaveBeenCalledWith(
 						'access',
@@ -198,7 +208,24 @@ describe('AuthService', () => {
 				'/auth/passkeys/authenticate/verify',
 			);
 			expect(req.request.method).toBe('POST');
+			expect(req.request.body).toEqual({
+				response: { id: 'cred' },
+				email: 'test@example.com',
+			});
 			req.flush(mockRes);
+		});
+
+		it('verifyPasskeyAuthentication should call verify endpoint without email', () => {
+			service.verifyPasskeyAuthentication({ id: 'cred' }).subscribe();
+
+			const req = httpMock.expectOne(
+				'/auth/passkeys/authenticate/verify',
+			);
+			expect(req.request.method).toBe('POST');
+			expect(req.request.body).toEqual({
+				response: { id: 'cred' },
+			});
+			req.flush({});
 		});
 	});
 });

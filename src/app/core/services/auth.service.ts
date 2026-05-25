@@ -64,21 +64,21 @@ export class AuthService {
 			);
 	}
 
-	beginPasskeyAuthentication(email: string) {
+	beginPasskeyAuthentication(email?: string) {
 		return this.http.post<Record<string, unknown>>(
 			'/auth/passkeys/authenticate/options',
-			{ email },
+			email ? { email } : {},
 		);
 	}
 
 	verifyPasskeyAuthentication(
-		email: string,
 		response: Record<string, unknown>,
+		email?: string,
 	) {
 		return this.http
 			.post<loginResponse>(
 				'/auth/passkeys/authenticate/verify',
-				{ email, response },
+				{ response, ...(email && { email }) },
 				{
 					observe: 'response',
 					withCredentials: true,

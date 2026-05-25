@@ -37,6 +37,7 @@ export class TextInputComponent implements ControlValueAccessor {
 	id = input<string>();
 	type = input<string>('text');
 	placeholder = input<string>('');
+	autocomplete = input<string>('');
 	showLabel = input<boolean>(true);
 	value = model<string>('');
 	errors = input<any>(null);
