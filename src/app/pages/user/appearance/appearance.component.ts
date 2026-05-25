@@ -14,6 +14,7 @@ import { MetaDataService } from '@core/services/meta-data.service';
 import { SearchService } from '@core/services/search.service';
 import { SettingsService } from '@core/services/settings.service';
 import { AppTheme, ThemeService } from '@core/services/theme.service';
+import { LanguageService } from '@core/services/language.service';
 import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,
@@ -36,6 +37,7 @@ export class AppearanceComponent implements OnInit {
 	private readonly localStorage = inject(LocalStorageService);
 	private readonly settingsService = inject(SettingsService);
 	public readonly themeService = inject(ThemeService);
+	public readonly languageService = inject(LanguageService);
 
 	isListView = input<boolean>(false);
 	private globalSearchQuery = this.searchService.query;
@@ -58,9 +60,16 @@ export class AppearanceComponent implements OnInit {
 		{ value: 'true-dark', label: 'True Dark (OLED)' },
 	];
 
+	languageOptions = computed(() => 
+		this.languageService.languages().map(lang => ({
+			value: lang.code,
+			label: lang.name
+		}))
+	);
+
 	showPage = computed(() => {
 		const q = this.globalSearchQuery().toLowerCase();
-		return 'aparência visual tema cores layout livros listagem'.includes(q);
+		return 'aparência visual tema cores layout livros listagem idioma linguagem'.includes(q);
 	});
 
 	constructor() {

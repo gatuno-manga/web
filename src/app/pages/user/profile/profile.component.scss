@@ -46,9 +46,15 @@ h1 {
 
 	.form-actions {
 		display: flex;
+		flex-wrap: wrap;
 		gap: 1.5rem;
 		margin-top: 4rem;
 		align-items: center;
+
+		app-button {
+			flex: 1 1 200px;
+			max-width: 100%;
+		}
 	}
 }
 

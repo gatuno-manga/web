@@ -22,6 +22,21 @@
 					/>
 				</div>
 			</div>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<label>Idioma do Aplicativo</label>
+					<span>Escolha o idioma preferencial para a interface e conteúdos.</span>
+				</div>
+				<div class="setting-control">
+					<app-select
+						[options]="languageOptions()"
+						[ngModel]="languageService.currentLanguage()"
+						(valueChange)="languageService.setLanguage($event)"
+						placeholder="Selecione um idioma"
+					/>
+				</div>
+			</div>
 		</div>
 
 		<div class="settings-group">

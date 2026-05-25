@@ -66,17 +66,19 @@
 
 .inline-form {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 1rem;
 	margin-bottom: 1.5rem;
 	width: 100%;
 
 	app-input {
-		flex: 1;
+		flex: 1 1 300px;
+		width: 100%;
 	}
 
 	app-button {
-		width: auto;
-		min-width: 180px;
+		flex: 1 1 180px;
+		width: 100%;
 	}
 }
 
@@ -91,6 +93,8 @@
 		padding: 1.25rem 1.5rem;
 		border-radius: 12px;
 		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5rem;
 		justify-content: space-between;
 		align-items: center;
 
@@ -98,6 +102,7 @@
 			display: flex;
 			align-items: center;
 			gap: 16px;
+			flex: 1 1 300px;
 		}
 
 		.item-info {
