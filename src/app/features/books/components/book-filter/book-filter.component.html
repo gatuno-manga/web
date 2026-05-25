@@ -3,7 +3,7 @@
 		type="text"
 		class="search-input"
 		[value]="searchValue()"
-		(input)="onSearchInput($any($event.target).value)"
+		(valueChange)="onSearchInput($event)"
 		(keydown.enter)="onSearch()"
 		rightIcon="search"
 		[rightIconClick]="onSearchClick"
@@ -85,9 +85,7 @@
 						placeholder="Ano"
 						[showLabel]="false"
 						[value]="publicationYear()?.toString() || ''"
-						(input)="
-							onPublicationYearChange($any($event.target).value)
-						"
+						(valueChange)="onPublicationYearChange($event)"
 						class="year-input"
 					/>
 				</div>
@@ -155,14 +153,17 @@
 @if (activeFilters().length > 0) {
 	<div class="active-filters-container">
 		@for (filter of activeFilters(); track filter.id) {
-			<div
+			<app-button
 				class="active-filter-badge"
 				[ngClass]="'filter-' + filter.type"
+				variant="text"
+				fill="none"
+				padding="none"
 				(click)="removeFilter(filter)"
 			>
 				<span class="filter-label">{{ filter.label }}</span>
 				<app-icons name="close" size="12" class="close-icon" />
-			</div>
+			</app-button>
 		}
 	</div>
 }

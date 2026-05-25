@@ -29,7 +29,8 @@ import {
 	RandomFilterResult,
 } from '@ui/molecules/notification/custom-components/random-filter-modal/random-filter-modal.component';
 import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';
-import { Observable, tap } from 'rxjs';
+import { debounceTime, Observable, Subject, tap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface ActiveFilter {
 	id: string;
@@ -154,6 +155,16 @@ export class BookFilterComponent implements OnInit {
 	loadingTags = signal<boolean>(false);
 	tagSearchQuery = signal<string>('');
 	private pendingSensitiveNames = signal<string[]>([]);
+
+	private searchSubject = new Subject<string>();
+
+	constructor() {
+		this.searchSubject
+			.pipe(debounceTime(500), takeUntilDestroyed())
+			.subscribe(() => {
+				this.onSearch();
+			});
+	}
 
 	displayTagsForComponent = computed(() => {
 		const excludedGlobal = new Set(this.tagsService.excludedTagsSignal());
@@ -407,6 +418,7 @@ export class BookFilterComponent implements OnInit {
 
 	onSearchInput(value: string) {
 		this.searchValue.set(value);
+		this.searchSubject.next(value);
 	}
 
 	toggleType(type: TypeBook) {
