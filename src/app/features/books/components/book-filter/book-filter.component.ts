@@ -309,6 +309,27 @@ export class BookFilterComponent implements OnInit {
 				next: (tags) => {
 					this.availableTags.set(tags);
 					this.loadingTags.set(false);
+
+					// Clean up selected and excluded tags that are no longer available
+					const availableIds = new Set(tags.map((t) => t.id));
+
+					const currentSelected = this.selectedTags();
+					const filteredSelected = currentSelected.filter((id) =>
+						availableIds.has(id),
+					);
+
+					if (currentSelected.length !== filteredSelected.length) {
+						this.selectedTags.set(filteredSelected);
+					}
+
+					const currentExcluded = this.excludedTags();
+					const filteredExcluded = currentExcluded.filter((id) =>
+						availableIds.has(id),
+					);
+
+					if (currentExcluded.length !== filteredExcluded.length) {
+						this.excludedTags.set(filteredExcluded);
+					}
 				},
 				error: () => {
 					this.loadingTags.set(false);
@@ -435,6 +456,11 @@ export class BookFilterComponent implements OnInit {
 
 	isSensitiveContentSelected(id: string): boolean {
 		return this.selectedSensitiveContent().includes(id);
+	}
+
+	onSensitiveContentChange(newIds: string[]) {
+		this.selectedSensitiveContent.set(newIds);
+		this.fetchTags();
 	}
 
 	onPublicationOperatorChange(value: string) {
