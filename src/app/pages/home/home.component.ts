@@ -1,10 +1,11 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import {
+	afterNextRender,
+	ChangeDetectionStrategy,
 	Component,
+	DestroyRef,
 	effect,
 	inject,
-	OnDestroy,
-	OnInit,
 	signal,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
@@ -17,7 +18,7 @@ import { ItemBookComponent } from '@features/books/components/item-book/item-boo
 import { BookList } from '@models/book.models';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, forkJoin } from 'rxjs';
 
 @Component({
 	selector: 'app-home',
@@ -25,20 +26,21 @@ import { firstValueFrom } from 'rxjs';
 	imports: [
 		BookGridComponent,
 		BlurhashComponent,
-		CommonModule,
 		RouterModule,
 		NgOptimizedImage,
 		ItemBookComponent,
 	],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent {
 	private metaService = inject(MetaDataService);
 	private bookService = inject(BookService);
 	private readingProgressService = inject(ReadingProgressService);
 	private sensitiveContentService = inject(SensitiveContentService);
 	private tagsService = inject(TagsService);
+	private destroyRef = inject(DestroyRef);
 
 	featuredBooks = signal<BookList[]>([]);
 	continueReadingBooks = signal<BookList[]>([]);
@@ -48,32 +50,29 @@ export class HomeComponent implements OnInit, OnDestroy {
 	isLoadingGrid = signal(true);
 	isLoadingFeatured = signal(true);
 	isLoadingRecentlyAdded = signal(true);
+	isLoadingContinueReading = signal(false);
 
 	currentFeaturedIndex = signal(0);
-	private carouselInterval?: any;
+	private carouselInterval?: ReturnType<typeof setInterval>;
 
 	constructor() {
 		this.setMetaData();
+		this.loadContinueReading();
 
-		// Re-load books whenever global filters change
+		// Re-carrega livros quando filtros globais mudam
 		effect(() => {
-			// Accessing signals to register dependency
 			this.sensitiveContentService.allowContentSignal();
 			this.tagsService.excludedTagsSignal();
 
-			this.loadFeaturedBooks();
-			this.loadLatestUpdated();
+			this.loadBooksData();
 			this.loadRecentlyAdded();
 		});
-	}
 
-	ngOnInit() {
-		this.loadContinueReading();
-		this.startCarousel();
-	}
-
-	ngOnDestroy() {
-		this.stopCarousel();
+		// Inicia o carousel apenas no browser (SSR safe) com cleanup automático
+		afterNextRender(() => {
+			this.startCarousel();
+			this.destroyRef.onDestroy(() => this.stopCarousel());
+		});
 	}
 
 	setMetaData() {
@@ -84,66 +83,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	async loadFeaturedBooks() {
+	/** Busca os livros mais recentemente atualizados.
+	 * Usa os primeiros 5 para o carousel featured e todos os 12 para o grid,
+	 * economizando uma request HTTP.
+	 */
+	async loadBooksData() {
 		this.isLoadingFeatured.set(true);
-		try {
-			const res = await firstValueFrom(
-				this.bookService.getBooks({
-					limit: 5,
-					orderBy: 'updatedAt',
-					order: 'DESC',
-				}),
-			);
-			this.featuredBooks.set(res.data);
-		} catch (e) {
-			console.error('Error loading featured books', e);
-		} finally {
-			this.isLoadingFeatured.set(false);
-		}
-	}
-
-	async loadContinueReading() {
-		try {
-			const progress = await this.readingProgressService.getAllProgress();
-			if (progress.length > 0) {
-				// Sort by updatedAt DESC and get unique bookIds
-				const sortedProgress = [...progress].sort(
-					(a, b) =>
-						new Date(b.updatedAt).getTime() -
-						new Date(a.updatedAt).getTime(),
-				);
-
-				const bookIds = [
-					...new Set(sortedProgress.map((p) => p.bookId)),
-				].slice(0, 10);
-				const books: BookList[] = [];
-
-				for (const id of bookIds) {
-					const book = await firstValueFrom(
-						this.bookService.getBook(id),
-					);
-					if (book) {
-						books.push({
-							id: book.id,
-							title: book.title,
-							cover: book.cover,
-							description: book.description,
-							tags: book.tags,
-							scrapingStatus: book.scrapingStatus,
-							blurHash: book.blurHash,
-							dominantColor: book.dominantColor,
-							metadata: book.metadata,
-						});
-					}
-				}
-				this.continueReadingBooks.set(books);
-			}
-		} catch (e) {
-			console.error('Error loading continue reading', e);
-		}
-	}
-
-	async loadLatestUpdated() {
 		this.isLoadingGrid.set(true);
 		try {
 			const res = await firstValueFrom(
@@ -153,11 +98,59 @@ export class HomeComponent implements OnInit, OnDestroy {
 					order: 'DESC',
 				}),
 			);
+			this.featuredBooks.set(res.data.slice(0, 5));
 			this.latestUpdatedBooks.set(res.data);
 		} catch (e) {
-			console.error('Error loading latest updated books', e);
+			console.error('Error loading books data', e);
 		} finally {
+			this.isLoadingFeatured.set(false);
 			this.isLoadingGrid.set(false);
+		}
+	}
+
+	async loadContinueReading() {
+		this.isLoadingContinueReading.set(true);
+		try {
+			const progress = await this.readingProgressService.getAllProgress();
+			if (progress.length === 0) return;
+
+			// Ordena por updatedAt DESC e pega IDs únicos
+			const bookIds = [
+				...new Set(
+					[...progress]
+						.sort(
+							(a, b) =>
+								new Date(b.updatedAt).getTime() -
+								new Date(a.updatedAt).getTime(),
+						)
+						.map((p) => p.bookId),
+				),
+			].slice(0, 10);
+
+			// forkJoin: todas as requests em paralelo (elimina N+1)
+			const bookResponses = await firstValueFrom(
+				forkJoin(bookIds.map((id) => this.bookService.getBook(id))),
+			);
+
+			const books: BookList[] = bookResponses
+				.filter(Boolean)
+				.map((book) => ({
+					id: book!.id,
+					title: book!.title,
+					cover: book!.cover,
+					description: book!.description,
+					tags: book!.tags,
+					scrapingStatus: book!.scrapingStatus,
+					blurHash: book!.blurHash,
+					dominantColor: book!.dominantColor,
+					metadata: book!.metadata,
+				}));
+
+			this.continueReadingBooks.set(books);
+		} catch (e) {
+			console.error('Error loading continue reading', e);
+		} finally {
+			this.isLoadingContinueReading.set(false);
 		}
 	}
 
@@ -180,11 +173,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 	}
 
 	startCarousel() {
-		if (typeof window !== 'undefined') {
-			this.carouselInterval = setInterval(() => {
-				this.nextFeatured();
-			}, 8000);
-		}
+		this.carouselInterval = setInterval(() => {
+			this.nextFeatured();
+		}, 8000);
 	}
 
 	stopCarousel() {
