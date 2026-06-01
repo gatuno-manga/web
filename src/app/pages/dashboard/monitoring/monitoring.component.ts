@@ -9,7 +9,7 @@ import {
 	signal,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { BookWebsocketService } from '@core/services/book-websocket.service';
+import { MqttService } from '@core/services/mqtt.service';
 import { DashboardService } from '@core/services/dashboard.service';
 import {
 	UpdateCompletedEvent,
@@ -50,7 +50,7 @@ const QUEUE_LABELS: Record<string, string> = {
 })
 export class MonitoringComponent implements OnInit, OnDestroy {
 	private dashboardService = inject(DashboardService);
-	private wsService = inject(BookWebsocketService);
+	private wsService = inject(MqttService);
 	private platformId = inject(PLATFORM_ID);
 
 	queueStats = signal<QueueStats>(EMPTY_QUEUE_STATS);
@@ -108,7 +108,7 @@ export class MonitoringComponent implements OnInit, OnDestroy {
 	}
 
 	setupWebSocket() {
-		if (!this.wsService.isConnected()) {
+		if (!this.wsService.connectionState() || String(this.wsService.connectionState()) !== 'connected') {
 			this.wsService.connect();
 		}
 

@@ -19,7 +19,7 @@ import {
 import { Page } from '@models/miscellaneous.models';
 import { firstValueFrom, from, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { BookWebsocketService } from './book-websocket.service';
+import { MqttService } from './mqtt.service';
 import { DownloadService } from './download.service';
 import { SensitiveContentService } from './sensitive-content.service';
 import { TagsService } from './tags.service';
@@ -35,7 +35,7 @@ export class BookService {
 		private readonly http: HttpClient,
 		private readonly sensitiveContentService: SensitiveContentService,
 		private readonly userTokenService: UserTokenService,
-		private readonly websocketService: BookWebsocketService,
+		private readonly websocketService: MqttService,
 		private readonly downloadService: DownloadService,
 		private readonly ngZone: NgZone,
 	) {

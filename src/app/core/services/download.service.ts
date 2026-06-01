@@ -14,7 +14,8 @@ import {
 	OfflineChapter,
 } from '@models/offline.models';
 import { DBSchema, IDBPDatabase, openDB } from 'idb';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, map, Observable } from 'rxjs';
+import { environment } from '@environments/environment';
 
 interface GatunoOfflineDB extends DBSchema {
 	books: {
@@ -61,7 +62,24 @@ export class DownloadService {
 		this.progressSubject.next(new Map(currentMap));
 	}
 
-	async saveBook(book: Book | BookBasic, coverBlob: Blob): Promise<void> {
+	/**
+	 * Retorna o progresso agregado de um livro
+	 */
+	getBookDownloadProgress(bookId: string): Observable<DownloadProgress[]> {
+		return this.downloadProgress$.pipe(
+			map((progressMap) => {
+				return Array.from(progressMap.values()).filter(
+					(p) => p.bookId === bookId,
+				);
+			}),
+		);
+	}
+
+	async saveBook(
+		book: Book | BookBasic,
+		coverBlob: Blob,
+		lastSyncAt?: Date,
+	): Promise<void> {
 		if (!this.dbPromise) return;
 		const db = await this.dbPromise;
 
@@ -83,6 +101,7 @@ export class DownloadService {
 			sensitiveContent: book.sensitiveContent,
 			totalChapters: totalChapters,
 			updatedAt: new Date(),
+			lastSyncAt: lastSyncAt,
 			blurHash: book.blurHash,
 			dominantColor: book.dominantColor,
 		};
@@ -137,6 +156,19 @@ export class DownloadService {
 
 		// Deletar o livro
 		await db.delete('books', bookId);
+
+		// Limpar progresso se existir
+		const currentMap = this.progressSubject.value;
+		let changed = false;
+		for (const [key, value] of currentMap.entries()) {
+			if (value.bookId === bookId) {
+				currentMap.delete(key);
+				changed = true;
+			}
+		}
+		if (changed) {
+			this.progressSubject.next(new Map(currentMap));
+		}
 	}
 
 	async isBookDownloaded(bookId: string): Promise<boolean> {
@@ -145,6 +177,205 @@ export class DownloadService {
 		return chapters.length > 0;
 	}
 
+	/**
+	 * Sincroniza um livro usando o novo endpoint delta sync
+	 */
+	async syncBook(book: Book | BookBasic): Promise<void> {
+		if (!this.dbPromise) return;
+
+		const savedBook = await this.getBook(book.id);
+		const lastSyncAt = savedBook?.lastSyncAt;
+
+		let url = `books/${book.id}/offline-sync`;
+		if (lastSyncAt) {
+			url += `?updatedSince=${lastSyncAt.toISOString()}`;
+		}
+
+		try {
+			const syncData = await firstValueFrom(
+				this.http.get<{
+					chapters: (Chapter & { deleted?: boolean })[];
+					syncTimestamp: string;
+				}>(url),
+			);
+
+			if (!syncData) {
+				throw new Error('Sync API returned empty response');
+			}
+
+			const chapters = syncData.chapters || [];
+			const syncTimestamp = syncData.syncTimestamp ? new Date(syncData.syncTimestamp) : new Date();
+
+			if (!savedBook) {
+				let coverBlob: Blob;
+				try {
+					coverBlob = await this.fetchImageBlob(book.cover);
+				} catch (e) {
+					console.warn('Failed to download book cover, using placeholder', e);
+					// Create a simple 1x1 transparent pixel as fallback if cover fails
+					coverBlob = new Blob([new Uint8Array([71, 73, 70, 56, 57, 97, 1, 0, 1, 0, 128, 0, 0, 0, 0, 0, 255, 255, 255, 33, 249, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 2, 68, 1, 0, 59])], { type: 'image/gif' });
+				}
+				await this.saveBook(book, coverBlob, syncTimestamp);
+			}
+
+			if (chapters.length === 0) {
+				// Nada para atualizar, apenas atualiza timestamp se necessário
+				if (savedBook) {
+					await this.saveBook(book, savedBook.cover, syncTimestamp);
+				}
+				return;
+			}
+
+			// Processar capítulos retornados
+			for (const chapterData of chapters) {
+				try {
+					if (chapterData.deleted) {
+						await this.deleteChapter(chapterData.id);
+						continue;
+					}
+
+					// Baixar conteúdo do capítulo (imagens, texto ou documento)
+					await this.processAndSaveChapter(book.id, chapterData);
+				} catch (chapterError) {
+					console.error(`Failed to sync chapter ${chapterData.id}`, chapterError);
+					// Continue with next chapter
+				}
+			}
+
+			// Atualizar timestamp da última sincronização
+			const currentSavedBook = await this.getBook(book.id);
+			if (currentSavedBook) {
+				await this.saveBook(book, currentSavedBook.cover, syncTimestamp);
+			}
+
+		} catch (error) {
+			console.error('Offline sync failed', error);
+			throw error;
+		}
+	}
+
+	private async processAndSaveChapter(bookId: string, chapter: Chapter): Promise<void> {
+		const contentType: ContentType = chapter.contentType || 'image';
+		const pages = chapter.pages || [];
+
+		try {
+			this.updateProgress(chapter.id, {
+				chapterId: chapter.id,
+				bookId: bookId,
+				total: contentType === 'image' ? pages.length : 1,
+				current: 0,
+				status: 'downloading',
+			});
+
+			const db = await this.dbPromise;
+			if (!db) return;
+
+			let offlineChapter: OfflineChapter;
+
+			if (contentType === 'text') {
+				offlineChapter = {
+					id: chapter.id,
+					bookId: bookId,
+					title: chapter.title,
+					index: chapter.index,
+					contentType: 'text',
+					pages: [],
+					content: chapter.content,
+					contentFormat: chapter.contentFormat,
+					downloadedAt: new Date(),
+					next: chapter.next,
+					previous: chapter.previous,
+				};
+			} else if (contentType === 'document' && chapter.documentPath) {
+				const url = this.resolveAssetUrl(chapter.documentPath);
+				const documentBlob = await firstValueFrom(
+					this.http.get(url, { responseType: 'blob' }),
+				);
+				offlineChapter = {
+					id: chapter.id,
+					bookId: bookId,
+					title: chapter.title,
+					index: chapter.index,
+					contentType: 'document',
+					pages: [],
+					document: documentBlob,
+					documentFormat: chapter.documentFormat,
+					downloadedAt: new Date(),
+					next: chapter.next,
+					previous: chapter.previous,
+				};
+			} else {
+				// Default: IMAGE
+				let completedCount = 0;
+				const downloadPromises = pages.map(
+					async (page: Page, index: number) => {
+						try {
+							const blob = await this.fetchImageBlob(page.path);
+							completedCount++;
+							this.updateProgress(chapter.id, {
+								chapterId: chapter.id,
+								bookId: bookId,
+								total: pages.length,
+								current: completedCount,
+								status: 'downloading',
+							});
+							return { index, blob };
+						} catch (e) {
+							console.warn(`Failed to download page ${page.path}`, e);
+							completedCount++; // Increment anyway to keep progress moving
+							return { index, blob: null as any }; // Will handle nulls below if needed
+						}
+					},
+				);
+
+				const results = await Promise.all(downloadPromises);
+				const sortedBlobs = results
+					.sort((a, b) => a.index - b.index)
+					.filter((r) => r.blob !== null) // Filter out failed pages
+					.map((r) => r.blob);
+
+				if (sortedBlobs.length === 0 && pages.length > 0) {
+					throw new Error('All pages failed to download');
+				}
+
+				offlineChapter = {
+					id: chapter.id,
+					bookId: bookId,
+					title: chapter.title,
+					index: chapter.index,
+					contentType: 'image',
+					pages: sortedBlobs,
+					downloadedAt: new Date(),
+					next: chapter.next,
+					previous: chapter.previous,
+				};
+			}
+
+			await db.put('chapters', offlineChapter);
+
+			this.updateProgress(chapter.id, {
+				chapterId: chapter.id,
+				bookId: bookId,
+				total: contentType === 'image' ? pages.length : 1,
+				current: contentType === 'image' ? pages.length : 1,
+				status: 'completed',
+			});
+		} catch (error) {
+			console.error(`Failed to process chapter ${chapter.id}`, error);
+			this.updateProgress(chapter.id, {
+				chapterId: chapter.id,
+				bookId: bookId,
+				total: 0,
+				current: 0,
+				status: 'error',
+			});
+			throw error;
+		}
+	}
+
+	/**
+	 * @deprecated Use syncBook instead
+	 */
 	async downloadChapter(
 		book: Book | BookBasic,
 		chapter: Chapter,
@@ -178,6 +409,7 @@ export class DownloadService {
 			console.error('Download failed', error);
 			this.updateProgress(chapter.id, {
 				chapterId: chapter.id,
+				bookId: book.id,
 				total: 0,
 				current: 0,
 				status: 'error',
@@ -194,6 +426,7 @@ export class DownloadService {
 
 		this.updateProgress(chapter.id, {
 			chapterId: chapter.id,
+			bookId: book.id,
 			total: chapter.pages.length,
 			current: 0,
 			status: 'downloading',
@@ -206,6 +439,7 @@ export class DownloadService {
 				completedCount++;
 				this.updateProgress(chapter.id, {
 					chapterId: chapter.id,
+					bookId: book.id,
 					total: chapter.pages.length,
 					current: completedCount,
 					status: 'downloading',
@@ -235,6 +469,7 @@ export class DownloadService {
 
 		this.updateProgress(chapter.id, {
 			chapterId: chapter.id,
+			bookId: book.id,
 			total: chapter.pages.length,
 			current: chapter.pages.length,
 			status: 'completed',
@@ -250,6 +485,7 @@ export class DownloadService {
 		// TEXT content is already inline in chapter.content - no network fetch needed
 		this.updateProgress(chapter.id, {
 			chapterId: chapter.id,
+			bookId: book.id,
 			total: 1,
 			current: 0,
 			status: 'downloading',
@@ -273,6 +509,7 @@ export class DownloadService {
 
 		this.updateProgress(chapter.id, {
 			chapterId: chapter.id,
+			bookId: book.id,
 			total: 1,
 			current: 1,
 			status: 'completed',
@@ -287,14 +524,16 @@ export class DownloadService {
 
 		this.updateProgress(chapter.id, {
 			chapterId: chapter.id,
+			bookId: book.id,
 			total: 1,
 			current: 0,
 			status: 'downloading',
 		});
 
 		// Fetch the document blob
+		const url = this.resolveAssetUrl(chapter.documentPath);
 		const documentBlob = await firstValueFrom(
-			this.http.get(chapter.documentPath, { responseType: 'blob' }),
+			this.http.get(url, { responseType: 'blob' }),
 		);
 		if (!documentBlob) throw new Error('Failed to download document');
 
@@ -316,23 +555,29 @@ export class DownloadService {
 
 		this.updateProgress(chapter.id, {
 			chapterId: chapter.id,
+			bookId: book.id,
 			total: 1,
 			current: 1,
 			status: 'completed',
 		});
 	}
 
+	private resolveAssetUrl(path: string): string {
+		if (!path) return '';
+		if (path.startsWith('http')) return path;
+		return path;
+	}
+
 	private async fetchImageBlob(url: string): Promise<Blob> {
+		const resolvedUrl = this.resolveAssetUrl(url);
 		return firstValueFrom(
-			this.http.get(url, { responseType: 'blob' }),
-		).then((blob) => {
-			if (!blob) throw new Error('Empty blob received');
-			return blob;
-		});
+			this.http.get(resolvedUrl, { responseType: 'blob' }),
+		);
 	}
 
 	saveToDevice(url: string, filename: string) {
-		this.http.get(url, { responseType: 'blob' }).subscribe((blob) => {
+		const resolvedUrl = this.resolveAssetUrl(url);
+		this.http.get(resolvedUrl, { responseType: 'blob' }).subscribe((blob) => {
 			const a = document.createElement('a');
 			const objectUrl = URL.createObjectURL(blob);
 			a.href = objectUrl;

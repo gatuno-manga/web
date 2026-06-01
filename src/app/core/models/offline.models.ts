@@ -18,6 +18,7 @@ export interface OfflineBook {
 	sensitiveContent: SensitiveContentResponse[];
 	totalChapters: number;
 	updatedAt: Date;
+	lastSyncAt?: Date;
 	blurHash?: string;
 	dominantColor?: string;
 }
@@ -43,6 +44,7 @@ export type DownloadStatus = 'pending' | 'downloading' | 'completed' | 'error';
 
 export interface DownloadProgress {
 	chapterId: string;
+	bookId: string;
 	total: number;
 	current: number;
 	status: DownloadStatus;

@@ -108,17 +108,13 @@ describe('ReadingProgressSyncService', () => {
 	});
 
 	it('should initialize with DISCONNECTED state', () => {
-		expect(service.connectionState()).toBe(
-			WebSocketConnectionState.DISCONNECTED,
-		);
+		expect(service.syncStatus().connected).toBe(false);
 	});
 
 	it('should connect when connect() is called', () => {
 		service.connect();
 		expect((service as any).createSocket).toHaveBeenCalled();
-		expect(service.connectionState()).toBe(
-			WebSocketConnectionState.CONNECTING,
-		);
+		expect(service.syncStatus().connected).toBe(true);
 	});
 
 	it('should save progress locally and then via websocket if connected', fakeAsync(() => {

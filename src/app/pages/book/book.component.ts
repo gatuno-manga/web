@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { BookWebsocketService } from '@core/services/book-websocket.service';
+import { MqttService } from '@core/services/mqtt.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { DownloadService } from '@core/services/download.service';
 import { DownloadManagerService } from '@core/services/download-manager.service';
@@ -92,7 +92,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	private bookService = inject(BookService);
 	private activatedRoute = inject(ActivatedRoute);
 	private router = inject(Router);
-	private wsService = inject(BookWebsocketService);
+	private wsService = inject(MqttService);
 	private downloadService = inject(DownloadService);
 	private readingProgressService = inject(UnifiedReadingProgressService);
 	private chapterService = inject(ChapterService);
@@ -224,7 +224,7 @@ export class BookComponent implements OnInit, OnDestroy {
 		this.wsSubscription?.unsubscribe();
 		const bookId = this.book()?.id;
 		if (bookId) {
-			this.wsService.unsubscribeFromBook(bookId);
+			// wsSubscription.unsubscribe() cleans up the observables internally.
 		}
 		if (this.coverUrl) {
 			URL.revokeObjectURL(this.coverUrl);
@@ -240,7 +240,7 @@ export class BookComponent implements OnInit, OnDestroy {
 		// Observa eventos do livro
 		this.wsSubscription = this.wsService
 			.watchBook(bookId)
-			.subscribe((event) => {
+			.subscribe((event: unknown) => {
 				const typedEvent = event as { type: string; data: unknown };
 				console.log(
 					'📡 Evento recebido:',

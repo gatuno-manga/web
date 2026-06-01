@@ -1,17 +1,35 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DownloadService } from '@core/services/download.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
+import { of } from 'rxjs';
 
 import { ItemBookComponent } from './item-book.component';
 
 describe('ItemBookComponent', () => {
 	let component: ItemBookComponent;
 	let fixture: ComponentFixture<ItemBookComponent>;
+	let downloadService: jasmine.SpyObj<DownloadService>;
 
 	beforeEach(async () => {
+		const downloadSpy = jasmine.createSpyObj('DownloadService', [
+			'isBookDownloaded',
+			'getBookDownloadProgress',
+			'deleteBook',
+			'downloadChapter',
+			'isChapterDownloaded',
+			'syncBook',
+		]);
+		downloadSpy.isBookDownloaded.and.returnValue(Promise.resolve(false));
+		downloadSpy.getBookDownloadProgress.and.returnValue(of([]));
+
 		await TestBed.configureTestingModule({
 			imports: [ItemBookComponent, SharedTestingModule],
+			providers: [{ provide: DownloadService, useValue: downloadSpy }],
 		}).compileComponents();
 
+		downloadService = TestBed.inject(
+			DownloadService,
+		) as jasmine.SpyObj<DownloadService>;
 		fixture = TestBed.createComponent(ItemBookComponent);
 		component = fixture.componentInstance;
 		fixture.componentRef.setInput('book', {
@@ -19,12 +37,30 @@ describe('ItemBookComponent', () => {
 			title: 'Test',
 			authors: [],
 			covers: [],
+			cover: 'test-cover.jpg',
+			totalChapters: 10,
 		} as any);
 		fixture.detectChanges();
 	});
 
 	it('should create', () => {
 		expect(component).toBeTruthy();
+	});
+
+	it('should show offline badge when isOffline is true', async () => {
+		component.isOffline.set(true);
+		fixture.detectChanges();
+		const badge = fixture.nativeElement.querySelector('.offline-badge');
+		expect(badge).toBeTruthy();
+		expect(badge.getAttribute('title')).toBe('Disponível Offline');
+	});
+
+	it('should show download progress when downloading', () => {
+		component.downloadProgress.set(45);
+		fixture.detectChanges();
+		const badge = fixture.nativeElement.querySelector('.downloading-badge');
+		expect(badge).toBeTruthy();
+		expect(badge.getAttribute('title')).toBe('Baixando: 45%');
 	});
 
 	it('should accept type input and default to grid', () => {

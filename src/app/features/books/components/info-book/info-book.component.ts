@@ -244,7 +244,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		this.websocketSubscription = this.bookService
 			.watchBook(bookId)
 			.subscribe({
-				next: (event) => {
+				next: (event: unknown) => {
 					const typedEvent = event as { type: string; data: unknown };
 					console.log('📡 Evento WebSocket recebido:', typedEvent);
 
@@ -284,7 +284,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 							break;
 					}
 				},
-				error: (error) => {
+				error: (error: unknown) => {
 					console.error('❌ Erro no WebSocket:', error);
 				},
 			});

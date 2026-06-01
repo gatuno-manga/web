@@ -23,7 +23,7 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { BookWebsocketService } from '@core/services/book-websocket.service';
+import { MqttService } from '@core/services/mqtt.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
 import { DownloadService } from '@core/services/download.service';
@@ -116,7 +116,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private notificationService = inject(NotificationService);
 	private metaDataService = inject(MetaDataService);
 	private settingsService = inject(SettingsService);
-	private bookWebsocketService = inject(BookWebsocketService);
+	private bookWebsocketService = inject(MqttService);
 	private downloadService = inject(DownloadService);
 	private readingProgressService = inject(UnifiedReadingProgressService);
 	private contextMenuService = inject(ContextMenuService);
@@ -318,14 +318,14 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		}
 
 		this.ngZone.runOutsideAngular(() => {
-			if (!this.bookWebsocketService.isConnected()) {
+			if (!this.bookWebsocketService.connectionState() || String(this.bookWebsocketService.connectionState()) !== 'connected') {
 				this.bookWebsocketService.connect();
 			}
 
 			this.bookWebsocketService
 				.watchChapter(chapterId, bookId)
 				.pipe(takeUntilDestroyed(this.destroyRef))
-				.subscribe((event) => {
+				.subscribe((event: unknown) => {
 					const typedEvent = event as { type: string; data: unknown };
 					if (
 						typedEvent.type === 'chapter.updated' ||
