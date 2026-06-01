@@ -96,8 +96,7 @@
 					},
 					"options": {
 						"host": "0.0.0.0",
-						"disableHostCheck": true,
-						"proxyConfig": "proxy.conf.json"
+						"disableHostCheck": true
 					},
 					"defaultConfiguration": "development"
 				},
