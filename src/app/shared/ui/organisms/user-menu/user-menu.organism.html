@@ -131,7 +131,7 @@
 		</div>
 	}
 } @else {
-	<app-aside position="right" [topOffset]="0" (closed)="isOpen.set(false)">
+	<app-aside position="right" [topOffset]="0" [(isOpen)]="isOpen">
 		<div class="mobile-menu-container">
 			<ng-container *ngTemplateOutlet="menuContent"></ng-container>
 		</div>

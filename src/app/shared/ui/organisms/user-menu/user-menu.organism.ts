@@ -58,7 +58,6 @@ export class UserMenuOrganismComponent implements OnInit {
 			.observe(['(min-width: 768px)'])
 			.subscribe((result) => {
 				this.isLargeScreen.set(result.matches);
-				if (this.isOpen()) this.close();
 			});
 	}
 
@@ -69,17 +68,11 @@ export class UserMenuOrganismComponent implements OnInit {
 	}
 
 	toggle() {
-		if (this.isLargeScreen()) {
-			this.isOpen.update((v) => !v);
-			if (!this.isOpen()) this.currentView.set('main');
-		} else {
-			this.aside()?.toggle();
-		}
+		this.isOpen.update((v) => !v);
 	}
 
 	close() {
 		this.isOpen.set(false);
-		this.aside()?.close();
 		setTimeout(() => this.currentView.set('main'), 300);
 	}
 

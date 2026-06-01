@@ -5,6 +5,7 @@ import {
 	HostListener,
 	inject,
 	input,
+	model,
 	OnDestroy,
 	OnInit,
 	output,
@@ -28,7 +29,7 @@ export class AsideComponent implements OnInit, OnDestroy {
 
 	closed = output<void>();
 
-	isOpen = signal(false);
+	isOpen = model(false);
 	private touchStartX = 0;
 	private touchStartY = 0;
 	private isDragging = signal(false);
