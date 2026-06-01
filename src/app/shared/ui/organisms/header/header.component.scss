@@ -91,28 +91,11 @@ header {
 	}
 }
 
-@keyframes slideDown {
-	from {
-		opacity: 0;
-		transform: translateY(-10px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
+
 
 @media (max-width: 600px) {
 	header {
 		padding: 0 15px;
-
-		.search-container.expanded .search-input {
-			width: 150px;
-		}
-
-		.search-dropdown {
-			width: calc(100vw - 30px);
-			right: -40px;
-		}
 	}
 }
+
