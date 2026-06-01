@@ -17,7 +17,7 @@ import {
 	ScrapingStatus,
 	UpdateBookDto,
 } from '@models/book.models';
-import { Page } from '@models/miscellaneous.models';
+import { Paginated } from '@models/miscellaneous.models';
 import { firstValueFrom, from, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { DownloadService } from './download.service';
@@ -74,7 +74,7 @@ export class BookService {
 			opts.sensitiveContent = [];
 
 		return this.http
-			.get<Page<BookList>>('books', {
+			.get<Paginated<BookList>>('books', {
 				params: { ...opts },
 			})
 			.pipe(
@@ -83,7 +83,7 @@ export class BookService {
 						return of({
 							data: [],
 							metadata: { total: 0, page: 1, lastPage: 0 },
-						} as Page<BookList>);
+						} as Paginated<BookList>);
 					}
 					console.warn(
 						'Online fetch failed, falling back to offline mode',
@@ -198,7 +198,7 @@ export class BookService {
 			);
 	}
 
-	getOfflineBooks(options?: BookPageOptions): Observable<Page<BookList>> {
+	getOfflineBooks(options?: BookPageOptions): Observable<Paginated<BookList>> {
 		const opts = { ...options };
 
 		return from(this.downloadService.getAllBooks()).pipe(

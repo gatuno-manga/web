@@ -17,7 +17,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { UserService } from '@core/services/user.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import { ChapterCommentNode } from '@models/book.models';
-import { Page as PaginatedResponse } from '@models/miscellaneous.models';
+import { Paginated as PaginatedResponse } from '@models/miscellaneous.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { MarkdownComponent } from 'ngx-markdown';
 import { filter, switchMap } from 'rxjs/operators';
