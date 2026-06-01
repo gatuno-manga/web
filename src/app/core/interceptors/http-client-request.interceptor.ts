@@ -42,31 +42,44 @@ export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
 		origin: isBrowser ? window.location.origin : undefined,
 	});
 
+	// Check if the request is going to our own API
+	const isInternalRequest =
+		requestUrl.startsWith(environment.apiURL) ||
+		requestUrl.startsWith(environment.apiURLServer || '') ||
+		req.url.startsWith('/') ||
+		!/^https?:\/\//i.test(req.url);
+
+	// Static assets and public data shouldn't get Gatuno-specific headers to avoid CORS issues
+	const isStaticOrData =
+		requestUrl.includes('/assets/') || requestUrl.includes('/data/');
+
 	const accessToken = cookieService.get('accessToken', false);
 	const authHeader = accessToken ? `Bearer ${accessToken}` : null;
 	const isRefreshRequest = req.url.includes('/auth/refresh');
 	let headers = req.headers;
 
-	if (authHeader && !isRefreshRequest) {
-		headers = headers.set('Authorization', authHeader);
+	if (isInternalRequest && !isStaticOrData) {
+		if (authHeader && !isRefreshRequest) {
+			headers = headers.set('Authorization', authHeader);
 
-		if (!isBrowser) {
-			// SSR: forward only access token cookie managed by the client app
-			headers = headers.set('cookie', `accessToken=${accessToken}`);
+			if (!isBrowser) {
+				// SSR: forward only access token cookie managed by the client app
+				headers = headers.set('cookie', `accessToken=${accessToken}`);
+			}
 		}
-	}
 
-	if (isBrowser) {
-		headers = headers
-			.set('x-client-platform', 'web')
-			.set('x-device-id', resolveBrowserDeviceId())
-			.set('x-device-name', resolveBrowserDeviceName());
+		if (isBrowser) {
+			headers = headers
+				.set('x-client-platform', 'web')
+				.set('x-device-id', resolveBrowserDeviceId())
+				.set('x-device-name', resolveBrowserDeviceName());
 
-		const mutableMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
-		if (mutableMethods.includes(req.method)) {
-			const csrfToken = csrfService.csrfToken;
-			if (csrfToken) {
-				headers = headers.set('x-csrf-token', csrfToken);
+			const mutableMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
+			if (mutableMethods.includes(req.method)) {
+				const csrfToken = csrfService.csrfToken;
+				if (csrfToken) {
+					headers = headers.set('x-csrf-token', csrfToken);
+				}
 			}
 		}
 	}
