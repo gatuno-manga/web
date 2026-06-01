@@ -5,23 +5,9 @@
 		id="page-{{ $index }}"
 		#pageRef
 		[attr.data-index]="$index"
-		[style.background-color]="
-			page.metadata?.dominantColor || bookDominantColor
-		"
-		[style.aspect-ratio]="
-			page.metadata?.width && page.metadata?.height
-				? page.metadata?.width + ' / ' + page.metadata?.height
-				: bookMetadata?.width && bookMetadata?.height
-					? bookMetadata?.width + ' / ' + bookMetadata?.height
-					: '2 / 3'
-		"
-		[style.min-height]="
-			page.metadata?.width && page.metadata?.height
-				? 'auto'
-				: bookMetadata?.height
-					? 'auto'
-					: '600px'
-		"
+		[style.background-color]="page.metadata?.dominantColor || bookDominantColor"
+		[style.aspect-ratio]="getPageAspectRatio(page)"
+		[style.min-height]="getPageMinHeight(page)"
 		(contextmenu)="onContextMenu($event, page, $index)"
 	>
 		<div
