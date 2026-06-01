@@ -223,41 +223,45 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			}
 		});
 
-		this.activatedRoute.paramMap
-			.pipe(takeUntilDestroyed())
-			.subscribe((params) => {
-				const chapterId = params.get('chapter');
-				const bookId = params.get('id');
+		// All data fetching and navigation logic must run only in the browser.
+		// This component is interactive and requires user auth state — it must NOT
+		// make HTTP requests during SSR (Node.js cannot reach localhost:3000 in Docker).
+		if (isPlatformBrowser(this.platformId)) {
+			this.activatedRoute.paramMap
+				.pipe(takeUntilDestroyed())
+				.subscribe((params) => {
+					const chapterId = params.get('chapter');
+					const bookId = params.get('id');
 
-				if (bookId) {
-					this.bookService.getBook(bookId).subscribe({
-						next: (book) => {
-							if (book) {
-								this.bookBlurHash.set(book.blurHash);
-								this.bookDominantColor.set(book.dominantColor);
-								this.bookMetadata.set(book.metadata);
-							}
-						},
-					});
-				}
+					if (bookId) {
+						this.bookService.getBook(bookId).subscribe({
+							next: (book) => {
+								if (book) {
+									this.bookBlurHash.set(book.blurHash);
+									this.bookDominantColor.set(book.dominantColor);
+									this.bookMetadata.set(book.metadata);
+								}
+							},
+						});
+					}
 
-				if (chapterId) {
-					if (this.currentChapterRouteId !== chapterId) {
-						this.currentChapterRouteId = chapterId;
-						this.dismissedChapterLoadErrorModalId = null;
+					if (chapterId) {
+						if (this.currentChapterRouteId !== chapterId) {
+							this.currentChapterRouteId = chapterId;
+							this.dismissedChapterLoadErrorModalId = null;
+						}
+						this.loadChapter(chapterId, false, false, 'route');
+						if (
+							bookId &&
+							this.userTokenService.hasValidAccessTokenSignal()
+						) {
+							this.setupWebSocket(chapterId, bookId);
+						}
+					} else {
+						this.backPage();
 					}
-					this.loadChapter(chapterId, false, false, 'route');
-					if (
-						bookId &&
-						isPlatformBrowser(this.platformId) &&
-						this.userTokenService.hasValidAccessTokenSignal()
-					) {
-						this.setupWebSocket(chapterId, bookId);
-					}
-				} else {
-					this.backPage();
-				}
-			});
+				});
+		}
 
 		afterNextRender(
 			() => {
@@ -266,6 +270,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			{ injector: this.injector },
 		);
 	}
+
 
 	ngOnInit(): void {
 		this.headerStateService.setFixed(true);

@@ -564,26 +564,95 @@ export class DownloadService {
 
 	private resolveAssetUrl(path: string): string {
 		if (!path) return '';
-		if (path.startsWith('http')) return path;
-		return path;
+		// Already absolute URL - return as-is
+		if (path.startsWith('http://') || path.startsWith('https://')) return path;
+		// Relative URL: resolve against API base URL
+		const base = (environment.apiURL || '').replace(/\/api\/?$/, '').replace(/\/+$/, '');
+		const cleanPath = path.replace(/^\/+/, '');
+		return `${base}/${cleanPath}`;
+	}
+
+	/**
+	 * Converts an absolute API URL to a relative path so the Angular dev server
+	 * proxy can follow any cross-origin redirects (e.g. to MinIO) server-side,
+	 * preventing CORS errors in the browser.
+	 */
+	private toProxyRelativeUrl(url: string): string {
+		if (!isPlatformBrowser(this.platformId)) return url;
+		try {
+			const apiOrigin = new URL(environment.apiURL || window.location.origin).origin;
+			const parsed = new URL(url);
+			if (parsed.origin === apiOrigin) {
+				// Return just the path+query so the request goes through the
+				// Angular dev-server proxy (e.g. /api/data/books/...)
+				return parsed.pathname + parsed.search;
+			}
+		} catch {
+			// fall through
+		}
+		return url;
+	}
+
+	private isExternalUrl(url: string): boolean {
+		if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
+		try {
+			const apiOrigin = new URL(environment.apiURL || window.location.origin).origin;
+			const urlOrigin = new URL(url).origin;
+			return urlOrigin !== apiOrigin;
+		} catch {
+			return false;
+		}
 	}
 
 	private async fetchImageBlob(url: string): Promise<Blob> {
 		const resolvedUrl = this.resolveAssetUrl(url);
+
+		// For genuinely external URLs (e.g. a public CDN on a different domain)
+		// use native fetch without any custom headers that could trigger CORS preflight.
+		if (this.isExternalUrl(resolvedUrl)) {
+			const response = await fetch(resolvedUrl);
+			if (!response.ok) {
+				throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+			}
+			return response.blob();
+		}
+
+		// For internal API URLs that may redirect to MinIO/S3, use a relative URL
+		// so the Angular dev-server proxy follows the redirect server-side.
+		// This avoids the browser making a cross-origin request to the storage server.
+		const proxyUrl = this.toProxyRelativeUrl(resolvedUrl);
 		return firstValueFrom(
-			this.http.get(resolvedUrl, { responseType: 'blob' }),
+			this.http.get(proxyUrl, { responseType: 'blob' }),
 		);
 	}
 
 	saveToDevice(url: string, filename: string) {
 		const resolvedUrl = this.resolveAssetUrl(url);
-		this.http.get(resolvedUrl, { responseType: 'blob' }).subscribe((blob) => {
+		const triggerDownload = (blob: Blob) => {
 			const a = document.createElement('a');
 			const objectUrl = URL.createObjectURL(blob);
 			a.href = objectUrl;
 			a.download = filename;
 			a.click();
 			URL.revokeObjectURL(objectUrl);
+		};
+
+		if (this.isExternalUrl(resolvedUrl)) {
+			// Use native fetch for external URLs to avoid CORS from Angular interceptor headers
+			fetch(resolvedUrl)
+				.then((response) => {
+					if (!response.ok) throw new Error(`HTTP ${response.status}`);
+					return response.blob();
+				})
+				.then(triggerDownload)
+				.catch((err) => console.error('Failed to save image to device', err));
+			return;
+		}
+
+		// Use a proxy-relative URL so the dev server follows any storage redirects server-side
+		const proxyUrl = this.toProxyRelativeUrl(resolvedUrl);
+		this.http.get(proxyUrl, { responseType: 'blob' }).subscribe((blob) => {
+			triggerDownload(blob);
 		});
 	}
 }

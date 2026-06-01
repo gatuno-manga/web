@@ -43,9 +43,10 @@ export const HttpClientRequestInterceptor: HttpInterceptorFn = (req, next) => {
 	});
 
 	// Check if the request is going to our own API
+	const apiUrlServer = environment.apiURLServer;
 	const isInternalRequest =
 		requestUrl.startsWith(environment.apiURL) ||
-		requestUrl.startsWith(environment.apiURLServer || '') ||
+		(!!apiUrlServer && requestUrl.startsWith(apiUrlServer)) ||
 		req.url.startsWith('/') ||
 		!/^https?:\/\//i.test(req.url);
 
