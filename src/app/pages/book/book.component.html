@@ -46,6 +46,14 @@
 							(load)="onImageLoad()"
 							(error)="onCoverImageError()"
 						/>
+						@if (b.originalLanguageCode) {
+							<img
+								[src]="b.originalLanguageCode | flag"
+								class="book-origin-flag"
+								alt="Bandeira de origem"
+								title="Origem do livro"
+							/>
+						}
 					} @else {
 						<div class="cover-placeholder">
 							<app-icons name="image" />
@@ -114,6 +122,10 @@
 											<span>Compartilhar</span>
 										</button>
 										@if (admin()) {
+											<button type="button" (click)="openBookEditModal()">
+												<app-icons name="edit" />
+												<span>Editar Livro</span>
+											</button>
 											<button type="button" (click)="forceCheckUpdates()">
 												<app-icons name="refresh-ccw-dot" />
 												<span>Forçar atualização</span>

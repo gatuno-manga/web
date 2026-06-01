@@ -1,4 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
+import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -49,6 +50,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 		MarkdownComponent,
 		NgOptimizedImage,
 		BlurhashComponent,
+		FlagPipe,
 	],
 	templateUrl: './book.component.html',
 	styleUrl: './book.component.scss',

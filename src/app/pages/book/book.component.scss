@@ -135,6 +135,19 @@ $page-size: 1200px;
 				}
 			}
 
+			.book-origin-flag {
+				position: absolute;
+				bottom: 8px;
+				right: 8px;
+				width: 28px;
+				height: 20px;
+				border-radius: 4px;
+				object-fit: cover;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+				z-index: 3;
+				opacity: 1;
+			}
+
 			.blur-placeholder {
 				position: absolute;
 				top: 0;

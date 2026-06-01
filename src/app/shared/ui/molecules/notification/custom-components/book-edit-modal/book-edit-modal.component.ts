@@ -17,6 +17,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { TagsService } from '@core/services/tags.service';
 import {
+	AlternativeTitle,
 	Author,
 	BookBasic,
 	SensitiveContentResponse,
@@ -30,6 +31,7 @@ import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
 import { TextAreaComponent } from '@ui/atoms/inputs/text-area/text-area.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';
+import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -52,6 +54,7 @@ export interface BookEditSaveEvent {
 		IconsComponent,
 		DragDropModule,
 		MultiSelectTagsComponent,
+		FlagPipe,
 	],
 	templateUrl: './book-edit-modal.component.html',
 	styleUrls: ['./book-edit-modal.component.scss'],
@@ -71,10 +74,12 @@ export class BookEditModalComponent implements OnInit {
 	isSaving = signal(false);
 
 	// Multi-value fields managed with signals for easier UI binding and reordering
-	alternativeTitles = signal<string[]>([]);
+	alternativeTitles = signal<AlternativeTitle[]>([]);
+	searchTerms = signal<string[]>([]);
 	originalUrls = signal<string[]>([]);
 
 	newAltTitle = signal('');
+	newSearchTerm = signal('');
 	newUrl = signal('');
 
 	// Master lists for selection
@@ -91,6 +96,27 @@ export class BookEditModalComponent implements OnInit {
 		value: type,
 		label: type.charAt(0).toUpperCase() + type.slice(1),
 	}));
+
+	languageCodes = [
+		{ value: '', label: 'Desconhecido' },
+		{ value: 'ja-JP', label: 'Japonês' },
+		{ value: 'ko-KR', label: 'Coreano' },
+		{ value: 'zh-CN', label: 'Chinês (Simplificado)' },
+		{ value: 'zh-TW', label: 'Chinês (Tradicional)' },
+		{ value: 'en-US', label: 'Inglês (EUA)' },
+		{ value: 'en-GB', label: 'Inglês (Reino Unido)' },
+		{ value: 'pt-BR', label: 'Português (Brasil)' },
+		{ value: 'pt-PT', label: 'Português (Portugal)' },
+		{ value: 'es-ES', label: 'Espanhol (Espanha)' },
+		{ value: 'es-419', label: 'Espanhol (América Latina)' },
+		{ value: 'fr-FR', label: 'Francês' },
+		{ value: 'it-IT', label: 'Italiano' },
+		{ value: 'de-DE', label: 'Alemão' },
+		{ value: 'ru-RU', label: 'Russo' },
+		{ value: 'id-ID', label: 'Indonésio' },
+		{ value: 'th-TH', label: 'Tailandês' },
+		{ value: 'vi-VN', label: 'Vietnamita' }
+	];
 
 	ngOnInit(): void {
 		this.initForm();
@@ -109,10 +135,18 @@ export class BookEditModalComponent implements OnInit {
 				[Validators.min(1900), Validators.max(2100)],
 			],
 			type: [this.book.type || TypeBook.OTHER],
+			originalLanguageCode: [(this.book as any).originalLanguageCode || ''],
 		});
 
 		this.alternativeTitles.set([
-			...((this.book as any).alternativeTitle || []),
+			...((this.book as any).alternativeTitles || []),
+		]);
+		// Se existir o array legado e o novo estiver vazio
+		if (this.alternativeTitles().length === 0 && (this.book as any).alternativeTitle?.length > 0) {
+			this.alternativeTitles.set((this.book as any).alternativeTitle.map((t: string) => ({ title: t, languageCode: null })));
+		}
+		this.searchTerms.set([
+			...((this.book as any).searchTerms || []),
 		]);
 		this.originalUrls.set([...((this.book as any).originalUrl || [])]);
 
@@ -172,8 +206,8 @@ export class BookEditModalComponent implements OnInit {
 	// --- Alternative Titles Management ---
 	addAltTitle(): void {
 		const val = this.newAltTitle().trim();
-		if (val && !this.alternativeTitles().includes(val)) {
-			this.alternativeTitles.update((prev) => [...prev, val]);
+		if (val && !this.alternativeTitles().find((t) => t.title === val)) {
+			this.alternativeTitles.update((prev) => [...prev, { title: val, languageCode: null }]);
 			this.newAltTitle.set('');
 		}
 	}
@@ -184,8 +218,31 @@ export class BookEditModalComponent implements OnInit {
 		);
 	}
 
-	onAltTitleDrop(event: CdkDragDrop<string[]>): void {
+	onAltTitleDrop(event: CdkDragDrop<AlternativeTitle[]>): void {
 		this.alternativeTitles.update((prev) => {
+			const next = [...prev];
+			moveItemInArray(next, event.previousIndex, event.currentIndex);
+			return next;
+		});
+	}
+
+	// --- Search Terms Management ---
+	addSearchTerm(): void {
+		const val = this.newSearchTerm().trim();
+		if (val && !this.searchTerms().includes(val)) {
+			this.searchTerms.update((prev) => [...prev, val]);
+			this.newSearchTerm.set('');
+		}
+	}
+
+	removeSearchTerm(index: number): void {
+		this.searchTerms.update((prev) =>
+			prev.filter((_, i) => i !== index),
+		);
+	}
+
+	onSearchTermDrop(event: CdkDragDrop<string[]>): void {
+		this.searchTerms.update((prev) => {
 			const next = [...prev];
 			moveItemInArray(next, event.previousIndex, event.currentIndex);
 			return next;
@@ -211,7 +268,7 @@ export class BookEditModalComponent implements OnInit {
 	}
 
 	onUrlDrop(event: CdkDragDrop<string[]>): void {
-		this.alternativeTitles.update((prev) => {
+		this.originalUrls.update((prev) => {
 			const next = [...prev];
 			moveItemInArray(next, event.previousIndex, event.currentIndex);
 			return next;
@@ -239,15 +296,28 @@ export class BookEditModalComponent implements OnInit {
 			updatedData.publication = formValues.publication;
 		if (formValues.type !== this.book.type)
 			updatedData.type = formValues.type;
+		if (formValues.originalLanguageCode !== ((this.book as any).originalLanguageCode || ''))
+			updatedData.originalLanguageCode = formValues.originalLanguageCode === '' ? null : formValues.originalLanguageCode;
 
 		// Array fields delta (deep compare simplified)
 		const currentAltTitles = this.alternativeTitles();
-		const originalAltTitles = (this.book as any).alternativeTitle || [];
+		const originalAltTitles = (this.book as any).alternativeTitles || [];
+		
+		// Map back for comparison
+		const currentAltTitlesMapped = currentAltTitles.map(t => t.title).join('|');
+		const originalAltTitlesMapped = originalAltTitles.map((t: any) => t.title).join('|');
+		
+		if (currentAltTitlesMapped !== originalAltTitlesMapped || currentAltTitles.length !== originalAltTitles.length) {
+			updatedData.alternativeTitles = currentAltTitles.map((t, index) => ({ ...t, rank: index }));
+		}
+
+		const currentSearchTerms = this.searchTerms();
+		const originalSearchTerms = (this.book as any).searchTerms || [];
 		if (
-			JSON.stringify(currentAltTitles) !==
-			JSON.stringify(originalAltTitles)
+			JSON.stringify(currentSearchTerms) !==
+			JSON.stringify(originalSearchTerms)
 		) {
-			updatedData.alternativeTitle = currentAltTitles;
+			updatedData.searchTerms = currentSearchTerms;
 		}
 
 		const currentUrls = this.originalUrls();
