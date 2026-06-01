@@ -43,6 +43,7 @@ import { ContextMenuItem } from '@models/context-menu.models';
 import { DownloadStatus } from '@models/offline.models';
 import { SavedPage } from '@models/saved-page.models';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
+import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
@@ -80,6 +81,7 @@ interface ModulesLoad {
 		RouterModule,
 		DecimalPipe,
 		ChapterIndexPipe,
+		FlagPipe,
 		IconsComponent,
 		ButtonComponent,
 		ImageViewerComponent,
