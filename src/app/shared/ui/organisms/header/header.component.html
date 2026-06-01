@@ -10,15 +10,26 @@
 		}
 	</nav>
 	<nav>
-		@if (!isLoggedIn()) {
-		<a [routerLink]="['/auth/login']">Login</a>
-		}
-		@else{
-		<div class="icons">
-			<a [routerLink]="['/user']" class="user">
-				<app-icons name="user" size="32" />
-			</a>
+		<app-search />
+
+		<div class="user-actions">
+			@if (!isLoggedIn()) {
+				<button type="button" class="icon-btn login-btn" aria-label="Menu do Usuário" (click)="userMenu.toggle(); $event.stopPropagation()">
+					<app-icons name="user" size="32" />
+				</button>
+			}
+			@else {
+				<button type="button" class="user-btn" (click)="userMenu.toggle(); $event.stopPropagation()">
+					@if (userProfile()?.profileImageUrl) {
+						<div class="avatar-container">
+							<img [src]="userProfile()?.profileImageUrl" alt="Avatar" class="avatar" />
+						</div>
+					} @else {
+						<app-icons name="user" size="32" />
+					}
+				</button>
+			}
+			<app-user-menu #userMenu />
 		</div>
-		}
 	</nav>
 </header>

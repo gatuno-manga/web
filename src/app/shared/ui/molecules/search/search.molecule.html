@@ -1,0 +1,27 @@
+<div class="search-container" [class.expanded]="isSearchExpanded()">
+	@if (isSearchExpanded()) {
+		<input
+			#searchInput
+			type="text"
+			[formControl]="searchControl"
+			placeholder="Pesquisar livros..."
+			(blur)="onSearchBlur()"
+			class="search-input"
+		/>
+		@if (searchResults().length > 0) {
+			<div class="search-dropdown" (mousedown)="preventBlur($event)">
+				@for (book of searchResults(); track book.id) {
+					<a [routerLink]="['/book', book.id]" class="search-result-item" (click)="clearSearch()">
+						@if (book.cover) {
+							<img [src]="book.cover" alt="" class="book-mini-cover" />
+						}
+						<span class="book-title">{{ book.title }}</span>
+					</a>
+				}
+			</div>
+		}
+	}
+	<button type="button" class="icon-btn search-btn" (click)="toggleSearch()" aria-label="Pesquisar">
+		<app-icons name="search" size="24" />
+	</button>
+</div>

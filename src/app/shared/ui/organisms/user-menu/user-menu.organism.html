@@ -1,0 +1,88 @@
+<ng-template #menuContent>
+	<div class="menu-content-wrapper">
+		<div class="menu-section user-section">
+			@if (isLoggedIn()) {
+				<div class="user-info">
+					@if (userProfile()?.profileImageUrl) {
+						<div class="avatar-container">
+							<img [src]="userProfile()?.profileImageUrl" alt="Avatar" class="avatar" />
+						</div>
+					} @else {
+						<app-icons name="user" size="48" class="default-avatar" />
+					}
+					<div class="user-details">
+						<span class="user-name">{{ userProfile()?.name || userProfile()?.userName || 'Usuário' }}</span>
+						<span class="user-email">{{ userProfile()?.email || '' }}</span>
+					</div>
+				</div>
+				<div class="divider"></div>
+				<a [routerLink]="['/user/profile']" class="menu-item" (click)="close()">
+					<app-icons name="user" size="20" />
+					<span>Perfil</span>
+				</a>
+				<a [routerLink]="['/user/all']" class="menu-item" (click)="close()">
+					<app-icons name="settings" size="20" />
+					<span>Configurações</span>
+				</a>
+			} @else {
+				<a [routerLink]="['/auth/login']" class="menu-item login-link" (click)="close()">
+					<app-icons name="lock" size="20" />
+					<span>Entrar ou Registrar</span>
+				</a>
+			}
+		</div>
+
+		<div class="divider"></div>
+		
+		<div class="menu-section">
+			<div class="section-title">Tema</div>
+			<div class="theme-options">
+				<button type="button" class="theme-btn" [class.active]="currentTheme() === 'light'" (click)="setTheme('light')">
+					<app-icons name="sun" size="18" />
+					<span>Claro</span>
+				</button>
+				<button type="button" class="theme-btn" [class.active]="currentTheme() === 'dark'" (click)="setTheme('dark')">
+					<app-icons name="moon" size="18" />
+					<span>Escuro</span>
+				</button>
+				<button type="button" class="theme-btn" [class.active]="currentTheme() === 'true-dark'" (click)="setTheme('true-dark')">
+					<app-icons name="contrast" size="18" />
+					<span>Amoled</span>
+				</button>
+			</div>
+		</div>
+
+		<div class="divider"></div>
+
+		<div class="menu-section">
+			<a [routerLink]="['/user/filter']" class="menu-item" (click)="close()">
+				<app-icons name="filter" size="20" />
+				<span>Filtro de Conteúdo</span>
+			</a>
+		</div>
+
+		@if (isLoggedIn()) {
+			<div class="divider"></div>
+			<div class="menu-section">
+				<button type="button" class="menu-item logout-btn" (click)="logout()">
+					<app-icons name="arrow-left" size="20" />
+					<span>Sair</span>
+				</button>
+			</div>
+		}
+	</div>
+</ng-template>
+
+@if (isLargeScreen()) {
+	@if (isOpen()) {
+		<div class="desktop-menu">
+			<ng-container *ngTemplateOutlet="menuContent"></ng-container>
+		</div>
+	}
+} @else {
+	<app-aside position="right" [topOffset]="0" (closed)="isOpen.set(false)">
+		<div class="mobile-menu-container">
+			<ng-container *ngTemplateOutlet="menuContent"></ng-container>
+		</div>
+	</app-aside>
+}
