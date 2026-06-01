@@ -104,7 +104,7 @@ export const routes: Routes = [
 				data: { ssr: { renderMode: RenderMode.Client } },
 				loadChildren: () =>
 					import('./pages/dashboard/dashboard.routes').then(
-						(m) => m.routes,
+						(m) => m.dashboardRoutes,
 					),
 			},
 		],
@@ -116,6 +116,6 @@ export const routes: Routes = [
 				(m) => m.OutletComponent,
 			),
 		loadChildren: () =>
-			import('./pages/auth/auth.routes').then((m) => m.routes),
+			import('./pages/auth/auth.routes').then((m) => m.authRoutes),
 	},
 ];
