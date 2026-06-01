@@ -6,26 +6,26 @@ h1 {
 	font-size: 2rem;
 	font-weight: 300;
 	margin-bottom: 0.5rem;
-	color: var(--white);
+	color: var(--app-text-color);
 }
 
 .subtitle {
 	font-size: 1rem;
 	font-weight: 300;
 	margin-bottom: 3rem;
-	color: var(--white);
+	color: var(--app-text-color);
 	opacity: 0.8;
 }
 
 .profile-editor {
-	color: var(--white);
+	color: var(--app-text-color);
 	width: 100%;
 
 	h3 {
 		font-size: 1.5rem;
 		font-weight: 400;
 		margin: 3rem 0 1.5rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid var(--border-color);
 		padding-bottom: 0.5rem;
 	}
 
@@ -60,7 +60,7 @@ h1 {
 
 :host-context(.list-view) {
 	padding-bottom: 4rem;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	border-bottom: 1px solid var(--border-color);
 	margin-bottom: 4rem;
 
 	h1 {
