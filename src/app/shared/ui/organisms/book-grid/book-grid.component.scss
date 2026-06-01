@@ -1,27 +1,26 @@
 .books-container {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
 	width: 100%;
 	max-width: 1500px;
 	margin: 0 auto;
 	user-select: none;
 	gap: 20px;
 	padding: 20px;
-	justify-content: center;
 
 	// --- grid & cover (padrão) ---
 	&.grid, &.cover {
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		justify-items: center;
+
 		app-item-book {
-			width: 250px;
+			width: 100%;
+			max-width: 250px;
 		}
 	}
 
 	// --- list: 2 colunas no máximo ---
 	&.list {
-		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		gap: 20px;
-		padding: 20px;
 		
 		app-item-book {
 			width: 100%;
@@ -39,14 +38,11 @@
 		gap: 15px;
 
 		&.grid, &.cover {
+			grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+
 			app-item-book {
-				width: calc(50% - 10px);
 				max-width: 180px;
 			}
-		}
-
-		&.list {
-			grid-template-columns: 1fr;
 		}
 	}
 }
@@ -60,6 +56,10 @@
 	&.grid,
 	&.cover {
 		max-width: 250px;
+
+		@media (max-width: 768px) {
+			max-width: 180px;
+		}
 
 		.cover-skeleton {
 			width: 100%;

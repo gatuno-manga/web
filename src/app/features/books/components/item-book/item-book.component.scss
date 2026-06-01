@@ -1,9 +1,11 @@
-$width: 250px;
-$width-mobile: 150px;
+:host {
+	display: block;
+	width: 100%;
+}
 
 .cover-image-container {
 	position: relative;
-	width: $width;
+	width: 100%;
 	height: 355px;
 	overflow: hidden;
 	border-radius: 12px;
@@ -11,7 +13,6 @@ $width-mobile: 150px;
 	z-index: 1;
 
 	@media (max-width: 768px) {
-		width: $width-mobile;
 		height: 220px;
 	}
 
@@ -244,11 +245,7 @@ $width-mobile: 150px;
 .grid {
 	align-items: center;
 	flex-direction: column;
-	width: $width;
-
-	@media (max-width: 768px) {
-		width: $width-mobile;
-	}
+	width: 100%;
 
 	.info {
 		padding: 20px;
@@ -278,13 +275,9 @@ $width-mobile: 150px;
 .cover {
 	align-items: center;
 	flex-direction: column;
-	width: $width;
+	width: 100%;
 	border: none;
 	background: transparent;
-
-	@media (max-width: 768px) {
-		width: $width-mobile;
-	}
 
 	&:hover {
 		transform: scale(1.05);
@@ -331,12 +324,11 @@ $width-mobile: 150px;
 .grid,
 .cover {
 	.cover-placeholder {
-		width: $width;
+		width: 100%;
 		height: 355px;
 		border-radius: 1px; // Slight radius to match card
 
 		@media (max-width: 768px) {
-			width: $width-mobile;
 			height: 220px;
 		}
 
