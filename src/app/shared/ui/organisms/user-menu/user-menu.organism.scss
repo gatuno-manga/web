@@ -87,6 +87,7 @@
 		border-radius: 50%;
 		overflow: hidden;
 		border: 2px solid var(--primary-color);
+		flex-shrink: 0;
 		
 		.avatar {
 			width: 100%;
@@ -97,6 +98,7 @@
 
 	.default-avatar {
 		color: var(--primary-color);
+		flex-shrink: 0;
 	}
 
 	.user-details {
@@ -108,14 +110,6 @@
 			font-weight: 600;
 			font-size: 1rem;
 			color: var(--app-text-color);
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-
-		.user-email {
-			font-size: 0.8rem;
-			color: rgba(from var(--app-text-color) r g b / 0.6);
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
