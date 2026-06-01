@@ -22,6 +22,17 @@
 	--overlay-bg: rgba(0, 0, 0, 0.7);
 	--shadow-color: rgba(var(--shadow-base), 0.2);
 
+	// Extended Semantic Tokens
+	--app-bg-color: var(--app-background-color);
+	--app-text-color-secondary: rgba(233, 225, 209, 0.55); // --beige com 55% opacidade
+	--white-muted: rgba(253, 253, 253, 0.45);
+	--border-color: rgba(233, 225, 209, 0.15);
+	--hover-color: rgba(233, 225, 209, 0.08);
+	--danger-color: var(--dark-red);
+	--warning-color: var(--yellow);
+	--success-color: var(--dark-green);
+
+
 	// Badge System
 	--badge-default-bg: rgba(43, 127, 255, 0.3);
 	--badge-default-border: rgba(43, 127, 255, 0.5);
@@ -73,6 +84,17 @@
 	// Overlays & Shadows
 	--overlay-bg: rgba(0, 0, 0, 0.85);
 	--shadow-color: rgba(0, 0, 0, 0.4);
+
+	// Extended Semantic Tokens
+	--app-bg-color: var(--app-background-color);
+	--app-text-color-secondary: rgba(233, 225, 209, 0.45); // mais apagado no true-dark
+	--white-muted: rgba(253, 253, 253, 0.35);
+	--border-color: rgba(233, 225, 209, 0.1);
+	--hover-color: rgba(233, 225, 209, 0.06);
+	--danger-color: var(--dark-red);
+	--warning-color: var(--yellow);
+	--success-color: var(--dark-green);
+
 
 	// Badge System
 	--badge-default-bg: rgba(43, 127, 255, 0.2);
@@ -126,6 +148,17 @@
 	// Overlays & Shadows
 	--overlay-bg: rgba(0, 0, 0, 0.3);
 	--shadow-color: rgba(var(--shadow-base), 0.15);
+
+	// Extended Semantic Tokens
+	--app-bg-color: var(--app-background-color);
+	--app-text-color-secondary: rgba(32, 20, 42, 0.55); // --dark-purple com 55% opacidade
+	--white-muted: rgba(32, 20, 42, 0.45); // no light é escuro, não branco
+	--border-color: rgba(32, 20, 42, 0.12);
+	--hover-color: rgba(32, 20, 42, 0.06);
+	--danger-color: var(--red);
+	--warning-color: var(--yellow);
+	--success-color: var(--success);
+
 
 	// Badge System (light theme has slightly different opacity for better contrast)
 	--badge-default-bg: rgba(43, 127, 255, 0.15);

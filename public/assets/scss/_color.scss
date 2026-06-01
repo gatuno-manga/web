@@ -1,4 +1,10 @@
 @mixin colors() {
+	// Typography
+	--font-display: 'Inknut Antiqua', serif;
+	--font-body: 'Manrope', sans-serif;
+	--font-ui: 'Plus Jakarta Sans', sans-serif;
+	--font-secondary: 'Epilogue', sans-serif;
+
 	--true-black: #000000;
 	--black: #000212;
 	--dark-purple: #20142a;
