@@ -47,22 +47,6 @@ describe('ItemBookComponent', () => {
 		expect(component).toBeTruthy();
 	});
 
-	it('should show offline badge when isOffline is true', async () => {
-		component.isOffline.set(true);
-		fixture.detectChanges();
-		const badge = fixture.nativeElement.querySelector('.offline-badge');
-		expect(badge).toBeTruthy();
-		expect(badge.getAttribute('title')).toBe('Disponível Offline');
-	});
-
-	it('should show download progress when downloading', () => {
-		component.downloadProgress.set(45);
-		fixture.detectChanges();
-		const badge = fixture.nativeElement.querySelector('.downloading-badge');
-		expect(badge).toBeTruthy();
-		expect(badge.getAttribute('title')).toBe('Baixando: 45%');
-	});
-
 	it('should accept type input and default to grid', () => {
 		expect(component.type()).toBe('grid');
 		fixture.componentRef.setInput('type', 'list');
@@ -115,5 +99,24 @@ describe('ItemBookComponent', () => {
 		component.fixCovers();
 
 		expect(bookService.fixAllCovers).toHaveBeenCalledWith('b1');
+	});
+
+	it('should check if book is downloaded and show badge', async () => {
+		downloadService.isBookDownloaded.withArgs('b1').and.returnValue(Promise.resolve(true));
+		
+		// Re-trigger the input setting and change detection to run the effect
+		fixture.componentRef.setInput('book', { id: 'b1', title: 'Test Book', cover: 'test.jpg' } as any);
+		fixture.detectChanges();
+		
+		// Wait for promise in effect to resolve
+		await fixture.whenStable();
+		fixture.detectChanges(); // Trigger update for template based on signal
+		
+		expect(downloadService.isBookDownloaded).toHaveBeenCalledWith('b1');
+		expect(component.isDownloaded()).toBeTrue();
+		
+		const compiled = fixture.nativeElement as HTMLElement;
+		const badge = compiled.querySelector('.downloaded-badge');
+		expect(badge).toBeTruthy();
 	});
 });

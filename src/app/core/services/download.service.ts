@@ -435,23 +435,34 @@ export class DownloadService {
 		let completedCount = 0;
 		const downloadPromises = chapter.pages.map(
 			async (page: Page, index: number) => {
-				const blob = await this.fetchImageBlob(page.path);
-				completedCount++;
-				this.updateProgress(chapter.id, {
-					chapterId: chapter.id,
-					bookId: book.id,
-					total: chapter.pages.length,
-					current: completedCount,
-					status: 'downloading',
-				});
-				return { index, blob };
+				try {
+					const blob = await this.fetchImageBlob(page.path);
+					completedCount++;
+					this.updateProgress(chapter.id, {
+						chapterId: chapter.id,
+						bookId: book.id,
+						total: chapter.pages.length,
+						current: completedCount,
+						status: 'downloading',
+					});
+					return { index, blob };
+				} catch (e) {
+					console.warn(`Failed to download page ${page.path}`, e);
+					completedCount++;
+					return { index, blob: null };
+				}
 			},
 		);
 
 		const results = await Promise.all(downloadPromises);
 		const sortedBlobs = results
 			.sort((a, b) => a.index - b.index)
-			.map((r) => r.blob);
+			.filter((r) => r.blob !== null)
+			.map((r) => r.blob!);
+
+		if (sortedBlobs.length === 0 && chapter.pages.length > 0) {
+			throw new Error('All pages failed to download');
+		}
 
 		const db = await this.dbPromise;
 		const offlineChapter: OfflineChapter = {

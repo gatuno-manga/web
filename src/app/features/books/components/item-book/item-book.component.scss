@@ -101,6 +101,20 @@ $width-mobile: 150px;
 		border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
+	.downloaded-badge {
+		background-color: var(--success-color, #28a745);
+		color: white;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 24px;
+		height: 24px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+		backdrop-filter: blur(4px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
 	.downloading-badge,
 	.offline-badge {
 		color: white;
@@ -137,6 +151,7 @@ $width-mobile: 150px;
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
+			animation: spin-center 2s linear infinite;
 		}
 	}
 
@@ -148,12 +163,12 @@ $width-mobile: 150px;
 		background-color: var(--secondary-color);
 	}
 
-	@keyframes spin {
+	@keyframes spin-center {
 		from {
-			transform: rotate(0deg);
+			transform: translate(-50%, -50%) rotate(0deg);
 		}
 		to {
-			transform: rotate(360deg);
+			transform: translate(-50%, -50%) rotate(360deg);
 		}
 	}
 }

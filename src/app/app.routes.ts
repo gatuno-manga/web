@@ -77,7 +77,8 @@ export const routes: Routes = [
 					import('./pages/chapters/chapters.component').then(
 						(m) => m.ChaptersComponent,
 					),
-				data: SERVER_RENDER_CONFIG('chapter'),
+				// Client-side only: requires user auth/state and images may be on external servers
+				data: { ssr: { renderMode: RenderMode.Client } },
 			},
 			{
 				path: 'users/:userId',
