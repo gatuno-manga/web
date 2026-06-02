@@ -15,8 +15,8 @@ import {
 } from '@models/book-events.model';
 import { SyncResponse } from '@models/reading-progress-events.model';
 import {
-	WebSocketConnectionState,
 	isValidTransition,
+	WebSocketConnectionState,
 } from '@models/websocket-state.model';
 import {
 	LogLevel,
@@ -24,11 +24,11 @@ import {
 	logStateTransition,
 	logWebSocketError,
 } from '@shared/utils/websocket-logger.utils';
-import { Observable, Subject, Subscription } from 'rxjs';
 import mqtt, { MqttClient } from 'mqtt';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { NetworkStatusService } from './network-status.service';
-import { UserTokenService } from './user-token.service';
 import { NotificationService } from './notification.service';
+import { UserTokenService } from './user-token.service';
 
 export interface MqttPayload {
 	event: string;
@@ -80,16 +80,20 @@ export class MqttService implements OnDestroy {
 	public bookUpdated$ = this.bookUpdatedSubject.asObservable();
 	public bookNewChapters$ = this.bookNewChaptersSubject.asObservable();
 	public bookUpdateStarted$ = this.bookUpdateStartedSubject.asObservable();
-	public bookUpdateCompleted$ = this.bookUpdateCompletedSubject.asObservable();
+	public bookUpdateCompleted$ =
+		this.bookUpdateCompletedSubject.asObservable();
 	public bookUpdateFailed$ = this.bookUpdateFailedSubject.asObservable();
 	public chaptersUpdated$ = this.chaptersUpdatedSubject.asObservable();
 	public chapterUpdated$ = this.chapterUpdatedSubject.asObservable();
 	public chaptersFix$ = this.chaptersFixSubject.asObservable();
 	public coverProcessed$ = this.coverProcessedSubject.asObservable();
 	public coverSelected$ = this.coverSelectedSubject.asObservable();
-	public chapterScrapingStarted$ = this.chapterScrapingStartedSubject.asObservable();
-	public chapterScrapingCompleted$ = this.chapterScrapingCompletedSubject.asObservable();
-	public chapterScrapingFailed$ = this.chapterScrapingFailedSubject.asObservable();
+	public chapterScrapingStarted$ =
+		this.chapterScrapingStartedSubject.asObservable();
+	public chapterScrapingCompleted$ =
+		this.chapterScrapingCompletedSubject.asObservable();
+	public chapterScrapingFailed$ =
+		this.chapterScrapingFailedSubject.asObservable();
 	public progressSynced$ = this.progressSyncedSubject.asObservable();
 	public error$ = this.errorSubject.asObservable();
 
@@ -109,7 +113,10 @@ export class MqttService implements OnDestroy {
 		this.disconnect();
 	}
 
-	private transitionTo(newState: WebSocketConnectionState, reason?: string): void {
+	private transitionTo(
+		newState: WebSocketConnectionState,
+		reason?: string,
+	): void {
 		const currentState = this._connectionState();
 		if (currentState === newState) return;
 
@@ -127,18 +134,22 @@ export class MqttService implements OnDestroy {
 	}
 
 	private setupNetworkListener(): void {
-		this.networkSubscription = this.networkStatusService.wentOffline$.subscribe(() => {
-			logConnectionEvent(
-				this.serviceName,
-				'offline',
-				'Rede offline - pausando MQTT',
-				LogLevel.INFO,
-			);
-			this.disconnectForOffline();
-		});
+		this.networkSubscription =
+			this.networkStatusService.wentOffline$.subscribe(() => {
+				logConnectionEvent(
+					this.serviceName,
+					'offline',
+					'Rede offline - pausando MQTT',
+					LogLevel.INFO,
+				);
+				this.disconnectForOffline();
+			});
 
 		this.networkStatusService.wentOnline$.subscribe(() => {
-			if (this._connectionState() === WebSocketConnectionState.OFFLINE_PAUSED) {
+			if (
+				this._connectionState() ===
+				WebSocketConnectionState.OFFLINE_PAUSED
+			) {
 				logConnectionEvent(
 					this.serviceName,
 					'online',
@@ -154,7 +165,10 @@ export class MqttService implements OnDestroy {
 		if (this.client) {
 			this.client.end(true);
 			this.client = null;
-			this.transitionTo(WebSocketConnectionState.OFFLINE_PAUSED, 'Rede offline');
+			this.transitionTo(
+				WebSocketConnectionState.OFFLINE_PAUSED,
+				'Rede offline',
+			);
 			this._connected.set(false);
 		}
 	}
@@ -172,13 +186,21 @@ export class MqttService implements OnDestroy {
 
 		const token = this.userTokenService.accessToken;
 		if (!token) {
-			this.transitionTo(WebSocketConnectionState.DISCONNECTED, 'Token não encontrado');
+			this.transitionTo(
+				WebSocketConnectionState.DISCONNECTED,
+				'Token não encontrado',
+			);
 			return;
 		}
 
-		this.transitionTo(WebSocketConnectionState.CONNECTING, 'Iniciando conexão MQTT');
+		this.transitionTo(
+			WebSocketConnectionState.CONNECTING,
+			'Iniciando conexão MQTT',
+		);
 
-		const brokerUrl = (this.env as any).mqttBrokerUrl || `ws://${this.window.location?.hostname || 'localhost'}:8083/mqtt`;
+		const brokerUrl =
+			(this.env as any).mqttBrokerUrl ||
+			`ws://${this.window.location?.hostname || 'localhost'}:8083/mqtt`;
 
 		this.client = mqtt.connect(brokerUrl, {
 			username: 'jwt',
@@ -196,8 +218,16 @@ export class MqttService implements OnDestroy {
 		if (!this.client) return;
 
 		this.client.on('connect', () => {
-			logConnectionEvent(this.serviceName, 'connected', 'MQTT conectado', LogLevel.INFO);
-			this.transitionTo(WebSocketConnectionState.CONNECTED, 'MQTT conectado com sucesso');
+			logConnectionEvent(
+				this.serviceName,
+				'connected',
+				'MQTT conectado',
+				LogLevel.INFO,
+			);
+			this.transitionTo(
+				WebSocketConnectionState.CONNECTED,
+				'MQTT conectado com sucesso',
+			);
 			this._connected.set(true);
 			this.resubscribeAll();
 
@@ -214,8 +244,14 @@ export class MqttService implements OnDestroy {
 		});
 
 		this.client.on('close', () => {
-			if (this._connectionState() !== WebSocketConnectionState.OFFLINE_PAUSED) {
-				this.transitionTo(WebSocketConnectionState.DISCONNECTED, 'MQTT desconectado');
+			if (
+				this._connectionState() !==
+				WebSocketConnectionState.OFFLINE_PAUSED
+			) {
+				this.transitionTo(
+					WebSocketConnectionState.DISCONNECTED,
+					'MQTT desconectado',
+				);
 			}
 			this._connected.set(false);
 		});
@@ -227,17 +263,23 @@ export class MqttService implements OnDestroy {
 		});
 
 		this.client.on('reconnect', () => {
-			this.transitionTo(WebSocketConnectionState.RECONNECTING, 'Tentativa de reconexão MQTT');
+			this.transitionTo(
+				WebSocketConnectionState.RECONNECTING,
+				'Tentativa de reconexão MQTT',
+			);
 		});
 	}
 
 	private handleMessage(topic: string, messageStr: string): void {
 		try {
 			const data = JSON.parse(messageStr) as MqttPayload;
-			
+
 			// Lógica de notificação pessoal
 			if (topic.includes('/notifications')) {
-				this.notificationService.show(data.payload.message || 'Nova notificação', data.payload.type || 'info');
+				this.notificationService.show(
+					data.payload.message || 'Nova notificação',
+					data.payload.type || 'info',
+				);
 				return;
 			}
 
@@ -289,7 +331,9 @@ export class MqttService implements OnDestroy {
 					break;
 				// Progresso pessoal
 				case 'progress:synced':
-					this.progressSyncedSubject.next(data.payload as SyncResponse);
+					this.progressSyncedSubject.next(
+						data.payload as SyncResponse,
+					);
 					break;
 			}
 		} catch (e) {
@@ -301,7 +345,10 @@ export class MqttService implements OnDestroy {
 		if (this.client) {
 			this.client.end(true);
 			this.client = null;
-			this.transitionTo(WebSocketConnectionState.DISCONNECTED, 'Desconexão manual');
+			this.transitionTo(
+				WebSocketConnectionState.DISCONNECTED,
+				'Desconexão manual',
+			);
 			this._connected.set(false);
 			this.subscribedTopics.clear();
 		}
@@ -316,9 +363,18 @@ export class MqttService implements OnDestroy {
 		this.client.subscribe(topic, { qos: 1 }, (err) => {
 			if (!err) {
 				this.subscribedTopics.add(topic);
-				logConnectionEvent(this.serviceName, 'subscribe', `Inscrito no tópico: ${topic}`, LogLevel.DEBUG);
+				logConnectionEvent(
+					this.serviceName,
+					'subscribe',
+					`Inscrito no tópico: ${topic}`,
+					LogLevel.DEBUG,
+				);
 			} else {
-				logWebSocketError(this.serviceName, err, `Falha ao inscrever: ${topic}`);
+				logWebSocketError(
+					this.serviceName,
+					err,
+					`Falha ao inscrever: ${topic}`,
+				);
 			}
 		});
 	}
@@ -343,25 +399,53 @@ export class MqttService implements OnDestroy {
 		return new Observable((observer) => {
 			const subscriptions = [
 				this.bookUpdated$.subscribe((event) => {
-					if (event.id === bookId) observer.next({ type: BookEvents.UPDATED, data: event });
+					if (event.id === bookId)
+						observer.next({
+							type: BookEvents.UPDATED,
+							data: event,
+						});
 				}),
 				this.chaptersUpdated$.subscribe((event) => {
-					if (event.bookId === bookId) observer.next({ type: BookEvents.CHAPTERS_UPDATED, data: event });
+					if (event.bookId === bookId)
+						observer.next({
+							type: BookEvents.CHAPTERS_UPDATED,
+							data: event,
+						});
 				}),
 				this.chapterScrapingStarted$.subscribe((event) => {
-					if (event.bookId === bookId) observer.next({ type: BookEvents.SCRAPING_STARTED, data: event });
+					if (event.bookId === bookId)
+						observer.next({
+							type: BookEvents.SCRAPING_STARTED,
+							data: event,
+						});
 				}),
 				this.chapterScrapingCompleted$.subscribe((event) => {
-					if (event.bookId === bookId) observer.next({ type: BookEvents.SCRAPING_COMPLETED, data: event });
+					if (event.bookId === bookId)
+						observer.next({
+							type: BookEvents.SCRAPING_COMPLETED,
+							data: event,
+						});
 				}),
 				this.chapterScrapingFailed$.subscribe((event) => {
-					if (event.bookId === bookId) observer.next({ type: BookEvents.SCRAPING_FAILED, data: event });
+					if (event.bookId === bookId)
+						observer.next({
+							type: BookEvents.SCRAPING_FAILED,
+							data: event,
+						});
 				}),
 				this.coverProcessed$.subscribe((event) => {
-					if (event.bookId === bookId) observer.next({ type: BookEvents.COVER_PROCESSED, data: event });
+					if (event.bookId === bookId)
+						observer.next({
+							type: BookEvents.COVER_PROCESSED,
+							data: event,
+						});
 				}),
 				this.coverSelected$.subscribe((event) => {
-					if (event.bookId === bookId) observer.next({ type: BookEvents.COVER_SELECTED, data: event });
+					if (event.bookId === bookId)
+						observer.next({
+							type: BookEvents.COVER_SELECTED,
+							data: event,
+						});
 				}),
 			];
 
@@ -375,23 +459,39 @@ export class MqttService implements OnDestroy {
 	watchChapter(chapterId: string, bookId: string): Observable<unknown> {
 		const chapterTopic = `books/events/chapter/${chapterId}`;
 		const bookTopic = `books/events/book/${bookId}`;
-		
+
 		this.subscribeTopic(chapterTopic);
 		this.subscribeTopic(bookTopic);
 
 		return new Observable((observer) => {
 			const subscriptions = [
 				this.chapterUpdated$.subscribe((event) => {
-					if (event.chapter?.id === chapterId) observer.next({ type: BookEvents.CHAPTER_UPDATED, data: event });
+					if (event.chapter?.id === chapterId)
+						observer.next({
+							type: BookEvents.CHAPTER_UPDATED,
+							data: event,
+						});
 				}),
 				this.chapterScrapingStarted$.subscribe((event) => {
-					if (event.chapterId === chapterId) observer.next({ type: BookEvents.SCRAPING_STARTED, data: event });
+					if (event.chapterId === chapterId)
+						observer.next({
+							type: BookEvents.SCRAPING_STARTED,
+							data: event,
+						});
 				}),
 				this.chapterScrapingCompleted$.subscribe((event) => {
-					if (event.chapterId === chapterId) observer.next({ type: BookEvents.SCRAPING_COMPLETED, data: event });
+					if (event.chapterId === chapterId)
+						observer.next({
+							type: BookEvents.SCRAPING_COMPLETED,
+							data: event,
+						});
 				}),
 				this.chapterScrapingFailed$.subscribe((event) => {
-					if (event.chapterId === chapterId) observer.next({ type: BookEvents.SCRAPING_FAILED, data: event });
+					if (event.chapterId === chapterId)
+						observer.next({
+							type: BookEvents.SCRAPING_FAILED,
+							data: event,
+						});
 				}),
 			];
 

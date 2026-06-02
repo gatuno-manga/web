@@ -12,7 +12,13 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { BookList } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
+import {
+	debounceTime,
+	distinctUntilChanged,
+	filter,
+	switchMap,
+	tap,
+} from 'rxjs';
 
 @Component({
 	selector: 'app-search',
@@ -91,7 +97,8 @@ export class SearchMoleculeComponent {
 
 		// Se o foco foi para um filho do componente (botão, link de resultado), não fecha
 		const host = (this.searchInput()?.nativeElement.closest('app-search') ??
-			this.searchInput()?.nativeElement.parentElement?.parentElement) as HTMLElement | null;
+			this.searchInput()?.nativeElement.parentElement
+				?.parentElement) as HTMLElement | null;
 
 		if (host && relatedTarget && host.contains(relatedTarget)) {
 			return;

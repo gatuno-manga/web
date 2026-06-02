@@ -46,12 +46,12 @@ export class ReadingProgressService {
 		this.isBrowser = isPlatformBrowser(platformId);
 		if (this.isBrowser) {
 			this.dbPromise = this.initDB();
-			
+
 			// Setup do debounce para I/O: agrupa por key e espera 1s após a última emissão
 			this.saveSubject
 				.pipe(
 					groupBy((data) => `${data.userId}_${data.chapterId}`),
-					mergeMap((group) => group.pipe(debounceTime(1000)))
+					mergeMap((group) => group.pipe(debounceTime(1000))),
 				)
 				.subscribe(async (data) => {
 					await this.executeSaveProgress(
@@ -145,9 +145,14 @@ export class ReadingProgressService {
 		if (!this.isBrowser || !this.dbPromise) return;
 
 		const targetUserId = userId || this.currentUserId;
-		
+
 		// Envia para o Subject que fará o debounce
-		this.saveSubject.next({ chapterId, bookId, pageIndex, userId: targetUserId });
+		this.saveSubject.next({
+			chapterId,
+			bookId,
+			pageIndex,
+			userId: targetUserId,
+		});
 		return Promise.resolve();
 	}
 

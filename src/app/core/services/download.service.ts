@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { environment } from '@environments/environment';
 import {
 	Book,
 	BookBasic,
@@ -15,7 +16,6 @@ import {
 } from '@models/offline.models';
 import { DBSchema, IDBPDatabase, openDB } from 'idb';
 import { BehaviorSubject, firstValueFrom, map, Observable } from 'rxjs';
-import { environment } from '@environments/environment';
 
 interface GatunoOfflineDB extends DBSchema {
 	books: {
@@ -204,16 +204,31 @@ export class DownloadService {
 			}
 
 			const chapters = syncData.chapters || [];
-			const syncTimestamp = syncData.syncTimestamp ? new Date(syncData.syncTimestamp) : new Date();
+			const syncTimestamp = syncData.syncTimestamp
+				? new Date(syncData.syncTimestamp)
+				: new Date();
 
 			if (!savedBook) {
 				let coverBlob: Blob;
 				try {
 					coverBlob = await this.fetchImageBlob(book.cover);
 				} catch (e) {
-					console.warn('Failed to download book cover, using placeholder', e);
+					console.warn(
+						'Failed to download book cover, using placeholder',
+						e,
+					);
 					// Create a simple 1x1 transparent pixel as fallback if cover fails
-					coverBlob = new Blob([new Uint8Array([71, 73, 70, 56, 57, 97, 1, 0, 1, 0, 128, 0, 0, 0, 0, 0, 255, 255, 255, 33, 249, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 2, 68, 1, 0, 59])], { type: 'image/gif' });
+					coverBlob = new Blob(
+						[
+							new Uint8Array([
+								71, 73, 70, 56, 57, 97, 1, 0, 1, 0, 128, 0, 0,
+								0, 0, 0, 255, 255, 255, 33, 249, 4, 1, 0, 0, 0,
+								0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 2, 68, 1,
+								0, 59,
+							]),
+						],
+						{ type: 'image/gif' },
+					);
 				}
 				await this.saveBook(book, coverBlob, syncTimestamp);
 			}
@@ -237,7 +252,10 @@ export class DownloadService {
 					// Baixar conteúdo do capítulo (imagens, texto ou documento)
 					await this.processAndSaveChapter(book.id, chapterData);
 				} catch (chapterError) {
-					console.error(`Failed to sync chapter ${chapterData.id}`, chapterError);
+					console.error(
+						`Failed to sync chapter ${chapterData.id}`,
+						chapterError,
+					);
 					// Continue with next chapter
 				}
 			}
@@ -245,16 +263,22 @@ export class DownloadService {
 			// Atualizar timestamp da última sincronização
 			const currentSavedBook = await this.getBook(book.id);
 			if (currentSavedBook) {
-				await this.saveBook(book, currentSavedBook.cover, syncTimestamp);
+				await this.saveBook(
+					book,
+					currentSavedBook.cover,
+					syncTimestamp,
+				);
 			}
-
 		} catch (error) {
 			console.error('Offline sync failed', error);
 			throw error;
 		}
 	}
 
-	private async processAndSaveChapter(bookId: string, chapter: Chapter): Promise<void> {
+	private async processAndSaveChapter(
+		bookId: string,
+		chapter: Chapter,
+	): Promise<void> {
 		const contentType: ContentType = chapter.contentType || 'image';
 		const pages = chapter.pages || [];
 
@@ -321,7 +345,10 @@ export class DownloadService {
 							});
 							return { index, blob };
 						} catch (e) {
-							console.warn(`Failed to download page ${page.path}`, e);
+							console.warn(
+								`Failed to download page ${page.path}`,
+								e,
+							);
 							completedCount++; // Increment anyway to keep progress moving
 							return { index, blob: null as any }; // Will handle nulls below if needed
 						}
@@ -576,9 +603,12 @@ export class DownloadService {
 	private resolveAssetUrl(path: string): string {
 		if (!path) return '';
 		// Already absolute URL - return as-is
-		if (path.startsWith('http://') || path.startsWith('https://')) return path;
+		if (path.startsWith('http://') || path.startsWith('https://'))
+			return path;
 		// Relative URL: resolve against API base URL
-		const base = (environment.apiURL || '').replace(/\/api\/?$/, '').replace(/\/+$/, '');
+		const base = (environment.apiURL || '')
+			.replace(/\/api\/?$/, '')
+			.replace(/\/+$/, '');
 		const cleanPath = path.replace(/^\/+/, '');
 		return `${base}/${cleanPath}`;
 	}
@@ -591,7 +621,9 @@ export class DownloadService {
 	private toProxyRelativeUrl(url: string): string {
 		if (!isPlatformBrowser(this.platformId)) return url;
 		try {
-			const apiOrigin = new URL(environment.apiURL || window.location.origin).origin;
+			const apiOrigin = new URL(
+				environment.apiURL || window.location.origin,
+			).origin;
 			const parsed = new URL(url);
 			if (parsed.origin === apiOrigin) {
 				// Return just the path+query so the request goes through the
@@ -605,9 +637,12 @@ export class DownloadService {
 	}
 
 	private isExternalUrl(url: string): boolean {
-		if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
+		if (!url.startsWith('http://') && !url.startsWith('https://'))
+			return false;
 		try {
-			const apiOrigin = new URL(environment.apiURL || window.location.origin).origin;
+			const apiOrigin = new URL(
+				environment.apiURL || window.location.origin,
+			).origin;
 			const urlOrigin = new URL(url).origin;
 			return urlOrigin !== apiOrigin;
 		} catch {
@@ -623,7 +658,9 @@ export class DownloadService {
 		if (this.isExternalUrl(resolvedUrl)) {
 			const response = await fetch(resolvedUrl);
 			if (!response.ok) {
-				throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+				throw new Error(
+					`Failed to fetch image: ${response.status} ${response.statusText}`,
+				);
 			}
 			return response.blob();
 		}
@@ -652,11 +689,14 @@ export class DownloadService {
 			// Use native fetch for external URLs to avoid CORS from Angular interceptor headers
 			fetch(resolvedUrl)
 				.then((response) => {
-					if (!response.ok) throw new Error(`HTTP ${response.status}`);
+					if (!response.ok)
+						throw new Error(`HTTP ${response.status}`);
 					return response.blob();
 				})
 				.then(triggerDownload)
-				.catch((err) => console.error('Failed to save image to device', err));
+				.catch((err) =>
+					console.error('Failed to save image to device', err),
+				);
 			return;
 		}
 

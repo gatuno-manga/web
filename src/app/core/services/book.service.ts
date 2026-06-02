@@ -20,8 +20,8 @@ import {
 import { Page } from '@models/miscellaneous.models';
 import { firstValueFrom, from, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { MqttService } from './mqtt.service';
 import { DownloadService } from './download.service';
+import { MqttService } from './mqtt.service';
 import { SensitiveContentService } from './sensitive-content.service';
 import { TagsService } from './tags.service';
 import { UserTokenService } from './user-token.service';
@@ -160,7 +160,12 @@ export class BookService {
 				}),
 				catchError((err) => {
 					if (!isPlatformBrowser(this.platformId)) {
-						return of({ data: [], page: 1, lastPage: 0, total: 0 } as PaginatedBookResponse);
+						return of({
+							data: [],
+							page: 1,
+							lastPage: 0,
+							total: 0,
+						} as PaginatedBookResponse);
 					}
 					console.warn(
 						'GraphQL fetch failed, falling back to REST/Offline',

@@ -9,12 +9,12 @@ import {
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { LanguageService } from '@core/services/language.service';
 import { LocalStorageService } from '@core/services/local-storage.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { SearchService } from '@core/services/search.service';
 import { SettingsService } from '@core/services/settings.service';
 import { AppTheme, ThemeService } from '@core/services/theme.service';
-import { LanguageService } from '@core/services/language.service';
 import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,
@@ -60,16 +60,18 @@ export class AppearanceComponent implements OnInit {
 		{ value: 'true-dark', label: 'True Dark (OLED)' },
 	];
 
-	languageOptions = computed(() => 
-		this.languageService.languages().map(lang => ({
+	languageOptions = computed(() =>
+		this.languageService.languages().map((lang) => ({
 			value: lang.code,
-			label: lang.name
-		}))
+			label: lang.name,
+		})),
 	);
 
 	showPage = computed(() => {
 		const q = this.globalSearchQuery().toLowerCase();
-		return 'aparência visual tema cores layout livros listagem idioma linguagem'.includes(q);
+		return 'aparência visual tema cores layout livros listagem idioma linguagem'.includes(
+			q,
+		);
 	});
 
 	constructor() {

@@ -9,8 +9,8 @@ import {
 	signal,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { MqttService } from '@core/services/mqtt.service';
 import { DashboardService } from '@core/services/dashboard.service';
+import { MqttService } from '@core/services/mqtt.service';
 import {
 	UpdateCompletedEvent,
 	UpdateFailedEvent,
@@ -108,7 +108,10 @@ export class MonitoringComponent implements OnInit, OnDestroy {
 	}
 
 	setupWebSocket() {
-		if (!this.wsService.connectionState() || String(this.wsService.connectionState()) !== 'connected') {
+		if (
+			!this.wsService.connectionState() ||
+			String(this.wsService.connectionState()) !== 'connected'
+		) {
 			this.wsService.connect();
 		}
 

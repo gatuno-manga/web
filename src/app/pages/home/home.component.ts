@@ -135,15 +135,15 @@ export class HomeComponent {
 			const books: BookList[] = bookResponses
 				.filter(Boolean)
 				.map((book) => ({
-					id: book!.id,
-					title: book!.title,
-					cover: book!.cover,
-					description: book!.description,
-					tags: book!.tags,
-					scrapingStatus: book!.scrapingStatus,
-					blurHash: book!.blurHash,
-					dominantColor: book!.dominantColor,
-					metadata: book!.metadata,
+					id: book?.id,
+					title: book?.title,
+					cover: book?.cover,
+					description: book?.description,
+					tags: book?.tags,
+					scrapingStatus: book?.scrapingStatus,
+					blurHash: book?.blurHash,
+					dominantColor: book?.dominantColor,
+					metadata: book?.metadata,
 				}));
 
 			this.continueReadingBooks.set(books);

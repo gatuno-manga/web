@@ -244,7 +244,10 @@ export class LoginComponent implements OnInit {
 				});
 			} else {
 				// Erros silenciosos no autofill (ex: cancelado pelo navegador ou sem suporte)
-				console.debug('Conditional UI passkey login skipped or failed', error);
+				console.debug(
+					'Conditional UI passkey login skipped or failed',
+					error,
+				);
 			}
 		}
 	}

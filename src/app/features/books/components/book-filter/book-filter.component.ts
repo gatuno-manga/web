@@ -9,6 +9,7 @@ import {
 	output,
 	signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NotificationService } from '@core/services/notification.service';
@@ -30,7 +31,6 @@ import {
 } from '@ui/molecules/notification/custom-components/random-filter-modal/random-filter-modal.component';
 import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';
 import { debounceTime, Observable, Subject, tap } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface ActiveFilter {
 	id: string;

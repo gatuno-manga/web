@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
-	computed,
 	ElementRef,
 	HostListener,
 	inject,
@@ -15,8 +14,8 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { AppTheme, ThemeService } from '@core/services/theme.service';
-import { UserTokenService } from '@core/services/user-token.service';
 import { UserService } from '@core/services/user.service';
+import { UserTokenService } from '@core/services/user-token.service';
 import { SensitiveContentResponse } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { AsideComponent } from '@ui/organisms/aside/aside.component';
@@ -62,9 +61,11 @@ export class UserMenuOrganismComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.sensitiveContentService.getSensitiveContent().subscribe((filters) => {
-			this.availableFilters.set(filters);
-		});
+		this.sensitiveContentService
+			.getSensitiveContent()
+			.subscribe((filters) => {
+				this.availableFilters.set(filters);
+			});
 	}
 
 	toggle() {

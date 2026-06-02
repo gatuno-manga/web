@@ -87,7 +87,6 @@ type RuntimeProcess = {
 	};
 };
 
-
 const resolveServerApiBaseUrlFromRuntime = (): string | null => {
 	const runtimeProcess = (globalThis as { process?: RuntimeProcess }).process;
 	const env = runtimeProcess?.env;

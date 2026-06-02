@@ -23,7 +23,6 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { MqttService } from '@core/services/mqtt.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
 import { DownloadService } from '@core/services/download.service';
@@ -31,6 +30,7 @@ import { HeaderStateService } from '@core/services/header-state.service';
 import { HighlightService } from '@core/services/highlight.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { MqttService } from '@core/services/mqtt.service';
 import { NetworkStatusService } from '@core/services/network-status.service';
 import { NotificationSeverity } from '@core/services/notification';
 import { NotificationService } from '@core/services/notification.service';
@@ -238,7 +238,9 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 							next: (book) => {
 								if (book) {
 									this.bookBlurHash.set(book.blurHash);
-									this.bookDominantColor.set(book.dominantColor);
+									this.bookDominantColor.set(
+										book.dominantColor,
+									);
 									this.bookMetadata.set(book.metadata);
 								}
 							},
@@ -270,7 +272,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			{ injector: this.injector },
 		);
 	}
-
 
 	ngOnInit(): void {
 		this.headerStateService.setFixed(true);
@@ -323,7 +324,11 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		}
 
 		this.ngZone.runOutsideAngular(() => {
-			if (!this.bookWebsocketService.connectionState() || String(this.bookWebsocketService.connectionState()) !== 'connected') {
+			if (
+				!this.bookWebsocketService.connectionState() ||
+				String(this.bookWebsocketService.connectionState()) !==
+					'connected'
+			) {
 				this.bookWebsocketService.connect();
 			}
 

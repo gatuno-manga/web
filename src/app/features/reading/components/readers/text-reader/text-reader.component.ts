@@ -56,9 +56,8 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	private settingsService = inject(SettingsService);
 	private highlightService = inject(HighlightService);
 	private sanitizer = inject(DomSanitizer);
-
-	private lastIntersectingElement: Element | null = null;
 	private intersectionObserver: IntersectionObserver | null = null;
+	private lastIntersectingElement: Element | null = null;
 
 	settings = toSignal(this.settingsService.settings$, {
 		initialValue: this.settingsService.getSettings(),

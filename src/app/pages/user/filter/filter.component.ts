@@ -119,7 +119,9 @@ export class FilterComponent implements OnInit {
 		const sensitiveContent =
 			allowedNames || this.sensitiveContentService.getContentAllow();
 		try {
-			const tags = await firstValueFrom(this.tagsService.getTags({ sensitiveContent }));
+			const tags = await firstValueFrom(
+				this.tagsService.getTags({ sensitiveContent }),
+			);
 			this.tagsList.set(tags);
 		} catch (err) {
 			console.error('Error loading tags', err);
@@ -138,20 +140,18 @@ export class FilterComponent implements OnInit {
 	async loadSensitiveContent() {
 		this.isLoading.set(true);
 		try {
-			const list = await firstValueFrom(this.sensitiveContentService.getSensitiveContent());
+			const list = await firstValueFrom(
+				this.sensitiveContentService.getSensitiveContent(),
+			);
 			this.sensitiveContentList.update((current) => [
 				...current,
 				...list,
 			]);
 			this.mapNamesToIds();
-		} catch (err) {
+		} catch (_err) {
 			try {
-				const offlineBooks =
-					await this.downloadService.getAllBooks();
-				const contentMap = new Map<
-					string,
-					SensitiveContentResponse
-				>();
+				const offlineBooks = await this.downloadService.getAllBooks();
+				const contentMap = new Map<string, SensitiveContentResponse>();
 
 				for (const book of offlineBooks) {
 					if (book.sensitiveContent) {
@@ -167,10 +167,7 @@ export class FilterComponent implements OnInit {
 					...offlineList,
 				]);
 			} catch (e) {
-				console.error(
-					'Error loading offline sensitive content',
-					e,
-				);
+				console.error('Error loading offline sensitive content', e);
 			} finally {
 				this.mapNamesToIds();
 			}

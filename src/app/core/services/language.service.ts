@@ -1,11 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import {
-	Inject,
-	Injectable,
-	PLATFORM_ID,
-	signal,
-} from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { LocalStorageService } from './local-storage.service';
 
 const LANGUAGE_KEY = 'app-language';
@@ -28,11 +23,13 @@ export class LanguageService {
 		private http: HttpClient,
 	) {
 		if (isPlatformBrowser(this.platformId)) {
-			const savedLang = this.localStorageService.get<string>(LANGUAGE_KEY);
+			const savedLang =
+				this.localStorageService.get<string>(LANGUAGE_KEY);
 			const browserLang = navigator.language;
-			
+
 			// Prioritize saved language, then browser language (normalized), then default 'pt-BR'
-			const initialLang = savedLang || this.normalizeBrowserLang(browserLang) || 'pt-BR';
+			const initialLang =
+				savedLang || this.normalizeBrowserLang(browserLang) || 'pt-BR';
 			this.currentLanguage.set(initialLang);
 
 			this.loadSupportedLanguages();
@@ -41,7 +38,7 @@ export class LanguageService {
 
 	private normalizeBrowserLang(lang: string): string | null {
 		if (!lang) return null;
-		// Simple normalization for common cases if needed, 
+		// Simple normalization for common cases if needed,
 		// but we should ideally match against supported languages once loaded.
 		return lang;
 	}

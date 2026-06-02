@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { ThemeService } from '@core/services/theme.service';
@@ -28,7 +28,9 @@ describe('HeaderComponent', () => {
 		profileSignal: signal({ profileImageUrl: 'test-url' }),
 	};
 	const mockBookService = {
-		getBooks: jasmine.createSpy('getBooks').and.returnValue(of({ data: [] })),
+		getBooks: jasmine
+			.createSpy('getBooks')
+			.and.returnValue(of({ data: [] })),
 	};
 
 	beforeEach(async () => {

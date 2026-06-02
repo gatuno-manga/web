@@ -111,37 +111,45 @@ export class SecurityComponent implements OnInit {
 
 	async loadSessions(): Promise<void> {
 		try {
-			this.sessions = await firstValueFrom(this.securityService.getSessions());
+			this.sessions = await firstValueFrom(
+				this.securityService.getSessions(),
+			);
 			this.cdr.markForCheck();
-		} catch (error) {
+		} catch (_error) {
 			this.setError('Falha ao carregar sessões ativas.');
 		}
 	}
 
 	async loadAuditHistory(): Promise<void> {
 		try {
-			const history = await firstValueFrom(this.securityService.getAuditHistory(1, 20));
+			const history = await firstValueFrom(
+				this.securityService.getAuditHistory(1, 20),
+			);
 			this.auditItems = history.items ?? [];
 			this.cdr.markForCheck();
-		} catch (error) {
+		} catch (_error) {
 			this.setError('Falha ao carregar histórico de acessos.');
 		}
 	}
 
 	async loadPasskeys(): Promise<void> {
 		try {
-			this.passkeys = await firstValueFrom(this.securityService.listPasskeys());
+			this.passkeys = await firstValueFrom(
+				this.securityService.listPasskeys(),
+			);
 			this.cdr.markForCheck();
-		} catch (error) {
+		} catch (_error) {
 			this.setError('Falha ao carregar passkeys.');
 		}
 	}
 
 	async loadMfaStatus(): Promise<void> {
 		try {
-			this.mfaStatus = await firstValueFrom(this.securityService.getMfaStatus());
+			this.mfaStatus = await firstValueFrom(
+				this.securityService.getMfaStatus(),
+			);
 			this.cdr.markForCheck();
-		} catch (error) {
+		} catch (_error) {
 			this.setError('Falha ao carregar status de MFA.');
 		}
 	}
@@ -149,10 +157,15 @@ export class SecurityComponent implements OnInit {
 	async revokeSession(sessionId: string): Promise<void> {
 		this.clearMessages();
 		try {
-			await firstValueFrom(this.securityService.revokeSession(sessionId, 'revogada pelo usuário'));
+			await firstValueFrom(
+				this.securityService.revokeSession(
+					sessionId,
+					'revogada pelo usuário',
+				),
+			);
 			this.setFeedback('Sessão encerrada com sucesso.');
 			await this.loadSessions();
-		} catch (error) {
+		} catch (_error) {
 			this.setError('Falha ao encerrar sessão.');
 		}
 	}
@@ -160,12 +173,14 @@ export class SecurityComponent implements OnInit {
 	async revokeOtherSessions(): Promise<void> {
 		this.clearMessages();
 		try {
-			const { revokedSessions } = await firstValueFrom(this.securityService.revokeOtherSessions());
+			const { revokedSessions } = await firstValueFrom(
+				this.securityService.revokeOtherSessions(),
+			);
 			this.setFeedback(
 				`Sessões encerradas com sucesso. Total revogado: ${revokedSessions}.`,
 			);
 			await this.loadSessions();
-		} catch (error) {
+		} catch (_error) {
 			this.setError('Falha ao encerrar outras sessões.');
 		}
 	}
@@ -182,12 +197,14 @@ export class SecurityComponent implements OnInit {
 	async beginTotpSetup(): Promise<void> {
 		this.clearMessages();
 		try {
-			this.mfaSetup = await firstValueFrom(this.securityService.beginTotpSetup());
+			this.mfaSetup = await firstValueFrom(
+				this.securityService.beginTotpSetup(),
+			);
 			this.backupCodes = [];
 			this.setFeedback(
 				'Escaneie o QR/URI no app autenticador e confirme com o código.',
 			);
-		} catch (error) {
+		} catch (_error) {
 			this.setError('Falha ao iniciar configuração de MFA.');
 		}
 	}
@@ -200,13 +217,15 @@ export class SecurityComponent implements OnInit {
 
 		this.clearMessages();
 		try {
-			const result = await firstValueFrom(this.securityService.verifyTotpSetup(this.mfaSetupCode.trim()));
+			const result = await firstValueFrom(
+				this.securityService.verifyTotpSetup(this.mfaSetupCode.trim()),
+			);
 			this.backupCodes = result.backupCodes ?? [];
 			this.mfaSetup = null;
 			this.mfaSetupCode = '';
 			this.setFeedback('MFA habilitado com sucesso.');
 			await this.loadMfaStatus();
-		} catch (error) {
+		} catch (_error) {
 			this.setError('Código MFA inválido para ativação.');
 		}
 	}
@@ -219,13 +238,15 @@ export class SecurityComponent implements OnInit {
 
 		this.clearMessages();
 		try {
-			await firstValueFrom(this.securityService.disableTotp(this.mfaDisableCode.trim()));
+			await firstValueFrom(
+				this.securityService.disableTotp(this.mfaDisableCode.trim()),
+			);
 			this.mfaDisableCode = '';
 			this.backupCodes = [];
 			this.isDisablingMfa = false;
 			this.setFeedback('MFA desativado com sucesso.');
 			await this.loadMfaStatus();
-		} catch (error) {
+		} catch (_error) {
 			this.setError('Falha ao desativar MFA. Verifique o código.');
 		}
 	}
@@ -268,7 +289,7 @@ export class SecurityComponent implements OnInit {
 			await firstValueFrom(this.securityService.deletePasskey(passkeyId));
 			this.setFeedback('Passkey removida com sucesso.');
 			await this.loadPasskeys();
-		} catch (error) {
+		} catch (_error) {
 			this.setError('Falha ao remover passkey.');
 		}
 	}

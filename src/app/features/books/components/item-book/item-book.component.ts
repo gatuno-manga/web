@@ -1,5 +1,6 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
+	ChangeDetectorRef,
 	Component,
 	computed,
 	effect,
@@ -7,7 +8,6 @@ import {
 	input,
 	output,
 	signal,
-	ChangeDetectorRef,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
@@ -22,7 +22,6 @@ import { ContextMenuItem } from '@models/context-menu.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { firstValueFrom } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 
 @Component({
 	selector: 'app-item-book',
@@ -64,37 +63,52 @@ export class ItemBookComponent {
 	isDownloaded = signal(false);
 
 	// Fetch dynamic progress updates from DownloadService
-	downloadProgress = signal<import('@core/models/offline.models').DownloadProgress[]>([]);
+	downloadProgress = signal<
+		import('@core/models/offline.models').DownloadProgress[]
+	>([]);
 	isDownloadingBook = signal(false);
 	downloadingTotalChapters = signal(0);
 	downloadingCurrentChapter = signal(0);
 
 	isDownloading = computed(() => {
 		const progresses = this.downloadProgress() || [];
-		const isProgressing = progresses.some(p => p.status === 'downloading' || p.status === 'pending');
+		const isProgressing = progresses.some(
+			(p) => p.status === 'downloading' || p.status === 'pending',
+		);
 		return this.isDownloadingBook() || isProgressing;
 	});
 
 	downloadPercent = computed(() => {
 		const progresses = this.downloadProgress() || [];
-		
+
 		if (this.isDownloadingBook()) {
 			const totalChapters = this.downloadingTotalChapters();
 			if (totalChapters === 0) return 0;
-			
+
 			const currentChapIdx = this.downloadingCurrentChapter();
-			const activeProgress = progresses.find(p => p.status === 'downloading');
+			const activeProgress = progresses.find(
+				(p) => p.status === 'downloading',
+			);
 			let currentChapPercent = 0;
 			if (activeProgress && activeProgress.total > 0) {
-				currentChapPercent = activeProgress.current / activeProgress.total;
+				currentChapPercent =
+					activeProgress.current / activeProgress.total;
 			}
-			
-			return ((currentChapIdx + currentChapPercent) / totalChapters) * 100;
+
+			return (
+				((currentChapIdx + currentChapPercent) / totalChapters) * 100
+			);
 		}
-		
+
 		if (progresses.length === 0) return 0;
-		const total = progresses.reduce((acc, curr) => acc + (curr.total || 0), 0);
-		const current = progresses.reduce((acc, curr) => acc + (curr.current || 0), 0);
+		const total = progresses.reduce(
+			(acc, curr) => acc + (curr.total || 0),
+			0,
+		);
+		const current = progresses.reduce(
+			(acc, curr) => acc + (curr.current || 0),
+			0,
+		);
 		return total > 0 ? (current / total) * 100 : 0;
 	});
 
@@ -270,7 +284,7 @@ export class ItemBookComponent {
 			this.downloadingTotalChapters.set(chapters.length);
 			this.downloadingCurrentChapter.set(0);
 			this.cdr.markForCheck();
-			
+
 			this.notificationService.info(
 				`Baixando ${chapters.length} capítulos em segundo plano.`,
 				'Download iniciado',

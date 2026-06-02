@@ -9,9 +9,9 @@ import {
 	PLATFORM_ID,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { MqttService } from '@core/services/mqtt.service';
 import { DashboardService } from '@core/services/dashboard.service';
 import { MetaDataService } from '@core/services/meta-data.service';
+import { MqttService } from '@core/services/mqtt.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import {
 	DashboardOverview,

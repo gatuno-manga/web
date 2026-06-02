@@ -95,7 +95,9 @@ export class ProfileComponent {
 
 		this.isLoading = true;
 		try {
-			await firstValueFrom(this.userService.updateProfile(this.profileForm.value));
+			await firstValueFrom(
+				this.userService.updateProfile(this.profileForm.value),
+			);
 			this.profileForm.markAsPristine();
 		} catch (error) {
 			console.error('Error saving profile', error);

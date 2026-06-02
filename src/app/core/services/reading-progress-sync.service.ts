@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable, OnDestroy, signal, inject } from '@angular/core';
+import { Inject, Injectable, inject, OnDestroy, signal } from '@angular/core';
 import { ENVIRONMENT, Environment } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
 import {
@@ -16,13 +16,13 @@ import {
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
+import { MqttService } from './mqtt.service';
 import { NetworkStatusService } from './network-status.service';
 import {
 	ReadingProgress,
 	ReadingProgressService,
 } from './reading-progress.service';
 import { UserTokenService } from './user-token.service';
-import { MqttService } from './mqtt.service';
 
 export interface SyncStatus {
 	connected: boolean;
@@ -41,7 +41,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private networkSubscription: Subscription | null = null;
 	private readonly serviceName = 'ReadingProgressSync';
 	private readonly baseUrl = 'users/me/reading-progress';
-	
+
 	private mqttService = inject(MqttService);
 
 	// Estado da sincronização usando Signals
@@ -69,7 +69,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 		private localProgressService: ReadingProgressService,
 		private networkStatusService: NetworkStatusService,
 		private backgroundSyncService: BackgroundSyncRegistrationService,
-		@Inject(ENVIRONMENT) private env: Environment,
+		@Inject(ENVIRONMENT) _env: Environment,
 		@Inject(WINDOW) private window: Window,
 	) {
 		this.isBrowser = typeof this.window.location !== 'undefined';
@@ -86,41 +86,44 @@ export class ReadingProgressSyncService implements OnDestroy {
 	}
 
 	private setupNetworkListener(): void {
-		this.networkSubscription = this.networkStatusService.wentOnline$.subscribe(() => {
-			if (this.pendingChanges.size > 0) {
-				this.syncPendingChanges();
-			}
-		});
+		this.networkSubscription =
+			this.networkStatusService.wentOnline$.subscribe(() => {
+				if (this.pendingChanges.size > 0) {
+					this.syncPendingChanges();
+				}
+			});
 	}
 
 	private setupMqttListeners(): void {
-		this.mqttSubscription = this.mqttService.progressSynced$.subscribe(async (response: SyncResponse) => {
-			logConnectionEvent(
-				this.serviceName,
-				'event',
-				'Resposta de sincronização recebida via MQTT',
-				LogLevel.DEBUG,
-			);
-
-			if (response.success && response.progress) {
-				const progress = response.progress;
-				await this.localProgressService.saveProgress(
-					progress.chapterId,
-					progress.bookId,
-					progress.pageIndex,
-				);
-				this.progressSyncedSubject.next(progress);
-			}
-
-			if (response.conflict) {
+		this.mqttSubscription = this.mqttService.progressSynced$.subscribe(
+			async (response: SyncResponse) => {
 				logConnectionEvent(
 					this.serviceName,
 					'event',
-					'Conflito de sincronização detectado',
-					LogLevel.WARN,
+					'Resposta de sincronização recebida via MQTT',
+					LogLevel.DEBUG,
 				);
-			}
-		});
+
+				if (response.success && response.progress) {
+					const progress = response.progress;
+					await this.localProgressService.saveProgress(
+						progress.chapterId,
+						progress.bookId,
+						progress.pageIndex,
+					);
+					this.progressSyncedSubject.next(progress);
+				}
+
+				if (response.conflict) {
+					logConnectionEvent(
+						this.serviceName,
+						'event',
+						'Conflito de sincronização detectado',
+						LogLevel.WARN,
+					);
+				}
+			},
+		);
 	}
 
 	connect(): void {
@@ -169,7 +172,10 @@ export class ReadingProgressSyncService implements OnDestroy {
 		this.syncViaHttp(progressData)
 			.then(() => {
 				this.pendingChanges.delete(chapterId);
-				this.updateSyncStatus({ pendingChanges: this.pendingChanges.size, lastSyncAt: new Date() });
+				this.updateSyncStatus({
+					pendingChanges: this.pendingChanges.size,
+					lastSyncAt: new Date(),
+				});
 			})
 			.catch(() => {
 				logConnectionEvent(
@@ -356,21 +362,5 @@ export class ReadingProgressSyncService implements OnDestroy {
 			...state,
 			...partial,
 		}));
-	}
-
-	private remoteToLocal(
-		remote: RemoteReadingProgress,
-		userId: string,
-	): ReadingProgress {
-		return {
-			id: `${userId}_${remote.chapterId}`,
-			chapterId: remote.chapterId,
-			bookId: remote.bookId,
-			userId: userId,
-			pageIndex: remote.pageIndex,
-			updatedAt: remote.updatedAt
-				? new Date(remote.updatedAt)
-				: new Date(),
-		};
 	}
 }

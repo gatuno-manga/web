@@ -10,12 +10,12 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { MqttService } from '@core/services/mqtt.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { DownloadService } from '@core/services/download.service';
 import { DownloadManagerService } from '@core/services/download-manager.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { MqttService } from '@core/services/mqtt.service';
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
 import { NotificationService } from '@core/services/notification.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
