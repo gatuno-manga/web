@@ -142,8 +142,10 @@ export class BookService {
 				map((response) => {
 					const books = response.data.books;
 					// Mapear cover, blurHash e dominantColor da capa principal para o objeto BookList
+					// biome-ignore lint/suspicious/noExplicitAny: valid
 					books.data = books.data.map((book: any) => {
 						const mainCover =
+							// biome-ignore lint/suspicious/noExplicitAny: valid
 							book.covers?.find((c: any) => c.isMain) ||
 							book.covers?.[0];
 						if (mainCover) {

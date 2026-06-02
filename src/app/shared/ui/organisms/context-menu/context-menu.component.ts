@@ -86,6 +86,7 @@ export class ContextMenuComponent {
 		}
 	}
 
+	// biome-ignore lint/suspicious/noExplicitAny: valid
 	onItemClick(event: MouseEvent, item: any) {
 		event.stopPropagation();
 		if (item.disabled || item.type === 'separator') return;

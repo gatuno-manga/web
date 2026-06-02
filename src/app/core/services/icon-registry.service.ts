@@ -28,6 +28,7 @@ export class IconRegistryService {
 
 	getIcon(name: string): Observable<string> {
 		if (this.iconCache.has(name)) {
+			// biome-ignore lint/style/noNonNullAssertion: valid
 			return of(this.iconCache.get(name)!);
 		}
 
@@ -40,6 +41,7 @@ export class IconRegistryService {
 		}
 
 		if (this.inFlightRequests.has(name)) {
+			// biome-ignore lint/style/noNonNullAssertion: valid
 			return this.inFlightRequests.get(name)!;
 		}
 

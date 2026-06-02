@@ -13,7 +13,7 @@ export class LocalStorageService {
 		this.isBrowser = isPlatformBrowser(this.platformId);
 	}
 
-	set(key: string, value: any) {
+	set(key: string, value: unknown) {
 		if (this.isBrowser) {
 			const stringValue =
 				typeof value === 'string' ? value : JSON.stringify(value);

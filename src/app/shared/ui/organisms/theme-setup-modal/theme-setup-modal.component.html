@@ -7,7 +7,7 @@
 
 		<div class="theme-options">
 			@for (theme of themes; track theme.id) {
-				<button
+				<button type="button"
 					class="theme-card"
 					[class.selected]="themeService.currentTheme() === theme.id"
 					(click)="selectTheme(theme.id)"

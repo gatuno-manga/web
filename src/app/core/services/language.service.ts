@@ -18,7 +18,7 @@ export class LanguageService {
 	public currentLanguage = signal<string>('pt-BR');
 
 	constructor(
-		@Inject(PLATFORM_ID) private platformId: Object,
+		@Inject(PLATFORM_ID) private platformId: object,
 		private localStorageService: LocalStorageService,
 		private http: HttpClient,
 	) {

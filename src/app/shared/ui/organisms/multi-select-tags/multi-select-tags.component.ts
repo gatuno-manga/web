@@ -98,7 +98,8 @@ export class MultiSelectTagsComponent {
 		} else {
 			// From Neutral to Selected
 			const totalActive = selected.length + excluded.length;
-			if (this.maxSelection() && totalActive >= this.maxSelection()!) {
+			const max = this.maxSelection();
+			if (max && totalActive >= max) {
 				// Reached limit, maybe emit warning? For now just block.
 				return;
 			}

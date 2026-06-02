@@ -32,7 +32,7 @@ import { UserTokenService } from './user-token.service';
 
 export interface MqttPayload {
 	event: string;
-	payload: any;
+	payload: unknown;
 }
 
 @Injectable({
@@ -450,7 +450,9 @@ export class MqttService implements OnDestroy {
 			];
 
 			return () => {
-				subscriptions.forEach((sub) => sub.unsubscribe());
+				subscriptions.forEach((sub) => {
+					sub.unsubscribe();
+				});
 				this.unsubscribeTopic(topic);
 			};
 		});
@@ -496,7 +498,9 @@ export class MqttService implements OnDestroy {
 			];
 
 			return () => {
-				subscriptions.forEach((sub) => sub.unsubscribe());
+				subscriptions.forEach((sub) => {
+					sub.unsubscribe();
+				});
 				this.unsubscribeTopic(chapterTopic);
 				// Não damos unsubscribe do bookTopic porque ele pode estar sendo usado por watchBook simultaneamente,
 				// idealmente haveria um ref count por tópico.

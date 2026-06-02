@@ -29,7 +29,7 @@ export class AuthQueueService {
 		this.refreshTokenSubject.next(token);
 	}
 
-	notifyFailure(_error: any): void {
+	notifyFailure(_error: unknown): void {
 		this.hasError = true;
 		this.isRefreshingSubject.next(false);
 		this.refreshTokenSubject.next(null);

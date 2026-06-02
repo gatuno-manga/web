@@ -37,6 +37,7 @@ export class BackgroundSyncRegistrationService {
 		try {
 			const registration = await navigator.serviceWorker.ready;
 			// Usando 'any' pois SyncManager não está no tipo padrão de ServiceWorkerRegistration em todos os ambientes
+			// biome-ignore lint/suspicious/noExplicitAny: valid
 			await (registration as any).sync.register(tagName);
 
 			logConnectionEvent(

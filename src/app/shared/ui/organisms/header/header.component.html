@@ -4,7 +4,7 @@
 		<button type="button" class="menu-btn" (click)="toggleMenu.emit()" aria-label="Abrir menu">
 			<app-icons name="list" size="24" />
 		</button>
-		<a id="logo" [routerLink]="['/']" [class.dark-theme]="isDarkTheme()">
+		<a id="logo" [routerLink]="['/']" [class.dark-theme]="isDarkTheme()" aria-label="Logo">
 			<app-icons name="logo" size="48" />
 		</a>
 		}

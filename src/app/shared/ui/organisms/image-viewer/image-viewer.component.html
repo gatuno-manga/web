@@ -8,6 +8,7 @@
 		<app-icons name="close" />
 	</button>
 	<div class="image-container">
+		<!-- biome-ignore lint/a11y/useAltText: binding -->
 		<img [src]="imageUrl" [alt]="imageTitle" (load)="onImageLoad()" />
 		@if(imageTitle) {
 		<div class="image-title">{{ imageTitle }}</div>

@@ -350,7 +350,7 @@ export class DownloadService {
 								e,
 							);
 							completedCount++; // Increment anyway to keep progress moving
-							return { index, blob: null as any }; // Will handle nulls below if needed
+							return { index, blob: null as unknown as Blob }; // Will handle nulls below if needed
 						}
 					},
 				);
@@ -485,6 +485,7 @@ export class DownloadService {
 		const sortedBlobs = results
 			.sort((a, b) => a.index - b.index)
 			.filter((r) => r.blob !== null)
+			// biome-ignore lint/style/noNonNullAssertion: valid
 			.map((r) => r.blob!);
 
 		if (sortedBlobs.length === 0 && chapter.pages.length > 0) {

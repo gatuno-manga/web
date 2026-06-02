@@ -14,6 +14,7 @@ describe('ImageService', () => {
 		const canvas = document.createElement('canvas');
 		canvas.width = 2;
 		canvas.height = 2;
+		// biome-ignore lint/style/noNonNullAssertion: valid
 		const ctx = canvas.getContext('2d')!;
 		ctx.fillStyle = 'rgb(255,0,0)';
 		ctx.fillRect(0, 0, 2, 2);
