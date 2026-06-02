@@ -125,7 +125,7 @@
 						@if (item.comment.profileImageUrl) {
 							<img
 								[src]="item.comment.profileImageUrl"
-								[alt]="'Avatar de ' + item.comment.userName"
+								alt="Avatar de {{ item.comment.userName }}"
 							/>
 						} @else {
 							<span>

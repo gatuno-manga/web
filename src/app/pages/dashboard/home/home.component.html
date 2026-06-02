@@ -84,7 +84,7 @@
 			@for (item of progressBooks.books; track $index) {
 				<div [routerLink]="['/books', item.id]" class="book">
 					<div class="book-image">
-						<img [src]="item.cover" [alt]="item.title" />
+						<img [src]="item.cover" alt="{{ item.title }}" />
 					</div>
 					<div class="book-title">{{ item.title }}</div>
 				</div>

@@ -1,26 +1,45 @@
-<button
-	#button
-	[id]="id()"
-	[type]="type()"
-	[disabled]="disabled()"
-	[class]="
-		'btn-' +
-		variant() +
-		' rounded-' +
-		rounded() +
-		' fill-' +
-		fill() +
-		' padding-' +
-		padding() +
-		' radio-' +
-		radio()
-	"
->
+<ng-template #buttonContent>
 	@if(leftIcon()){
-	<app-icons [name]="leftIcon()!" />
+		<app-icons [name]="leftIcon()!" />
 	}
 	<ng-content></ng-content>
 	@if(rightIcon()){
-	<app-icons [name]="rightIcon()!" />
+		<app-icons [name]="rightIcon()!" />
 	}
-</button>
+</ng-template>
+
+@switch (type()) {
+	@case ('submit') {
+		<button
+			#button
+			type="submit"
+			[id]="id()"
+			[disabled]="disabled()"
+			[class]="buttonClass()"
+		>
+			<ng-container [ngTemplateOutlet]="buttonContent" />
+		</button>
+	}
+	@case ('reset') {
+		<button
+			#button
+			type="reset"
+			[id]="id()"
+			[disabled]="disabled()"
+			[class]="buttonClass()"
+		>
+			<ng-container [ngTemplateOutlet]="buttonContent" />
+		</button>
+	}
+	@default {
+		<button
+			#button
+			type="button"
+			[id]="id()"
+			[disabled]="disabled()"
+			[class]="buttonClass()"
+		>
+			<ng-container [ngTemplateOutlet]="buttonContent" />
+		</button>
+	}
+}

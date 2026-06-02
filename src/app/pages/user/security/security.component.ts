@@ -266,11 +266,12 @@ export class SecurityComponent implements OnInit {
 				this.securityService.beginPasskeyRegistration(),
 			);
 			const registration = await startRegistration({
-				optionsJSON: options as PublicKeyCredentialCreationOptionsJSON,
+				optionsJSON:
+					options as unknown as PublicKeyCredentialCreationOptionsJSON,
 			});
 			await firstValueFrom(
 				this.securityService.verifyPasskeyRegistration(
-					registration as Record<
+					registration as unknown as Record<
 						string,
 						object | string | number | boolean | null | undefined
 					>,

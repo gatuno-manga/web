@@ -1,6 +1,8 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
+	computed,
 	ElementRef,
 	input,
 	viewChild,
@@ -15,7 +17,7 @@ export type ButtonPadding = 'none' | 'normal';
 
 @Component({
 	selector: 'app-button',
-	imports: [IconsComponent],
+	imports: [IconsComponent, NgTemplateOutlet],
 	templateUrl: './button.component.html',
 	styleUrl: './button.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,4 +35,8 @@ export class ButtonComponent {
 	rightIcon = input<string | null>(null);
 	leftIcon = input<string | null>(null);
 	disabled = input<boolean>(false);
+
+	buttonClass = computed(() => {
+		return `btn-${this.variant()} rounded-${this.rounded()} fill-${this.fill()} padding-${this.padding()} radio-${this.radio()}`;
+	});
 }

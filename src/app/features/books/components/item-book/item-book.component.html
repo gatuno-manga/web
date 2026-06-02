@@ -82,7 +82,7 @@
 			@if (isBlobUrl(book().cover)) {
 				<img
 					[src]="book().cover"
-					[alt]="'Capa do livro ' + book().title"
+					alt="Capa do livro {{ book().title }}"
 					[class.loaded]="isImageLoaded()"
 					(load)="onImageLoad()"
 					(error)="onImageError()"
@@ -90,7 +90,7 @@
 			} @else {
 				<img
 					[ngSrc]="book().cover"
-					[alt]="'Capa do livro ' + book().title"
+					alt="Capa do livro {{ book().title }}"
 					fill
 					[priority]="priority()"
 					[class.loaded]="isImageLoaded()"

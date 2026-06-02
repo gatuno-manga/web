@@ -313,7 +313,7 @@
 						@if (cover.url && !coverImageErrors().has(cover.id)) {
 							<img
 								[src]="cover.url"
-								[attr.alt]="'Cover ' + cover.id"
+								alt="Cover {{ cover.id }}"
 								(error)="onCoverImageError(cover.id)"
 							/>
 						} @else {
@@ -419,7 +419,7 @@
 						@if (savedPage.page.path) {
 							<img
 								[src]="savedPage.page.path"
-								[alt]="'Page ' + savedPage.page.index"
+								alt="Page {{ savedPage.page.index }}"
 								loading="lazy"
 							/>
 						} @else {
