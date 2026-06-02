@@ -133,8 +133,9 @@ export class FileInputComponent {
 		}
 
 		// Validation: Size
-		if (this.maxSize() && file.size > this.maxSize()! * 1024 * 1024) {
-			const err = `O arquivo excede o tamanho máximo de ${this.maxSize()}MB.`;
+		const maxSize = this.maxSize();
+		if (maxSize && file.size > maxSize * 1024 * 1024) {
+			const err = `O arquivo excede o tamanho máximo de ${maxSize}MB.`;
 			this.errorMessage.set(err);
 			this.error.emit(err);
 			return;

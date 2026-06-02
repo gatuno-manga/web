@@ -216,14 +216,15 @@ export class DownloadManagerService {
 				`Download de "${fileName}" concluído com sucesso!`,
 				'Download completo',
 			);
-		} catch (error: unknown) {
-			if ((error as Error).name === 'AbortError') {
+		} catch (err) {
+			const error = err as Error;
+			if (error.name === 'AbortError') {
 				// Já tratado no cancelDownload
 				return;
 			}
 
 			task.status = 'error';
-			task.error = (error as Error)?.message || 'Erro desconhecido';
+			task.error = error?.message || 'Erro desconhecido';
 			this.emitTasks();
 
 			this.notificationService.error(

@@ -7,6 +7,7 @@
 
 		<div class="header-actions">
 			<button
+				type="button"
 				class="action-btn"
 				[class.active]="showSensitiveContent()"
 				(click)="toggleSensitiveContent()"
@@ -38,7 +39,7 @@
 										@if (book.bookBlurHash) {
 											<app-blurhash [hash]="book.bookBlurHash" class="blur-bg" />
 										}
-										<img [ngSrc]="book.bookCover" width="120" height="180" [alt]="book.bookTitle" />
+										<img [ngSrc]="book.bookCover" width="120" height="180" alt="{{ book.bookTitle }}" />
 									</div>
 									<div class="item-content">
 										<a [routerLink]="['/books', book.bookId]" class="book-title">{{ book.bookTitle }}</a>

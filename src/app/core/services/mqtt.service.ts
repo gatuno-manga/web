@@ -30,14 +30,35 @@ import { NetworkStatusService } from './network-status.service';
 import { NotificationService } from './notification.service';
 import { UserTokenService } from './user-token.service';
 
+export type MqttPayloadData =
+	| BookEvent
+	| ChapterEvent
+	| CoverEvent
+	| NewChaptersEvent
+	| ScrapingEvent
+	| UpdateCompletedEvent
+	| UpdateFailedEvent
+	| UpdateStartedEvent
+	| SyncResponse
+	| object
+	| string
+	| number
+	| boolean
+	| null;
+
 export interface MqttPayload {
 	event: string;
-	payload: unknown;
+	payload: MqttPayloadData;
 }
 
 interface NotificationPayload {
 	message?: string;
 	type?: string;
+}
+
+export interface MqttWatchEvent {
+	type: string;
+	data: MqttPayloadData;
 }
 
 @Injectable({
@@ -420,7 +441,7 @@ export class MqttService implements OnDestroy {
 		}
 	}
 
-	watchBook(bookId: string): Observable<unknown> {
+	watchBook(bookId: string): Observable<MqttWatchEvent> {
 		const topic = `books/events/book/${bookId}`;
 		this.subscribeTopic(topic);
 
@@ -486,7 +507,10 @@ export class MqttService implements OnDestroy {
 		});
 	}
 
-	watchChapter(chapterId: string, bookId: string): Observable<unknown> {
+	watchChapter(
+		chapterId: string,
+		bookId: string,
+	): Observable<MqttWatchEvent> {
 		const chapterTopic = `books/events/chapter/${chapterId}`;
 		const bookTopic = `books/events/book/${bookId}`;
 

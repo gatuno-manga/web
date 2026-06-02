@@ -164,17 +164,17 @@
 	</div>
 	<div class="controls">
 		@if (chapter()?.previous; as prev) {
-			<a class="arrow" (click)="previousPage()">
+			<a class="arrow" (click)="previousPage()" aria-label="Capítulo anterior">
 				<app-icons name="arrow-left" size="16" />
 			</a>
 		}
-		<a class="index" (click)="backPage()">
+		<a class="index" (click)="backPage()" aria-label="Voltar para o livro">
 			{{ chapter()?.index | chapterIndex }}/{{
 				chapter()?.totalChapters || 0
 			}}
 		</a>
 		@if (chapter()?.next; as next) {
-			<a class="arrow" (click)="nextPage()">
+			<a class="arrow" (click)="nextPage()" aria-label="Próximo capítulo">
 				<app-icons name="arrow-right" size="16" />
 			</a>
 		}

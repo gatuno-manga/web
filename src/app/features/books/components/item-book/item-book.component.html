@@ -16,6 +16,7 @@
 	<ng-template #badgesAndRemove>
 		@if (canRemove()) {
 			<button
+				type="button"
 				class="remove-btn"
 				(click)="onRemove($event)"
 				aria-label="Remover do histórico"

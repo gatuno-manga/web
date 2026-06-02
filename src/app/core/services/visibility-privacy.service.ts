@@ -9,7 +9,7 @@ export class VisibilityPrivacyService {
 	private platformId = inject(PLATFORM_ID);
 	private settingsService = inject(SettingsService);
 
-	private idleTimer: any;
+	private idleTimer: ReturnType<typeof setTimeout> | undefined;
 
 	isBlurred = signal<boolean>(false);
 	isInactive = signal<boolean>(false);

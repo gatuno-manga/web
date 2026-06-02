@@ -242,8 +242,7 @@ export class BookComponent implements OnInit, OnDestroy {
 		// Observa eventos do livro
 		this.wsSubscription = this.wsService
 			.watchBook(bookId)
-			.subscribe((event: unknown) => {
-				const typedEvent = event as { type: string; data: unknown };
+			.subscribe((typedEvent) => {
 				console.log(
 					'📡 Evento recebido:',
 					typedEvent.type,
@@ -770,7 +769,7 @@ export class BookComponent implements OnInit, OnDestroy {
 
 			// Função auxiliar para delay
 			const delay = (ms: number) =>
-				new Promise((resolve) => setTimeout(resolve, ms));
+				new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 			// Baixar capítulos sequencialmente em segundo plano com intervalo de 1s
 			await this.downloadChaptersInBackground(chapters, delay);
@@ -938,7 +937,7 @@ export class BookComponent implements OnInit, OnDestroy {
 
 	private async downloadChaptersInBackground(
 		chapters: Chapterlist[],
-		delay: (ms: number) => Promise<unknown>,
+		delay: (ms: number) => Promise<void>,
 	) {
 		const b = this.book();
 		if (!b) return;

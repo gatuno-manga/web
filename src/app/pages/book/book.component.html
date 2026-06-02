@@ -110,6 +110,7 @@
 										</button>
 										@if (isBookDownloaded()) {
 											<button
+												type="button"
 												(click)="deleteDownloadedBook()"
 												class="danger"
 											>
@@ -140,7 +141,7 @@
 							</div>
 							<app-button
 								class="btn-actions"
-								type="primary"
+								variant="primary"
 								radio="square"
 								rounded="small"
 								padding="none"

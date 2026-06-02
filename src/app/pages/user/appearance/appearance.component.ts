@@ -123,9 +123,12 @@ export class AppearanceComponent implements OnInit {
 		}
 	}
 
-	onThemeChange(event: Event) {
-		const select = event.target as HTMLSelectElement;
-		this.themeService.setTheme(select.value as AppTheme);
+	onThemeChangeFromSelect(value: string) {
+		this.themeService.setTheme(value as AppTheme);
+	}
+
+	onLanguageChange(value: string) {
+		this.languageService.setLanguage(value);
 	}
 
 	onModeChange(event: Event) {

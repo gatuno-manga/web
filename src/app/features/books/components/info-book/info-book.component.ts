@@ -1818,7 +1818,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 									// mas vamos recarregar para ver se já aparece algo
 									setTimeout(() => this.loadCovers(), 2000);
 								},
-								error: (err: any) => {
+								error: (err: Error) => {
 									console.error('Error scraping cover:', err);
 									this.notificationService.error(
 										'Erro ao agendar captura de capa.',

@@ -30,7 +30,7 @@ import { HeaderStateService } from '@core/services/header-state.service';
 import { HighlightService } from '@core/services/highlight.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { MqttService } from '@core/services/mqtt.service';
+import { MqttService, MqttWatchEvent } from '@core/services/mqtt.service';
 import { NetworkStatusService } from '@core/services/network-status.service';
 import { NotificationSeverity } from '@core/services/notification';
 import { NotificationService } from '@core/services/notification.service';
@@ -335,8 +335,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.bookWebsocketService
 				.watchChapter(chapterId, bookId)
 				.pipe(takeUntilDestroyed(this.destroyRef))
-				.subscribe((event: unknown) => {
-					const typedEvent = event as { type: string; data: unknown };
+				.subscribe((typedEvent: MqttWatchEvent) => {
 					if (
 						typedEvent.type === 'chapter.updated' ||
 						typedEvent.type === 'chapter.scraping.completed'

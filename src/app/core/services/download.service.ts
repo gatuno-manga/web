@@ -350,16 +350,20 @@ export class DownloadService {
 								e,
 							);
 							completedCount++; // Increment anyway to keep progress moving
-							return { index, blob: null as unknown as Blob }; // Will handle nulls below if needed
+							return { index, blob: null }; // Will handle nulls below if needed
 						}
 					},
 				);
 
 				const results = await Promise.all(downloadPromises);
-				const sortedBlobs = results
-					.sort((a, b) => a.index - b.index)
-					.filter((r) => r.blob !== null) // Filter out failed pages
-					.map((r) => r.blob);
+				const sortedBlobs = (
+					results
+						.sort((a, b) => a.index - b.index)
+						.filter((r) => r.blob !== null) as {
+						index: number;
+						blob: Blob;
+					}[]
+				).map((r) => r.blob);
 
 				if (sortedBlobs.length === 0 && pages.length > 0) {
 					throw new Error('All pages failed to download');

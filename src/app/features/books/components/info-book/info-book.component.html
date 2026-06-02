@@ -313,7 +313,7 @@
 						@if (cover.url && !coverImageErrors().has(cover.id)) {
 							<img
 								[src]="cover.url"
-								[alt]="'Cover ' + cover.id"
+								[attr.alt]="'Cover ' + cover.id"
 								(error)="onCoverImageError(cover.id)"
 							/>
 						} @else {

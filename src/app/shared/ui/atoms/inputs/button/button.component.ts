@@ -24,7 +24,7 @@ export class ButtonComponent {
 	buttonRef = viewChild<ElementRef<HTMLButtonElement>>('button');
 
 	id = input<string>();
-	type = input<string>('button');
+	type = input<'button' | 'submit' | 'reset'>('button');
 	variant = input<ButtonVariant>('primary');
 	rounded = input<ButtonRounded>('full');
 	fill = input<ButtonFill>('full');

@@ -10,7 +10,11 @@ import {
 	output,
 	viewChild,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+	ControlValueAccessor,
+	NG_VALUE_ACCESSOR,
+	ValidationErrors,
+} from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
@@ -40,7 +44,7 @@ export class TextInputComponent implements ControlValueAccessor {
 	autocomplete = input<string>('');
 	showLabel = input<boolean>(true);
 	value = model<string>('');
-	errors = input<any>(null);
+	errors = input<ValidationErrors | null | undefined>(null);
 	touched = input<boolean>(false);
 	rightIconInput = input<string | null>(null, { alias: 'rightIcon' });
 	leftIconInput = input<string | null>(null, { alias: 'leftIcon' });

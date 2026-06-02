@@ -34,10 +34,10 @@ export class CookieService {
 		return this.cookieService.get(key);
 	}
 
-	delete(key: string, usePrefix: boolean = true): void {
+	delete(key: string, usePrefix: boolean = true, domain?: string): void {
 		if (usePrefix) {
 			key = `${this.KEY}/${key}`;
 		}
-		this.cookieService.delete(key, this.cookieConfig.path);
+		this.cookieService.delete(key, this.cookieConfig.path, domain);
 	}
 }

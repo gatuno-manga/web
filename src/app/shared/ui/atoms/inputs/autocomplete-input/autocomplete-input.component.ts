@@ -16,7 +16,7 @@ import {
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 export interface AutocompleteOption {
-	id: any;
+	id: string | number;
 	label: string;
 	description?: string;
 	image?: string;
@@ -88,11 +88,11 @@ export class AutocompleteInputComponent implements ControlValueAccessor {
 		this.value.set(value || '');
 	}
 
-	registerOnChange(fn: any): void {
+	registerOnChange(fn: (value: string) => void): void {
 		this.onChange = fn;
 	}
 
-	registerOnTouched(fn: any): void {
+	registerOnTouched(fn: () => void): void {
 		this.onTouched = fn;
 	}
 

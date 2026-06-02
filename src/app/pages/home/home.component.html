@@ -17,13 +17,13 @@
               @if (book.blurHash) {
                 <app-blurhash [hash]="book.blurHash" class="bg-blur" />
               }
-              <img [ngSrc]="book.cover" fill priority [alt]="book.title" class="bg-image" />
+              <img [ngSrc]="book.cover" fill priority alt="{{ book.title }}" class="bg-image" />
               <div class="gradient-overlay"></div>
             </div>
 
             <div class="item-content">
               <div class="cover-container">
-                <img [ngSrc]="book.cover" [alt]="book.title" width="298" height="453" priority />
+                <img [ngSrc]="book.cover" alt="{{ book.title }}" width="298" height="453" priority />
               </div>
               <div class="info-container">
                 <!-- h2 aqui (h1 único e estático fica fora do loop) -->

@@ -54,6 +54,7 @@ interface BookQueryParams {
 
 @Component({
 	selector: 'app-books',
+	standalone: true,
 	imports: [
 		RouterModule,
 		SelectCycleComponent,
@@ -105,7 +106,7 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private _scrollAnchor?: ElementRef;
 	@ViewChild('scrollAnchor') set scrollAnchor(element:
 		| ElementRef
-		| undefined) {
+		| undefined,) {
 		this._scrollAnchor = element;
 		if (element && this.observer) {
 			this.observer.disconnect();
@@ -460,21 +461,36 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			limit: this.listSettings.limit,
 			search: this.filterOptions.search,
 			sensitiveContent: allowedSensitiveContent,
-			type: this.filterOptions.type?.map((t) => t.toUpperCase()) as any,
+			type: this.filterOptions.type?.map((t) => t.toUpperCase()),
 			tags: this.filterOptions.tags,
-			tagsLogic: this.filterOptions.tagsLogic?.toUpperCase() as any,
+			tagsLogic: this.filterOptions.tagsLogic?.toUpperCase() as
+				| 'AND'
+				| 'OR',
 			excludeTags: this.filterOptions.excludeTags,
 			excludeTagsLogic:
-				this.filterOptions.excludeTagsLogic?.toUpperCase() as any,
+				this.filterOptions.excludeTagsLogic?.toUpperCase() as
+					| 'AND'
+					| 'OR',
 			authors: this.filterOptions.authors,
-			authorsLogic: this.filterOptions.authorsLogic?.toUpperCase() as any,
+			authorsLogic: this.filterOptions.authorsLogic?.toUpperCase() as
+				| 'AND'
+				| 'OR',
 			publication: this.filterOptions.publication,
 			publicationOperator:
-				this.filterOptions.publicationOperator?.toUpperCase() as any,
+				this.filterOptions.publicationOperator?.toUpperCase() as
+					| 'EQ'
+					| 'GT'
+					| 'GTE'
+					| 'LT'
+					| 'LTE',
 			orderBy: this.filterOptions.orderBy
 				?.replace(/[A-Z]/g, '_$&')
-				.toUpperCase() as any,
-			order: this.filterOptions.order as any,
+				.toUpperCase() as
+				| 'CREATED_AT'
+				| 'PUBLICATION'
+				| 'TITLE'
+				| 'UPDATED_AT',
+			order: this.filterOptions.order,
 		};
 
 		const fields = ['id', 'title'];

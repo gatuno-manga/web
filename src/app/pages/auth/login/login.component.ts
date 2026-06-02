@@ -13,7 +13,10 @@ import {
 	isMfaChallengeResponse,
 	loginResponse,
 } from '@models/user.models';
-import { startAuthentication } from '@simplewebauthn/browser';
+import {
+	PublicKeyCredentialRequestOptionsJSON,
+	startAuthentication,
+} from '@simplewebauthn/browser';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { MfaInputComponent } from '@ui/atoms/inputs/mfa-input/mfa-input.component';
@@ -207,7 +210,8 @@ export class LoginComponent implements OnInit {
 			}
 
 			const assertion = await startAuthentication({
-				optionsJSON: options as never,
+				optionsJSON:
+					options as object as PublicKeyCredentialRequestOptionsJSON,
 				useBrowserAutofill: isAutofill,
 			});
 
@@ -216,7 +220,7 @@ export class LoginComponent implements OnInit {
 
 			const response = await firstValueFrom(
 				this.authService.verifyPasskeyAuthentication(
-					assertion as unknown as Record<string, unknown>,
+					assertion,
 					email || undefined,
 				),
 			);
@@ -227,12 +231,13 @@ export class LoginComponent implements OnInit {
 			}
 
 			this.handleAuthResult(response.body);
-		} catch (error: any) {
+		} catch (err) {
+			const error = err as { name?: string };
 			if (!isAutofill) {
 				console.error('Passkey sign-in failed', error);
 				this.isLoading = false;
 
-				const isNotAllowed = error?.name === 'NotAllowedError';
+				const isNotAllowed = error.name === 'NotAllowedError';
 				const passkeyFailed =
 					!email && isNotAllowed
 						? 'Nenhuma passkey encontrada no dispositivo. Digite seu e-mail caso possua passkeys em outros dispositivos.'

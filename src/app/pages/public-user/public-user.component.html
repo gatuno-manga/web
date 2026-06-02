@@ -9,7 +9,7 @@
 		<header class="public-user-page__header">
 			<div class="public-user-page__avatar">
 				@if (user.profileImageUrl) {
-					<img [src]="user.profileImageUrl" [alt]="'Avatar de ' + user.userName" />
+					<img [src]="user.profileImageUrl" alt="Avatar de {{ user.userName }}" />
 				} @else {
 					<span>{{ user.userName.slice(0, 2).toUpperCase() }}</span>
 				}

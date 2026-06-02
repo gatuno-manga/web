@@ -5,7 +5,7 @@ import { Chapter } from '@models/book.models';
 interface BatchReadResult {
 	chapterId: string;
 	success: boolean;
-	result?: unknown;
+	result?: object | string | number | boolean | null;
 	error?: string;
 }
 

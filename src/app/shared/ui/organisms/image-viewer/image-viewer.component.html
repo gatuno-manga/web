@@ -8,7 +8,7 @@
 		<app-icons name="close" />
 	</button>
 	<div class="image-container">
-		<img [src]="imageUrl" [attr.alt]="imageTitle || 'Visualização'" (load)="onImageLoad()" />
+		<img [src]="imageUrl" alt="Visualização" [attr.alt]="imageTitle || 'Visualização'" (load)="onImageLoad()" />
 		@if(imageTitle) {
 		<div class="image-title">{{ imageTitle }}</div>
 		}

@@ -24,7 +24,7 @@ export class ThemeService {
 	public hasUserSelectedTheme = signal<boolean>(true);
 
 	constructor(
-		@Inject(PLATFORM_ID) private platformId: Object,
+		@Inject(PLATFORM_ID) private platformId: object,
 		private rendererFactory: RendererFactory2,
 		private cookieService: CookieService,
 		private localStorageService: LocalStorageService,

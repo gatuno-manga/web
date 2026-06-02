@@ -30,7 +30,10 @@ export enum NotificationSeverity {
 /**
  * Dados que podem ser passados para o componente personalizado
  */
-export type NotificationComponentData = Record<string, unknown>;
+export type NotificationComponentData = Record<
+	string,
+	object | string | number | boolean | null | undefined
+>;
 
 /**
  * Constantes padrão para notificações
@@ -68,7 +71,7 @@ export interface NotificationConfig<
 	 * Componente personalizado a ser renderizado
 	 * Se fornecido, substitui a renderização padrão da notificação
 	 */
-	component?: Type<unknown>;
+	component?: Type<object>;
 	/**
 	 * Dados a serem passados para o componente personalizado
 	 */
@@ -107,6 +110,6 @@ export interface OverlayNotification {
 	type: NotificationVisualType;
 	title?: string;
 	dismissible: boolean;
-	component?: Type<unknown>;
+	component?: Type<object>;
 	componentData?: NotificationComponentData;
 }

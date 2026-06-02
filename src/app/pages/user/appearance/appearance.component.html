@@ -18,7 +18,7 @@
 					<app-select
 						[options]="themes"
 						[ngModel]="themeService.currentTheme()"
-						(valueChange)="themeService.setTheme($any($event))"
+						(valueChange)="onThemeChangeFromSelect($event)"
 					/>
 				</div>
 			</div>

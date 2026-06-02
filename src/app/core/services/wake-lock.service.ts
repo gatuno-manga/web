@@ -1,12 +1,27 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 
+interface WakeLockSentinel extends EventTarget {
+	readonly released: boolean;
+	readonly type: 'screen';
+	release(): Promise<void>;
+	onrelease: ((this: WakeLockSentinel, ev: Event) => void) | null;
+}
+
+interface WakeLock {
+	request(type: 'screen'): Promise<WakeLockSentinel>;
+}
+
+interface NavigatorWithWakeLock extends Navigator {
+	readonly wakeLock: WakeLock;
+}
+
 @Injectable({
 	providedIn: 'root',
 })
 export class WakeLockService {
 	private platformId = inject(PLATFORM_ID);
-	private wakeLock: any = null;
+	private wakeLock: WakeLockSentinel | null = null;
 
 	isSupported = signal<boolean>(false);
 	isActive = signal<boolean>(false);
@@ -31,7 +46,8 @@ export class WakeLockService {
 		if (!this.isSupported()) return;
 
 		try {
-			this.wakeLock = await (navigator as any).wakeLock.request('screen');
+			const nav = navigator as unknown as NavigatorWithWakeLock;
+			this.wakeLock = await nav.wakeLock.request('screen');
 			this.isActive.set(true);
 
 			this.wakeLock.addEventListener('release', () => {

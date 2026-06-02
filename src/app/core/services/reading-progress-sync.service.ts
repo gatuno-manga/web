@@ -169,22 +169,21 @@ export class ReadingProgressSyncService implements OnDestroy {
 		}
 
 		// Tenta sincronizar via HTTP imediatamente
-		this.syncViaHttp(progressData)
-			.then(() => {
-				this.pendingChanges.delete(chapterId);
-				this.updateSyncStatus({
-					pendingChanges: this.pendingChanges.size,
-					lastSyncAt: new Date(),
-				});
-			})
-			.catch(() => {
-				logConnectionEvent(
-					this.serviceName,
-					'sync',
-					'Falha no sync via HTTP. Background Sync agendado.',
-					LogLevel.DEBUG,
-				);
+		try {
+			await this.syncViaHttp(progressData);
+			this.pendingChanges.delete(chapterId);
+			this.updateSyncStatus({
+				pendingChanges: this.pendingChanges.size,
+				lastSyncAt: new Date(),
 			});
+		} catch (_err) {
+			logConnectionEvent(
+				this.serviceName,
+				'sync',
+				'Falha no sync via HTTP. Background Sync agendado.',
+				LogLevel.DEBUG,
+			);
+		}
 	}
 
 	async getProgress(chapterId: string): Promise<ReadingProgress | undefined> {

@@ -20,6 +20,7 @@ import {
 	AlternativeTitle,
 	Author,
 	BookBasic,
+	BookDetail,
 	SensitiveContentResponse,
 	TypeBook,
 	tag,
@@ -124,6 +125,8 @@ export class BookEditModalComponent implements OnInit {
 	}
 
 	private initForm(): void {
+		const bookDetail = this.book as BookBasic & BookDetail;
+
 		this.editForm = this.fb.group({
 			title: [
 				this.book.title,
@@ -135,28 +138,25 @@ export class BookEditModalComponent implements OnInit {
 				[Validators.min(1900), Validators.max(2100)],
 			],
 			type: [this.book.type || TypeBook.OTHER],
-			originalLanguageCode: [
-				(this.book as any).originalLanguageCode || '',
-			],
+			originalLanguageCode: [this.book.originalLanguageCode || ''],
 		});
 
-		this.alternativeTitles.set([
-			...((this.book as any).alternativeTitles || []),
-		]);
+		this.alternativeTitles.set([...(bookDetail.alternativeTitles || [])]);
 		// Se existir o array legado e o novo estiver vazio
 		if (
 			this.alternativeTitles().length === 0 &&
-			(this.book as any).alternativeTitle?.length > 0
+			bookDetail.alternativeTitle &&
+			bookDetail.alternativeTitle.length > 0
 		) {
 			this.alternativeTitles.set(
-				(this.book as any).alternativeTitle.map((t: string) => ({
+				bookDetail.alternativeTitle.map((t: string) => ({
 					title: t,
 					languageCode: null,
 				})),
 			);
 		}
-		this.searchTerms.set([...((this.book as any).searchTerms || [])]);
-		this.originalUrls.set([...((this.book as any).originalUrl || [])]);
+		this.searchTerms.set([...(bookDetail.searchTerms || [])]);
+		this.originalUrls.set([...(bookDetail.originalUrl || [])]);
 
 		this.selectedTagIds.set(this.book.tags.map((t) => t.id));
 		this.selectedAuthorIds.set(this.book.authors.map((a) => a.id));
@@ -295,6 +295,7 @@ export class BookEditModalComponent implements OnInit {
 
 		const formValues = this.editForm.value;
 		const updatedData: UpdateBookDto = {};
+		const bookDetail = this.book as BookBasic & BookDetail;
 
 		// Basic fields delta
 		if (formValues.title !== this.book.title)
@@ -307,7 +308,7 @@ export class BookEditModalComponent implements OnInit {
 			updatedData.type = formValues.type;
 		if (
 			formValues.originalLanguageCode !==
-			((this.book as any).originalLanguageCode || '')
+			(this.book.originalLanguageCode || '')
 		)
 			updatedData.originalLanguageCode =
 				formValues.originalLanguageCode === ''
@@ -316,14 +317,14 @@ export class BookEditModalComponent implements OnInit {
 
 		// Array fields delta (deep compare simplified)
 		const currentAltTitles = this.alternativeTitles();
-		const originalAltTitles = (this.book as any).alternativeTitles || [];
+		const originalAltTitles = bookDetail.alternativeTitles || [];
 
 		// Map back for comparison
 		const currentAltTitlesMapped = currentAltTitles
 			.map((t) => t.title)
 			.join('|');
 		const originalAltTitlesMapped = originalAltTitles
-			.map((t: any) => t.title)
+			.map((t) => t.title)
 			.join('|');
 
 		if (
@@ -336,7 +337,7 @@ export class BookEditModalComponent implements OnInit {
 		}
 
 		const currentSearchTerms = this.searchTerms();
-		const originalSearchTerms = (this.book as any).searchTerms || [];
+		const originalSearchTerms = bookDetail.searchTerms || [];
 		if (
 			JSON.stringify(currentSearchTerms) !==
 			JSON.stringify(originalSearchTerms)
@@ -345,7 +346,7 @@ export class BookEditModalComponent implements OnInit {
 		}
 
 		const currentUrls = this.originalUrls();
-		const originalUrls = (this.book as any).originalUrl || [];
+		const originalUrls = bookDetail.originalUrl || [];
 		if (JSON.stringify(currentUrls) !== JSON.stringify(originalUrls)) {
 			updatedData.originalUrl = currentUrls;
 		}

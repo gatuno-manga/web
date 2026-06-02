@@ -42,7 +42,7 @@ export class ReadingProgressService {
 		userId: string;
 	}>();
 
-	constructor(@Inject(PLATFORM_ID) platformId: Object) {
+	constructor(@Inject(PLATFORM_ID) platformId: object) {
 		this.isBrowser = isPlatformBrowser(platformId);
 		if (this.isBrowser) {
 			this.dbPromise = this.initDB();

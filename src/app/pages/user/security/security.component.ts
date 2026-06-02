@@ -18,7 +18,10 @@ import {
 	MfaStatusResponse,
 	PasskeySummary,
 } from '@models/account-security.models';
-import { startRegistration } from '@simplewebauthn/browser';
+import {
+	PublicKeyCredentialCreationOptionsJSON,
+	startRegistration,
+} from '@simplewebauthn/browser';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
@@ -263,11 +266,14 @@ export class SecurityComponent implements OnInit {
 				this.securityService.beginPasskeyRegistration(),
 			);
 			const registration = await startRegistration({
-				optionsJSON: options as never,
+				optionsJSON: options as PublicKeyCredentialCreationOptionsJSON,
 			});
 			await firstValueFrom(
 				this.securityService.verifyPasskeyRegistration(
-					registration as unknown as Record<string, unknown>,
+					registration as Record<
+						string,
+						object | string | number | boolean | null | undefined
+					>,
 					this.passkeyName.trim() || undefined,
 				),
 			);

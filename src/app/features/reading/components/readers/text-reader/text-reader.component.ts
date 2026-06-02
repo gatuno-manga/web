@@ -57,7 +57,6 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	private highlightService = inject(HighlightService);
 	private sanitizer = inject(DomSanitizer);
 	private intersectionObserver: IntersectionObserver | null = null;
-	private lastIntersectingElement: Element | null = null;
 
 	settings = toSignal(this.settingsService.settings$, {
 		initialValue: this.settingsService.getSettings(),
@@ -207,7 +206,7 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 			}
 
 			if (bestEntry) {
-				this.lastIntersectingElement = bestEntry.target;
+				// No logic needed here yet, just identifying best entry
 			}
 		}, options);
 

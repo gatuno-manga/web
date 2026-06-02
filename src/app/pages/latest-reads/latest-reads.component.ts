@@ -10,9 +10,16 @@ import {
 import { RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { MetaDataService } from '@core/services/meta-data.service';
-import { ReadingProgressService } from '@core/services/reading-progress.service';
+import {
+	ReadingProgress,
+	ReadingProgressService,
+} from '@core/services/reading-progress.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { BookBasic, Chapterlist } from '@models/book.models';
+import {
+	BookBasic,
+	Chapterlist,
+	SensitiveContentResponse,
+} from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { firstValueFrom } from 'rxjs';
@@ -24,7 +31,7 @@ export interface HistoryEntry {
 	bookCover: string;
 	bookBlurHash?: string;
 	bookDominantColor?: string;
-	sensitiveContent: any[];
+	sensitiveContent: SensitiveContentResponse[];
 	chapter: {
 		id: string;
 		title: string;
@@ -66,7 +73,7 @@ export class LatestReadsComponent implements OnInit {
 			if (!this.showSensitiveContent()) {
 				const bookSensitive = entry.sensitiveContent || [];
 				if (bookSensitive.length > 0) {
-					return bookSensitive.every((sc: any) =>
+					return bookSensitive.every((sc) =>
 						allowedNames.includes(sc.name),
 					);
 				}
@@ -85,7 +92,9 @@ export class LatestReadsComponent implements OnInit {
 				dateGroups.set(dateStr, new Map<string, HistoryEntry[]>());
 			}
 
-			const bookGroups = dateGroups.get(dateStr)!;
+			const bookGroups = dateGroups.get(dateStr);
+			if (!bookGroups) continue;
+
 			if (!bookGroups.has(entry.bookId)) {
 				bookGroups.set(entry.bookId, []);
 			}
@@ -176,7 +185,7 @@ export class LatestReadsComponent implements OnInit {
 	}
 
 	private async processProgressEntry(
-		p: any,
+		p: ReadingProgress,
 		bookCache: Map<string, BookBasic>,
 		chapterCache: Map<string, Chapterlist[]>,
 	): Promise<HistoryEntry | null> {
@@ -208,7 +217,7 @@ export class LatestReadsComponent implements OnInit {
 			: `Capítulo ${index}`;
 
 		return {
-			progressId: p.id,
+			progressId: p.id || '',
 			bookId: bookBasic.id,
 			bookTitle: bookBasic.title,
 			bookCover: bookBasic.cover,

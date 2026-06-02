@@ -7,7 +7,8 @@ import {
 	loginResponse,
 	registerRequest,
 } from '@models/user.models';
-import { tap } from 'rxjs';
+import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
+import { tap } from 'rxjs/operators';
 import { UnifiedReadingProgressService } from './unified-reading-progress.service';
 import { UserTokenService } from './user-token.service';
 
@@ -15,26 +16,26 @@ import { UserTokenService } from './user-token.service';
 	providedIn: 'root',
 })
 export class AuthService {
-	private readingProgressService = inject(UnifiedReadingProgressService);
+	private readonly http = inject(HttpClient);
+	private readonly userTokenService = inject(UserTokenService);
+	private readonly readingProgressService = inject(
+		UnifiedReadingProgressService,
+	);
 
-	constructor(
-		private readonly http: HttpClient,
-		private readonly userTokenService: UserTokenService,
-	) {}
-
-	login(data: loginRequest) {
+	login(payload: loginRequest) {
 		return this.http
-			.post<loginResponse>('/auth/signin', data, {
+			.post<loginResponse>('/auth/login', payload, {
 				observe: 'response',
-				withCredentials: true,
 			})
 			.pipe(
-				tap(({ body }) => {
+				tap((response) => {
+					const body = response.body;
 					if (body && isAuthTokensResponse(body)) {
 						this.userTokenService.setTokens(
 							body.accessToken,
 							body.csrfToken,
 						);
+						// Sincroniza o histórico de leitura após o login
 						this.readingProgressService.onUserLogin();
 					}
 				}),
@@ -44,53 +45,19 @@ export class AuthService {
 	verifyMfaLogin(mfaToken: string, code: string) {
 		return this.http
 			.post<authTokensResponse>(
-				'/auth/mfa/verify-login',
+				'/auth/mfa/verify',
 				{ mfaToken, code },
-				{
-					observe: 'response',
-					withCredentials: true,
-				},
+				{ observe: 'response' },
 			)
 			.pipe(
-				tap(({ body }) => {
-					if (body?.accessToken) {
+				tap((response) => {
+					const body = response.body;
+					if (body) {
 						this.userTokenService.setTokens(
 							body.accessToken,
 							body.csrfToken,
 						);
-						this.readingProgressService.onUserLogin();
-					}
-				}),
-			);
-	}
-
-	beginPasskeyAuthentication(email?: string) {
-		return this.http.post<Record<string, unknown>>(
-			'/auth/passkeys/authenticate/options',
-			email ? { email } : {},
-		);
-	}
-
-	verifyPasskeyAuthentication(
-		response: Record<string, unknown>,
-		email?: string,
-	) {
-		return this.http
-			.post<loginResponse>(
-				'/auth/passkeys/authenticate/verify',
-				{ response, ...(email && { email }) },
-				{
-					observe: 'response',
-					withCredentials: true,
-				},
-			)
-			.pipe(
-				tap(({ body }) => {
-					if (body && isAuthTokensResponse(body)) {
-						this.userTokenService.setTokens(
-							body.accessToken,
-							body.csrfToken,
-						);
+						// Sincroniza o histórico de leitura após o login
 						this.readingProgressService.onUserLogin();
 					}
 				}),
@@ -98,35 +65,62 @@ export class AuthService {
 	}
 
 	logout() {
-		const csrfToken = this.userTokenService.csrfToken;
-		return this.http
-			.get('/auth/logout', {
-				withCredentials: true,
-				headers: csrfToken ? { 'x-csrf-token': csrfToken } : undefined,
-			})
-			.pipe(
-				tap(() => {
-					this.userTokenService.removeTokens();
-					// Reseta o estado de leitura para guest
-					this.readingProgressService.onUserLogout();
-				}),
-			);
+		return this.http.post<void>('/auth/logout', {}).pipe(
+			tap(() => {
+				this.userTokenService.removeTokens();
+				this.readingProgressService.onUserLogout();
+			}),
+		);
 	}
 
-	register(data: registerRequest) {
+	register(payload: registerRequest) {
 		return this.http
-			.post<authTokensResponse>('/auth/signup', data, {
+			.post<authTokensResponse>('/auth/register', payload, {
 				observe: 'response',
-				withCredentials: true,
 			})
 			.pipe(
-				tap(({ body }) => {
+				tap((response) => {
+					const body = response.body;
 					if (body) {
 						this.userTokenService.setTokens(
 							body.accessToken,
 							body.csrfToken,
 						);
 						// Sincroniza o histórico de leitura após o registro
+						this.readingProgressService.onUserLogin();
+					}
+				}),
+			);
+	}
+
+	beginPasskeyAuthentication(email?: string) {
+		return this.http.post<
+			Record<
+				string,
+				object | string | number | boolean | null | undefined
+			>
+		>('/auth/passkeys/authenticate/options', email ? { email } : {});
+	}
+
+	verifyPasskeyAuthentication(
+		response: AuthenticationResponseJSON,
+		email?: string,
+	) {
+		return this.http
+			.post<loginResponse>(
+				'/auth/passkeys/authenticate/verify',
+				{ response, ...(email && { email }) },
+				{ observe: 'response' },
+			)
+			.pipe(
+				tap((res) => {
+					const body = res.body;
+					if (body && isAuthTokensResponse(body)) {
+						this.userTokenService.setTokens(
+							body.accessToken,
+							body.csrfToken,
+						);
+						// Sincroniza o histórico de leitura após o login
 						this.readingProgressService.onUserLogin();
 					}
 				}),

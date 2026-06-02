@@ -13,7 +13,7 @@ export class LocalStorageService {
 		this.isBrowser = isPlatformBrowser(this.platformId);
 	}
 
-	set(key: string, value: unknown) {
+	set(key: string, value: object | string | number | boolean | null) {
 		if (this.isBrowser) {
 			const stringValue =
 				typeof value === 'string' ? value : JSON.stringify(value);
@@ -29,7 +29,8 @@ export class LocalStorageService {
 			try {
 				return JSON.parse(value) as T;
 			} catch (_error) {
-				return value as unknown as T;
+				// If parsing fails, it might be a plain string
+				return value as T;
 			}
 		}
 		return null;
