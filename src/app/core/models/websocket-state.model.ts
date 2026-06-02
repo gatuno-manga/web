@@ -101,7 +101,6 @@ export const STATE_TRANSITIONS: Record<
 	],
 };
 
-
 /**
  * Valida se uma transição de estado é permitida.
  *
@@ -123,4 +122,3 @@ export function isValidTransition(
 	const allowedTransitions = STATE_TRANSITIONS[currentState] || [];
 	return allowedTransitions.includes(nextState);
 }
-

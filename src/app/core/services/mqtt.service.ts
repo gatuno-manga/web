@@ -35,6 +35,11 @@ export interface MqttPayload {
 	payload: unknown;
 }
 
+interface NotificationPayload {
+	message?: string;
+	type?: string;
+}
+
 @Injectable({
 	providedIn: 'root',
 })
@@ -199,7 +204,7 @@ export class MqttService implements OnDestroy {
 		);
 
 		const brokerUrl =
-			(this.env as any).mqttBrokerUrl ||
+			this.env.mqttBrokerUrl ||
 			`ws://${this.window.location?.hostname || 'localhost'}:8083/mqtt`;
 
 		this.client = mqtt.connect(brokerUrl, {
@@ -276,10 +281,10 @@ export class MqttService implements OnDestroy {
 
 			// Lógica de notificação pessoal
 			if (topic.includes('/notifications')) {
+				const notification = data.payload as NotificationPayload;
 				this.notificationService.show(
-					(data.payload as { message?: string }).message ||
-						'Nova notificação',
-					((data.payload as { type?: string }).type || 'info') as
+					notification.message || 'Nova notificação',
+					(notification.type || 'info') as
 						| 'info'
 						| 'success'
 						| 'warning'

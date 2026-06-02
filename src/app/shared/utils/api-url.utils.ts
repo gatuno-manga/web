@@ -120,6 +120,11 @@ export function buildApiUrl(path: string, config: UrlConfig): string {
 			config.apiUrlServer ||
 			config.apiUrl ||
 			'http://localhost:3000/api';
+
+		const runtimeProcess = (globalThis as { process?: RuntimeProcess }).process;
+		if (runtimeProcess?.env?.HOSTNAME && (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1'))) {
+			baseUrl = baseUrl.replace(/localhost|127\.0\.0\.1/, 'api');
+		}
 	} else if (!baseUrl) {
 		baseUrl = `${config.origin || ''}/api`;
 	}

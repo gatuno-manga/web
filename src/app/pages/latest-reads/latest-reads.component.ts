@@ -134,10 +134,15 @@ export class LatestReadsComponent implements OnInit {
 	private async loadHistory() {
 		this.isLoading.set(true);
 		try {
-			const progressList = await this.readingProgressService.getAllProgress();
+			const progressList =
+				await this.readingProgressService.getAllProgress();
 			if (progressList && progressList.length > 0) {
 				const sortedProgress = progressList
-					.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+					.sort(
+						(a, b) =>
+							new Date(b.updatedAt).getTime() -
+							new Date(a.updatedAt).getTime(),
+					)
 					.slice(0, 100);
 
 				const results: HistoryEntry[] = [];
@@ -146,12 +151,19 @@ export class LatestReadsComponent implements OnInit {
 
 				for (const p of sortedProgress) {
 					try {
-						const entry = await this.processProgressEntry(p, bookCache, chapterCache);
+						const entry = await this.processProgressEntry(
+							p,
+							bookCache,
+							chapterCache,
+						);
 						if (entry) {
 							results.push(entry);
 						}
 					} catch (err) {
-						console.error(`Erro ao carregar histórico para o livro ${p.bookId}:`, err);
+						console.error(
+							`Erro ao carregar histórico para o livro ${p.bookId}:`,
+							err,
+						);
 					}
 				}
 				this.historyEntries.set(results);
@@ -166,11 +178,13 @@ export class LatestReadsComponent implements OnInit {
 	private async processProgressEntry(
 		p: any,
 		bookCache: Map<string, BookBasic>,
-		chapterCache: Map<string, Chapterlist[]>
+		chapterCache: Map<string, Chapterlist[]>,
 	): Promise<HistoryEntry | null> {
 		let bookBasic = bookCache.get(p.bookId);
 		if (!bookBasic) {
-			bookBasic = await firstValueFrom(this.bookService.getBook(p.bookId));
+			bookBasic = await firstValueFrom(
+				this.bookService.getBook(p.bookId),
+			);
 			if (bookBasic) bookCache.set(p.bookId, bookBasic);
 		}
 
@@ -178,7 +192,9 @@ export class LatestReadsComponent implements OnInit {
 
 		let chapters = chapterCache.get(p.bookId);
 		if (!chapters) {
-			const chaptersPage = await firstValueFrom(this.bookService.getChapters(p.bookId, { limit: 500 }));
+			const chaptersPage = await firstValueFrom(
+				this.bookService.getChapters(p.bookId, { limit: 500 }),
+			);
 			chapters = chaptersPage.data;
 			chapterCache.set(p.bookId, chapters);
 		}

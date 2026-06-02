@@ -1,5 +1,4 @@
 import { NgOptimizedImage } from '@angular/common';
-import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -24,6 +23,7 @@ import { UnifiedReadingProgressService } from '@core/services/unified-reading-pr
 import { UserTokenService } from '@core/services/user-token.service';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
+import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';

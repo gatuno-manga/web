@@ -198,7 +198,9 @@ export class BookService {
 			);
 	}
 
-	getOfflineBooks(options?: BookPageOptions): Observable<Paginated<BookList>> {
+	getOfflineBooks(
+		options?: BookPageOptions,
+	): Observable<Paginated<BookList>> {
 		const opts = { ...options };
 
 		return from(this.downloadService.getAllBooks()).pipe(

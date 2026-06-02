@@ -59,6 +59,7 @@ describe('ChaptersComponent', () => {
 			ModalNotificationService,
 		);
 		const showSpy = spyOn(modalNotificationService, 'show');
+		spyOn(console, 'error');
 		spyOn<any>(component, 'resolveChapterData').and.rejectWith(
 			new Error('boom'),
 		);
@@ -82,6 +83,7 @@ describe('ChaptersComponent', () => {
 			ModalNotificationService,
 		);
 		const showSpy = spyOn(modalNotificationService, 'show');
+		spyOn(console, 'error');
 		spyOn<any>(component, 'resolveChapterData').and.resolveTo(null);
 
 		await component.loadChapter('chapter-id');
@@ -155,6 +157,7 @@ describe('ChaptersComponent', () => {
 			modalNotificationService,
 			'show',
 		).and.callThrough();
+		spyOn(console, 'error');
 		spyOn<any>(component, 'resolveChapterData').and.rejectWith(
 			new Error('boom'),
 		);
@@ -174,6 +177,7 @@ describe('ChaptersComponent', () => {
 			modalNotificationService,
 			'show',
 		).and.callThrough();
+		spyOn(console, 'error');
 		spyOn<any>(component, 'resolveChapterData').and.rejectWith(
 			new Error('boom'),
 		);
@@ -197,6 +201,7 @@ describe('ChaptersComponent', () => {
 			modalNotificationService,
 			'show',
 		).and.callThrough();
+		spyOn(console, 'error');
 		spyOn<any>(component, 'resolveChapterData').and.rejectWith(
 			new Error('boom'),
 		);

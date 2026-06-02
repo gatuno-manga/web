@@ -1,0 +1,925 @@
+
+> front@0.8.0 test:headless
+> ng test --browsers=ChromeHeadlessCI --watch=false
+
+01 06 2026 12:45:33.659:INFO [karma-server]: Karma v6.4.4 server started at http://localhost:9876/
+01 06 2026 12:45:33.660:INFO [launcher]: Launching browsers ChromeHeadlessCI with concurrency unlimited
+01 06 2026 12:45:33.663:INFO [launcher]: Starting browser ChromeHeadless
+01 06 2026 12:45:33.865:INFO [Chrome Headless 147.0.0.0 (Linux 0.0.0)]: Connected on socket z5h6GhJn75P1ifjEAAAB with id 35789843
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 0 of 310[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2K[31mChrome Headless 147.0.0.0 (Linux 0.0.0) buildApiUrl deve substituir loopback por serviço api em SSR quando rodando em container FAILED[39m
+	Expected 'http://localhost:3000/api/auth/refresh' to be 'http://api:3000/api/auth/refresh'.
+	    at <Jasmine>
+	    at UserContext.apply (src/app/shared/utils/api-url.utils.spec.ts:127:15)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 1 of 310[31m (1 FAILED)[39m (0 secs / 0.002 secs)
+Chrome Headless 147.0.0.0 (Linux 0.0.0) buildApiUrl deve substituir loopback por serviço api em SSR quando rodando em container FAILED
+	Expected 'http://localhost:3000/api/auth/refresh' to be 'http://api:3000/api/auth/refresh'.
+	    at <Jasmine>
+	    at UserContext.apply (src/app/shared/utils/api-url.utils.spec.ts:127:15)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 2 of 310[31m (1 FAILED)[39m (0 secs / 0.003 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 3 of 310[31m (1 FAILED)[39m (0 secs / 0.003 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 4 of 310[31m (1 FAILED)[39m (0 secs / 0.003 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 5 of 310[31m (1 FAILED)[39m (0 secs / 0.004 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 6 of 310[31m (1 FAILED)[39m (0 secs / 0.004 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 7 of 310[31m (1 FAILED)[39m (0 secs / 0.004 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 8 of 310[31m (1 FAILED)[39m (0 secs / 0.004 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 9 of 310[31m (1 FAILED)[39m (0 secs / 0.004 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 10 of 310[31m (1 FAILED)[39m (0 secs / 0.013 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 11 of 310[31m (1 FAILED)[39m (0 secs / 0.014 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 12 of 310[31m (1 FAILED)[39m (0 secs / 0.015 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 13 of 310[31m (1 FAILED)[39m (0 secs / 0.016 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 14 of 310[31m (1 FAILED)[39m (0 secs / 0.017 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 15 of 310[31m (1 FAILED)[39m (0 secs / 0.018 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 16 of 310[31m (1 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 17 of 310[31m (1 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 18 of 310[31m (1 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 19 of 310[31m (1 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 20 of 310[31m (1 FAILED)[39m (0 secs / 0.02 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 21 of 310[31m (1 FAILED)[39m (0 secs / 0.021 secs)
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 21 of 310[31m (1 FAILED)[39m (0 secs / 0.021 secs)
+LOG: '[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'
+[1A[2KERROR: [36m'[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 500 Server Error', error: null}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 21 of 310[31m (1 FAILED)[39m (0 secs / 0.021 secs)
+ERROR: '[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 500 Server Error', error: null}
+[1A[2KWARN: [36m'[GATUNO_INTERCEPTOR] Falha temporária no refresh. Mantendo sessão.'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 21 of 310[31m (1 FAILED)[39m (0 secs / 0.021 secs)
+WARN: '[GATUNO_INTERCEPTOR] Falha temporária no refresh. Mantendo sessão.'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 22 of 310[31m (1 FAILED)[39m (0 secs / 0.023 secs)
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 22 of 310[31m (1 FAILED)[39m (0 secs / 0.023 secs)
+LOG: '[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Refresh concluído, repetindo requisição original...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 22 of 310[31m (1 FAILED)[39m (0 secs / 0.023 secs)
+LOG: '[GATUNO_INTERCEPTOR] Refresh concluído, repetindo requisição original...'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 23 of 310[31m (1 FAILED)[39m (0 secs / 0.024 secs)
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 23 of 310[31m (1 FAILED)[39m (0 secs / 0.024 secs)
+LOG: '[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'
+[1A[2KERROR: [36m'[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 401, statusText: 'Expired Refresh', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 401 Expired Refresh', error: null}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 23 of 310[31m (1 FAILED)[39m (0 secs / 0.024 secs)
+ERROR: '[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 401, statusText: 'Expired Refresh', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 401 Expired Refresh', error: null}
+[1A[2KWARN: [36m'[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 23 of 310[31m (1 FAILED)[39m (0 secs / 0.024 secs)
+WARN: '[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 24 of 310[31m (1 FAILED)[39m (0 secs / 0.025 secs)
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 24 of 310[31m (1 FAILED)[39m (0 secs / 0.025 secs)
+LOG: '[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 24 of 310[31m (1 FAILED)[39m (0 secs / 0.025 secs)
+LOG: '[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Refresh concluído, repetindo requisição original...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 24 of 310[31m (1 FAILED)[39m (0 secs / 0.025 secs)
+LOG: '[GATUNO_INTERCEPTOR] Refresh concluído, repetindo requisição original...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Retentando requisição enfileirada...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 24 of 310[31m (1 FAILED)[39m (0 secs / 0.025 secs)
+LOG: '[GATUNO_INTERCEPTOR] Retentando requisição enfileirada...'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 25 of 310[31m (1 FAILED)[39m (0 secs / 0.026 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 26 of 310[31m (1 FAILED)[39m (0 secs / 0.027 secs)
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 26 of 310[31m (1 FAILED)[39m (0 secs / 0.027 secs)
+LOG: '[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 26 of 310[31m (1 FAILED)[39m (0 secs / 0.027 secs)
+LOG: '[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...'
+[1A[2KERROR: [36m'[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 401, statusText: 'Unknown Error', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 401 undefined', error: null}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 26 of 310[31m (1 FAILED)[39m (0 secs / 0.027 secs)
+ERROR: '[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 401, statusText: 'Unknown Error', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 401 undefined', error: null}
+[1A[2KWARN: [36m'[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 26 of 310[31m (1 FAILED)[39m (0 secs / 0.027 secs)
+WARN: '[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 27 of 310[31m (1 FAILED)[39m (0 secs / 0.028 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 28 of 310[31m (1 FAILED)[39m (0 secs / 0.097 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 29 of 310[31m (1 FAILED)[39m (0 secs / 0.099 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 30 of 310[31m (1 FAILED)[39m (0 secs / 0.102 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 31 of 310[31m (1 FAILED)[39m (0 secs / 0.103 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 32 of 310[31m (1 FAILED)[39m (0 secs / 0.105 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 33 of 310[31m (1 FAILED)[39m (0 secs / 0.106 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 34 of 310[31m (1 FAILED)[39m (0 secs / 0.118 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 35 of 310[31m (1 FAILED)[39m (0 secs / 0.123 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 35 of 310[31m (1 FAILED)[39m (0 secs / 0.123 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 36 of 310[31m (1 FAILED)[39m (0 secs / 0.161 secs)
+01 06 2026 12:45:35.170:WARN [web-server]: 404: /_karma_webpack_/test-url
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 36 of 310[31m (1 FAILED)[39m (0 secs / 0.161 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 37 of 310[31m (1 FAILED)[39m (0 secs / 0.168 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 37 of 310[31m (1 FAILED)[39m (0 secs / 0.168 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 38 of 310[31m (1 FAILED)[39m (0 secs / 0.174 secs)
+01 06 2026 12:45:35.184:WARN [web-server]: 404: /_karma_webpack_/test-url
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 38 of 310[31m (1 FAILED)[39m (0 secs / 0.174 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 39 of 310[31m (1 FAILED)[39m (0 secs / 0.18 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 40 of 310[31m (1 FAILED)[39m (0 secs / 0.181 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 41 of 310[31m (1 FAILED)[39m (0 secs / 0.181 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 42 of 310[31m (1 FAILED)[39m (0 secs / 0.182 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 43 of 310[31m (1 FAILED)[39m (0 secs / 0.183 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 44 of 310[31m (1 FAILED)[39m (0 secs / 0.183 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 45 of 310[31m (1 FAILED)[39m (0 secs / 0.187 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 46 of 310[31m (1 FAILED)[39m (0 secs / 0.197 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 47 of 310[31m (1 FAILED)[39m (0 secs / 0.202 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 48 of 310[31m (1 FAILED)[39m (0 secs / 0.204 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 49 of 310[31m (1 FAILED)[39m (0 secs / 0.205 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 310[31m (1 FAILED)[39m (0 secs / 0.206 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 51 of 310[31m (1 FAILED)[39m (0 secs / 0.207 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 52 of 310[31m (1 FAILED)[39m (0 secs / 0.209 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 53 of 310[31m (1 FAILED)[39m (0 secs / 0.217 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 54 of 310[31m (1 FAILED)[39m (0 secs / 0.218 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 55 of 310[31m (1 FAILED)[39m (0 secs / 0.219 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 56 of 310[31m (1 FAILED)[39m (0 secs / 0.221 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 57 of 310[31m (1 FAILED)[39m (0 secs / 0.223 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 58 of 310[31m (1 FAILED)[39m (0 secs / 0.225 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 59 of 310[31m (1 FAILED)[39m (0 secs / 0.226 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 60 of 310[31m (1 FAILED)[39m (0 secs / 0.227 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 61 of 310[31m (1 FAILED)[39m (0 secs / 0.228 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 62 of 310[31m (1 FAILED)[39m (0 secs / 0.238 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 63 of 310[31m (1 FAILED)[39m (0 secs / 0.239 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 64 of 310[31m (1 FAILED)[39m (0 secs / 0.241 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 65 of 310[31m (1 FAILED)[39m (0 secs / 0.242 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 66 of 310[31m (1 FAILED)[39m (0 secs / 0.244 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 67 of 310[31m (1 FAILED)[39m (0 secs / 0.245 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 68 of 310[31m (1 FAILED)[39m (0 secs / 0.246 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 69 of 310[31m (1 FAILED)[39m (0 secs / 0.246 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 70 of 310[31m (1 FAILED)[39m (0 secs / 0.246 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 71 of 310[31m (1 FAILED)[39m (0 secs / 0.26 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 72 of 310[31m (1 FAILED)[39m (0 secs / 0.265 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 73 of 310[31m (1 FAILED)[39m (0 secs / 0.268 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 74 of 310[31m (1 FAILED)[39m (0 secs / 0.27 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 75 of 310[31m (1 FAILED)[39m (0 secs / 0.272 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 76 of 310[31m (1 FAILED)[39m (0 secs / 0.274 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 77 of 310[31m (1 FAILED)[39m (0 secs / 0.311 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 78 of 310[31m (1 FAILED)[39m (0 secs / 0.319 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 79 of 310[31m (1 FAILED)[39m (0 secs / 0.326 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 80 of 310[31m (1 FAILED)[39m (0 secs / 0.333 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 81 of 310[31m (1 FAILED)[39m (0 secs / 0.34 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 82 of 310[31m (1 FAILED)[39m (0 secs / 0.347 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 83 of 310[31m (1 FAILED)[39m (0 secs / 0.353 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 84 of 310[31m (1 FAILED)[39m (0 secs / 0.359 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 85 of 310[31m (1 FAILED)[39m (0 secs / 0.366 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 86 of 310[31m (1 FAILED)[39m (0 secs / 0.369 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 87 of 310[31m (1 FAILED)[39m (0 secs / 0.371 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 88 of 310[31m (1 FAILED)[39m (0 secs / 0.373 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 89 of 310[31m (1 FAILED)[39m (0 secs / 0.376 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 90 of 310[31m (1 FAILED)[39m (0 secs / 0.379 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 91 of 310[31m (1 FAILED)[39m (0 secs / 0.382 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 92 of 310[31m (1 FAILED)[39m (0 secs / 0.385 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 93 of 310[31m (1 FAILED)[39m (0 secs / 0.388 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 94 of 310[31m (1 FAILED)[39m (0 secs / 0.391 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 95 of 310[31m (1 FAILED)[39m (0 secs / 0.394 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 96 of 310[31m (1 FAILED)[39m (0 secs / 0.396 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 97 of 310[31m (1 FAILED)[39m (0 secs / 0.397 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 98 of 310[31m (1 FAILED)[39m (0 secs / 0.398 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 99 of 310[31m (1 FAILED)[39m (0 secs / 0.4 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 100 of 310[31m (1 FAILED)[39m (0 secs / 0.401 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 101 of 310[31m (1 FAILED)[39m (0 secs / 0.402 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 102 of 310[31m (1 FAILED)[39m (0 secs / 0.403 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 103 of 310[31m (1 FAILED)[39m (0 secs / 0.404 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 104 of 310[31m (1 FAILED)[39m (0 secs / 0.404 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 105 of 310[31m (1 FAILED)[39m (0 secs / 0.404 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 106 of 310[31m (1 FAILED)[39m (0 secs / 0.405 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 107 of 310[31m (1 FAILED)[39m (0 secs / 0.406 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 108 of 310[31m (1 FAILED)[39m (0 secs / 0.408 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 109 of 310[31m (1 FAILED)[39m (0 secs / 0.409 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 110 of 310[31m (1 FAILED)[39m (0 secs / 0.41 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 111 of 310[31m (1 FAILED)[39m (0 secs / 0.411 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 112 of 310[31m (1 FAILED)[39m (0 secs / 0.412 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 113 of 310[31m (1 FAILED)[39m (0 secs / 0.413 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 114 of 310[31m (1 FAILED)[39m (0 secs / 0.414 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 115 of 310[31m (1 FAILED)[39m (0 secs / 0.415 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 116 of 310[31m (1 FAILED)[39m (0 secs / 0.416 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 117 of 310[31m (1 FAILED)[39m (0 secs / 0.417 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 118 of 310[31m (1 FAILED)[39m (0 secs / 0.418 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 119 of 310[31m (1 FAILED)[39m (0 secs / 0.419 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 120 of 310[31m (1 FAILED)[39m (0 secs / 0.419 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 121 of 310[31m (1 FAILED)[39m (0 secs / 0.42 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 122 of 310[31m (1 FAILED)[39m (0 secs / 0.421 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 123 of 310[31m (1 FAILED)[39m (0 secs / 0.421 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 124 of 310[31m (1 FAILED)[39m (0 secs / 0.421 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 125 of 310[31m (1 FAILED)[39m (0 secs / 0.421 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 126 of 310[31m (1 FAILED)[39m (0 secs / 0.422 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 127 of 310[31m (1 FAILED)[39m (0 secs / 0.423 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 128 of 310[31m (1 FAILED)[39m (0 secs / 0.424 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 129 of 310[31m (1 FAILED)[39m (0 secs / 0.433 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 130 of 310[31m (1 FAILED)[39m (0 secs / 0.436 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 131 of 310[31m (1 FAILED)[39m (0 secs / 0.438 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 132 of 310[31m (1 FAILED)[39m (0 secs / 0.441 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 133 of 310[31m (1 FAILED)[39m (0 secs / 0.444 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 134 of 310[31m (1 FAILED)[39m (0 secs / 0.447 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 135 of 310[31m (1 FAILED)[39m (0 secs / 0.45 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 136 of 310[31m (1 FAILED)[39m (0 secs / 0.453 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 137 of 310[31m (1 FAILED)[39m (0 secs / 0.456 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 137 of 310[31m (1 FAILED)[39m (0 secs / 0.456 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 138 of 310[31m (1 FAILED)[39m (0 secs / 0.47 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 138 of 310[31m (1 FAILED)[39m (0 secs / 0.47 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 139 of 310[31m (1 FAILED)[39m (0 secs / 0.474 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 139 of 310[31m (1 FAILED)[39m (0 secs / 0.474 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 140 of 310[31m (1 FAILED)[39m (0 secs / 0.477 secs)
+[1A[2KWARN: [36m'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 140 of 310[31m (1 FAILED)[39m (0 secs / 0.477 secs)
+WARN: 'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 141 of 310[31m (1 FAILED)[39m (0 secs / 0.482 secs)
+[1A[2KWARN: [36m'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 141 of 310[31m (1 FAILED)[39m (0 secs / 0.482 secs)
+WARN: 'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 142 of 310[31m (1 FAILED)[39m (0 secs / 0.483 secs)
+[1A[2KWARN: [36m'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 142 of 310[31m (1 FAILED)[39m (0 secs / 0.483 secs)
+WARN: 'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 143 of 310[31m (1 FAILED)[39m (0 secs / 0.483 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 144 of 310[31m (1 FAILED)[39m (0 secs / 0.488 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 145 of 310[31m (1 FAILED)[39m (0 secs / 0.489 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 146 of 310[31m (1 FAILED)[39m (0 secs / 0.491 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 147 of 310[31m (1 FAILED)[39m (0 secs / 0.491 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 148 of 310[31m (1 FAILED)[39m (0 secs / 0.492 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 149 of 310[31m (1 FAILED)[39m (0 secs / 0.493 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 310[31m (1 FAILED)[39m (0 secs / 0.493 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 151 of 310[31m (1 FAILED)[39m (0 secs / 0.493 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 152 of 310[31m (1 FAILED)[39m (0 secs / 0.495 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 153 of 310[31m (1 FAILED)[39m (0 secs / 0.495 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 154 of 310[31m (1 FAILED)[39m (0 secs / 0.496 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 155 of 310[31m (1 FAILED)[39m (0 secs / 0.497 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 156 of 310[31m (1 FAILED)[39m (0 secs / 0.499 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 157 of 310[31m (1 FAILED)[39m (0 secs / 0.5 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 158 of 310[31m (1 FAILED)[39m (0 secs / 0.501 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 159 of 310[31m (1 FAILED)[39m (0 secs / 0.501 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 160 of 310[31m (1 FAILED)[39m (0 secs / 0.504 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 161 of 310[31m (1 FAILED)[39m (0 secs / 0.507 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 162 of 310[31m (1 FAILED)[39m (0 secs / 0.508 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 163 of 310[31m (1 FAILED)[39m (0 secs / 0.509 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 164 of 310[31m (1 FAILED)[39m (0 secs / 0.51 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 165 of 310[31m (1 FAILED)[39m (0 secs / 0.514 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 166 of 310[31m (1 FAILED)[39m (0 secs / 0.516 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 167 of 310[31m (1 FAILED)[39m (0 secs / 0.518 secs)
+[1A[2K[31mChrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should connect when connect() is called FAILED[39m
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 168 of 310[31m (2 FAILED)[39m (0 secs / 0.52 secs)
+Chrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should connect when connect() is called FAILED
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+[1A[2K[31mChrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should be created FAILED[39m
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 169 of 310[31m (3 FAILED)[39m (0 secs / 0.521 secs)
+Chrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should be created FAILED
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+[1A[2K[31mChrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should save progress locally and then via websocket if connected FAILED[39m
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 170 of 310[31m (4 FAILED)[39m (0 secs / 0.521 secs)
+Chrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should save progress locally and then via websocket if connected FAILED
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+[1A[2K[31mChrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should initialize with DISCONNECTED state FAILED[39m
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 171 of 310[31m (5 FAILED)[39m (0 secs / 0.521 secs)
+Chrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should initialize with DISCONNECTED state FAILED
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+[1A[2K[31mChrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should update sync status correctly FAILED[39m
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 172 of 310[31m (6 FAILED)[39m (0 secs / 0.522 secs)
+Chrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should update sync status correctly FAILED
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+[1A[2K[31mChrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should save progress locally and register background sync if disconnected FAILED[39m
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 173 of 310[31m (7 FAILED)[39m (0 secs / 0.523 secs)
+Chrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should save progress locally and register background sync if disconnected FAILED
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+[1A[2K[31mChrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should return local progress in getProgress if socket not connected FAILED[39m
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 174 of 310[31m (8 FAILED)[39m (0 secs / 0.524 secs)
+Chrome Headless 147.0.0.0 (Linux 0.0.0) ReadingProgressSyncService should return local progress in getProgress if socket not connected FAILED
+	Error: <spyOn> : createSocket() method does not exist
+	Usage: spyOn(<object>, <methodName>)
+	    at <Jasmine>
+	    at UserContext.apply (src/app/core/services/reading-progress-sync.service.spec.ts:89:3)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
+	    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
+	    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
+	    at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 175 of 310[31m (8 FAILED)[39m (0 secs / 0.561 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 176 of 310[31m (8 FAILED)[39m (0 secs / 0.564 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 177 of 310[31m (8 FAILED)[39m (0 secs / 0.568 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 178 of 310[31m (8 FAILED)[39m (0 secs / 0.571 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 179 of 310[31m (8 FAILED)[39m (0 secs / 0.574 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 180 of 310[31m (8 FAILED)[39m (0 secs / 0.577 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 181 of 310[31m (8 FAILED)[39m (0 secs / 0.58 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 182 of 310[31m (8 FAILED)[39m (0 secs / 0.583 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 183 of 310[31m (8 FAILED)[39m (0 secs / 0.586 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 184 of 310[31m (8 FAILED)[39m (0 secs / 0.589 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 185 of 310[31m (8 FAILED)[39m (0 secs / 0.592 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 186 of 310[31m (8 FAILED)[39m (0 secs / 0.596 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 187 of 310[31m (8 FAILED)[39m (0 secs / 0.599 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 188 of 310[31m (8 FAILED)[39m (0 secs / 0.611 secs)
+[1A[2KLOG: [36m'📡 Evento WebSocket recebido:', Object{type: 'chapters.updated'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 188 of 310[31m (8 FAILED)[39m (0 secs / 0.611 secs)
+LOG: '📡 Evento WebSocket recebido:', Object{type: 'chapters.updated'}
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 189 of 310[31m (8 FAILED)[39m (0 secs / 0.614 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 190 of 310[31m (8 FAILED)[39m (0 secs / 0.615 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 191 of 310[31m (8 FAILED)[39m (0 secs / 0.616 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 192 of 310[31m (8 FAILED)[39m (0 secs / 0.616 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 193 of 310[31m (8 FAILED)[39m (0 secs / 0.617 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 194 of 310[31m (8 FAILED)[39m (0 secs / 0.618 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 195 of 310[31m (8 FAILED)[39m (0 secs / 0.619 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 196 of 310[31m (8 FAILED)[39m (0 secs / 0.619 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 197 of 310[31m (8 FAILED)[39m (0 secs / 0.62 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 198 of 310[31m (8 FAILED)[39m (0 secs / 0.625 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 199 of 310[31m (8 FAILED)[39m (0 secs / 0.627 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 200 of 310[31m (8 FAILED)[39m (0 secs / 0.629 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 201 of 310[31m (8 FAILED)[39m (0 secs / 0.632 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 202 of 310[31m (8 FAILED)[39m (0 secs / 0.634 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 203 of 310[31m (8 FAILED)[39m (0 secs / 0.636 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 204 of 310[31m (8 FAILED)[39m (0 secs / 0.638 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 205 of 310[31m (8 FAILED)[39m (0 secs / 0.64 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 206 of 310[31m (8 FAILED)[39m (0 secs / 0.642 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 207 of 310[31m (8 FAILED)[39m (0 secs / 0.642 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 208 of 310[31m (8 FAILED)[39m (0 secs / 0.642 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 209 of 310[31m (8 FAILED)[39m (0 secs / 0.649 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 210 of 310[31m (8 FAILED)[39m (0 secs / 0.65 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 211 of 310[31m (8 FAILED)[39m (0 secs / 0.651 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 212 of 310[31m (8 FAILED)[39m (0 secs / 0.653 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 213 of 310[31m (8 FAILED)[39m (0 secs / 0.655 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 214 of 310[31m (8 FAILED)[39m (0 secs / 0.658 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 215 of 310[31m (8 FAILED)[39m (0 secs / 0.66 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 216 of 310[31m (8 FAILED)[39m (0 secs / 0.661 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 217 of 310[31m (8 FAILED)[39m (0 secs / 0.663 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 218 of 310[31m (8 FAILED)[39m (0 secs / 0.666 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 219 of 310[31m (8 FAILED)[39m (0 secs / 0.668 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 220 of 310[31m (8 FAILED)[39m (0 secs / 0.672 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 221 of 310[31m (8 FAILED)[39m (0 secs / 0.673 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 222 of 310[31m (8 FAILED)[39m (0 secs / 0.68 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 223 of 310[31m (8 FAILED)[39m (0 secs / 0.682 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 224 of 310[31m (8 FAILED)[39m (0 secs / 0.684 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 225 of 310[31m (8 FAILED)[39m (0 secs / 0.687 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 226 of 310[31m (8 FAILED)[39m (0 secs / 0.689 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 227 of 310[31m (8 FAILED)[39m (0 secs / 0.69 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 228 of 310[31m (8 FAILED)[39m (0 secs / 0.692 secs)
+[1A[2KLOG: [36m'Selected Sensitive Content IDs:', [][39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 228 of 310[31m (8 FAILED)[39m (0 secs / 0.692 secs)
+LOG: 'Selected Sensitive Content IDs:', []
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 229 of 310[31m (8 FAILED)[39m (0 secs / 0.705 secs)
+01 06 2026 12:45:35.804:WARN [web-server]: 404: /_karma_webpack_/assets/icons/chevron-down.svg
+[1A[2KERROR: [36m'Failed to load icon: chevron-down', HttpErrorResponse{headers: HttpHeaders{headers: undefined, normalizedNames: Map{}, lazyInit: () => { ... }, lazyUpdate: null}, status: 404, statusText: 'Not Found', url: 'http://localhost:9876/assets/icons/chevron-down.svg', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for http://localhost:9876/assets/icons/chevron-down.svg: 404 Not Found', error: 'NOT FOUND'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 229 of 310[31m (8 FAILED)[39m (0 secs / 0.705 secs)
+ERROR: 'Failed to load icon: chevron-down', HttpErrorResponse{headers: HttpHeaders{headers: undefined, normalizedNames: Map{}, lazyInit: () => { ... }, lazyUpdate: null}, status: 404, statusText: 'Not Found', url: 'http://localhost:9876/assets/icons/chevron-down.svg', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for http://localhost:9876/assets/icons/chevron-down.svg: 404 Not Found', error: 'NOT FOUND'}
+[1A[2KLOG: [36m'Selected Sensitive Content IDs:', [][39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 229 of 310[31m (8 FAILED)[39m (0 secs / 0.705 secs)
+LOG: 'Selected Sensitive Content IDs:', []
+01 06 2026 12:45:35.810:WARN [web-server]: 404: /_karma_webpack_/assets/icons/chevron-down.svg
+[1A[2KLOG: [36m'Selected Sensitive Content IDs:', [][39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 229 of 310[31m (8 FAILED)[39m (0 secs / 0.705 secs)
+LOG: 'Selected Sensitive Content IDs:', []
+[1A[2KLOG: [36m'Selected Sensitive Content IDs:', ['new-sensitive-id'][39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 229 of 310[31m (8 FAILED)[39m (0 secs / 0.705 secs)
+LOG: 'Selected Sensitive Content IDs:', ['new-sensitive-id']
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 230 of 310[31m (8 FAILED)[39m (0 secs / 0.709 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 231 of 310[31m (8 FAILED)[39m (0 secs / 0.71 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 232 of 310[31m (8 FAILED)[39m (0 secs / 0.711 secs)
+[1A[2KERROR: [36m'Failed to load icon: chevron-down', HttpErrorResponse{headers: HttpHeaders{headers: undefined, normalizedNames: Map{}, lazyInit: () => { ... }, lazyUpdate: null}, status: 404, statusText: 'Not Found', url: 'http://localhost:9876/assets/icons/chevron-down.svg', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for http://localhost:9876/assets/icons/chevron-down.svg: 404 Not Found', error: 'NOT FOUND'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 232 of 310[31m (8 FAILED)[39m (0 secs / 0.711 secs)
+ERROR: 'Failed to load icon: chevron-down', HttpErrorResponse{headers: HttpHeaders{headers: undefined, normalizedNames: Map{}, lazyInit: () => { ... }, lazyUpdate: null}, status: 404, statusText: 'Not Found', url: 'http://localhost:9876/assets/icons/chevron-down.svg', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for http://localhost:9876/assets/icons/chevron-down.svg: 404 Not Found', error: 'NOT FOUND'}
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 233 of 310[31m (8 FAILED)[39m (0 secs / 0.711 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 234 of 310[31m (8 FAILED)[39m (0 secs / 0.715 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 235 of 310[31m (8 FAILED)[39m (0 secs / 0.715 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 236 of 310[31m (8 FAILED)[39m (0 secs / 0.716 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 237 of 310[31m (8 FAILED)[39m (0 secs / 0.717 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 238 of 310[31m (8 FAILED)[39m (0 secs / 0.717 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 239 of 310[31m (8 FAILED)[39m (0 secs / 0.718 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 240 of 310[31m (8 FAILED)[39m (0 secs / 0.718 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 241 of 310[31m (8 FAILED)[39m (0 secs / 0.719 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 242 of 310[31m (8 FAILED)[39m (0 secs / 0.719 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 243 of 310[31m (8 FAILED)[39m (0 secs / 0.72 secs)
+[1A[2KWARN: [36m'[CrossTabSync] Failed to parse storage event:', SyntaxError: Unexpected token 'j', "json-invalido{{{" is not valid JSON
+SyntaxError: Unexpected token 'j', "json-invalido{{{" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at listener (http://localhost:9876/_karma_webpack_/webpack:/src/app/core/services/cross-tab-sync.service.ts:75:44)
+    at forEach (http://localhost:9876/_karma_webpack_/webpack:/src/app/core/services/cross-tab-sync.service.spec.ts:154:6)
+    at Array.forEach (<anonymous>)
+    at http://localhost:9876/_karma_webpack_/webpack:/src/app/core/services/cross-tab-sync.service.spec.ts:153:27
+    at compare (http://localhost:9876/base/node_modules/karma-jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine.js?86d98e11f43f2c8cfac9fb4806ed6c0aced74cbe:6632:11)
+    at defaultNegativeCompare (http://localhost:9876/base/node_modules/karma-jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine.js?86d98e11f43f2c8cfac9fb4806ed6c0aced74cbe:3769:39)
+    at Expector.compare (http://localhost:9876/base/node_modules/karma-jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine.js?86d98e11f43f2c8cfac9fb4806ed6c0aced74cbe:3955:27)
+    at Expectation.toThrow (http://localhost:9876/base/node_modules/karma-jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine.js?86d98e11f43f2c8cfac9fb4806ed6c0aced74cbe:3714:36)
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/core/services/cross-tab-sync.service.spec.ts:157:11)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 243 of 310[31m (8 FAILED)[39m (0 secs / 0.72 secs)
+WARN: '[CrossTabSync] Failed to parse storage event:', SyntaxError: Unexpected token 'j', "json-invalido{{{" is not valid JSON
+SyntaxError: Unexpected token 'j', "json-invalido{{{" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at listener (http://localhost:9876/_karma_webpack_/webpack:/src/app/core/services/cross-tab-sync.service.ts:75:44)
+    at forEach (http://localhost:9876/_karma_webpack_/webpack:/src/app/core/services/cross-tab-sync.service.spec.ts:154:6)
+    at Array.forEach (<anonymous>)
+    at http://localhost:9876/_karma_webpack_/webpack:/src/app/core/services/cross-tab-sync.service.spec.ts:153:27
+    at compare (http://localhost:9876/base/node_modules/karma-jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine.js?86d98e11f43f2c8cfac9fb4806ed6c0aced74cbe:6632:11)
+    at defaultNegativeCompare (http://localhost:9876/base/node_modules/karma-jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine.js?86d98e11f43f2c8cfac9fb4806ed6c0aced74cbe:3769:39)
+    at Expector.compare (http://localhost:9876/base/node_modules/karma-jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine.js?86d98e11f43f2c8cfac9fb4806ed6c0aced74cbe:3955:27)
+    at Expectation.toThrow (http://localhost:9876/base/node_modules/karma-jasmine/node_modules/jasmine-core/lib/jasmine-core/jasmine.js?86d98e11f43f2c8cfac9fb4806ed6c0aced74cbe:3714:36)
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/core/services/cross-tab-sync.service.spec.ts:157:11)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 244 of 310[31m (8 FAILED)[39m (0 secs / 0.721 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 245 of 310[31m (8 FAILED)[39m (0 secs / 0.722 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 246 of 310[31m (8 FAILED)[39m (0 secs / 0.722 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 247 of 310[31m (8 FAILED)[39m (0 secs / 0.723 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 248 of 310[31m (8 FAILED)[39m (0 secs / 0.723 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 249 of 310[31m (8 FAILED)[39m (0 secs / 0.724 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 250 of 310[31m (8 FAILED)[39m (0 secs / 0.73 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 251 of 310[31m (8 FAILED)[39m (0 secs / 0.735 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 252 of 310[31m (8 FAILED)[39m (0 secs / 0.744 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 253 of 310[31m (8 FAILED)[39m (0 secs / 0.747 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 254 of 310[31m (8 FAILED)[39m (0 secs / 0.751 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 255 of 310[31m (8 FAILED)[39m (0 secs / 0.754 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 256 of 310[31m (8 FAILED)[39m (0 secs / 0.758 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 257 of 310[31m (8 FAILED)[39m (0 secs / 0.768 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 258 of 310[31m (8 FAILED)[39m (0 secs / 0.769 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 259 of 310[31m (8 FAILED)[39m (0 secs / 0.772 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 259 of 310[31m (8 FAILED)[39m (0 secs / 0.772 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 260 of 310[31m (8 FAILED)[39m (0 secs / 0.781 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 260 of 310[31m (8 FAILED)[39m (0 secs / 0.781 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 261 of 310[31m (8 FAILED)[39m (0 secs / 0.794 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 262 of 310[31m (8 FAILED)[39m (0 secs / 0.795 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 263 of 310[31m (8 FAILED)[39m (0 secs / 0.796 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 264 of 310[31m (8 FAILED)[39m (0 secs / 0.797 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 265 of 310[31m (8 FAILED)[39m (0 secs / 0.797 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 266 of 310[31m (8 FAILED)[39m (0 secs / 0.798 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 267 of 310[31m (8 FAILED)[39m (0 secs / 0.799 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 268 of 310[31m (8 FAILED)[39m (0 secs / 0.8 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 269 of 310[31m (8 FAILED)[39m (0 secs / 0.805 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 270 of 310[31m (8 FAILED)[39m (0 secs / 0.808 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 271 of 310[31m (8 FAILED)[39m (0 secs / 0.809 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 272 of 310[31m (8 FAILED)[39m (0 secs / 0.81 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 273 of 310[31m (8 FAILED)[39m (0 secs / 0.81 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 273 of 310[31m (8 FAILED)[39m (0 secs / 0.81 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 274 of 310[31m (8 FAILED)[39m (0 secs / 0.819 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 274 of 310[31m (8 FAILED)[39m (0 secs / 0.819 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 275 of 310[31m (8 FAILED)[39m (0 secs / 0.825 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 276 of 310[31m (8 FAILED)[39m (0 secs / 0.826 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 276 of 310[31m (8 FAILED)[39m (0 secs / 0.826 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 277 of 310[31m (8 FAILED)[39m (0 secs / 0.835 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 278 of 310[31m (8 FAILED)[39m (0 secs / 0.837 secs)
+[1A[2KLOG: [36m'🔄 Carregando dados do dashboard...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 278 of 310[31m (8 FAILED)[39m (0 secs / 0.837 secs)
+LOG: '🔄 Carregando dados do dashboard...'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 279 of 310[31m (8 FAILED)[39m (0 secs / 0.847 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 279 of 310[31m (8 FAILED)[39m (0 secs / 0.847 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 280 of 310[31m (8 FAILED)[39m (0 secs / 0.863 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 281 of 310[31m (8 FAILED)[39m (0 secs / 0.874 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 282 of 310[31m (8 FAILED)[39m (0 secs / 0.875 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 283 of 310[31m (8 FAILED)[39m (0 secs / 0.876 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 283 of 310[31m (8 FAILED)[39m (0 secs / 0.876 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 284 of 310[31m (8 FAILED)[39m (0 secs / 0.899 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 284 of 310[31m (8 FAILED)[39m (0 secs / 0.899 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KERROR: [36m'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:63:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 284 of 310[31m (8 FAILED)[39m (0 secs / 0.899 secs)
+ERROR: 'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:63:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 285 of 310[31m (8 FAILED)[39m (0 secs / 0.903 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 285 of 310[31m (8 FAILED)[39m (0 secs / 0.903 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KERROR: [36m'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:159:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 285 of 310[31m (8 FAILED)[39m (0 secs / 0.903 secs)
+ERROR: 'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:159:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+[1A[2KERROR: [36m'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:159:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 285 of 310[31m (8 FAILED)[39m (0 secs / 0.903 secs)
+ERROR: 'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:159:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 286 of 310[31m (8 FAILED)[39m (0 secs / 0.907 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 286 of 310[31m (8 FAILED)[39m (0 secs / 0.907 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 286 of 310[31m (8 FAILED)[39m (0 secs / 0.907 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KERROR: [36m'Error rendering blurhash:', ValidationError: blurhash length mismatch: length is 9 but it should be 32
+ValidationError: blurhash length mismatch: length is 9 but it should be 32
+    at C (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1073)
+    at U (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1434)
+    at BlurhashComponent.render (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:61:25)
+    at fn (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:34:10)
+    at Object.fn (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:2943:5)
+    at runEffect (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:425:10)
+    at Object.run (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:2865:16)
+    at runEffectsInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5387:16)
+    at refreshView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5487:5)
+    at detectChangesInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5607:5)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 286 of 310[31m (8 FAILED)[39m (0 secs / 0.907 secs)
+ERROR: 'Error rendering blurhash:', ValidationError: blurhash length mismatch: length is 9 but it should be 32
+ValidationError: blurhash length mismatch: length is 9 but it should be 32
+    at C (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1073)
+    at U (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1434)
+    at BlurhashComponent.render (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:61:25)
+    at fn (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:34:10)
+    at Object.fn (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:2943:5)
+    at runEffect (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:425:10)
+    at Object.run (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:2865:16)
+    at runEffectsInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5387:16)
+    at refreshView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5487:5)
+    at detectChangesInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5607:5)
+[1A[2KERROR: [36m'Error rendering blurhash:', ValidationError: blurhash length mismatch: length is 9 but it should be 32
+ValidationError: blurhash length mismatch: length is 9 but it should be 32
+    at C (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1073)
+    at U (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1434)
+    at BlurhashComponent.render (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:61:25)
+    at BlurhashComponent.call [as ngAfterViewInit] (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:40:8)
+    at callHookInternal (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:555:10)
+    at callHook (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:570:7)
+    at callHooks (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:544:9)
+    at executeInitAndCheckHooks (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:513:5)
+    at refreshView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5524:11)
+    at detectChangesInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5607:5)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 286 of 310[31m (8 FAILED)[39m (0 secs / 0.907 secs)
+ERROR: 'Error rendering blurhash:', ValidationError: blurhash length mismatch: length is 9 but it should be 32
+ValidationError: blurhash length mismatch: length is 9 but it should be 32
+    at C (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1073)
+    at U (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1434)
+    at BlurhashComponent.render (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:61:25)
+    at BlurhashComponent.call [as ngAfterViewInit] (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:40:8)
+    at callHookInternal (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:555:10)
+    at callHook (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:570:7)
+    at callHooks (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:544:9)
+    at executeInitAndCheckHooks (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:513:5)
+    at refreshView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5524:11)
+    at detectChangesInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5607:5)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 287 of 310[31m (8 FAILED)[39m (0 secs / 0.915 secs)
+[1A[2KERROR: [36m'Erro ao carregar capítulo', '[chapter=test-chapter-id] reason=unknown source=unknown origin=route forceOnline=false silent=false', Object{chapterId: 'test-chapter-id', origin: 'route', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: NG0205: Injector has already been destroyed.
+Error: NG0205: Injector has already been destroyed.
+    at assertNotDestroyed (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:1395:11)
+    at runInInjectionContext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:1429:5)
+    at HttpInterceptorHandler.chain (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1288:67)
+    at HttpInterceptorHandler.handle (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1377:19)
+    at project (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1518:64)
+    at doInnerSub (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/mergeInternals.js:19:19)
+    at onNext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/mergeInternals.js:14:57)
+    at OperatorSubscriber._next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:13:21)
+    at OperatorSubscriber.next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:31:18)
+    at Observable._subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/observable/innerFrom.js:51:24)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 287 of 310[31m (8 FAILED)[39m (0 secs / 0.915 secs)
+ERROR: 'Erro ao carregar capítulo', '[chapter=test-chapter-id] reason=unknown source=unknown origin=route forceOnline=false silent=false', Object{chapterId: 'test-chapter-id', origin: 'route', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: NG0205: Injector has already been destroyed.
+Error: NG0205: Injector has already been destroyed.
+    at assertNotDestroyed (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:1395:11)
+    at runInInjectionContext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:1429:5)
+    at HttpInterceptorHandler.chain (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1288:67)
+    at HttpInterceptorHandler.handle (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1377:19)
+    at project (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1518:64)
+    at doInnerSub (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/mergeInternals.js:19:19)
+    at onNext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/mergeInternals.js:14:57)
+    at OperatorSubscriber._next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:13:21)
+    at OperatorSubscriber.next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:31:18)
+    at Observable._subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/observable/innerFrom.js:51:24)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 287 of 310[31m (8 FAILED)[39m (0 secs / 0.915 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KERROR: [36m'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:178:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 287 of 310[31m (8 FAILED)[39m (0 secs / 0.915 secs)
+ERROR: 'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:178:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+[1A[2KERROR: [36m'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:178:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 287 of 310[31m (8 FAILED)[39m (0 secs / 0.915 secs)
+ERROR: 'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:178:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 288 of 310[31m (8 FAILED)[39m (0 secs / 0.92 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 288 of 310[31m (8 FAILED)[39m (0 secs / 0.92 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KERROR: [36m'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:201:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 288 of 310[31m (8 FAILED)[39m (0 secs / 0.92 secs)
+ERROR: 'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:201:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+[1A[2KERROR: [36m'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=retry-modal forceOnline=true silent=false', Object{chapterId: 'chapter-id', origin: 'retry-modal', reason: 'unknown', source: 'unknown', forceOnline: true, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:201:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 288 of 310[31m (8 FAILED)[39m (0 secs / 0.92 secs)
+ERROR: 'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=retry-modal forceOnline=true silent=false', Object{chapterId: 'chapter-id', origin: 'retry-modal', reason: 'unknown', source: 'unknown', forceOnline: true, silent: false, statusCode: undefined}, Error: boom
+Error: boom
+    at UserContext.<anonymous> (http://localhost:9876/_karma_webpack_/webpack:/src/app/pages/chapters/chapters.component.spec.ts:201:4)
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at _next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at executor (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:22:1)
+    at new ZoneAwarePromise (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2701:25)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:14:1)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 289 of 310[31m (8 FAILED)[39m (0 secs / 0.924 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 289 of 310[31m (8 FAILED)[39m (0 secs / 0.924 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KERROR: [36m'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 289 of 310[31m (8 FAILED)[39m (0 secs / 0.924 secs)
+ERROR: 'Erro ao carregar capítulo', '[chapter=chapter-id] reason=unknown source=unknown origin=unknown forceOnline=false silent=false', Object{chapterId: 'chapter-id', origin: 'unknown', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false}
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 290 of 310[31m (8 FAILED)[39m (0 secs / 0.93 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 290 of 310[31m (8 FAILED)[39m (0 secs / 0.93 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 291 of 310[31m (8 FAILED)[39m (0 secs / 0.934 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 291 of 310[31m (8 FAILED)[39m (0 secs / 0.934 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 292 of 310[31m (8 FAILED)[39m (0 secs / 0.937 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 292 of 310[31m (8 FAILED)[39m (0 secs / 0.937 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 293 of 310[31m (8 FAILED)[39m (0 secs / 0.941 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 294 of 310[31m (8 FAILED)[39m (0 secs / 0.944 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 295 of 310[31m (8 FAILED)[39m (0 secs / 0.946 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 296 of 310[31m (8 FAILED)[39m (0 secs / 0.947 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 297 of 310[31m (8 FAILED)[39m (0 secs / 0.949 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 298 of 310[31m (8 FAILED)[39m (0 secs / 0.95 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 299 of 310[31m (8 FAILED)[39m (0 secs / 0.951 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 310[31m (8 FAILED)[39m (0 secs / 0.96 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 301 of 310[31m (8 FAILED)[39m (0 secs / 0.963 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 302 of 310[31m (8 FAILED)[39m (0 secs / 0.965 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 303 of 310[31m (8 FAILED)[39m (0 secs / 0.966 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 304 of 310[31m (8 FAILED)[39m (0 secs / 0.966 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 305 of 310[31m (8 FAILED)[39m (0 secs / 0.967 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 306 of 310[31m (8 FAILED)[39m (0 secs / 0.968 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 307 of 310[31m (8 FAILED)[39m (0 secs / 0.969 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 308 of 310[31m (8 FAILED)[39m (0 secs / 0.97 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 309 of 310[31m (8 FAILED)[39m (0 secs / 0.97 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 310 of 310[31m (8 FAILED)[39m (0 secs / 0.971 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 310 of 310[31m (8 FAILED)[39m (1.127 secs / 0.971 secs)
+[31mTOTAL: 8 FAILED, 302 SUCCESS[39m
+TOTAL: 8 FAILED, 302 SUCCESS
