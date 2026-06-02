@@ -52,10 +52,8 @@ export class CsrfService {
 			}
 
 			for (const domain of domainsToTry) {
-				// biome-ignore lint/suspicious/noDocumentCookie: valid
 				document.cookie = `csrfToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
 			}
-			// biome-ignore lint/suspicious/noDocumentCookie: valid
 			document.cookie = `csrfToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		}
 	}

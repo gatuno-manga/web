@@ -28,8 +28,7 @@ export class IconRegistryService {
 
 	getIcon(name: string): Observable<string> {
 		if (this.iconCache.has(name)) {
-			// biome-ignore lint/style/noNonNullAssertion: valid
-			return of(this.iconCache.get(name)!);
+			return of(this.iconCache.get(name) as string);
 		}
 
 		const KEY = makeStateKey<string>(`SVG_ICON_${name}`);
@@ -41,8 +40,7 @@ export class IconRegistryService {
 		}
 
 		if (this.inFlightRequests.has(name)) {
-			// biome-ignore lint/style/noNonNullAssertion: valid
-			return this.inFlightRequests.get(name)!;
+			return this.inFlightRequests.get(name) as Observable<string>;
 		}
 
 		const path = `/assets/icons/${name}.svg`;

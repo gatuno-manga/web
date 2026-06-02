@@ -12,8 +12,8 @@ export class HighlightService {
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
 			this.isSupported.set(
-				// biome-ignore lint/suspicious/noExplicitAny: valid
-				typeof (CSS as any)?.highlights !== 'undefined',
+				typeof (CSS as unknown as { highlights: unknown })
+					?.highlights !== 'undefined',
 			);
 		}
 	}
@@ -22,10 +22,16 @@ export class HighlightService {
 		if (!this.isSupported()) return;
 
 		try {
-			// biome-ignore lint/suspicious/noExplicitAny: valid
-			const highlight = new (window as any).Highlight(...ranges);
-			// biome-ignore lint/suspicious/noExplicitAny: valid
-			(CSS as any).highlights.set(name, highlight);
+			const highlight = new (
+				window as unknown as {
+					Highlight: new (...args: unknown[]) => unknown;
+				}
+			).Highlight(...ranges);
+			(
+				CSS as unknown as {
+					highlights: { set: (k: string, v: unknown) => void };
+				}
+			).highlights.set(name, highlight);
 		} catch (err) {
 			console.error(`Highlight API Error: ${err}`);
 		}
@@ -33,14 +39,16 @@ export class HighlightService {
 
 	clearHighlight(name: string) {
 		if (!this.isSupported()) return;
-		// biome-ignore lint/suspicious/noExplicitAny: valid
-		(CSS as any).highlights.delete(name);
+		(
+			CSS as unknown as { highlights: { delete: (k: string) => void } }
+		).highlights.delete(name);
 	}
 
 	clearAllHighlights() {
 		if (!this.isSupported()) return;
-		// biome-ignore lint/suspicious/noExplicitAny: valid
-		(CSS as any).highlights.clear();
+		(
+			CSS as unknown as { highlights: { clear: () => void } }
+		).highlights.clear();
 	}
 
 	getSelectionRanges(): Range[] {

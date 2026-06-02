@@ -485,8 +485,7 @@ export class DownloadService {
 		const sortedBlobs = results
 			.sort((a, b) => a.index - b.index)
 			.filter((r) => r.blob !== null)
-			// biome-ignore lint/style/noNonNullAssertion: valid
-			.map((r) => r.blob!);
+			.map((r) => r.blob as Blob);
 
 		if (sortedBlobs.length === 0 && chapter.pages.length > 0) {
 			throw new Error('All pages failed to download');

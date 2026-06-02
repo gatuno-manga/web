@@ -9,8 +9,7 @@
 		class="search-input"
 		[attr.aria-hidden]="!isSearchExpanded()"
 		[tabIndex]="isSearchExpanded() ? 0 : -1"
-		<!-- biome-ignore lint/a11y/useAriaPropsForRole: binding -->
-			role="combobox"
+			role="combobox" aria-expanded="false"
 		
 		aria-autocomplete="list"
 		aria-haspopup="listbox"
