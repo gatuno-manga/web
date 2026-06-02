@@ -9,9 +9,9 @@ import {
 	PLATFORM_ID,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { BookWebsocketService } from '@core/services/book-websocket.service';
 import { DashboardService } from '@core/services/dashboard.service';
 import { MetaDataService } from '@core/services/meta-data.service';
+import { MqttService } from '@core/services/mqtt.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import {
 	DashboardOverview,
@@ -82,7 +82,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 	constructor(
 		private readonly dashboardService: DashboardService,
 		private metaService: MetaDataService,
-		private wsService: BookWebsocketService,
+		private wsService: MqttService,
 		private userTokenService: UserTokenService,
 	) {
 		this.setMetaData();

@@ -23,7 +23,6 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { BookWebsocketService } from '@core/services/book-websocket.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
 import { DownloadService } from '@core/services/download.service';
@@ -31,6 +30,7 @@ import { HeaderStateService } from '@core/services/header-state.service';
 import { HighlightService } from '@core/services/highlight.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { MqttService, MqttWatchEvent } from '@core/services/mqtt.service';
 import { NetworkStatusService } from '@core/services/network-status.service';
 import { NotificationSeverity } from '@core/services/notification';
 import { NotificationService } from '@core/services/notification.service';
@@ -116,7 +116,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private notificationService = inject(NotificationService);
 	private metaDataService = inject(MetaDataService);
 	private settingsService = inject(SettingsService);
-	private bookWebsocketService = inject(BookWebsocketService);
+	private bookWebsocketService = inject(MqttService);
 	private downloadService = inject(DownloadService);
 	private readingProgressService = inject(UnifiedReadingProgressService);
 	private contextMenuService = inject(ContextMenuService);
@@ -223,41 +223,47 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			}
 		});
 
-		this.activatedRoute.paramMap
-			.pipe(takeUntilDestroyed())
-			.subscribe((params) => {
-				const chapterId = params.get('chapter');
-				const bookId = params.get('id');
+		// All data fetching and navigation logic must run only in the browser.
+		// This component is interactive and requires user auth state — it must NOT
+		// make HTTP requests during SSR (Node.js cannot reach localhost:3000 in Docker).
+		if (isPlatformBrowser(this.platformId)) {
+			this.activatedRoute.paramMap
+				.pipe(takeUntilDestroyed())
+				.subscribe((params) => {
+					const chapterId = params.get('chapter');
+					const bookId = params.get('id');
 
-				if (bookId) {
-					this.bookService.getBook(bookId).subscribe({
-						next: (book) => {
-							if (book) {
-								this.bookBlurHash.set(book.blurHash);
-								this.bookDominantColor.set(book.dominantColor);
-								this.bookMetadata.set(book.metadata);
-							}
-						},
-					});
-				}
+					if (bookId) {
+						this.bookService.getBook(bookId).subscribe({
+							next: (book) => {
+								if (book) {
+									this.bookBlurHash.set(book.blurHash);
+									this.bookDominantColor.set(
+										book.dominantColor,
+									);
+									this.bookMetadata.set(book.metadata);
+								}
+							},
+						});
+					}
 
-				if (chapterId) {
-					if (this.currentChapterRouteId !== chapterId) {
-						this.currentChapterRouteId = chapterId;
-						this.dismissedChapterLoadErrorModalId = null;
+					if (chapterId) {
+						if (this.currentChapterRouteId !== chapterId) {
+							this.currentChapterRouteId = chapterId;
+							this.dismissedChapterLoadErrorModalId = null;
+						}
+						this.loadChapter(chapterId, false, false, 'route');
+						if (
+							bookId &&
+							this.userTokenService.hasValidAccessTokenSignal()
+						) {
+							this.setupWebSocket(chapterId, bookId);
+						}
+					} else {
+						this.backPage();
 					}
-					this.loadChapter(chapterId, false, false, 'route');
-					if (
-						bookId &&
-						isPlatformBrowser(this.platformId) &&
-						this.userTokenService.hasValidAccessTokenSignal()
-					) {
-						this.setupWebSocket(chapterId, bookId);
-					}
-				} else {
-					this.backPage();
-				}
-			});
+				});
+		}
 
 		afterNextRender(
 			() => {
@@ -318,15 +324,18 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		}
 
 		this.ngZone.runOutsideAngular(() => {
-			if (!this.bookWebsocketService.isConnected()) {
+			if (
+				!this.bookWebsocketService.connectionState() ||
+				String(this.bookWebsocketService.connectionState()) !==
+					'connected'
+			) {
 				this.bookWebsocketService.connect();
 			}
 
 			this.bookWebsocketService
 				.watchChapter(chapterId, bookId)
 				.pipe(takeUntilDestroyed(this.destroyRef))
-				.subscribe((event) => {
-					const typedEvent = event as { type: string; data: unknown };
+				.subscribe((typedEvent: MqttWatchEvent) => {
 					if (
 						typedEvent.type === 'chapter.updated' ||
 						typedEvent.type === 'chapter.scraping.completed'

@@ -56,8 +56,6 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	private settingsService = inject(SettingsService);
 	private highlightService = inject(HighlightService);
 	private sanitizer = inject(DomSanitizer);
-
-	private lastIntersectingElement: Element | null = null;
 	private intersectionObserver: IntersectionObserver | null = null;
 
 	settings = toSignal(this.settingsService.settings$, {
@@ -96,7 +94,6 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		// biome-ignore lint/complexity/useLiteralKeys: SimpleChanges has index signature and TS config requires bracket access (noPropertyAccessFromIndexSignature: true)
 		if (changes['content'] || changes['format']) {
 			this.updateSafeContent();
 			this.calculateWordCount();
@@ -209,7 +206,7 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 			}
 
 			if (bestEntry) {
-				this.lastIntersectingElement = bestEntry.target;
+				// No logic needed here yet, just identifying best entry
 			}
 		}, options);
 

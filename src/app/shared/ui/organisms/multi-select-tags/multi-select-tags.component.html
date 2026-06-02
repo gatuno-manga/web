@@ -5,7 +5,7 @@
 			[placeholder]="placeholderSearch()"
 			[showLabel]="false"
 			[value]="searchQuery()"
-			(input)="searchQuery.set($any($event.target).value)"
+			(valueChange)="searchQuery.set($event)"
 			leftIcon="search"
 		/>
 	</div>
@@ -13,32 +13,38 @@
 	<div class="badges-container">
 		<!-- Render Filtered Items -->
 		@for (tag of filteredOptions(); track tag.id) {
-			<div
+			<app-button
 				class="badge"
 				[class.selected]="isTagSelected(tag.id)"
 				[class.excluded]="isTagExcluded(tag.id)"
+				variant="text"
+				fill="none"
+				padding="none"
 				(click)="toggleTag(tag.id)"
 			>
 				@if (isTagExcluded(tag.id)) {
 					<app-icons name="close" size="10px" />
 				}
 				{{ tag.name }}
-			</div>
+			</app-button>
 		}
 
 		<!-- Render Active Items that are NOT in current filter (keep them visible) -->
 		@for (tag of activeItemsNotInFilter(); track tag.id) {
-			<div
+			<app-button
 				class="badge"
 				[class.selected]="isTagSelected(tag.id)"
 				[class.excluded]="isTagExcluded(tag.id)"
+				variant="text"
+				fill="none"
+				padding="none"
 				(click)="toggleTag(tag.id)"
 			>
 				@if (isTagExcluded(tag.id)) {
 					<app-icons name="close" size="10px" />
 				}
 				{{ tag.name }}
-			</div>
+			</app-button>
 		}
 
 		@if (filteredOptions().length === 0 && searchQuery()) {

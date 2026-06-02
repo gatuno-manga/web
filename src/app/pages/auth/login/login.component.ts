@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
 	FormBuilder,
 	FormGroup,
@@ -13,7 +13,10 @@ import {
 	isMfaChallengeResponse,
 	loginResponse,
 } from '@models/user.models';
-import { startAuthentication } from '@simplewebauthn/browser';
+import {
+	PublicKeyCredentialRequestOptionsJSON,
+	startAuthentication,
+} from '@simplewebauthn/browser';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { MfaInputComponent } from '@ui/atoms/inputs/mfa-input/mfa-input.component';
@@ -37,7 +40,7 @@ import { firstValueFrom } from 'rxjs';
 	templateUrl: './login.component.html',
 	styleUrl: './login.component.scss',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 	form: FormGroup;
 	private returnUrl = '/books';
 	step: 'email' | 'password' | 'mfa' = 'email';
@@ -59,6 +62,11 @@ export class LoginComponent {
 		this.returnUrl =
 			this.route.snapshot.queryParamMap.get('returnUrl') || '/books';
 		this.setMetaData();
+	}
+
+	ngOnInit(): void {
+		// Tenta iniciar a autenticação por passkey (nameless/conditional UI) assim que a página carrega
+		void this.signInWithPasskey(true);
 	}
 
 	setMetaData() {
@@ -185,32 +193,35 @@ export class LoginComponent {
 		});
 	}
 
-	async signInWithPasskey() {
-		const email = String(this.form.get('email')?.value ?? '').trim();
-		if (!email || this.isLoading) {
-			this.form.setErrors({
-				...(this.form.errors ?? {}),
-				passkeyFailed: 'Informe o email para autenticar com passkey.',
-			});
-			return;
-		}
+	async signInWithPasskey(isAutofill = false) {
+		if (this.isLoading && !isAutofill) return;
 
-		this.isLoading = true;
+		const email = String(this.form.get('email')?.value ?? '').trim();
+
+		// No modo autofill, não queremos mostrar loading spinner
+		if (!isAutofill) this.isLoading = true;
+
 		try {
 			const options = await firstValueFrom(
-				this.authService.beginPasskeyAuthentication(email),
+				this.authService.beginPasskeyAuthentication(email || undefined),
 			);
 			if (!options) {
 				throw new Error('Passkey options not received');
 			}
 
 			const assertion = await startAuthentication({
-				optionsJSON: options as never,
+				optionsJSON:
+					options as object as PublicKeyCredentialRequestOptionsJSON,
+				useBrowserAutofill: isAutofill,
 			});
+
+			// Se chegamos aqui, o usuário selecionou uma passkey
+			if (isAutofill) this.isLoading = true;
+
 			const response = await firstValueFrom(
 				this.authService.verifyPasskeyAuthentication(
-					email,
-					assertion as unknown as Record<string, unknown>,
+					assertion,
+					email || undefined,
 				),
 			);
 
@@ -220,13 +231,29 @@ export class LoginComponent {
 			}
 
 			this.handleAuthResult(response.body);
-		} catch (error) {
-			console.error('Passkey sign-in failed', error);
-			this.isLoading = false;
-			this.form.setErrors({
-				...(this.form.errors ?? {}),
-				passkeyFailed: 'Falha ao autenticar com passkey.',
-			});
+		} catch (err) {
+			const error = err as { name?: string };
+			if (!isAutofill) {
+				console.error('Passkey sign-in failed', error);
+				this.isLoading = false;
+
+				const isNotAllowed = error.name === 'NotAllowedError';
+				const passkeyFailed =
+					!email && isNotAllowed
+						? 'Nenhuma passkey encontrada no dispositivo. Digite seu e-mail caso possua passkeys em outros dispositivos.'
+						: 'Falha ao autenticar com passkey.';
+
+				this.form.setErrors({
+					...(this.form.errors ?? {}),
+					passkeyFailed,
+				});
+			} else {
+				// Erros silenciosos no autofill (ex: cancelado pelo navegador ou sem suporte)
+				console.debug(
+					'Conditional UI passkey login skipped or failed',
+					error,
+				);
+			}
 		}
 	}
 }

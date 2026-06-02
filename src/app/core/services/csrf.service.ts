@@ -52,9 +52,9 @@ export class CsrfService {
 			}
 
 			for (const domain of domainsToTry) {
-				document.cookie = `csrfToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+				this.cookieService.delete('csrfToken', false, domain);
 			}
-			document.cookie = `csrfToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+			this.cookieService.delete('csrfToken', false);
 		}
 	}
 }

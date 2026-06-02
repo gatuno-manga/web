@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { NetworkStatusService } from '@core/services/network-status.service';
@@ -7,6 +7,7 @@ import { UserTokenService } from '@core/services/user-token.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
 	selector: 'app-outlet',
@@ -18,6 +19,7 @@ import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.compo
 	],
 	templateUrl: './outlet.component.html',
 	styleUrl: './outlet.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OutletComponent {
 	readonly networkStatus = inject(NetworkStatusService);
@@ -26,12 +28,13 @@ export class OutletComponent {
 	readonly searchService = inject(SearchService);
 	readonly userTokenService = inject(UserTokenService);
 
-	logout(): void {
-		this.authService.logout().subscribe({
-			next: () => {
-				this.router.navigate(['/']);
-			},
-		});
+	async logout(): Promise<void> {
+		try {
+			await firstValueFrom(this.authService.logout());
+			this.router.navigate(['/']);
+		} catch (error) {
+			console.error('Logout failed', error);
+		}
 	}
 
 	updateSearch(event: Event): void {

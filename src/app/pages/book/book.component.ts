@@ -10,12 +10,12 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { BookWebsocketService } from '@core/services/book-websocket.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { DownloadService } from '@core/services/download.service';
 import { DownloadManagerService } from '@core/services/download-manager.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { MqttService } from '@core/services/mqtt.service';
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
 import { NotificationService } from '@core/services/notification.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
@@ -23,6 +23,7 @@ import { UnifiedReadingProgressService } from '@core/services/unified-reading-pr
 import { UserTokenService } from '@core/services/user-token.service';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
+import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
@@ -49,6 +50,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 		MarkdownComponent,
 		NgOptimizedImage,
 		BlurhashComponent,
+		FlagPipe,
 	],
 	templateUrl: './book.component.html',
 	styleUrl: './book.component.scss',
@@ -92,7 +94,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	private bookService = inject(BookService);
 	private activatedRoute = inject(ActivatedRoute);
 	private router = inject(Router);
-	private wsService = inject(BookWebsocketService);
+	private wsService = inject(MqttService);
 	private downloadService = inject(DownloadService);
 	private readingProgressService = inject(UnifiedReadingProgressService);
 	private chapterService = inject(ChapterService);
@@ -224,7 +226,7 @@ export class BookComponent implements OnInit, OnDestroy {
 		this.wsSubscription?.unsubscribe();
 		const bookId = this.book()?.id;
 		if (bookId) {
-			this.wsService.unsubscribeFromBook(bookId);
+			// wsSubscription.unsubscribe() cleans up the observables internally.
 		}
 		if (this.coverUrl) {
 			URL.revokeObjectURL(this.coverUrl);
@@ -240,8 +242,7 @@ export class BookComponent implements OnInit, OnDestroy {
 		// Observa eventos do livro
 		this.wsSubscription = this.wsService
 			.watchBook(bookId)
-			.subscribe((event) => {
-				const typedEvent = event as { type: string; data: unknown };
+			.subscribe((typedEvent) => {
 				console.log(
 					'📡 Evento recebido:',
 					typedEvent.type,
@@ -768,7 +769,7 @@ export class BookComponent implements OnInit, OnDestroy {
 
 			// Função auxiliar para delay
 			const delay = (ms: number) =>
-				new Promise((resolve) => setTimeout(resolve, ms));
+				new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 			// Baixar capítulos sequencialmente em segundo plano com intervalo de 1s
 			await this.downloadChaptersInBackground(chapters, delay);
@@ -936,7 +937,7 @@ export class BookComponent implements OnInit, OnDestroy {
 
 	private async downloadChaptersInBackground(
 		chapters: Chapterlist[],
-		delay: (ms: number) => Promise<unknown>,
+		delay: (ms: number) => Promise<void>,
 	) {
 		const b = this.book();
 		if (!b) return;

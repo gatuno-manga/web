@@ -3,7 +3,7 @@ import { isNotLoggedMatchGuard } from '@features/authentication/guards/auth.guar
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 
-export const routes: Routes = [
+export const authRoutes: Routes = [
 	{
 		path: '',
 		pathMatch: 'full',

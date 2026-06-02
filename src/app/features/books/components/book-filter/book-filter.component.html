@@ -3,7 +3,7 @@
 		type="text"
 		class="search-input"
 		[value]="searchValue()"
-		(input)="onSearchInput($any($event.target).value)"
+		(valueChange)="onSearchInput($event)"
 		(keydown.enter)="onSearch()"
 		rightIcon="search"
 		[rightIconClick]="onSearchClick"
@@ -85,9 +85,7 @@
 						placeholder="Ano"
 						[showLabel]="false"
 						[value]="publicationYear()?.toString() || ''"
-						(input)="
-							onPublicationYearChange($any($event.target).value)
-						"
+						(valueChange)="onPublicationYearChange($event)"
 						class="year-input"
 					/>
 				</div>
@@ -107,7 +105,8 @@
 				<h3 class="filter-title">Conteúdos sensíveis</h3>
 				<app-multi-select-tags
 					[options]="availableSensitiveContent()"
-					[(selectedIds)]="selectedSensitiveContent"
+					[selectedIds]="selectedSensitiveContent()"
+					(selectedIdsChange)="onSensitiveContentChange($event)"
 					placeholderSearch="Filtrar conteúdos..."
 					[groupSelectedAtTop]="true"
 				/>
@@ -117,18 +116,14 @@
 		<!-- Row 2: Tags -->
 		<div class="filter-group tags-group">
 			<h3 class="filter-title">Tags</h3>
-			@if (loadingTags()) {
-				<div class="loading">Carregando tags...</div>
-			} @else {
-				<app-multi-select-tags
-					[options]="displayTagsForComponent()"
-					[(selectedIds)]="selectedTags"
-					[(excludedIds)]="excludedTags"
-					[allowExclude]="true"
-					placeholderSearch="Filtrar tags..."
-					[groupSelectedAtTop]="true"
-				/>
-			}
+			<app-multi-select-tags
+				[options]="displayTagsForComponent()"
+				[(selectedIds)]="selectedTags"
+				[(excludedIds)]="excludedTags"
+				[allowExclude]="true"
+				placeholderSearch="Filtrar tags..."
+				[groupSelectedAtTop]="true"
+			/>
 		</div>
 
 		<!-- Row 3: Logic -->
@@ -158,14 +153,17 @@
 @if (activeFilters().length > 0) {
 	<div class="active-filters-container">
 		@for (filter of activeFilters(); track filter.id) {
-			<div
+			<app-button
 				class="active-filter-badge"
 				[ngClass]="'filter-' + filter.type"
+				variant="text"
+				fill="none"
+				padding="none"
 				(click)="removeFilter(filter)"
 			>
 				<span class="filter-label">{{ filter.label }}</span>
 				<app-icons name="close" size="12" class="close-icon" />
-			</div>
+			</app-button>
 		}
 	</div>
 }

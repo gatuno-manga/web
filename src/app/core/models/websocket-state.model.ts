@@ -102,25 +102,6 @@ export const STATE_TRANSITIONS: Record<
 };
 
 /**
- * Interface para rastreamento de transição de estado com contexto.
- *
- * Útil para debugging e logging detalhado do ciclo de vida da conexão.
- */
-export interface StateTransitionEvent {
-	/** Estado anterior */
-	from: WebSocketConnectionState;
-
-	/** Estado novo */
-	to: WebSocketConnectionState;
-
-	/** Timestamp da transição */
-	timestamp: Date;
-
-	/** Motivo/evento que causou a transição (opcional) */
-	reason?: string;
-}
-
-/**
  * Valida se uma transição de estado é permitida.
  *
  * @param currentState - Estado atual da conexão
@@ -140,23 +121,4 @@ export function isValidTransition(
 ): boolean {
 	const allowedTransitions = STATE_TRANSITIONS[currentState] || [];
 	return allowedTransitions.includes(nextState);
-}
-
-/**
- * Retorna uma descrição legível do estado.
- *
- * @param state - Estado da conexão
- * @returns Descrição textual do estado
- */
-export function getStateDescription(state: WebSocketConnectionState): string {
-	const descriptions: Record<WebSocketConnectionState, string> = {
-		[WebSocketConnectionState.DISCONNECTED]: 'Desconectado',
-		[WebSocketConnectionState.CONNECTING]: 'Conectando...',
-		[WebSocketConnectionState.CONNECTED]: 'Conectado',
-		[WebSocketConnectionState.RECONNECTING]: 'Reconectando...',
-		[WebSocketConnectionState.OFFLINE_PAUSED]: 'Pausado (sem rede)',
-		[WebSocketConnectionState.ERROR]: 'Erro na conexão',
-	};
-
-	return descriptions[state] || 'Estado desconhecido';
 }

@@ -1,5 +1,6 @@
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject, NgZone } from '@angular/core';
+import { Injectable, inject, NgZone, PLATFORM_ID } from '@angular/core';
 import { environment } from '@environments/environment';
 import {
 	Book,
@@ -16,11 +17,11 @@ import {
 	ScrapingStatus,
 	UpdateBookDto,
 } from '@models/book.models';
-import { Page } from '@models/miscellaneous.models';
-import { firstValueFrom, from, Observable } from 'rxjs';
+import { Paginated } from '@models/miscellaneous.models';
+import { firstValueFrom, from, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { BookWebsocketService } from './book-websocket.service';
 import { DownloadService } from './download.service';
+import { MqttService } from './mqtt.service';
 import { SensitiveContentService } from './sensitive-content.service';
 import { TagsService } from './tags.service';
 import { UserTokenService } from './user-token.service';
@@ -30,12 +31,13 @@ import { UserTokenService } from './user-token.service';
 })
 export class BookService {
 	private readonly tagsService = inject(TagsService);
+	private readonly platformId = inject(PLATFORM_ID);
 
 	constructor(
 		private readonly http: HttpClient,
 		private readonly sensitiveContentService: SensitiveContentService,
 		private readonly userTokenService: UserTokenService,
-		private readonly websocketService: BookWebsocketService,
+		private readonly websocketService: MqttService,
 		private readonly downloadService: DownloadService,
 		private readonly ngZone: NgZone,
 	) {
@@ -72,11 +74,17 @@ export class BookService {
 			opts.sensitiveContent = [];
 
 		return this.http
-			.get<Page<BookList>>('books', {
+			.get<Paginated<BookList>>('books', {
 				params: { ...opts },
 			})
 			.pipe(
 				catchError((err) => {
+					if (!isPlatformBrowser(this.platformId)) {
+						return of({
+							data: [],
+							metadata: { total: 0, page: 1, lastPage: 0 },
+						} as Paginated<BookList>);
+					}
 					console.warn(
 						'Online fetch failed, falling back to offline mode',
 						err,
@@ -134,23 +142,42 @@ export class BookService {
 				map((response) => {
 					const books = response.data.books;
 					// Mapear cover, blurHash e dominantColor da capa principal para o objeto BookList
-					books.data = books.data.map((book: any) => {
+					books.data = books.data.map((b) => {
+						const book =
+							b as import('@models/book.models').BookList & {
+								covers?: {
+									isMain?: boolean;
+									url?: string;
+									metadata?: {
+										blurHash?: string;
+										dominantColor?: string;
+									};
+								}[];
+							};
 						const mainCover =
-							book.covers?.find((c: any) => c.isMain) ||
+							book.covers?.find((c) => c.isMain) ||
 							book.covers?.[0];
 						if (mainCover) {
-							book.cover = mainCover.url;
+							book.cover = mainCover.url as string;
 							if (mainCover.metadata) {
 								book.blurHash = mainCover.metadata.blurHash;
 								book.dominantColor =
 									mainCover.metadata.dominantColor;
 							}
 						}
-						return book;
+						return book as import('@models/book.models').BookList;
 					});
 					return books;
 				}),
 				catchError((err) => {
+					if (!isPlatformBrowser(this.platformId)) {
+						return of({
+							data: [],
+							page: 1,
+							lastPage: 0,
+							total: 0,
+						} as PaginatedBookResponse);
+					}
 					console.warn(
 						'GraphQL fetch failed, falling back to REST/Offline',
 						err,
@@ -171,7 +198,9 @@ export class BookService {
 			);
 	}
 
-	getOfflineBooks(options?: BookPageOptions): Observable<Page<BookList>> {
+	getOfflineBooks(
+		options?: BookPageOptions,
+	): Observable<Paginated<BookList>> {
 		const opts = { ...options };
 
 		return from(this.downloadService.getAllBooks()).pipe(

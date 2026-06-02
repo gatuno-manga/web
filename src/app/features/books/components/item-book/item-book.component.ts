@@ -1,7 +1,9 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
+	ChangeDetectorRef,
 	Component,
 	computed,
+	effect,
 	inject,
 	input,
 	output,
@@ -54,9 +56,90 @@ export class ItemBookComponent {
 	private bookService = inject(BookService);
 	private chapterService = inject(ChapterService);
 	public userTokenService = inject(UserTokenService);
+	private cdr = inject(ChangeDetectorRef);
 
 	imageError = false;
 	isImageLoaded = signal(false);
+	isDownloaded = signal(false);
+
+	// Fetch dynamic progress updates from DownloadService
+	downloadProgress = signal<
+		import('@core/models/offline.models').DownloadProgress[]
+	>([]);
+	isDownloadingBook = signal(false);
+	downloadingTotalChapters = signal(0);
+	downloadingCurrentChapter = signal(0);
+
+	isDownloading = computed(() => {
+		const progresses = this.downloadProgress() || [];
+		const isProgressing = progresses.some(
+			(p) => p.status === 'downloading' || p.status === 'pending',
+		);
+		return this.isDownloadingBook() || isProgressing;
+	});
+
+	downloadPercent = computed(() => {
+		const progresses = this.downloadProgress() || [];
+
+		if (this.isDownloadingBook()) {
+			const totalChapters = this.downloadingTotalChapters();
+			if (totalChapters === 0) return 0;
+
+			const currentChapIdx = this.downloadingCurrentChapter();
+			const activeProgress = progresses.find(
+				(p) => p.status === 'downloading',
+			);
+			let currentChapPercent = 0;
+			if (activeProgress && activeProgress.total > 0) {
+				currentChapPercent =
+					activeProgress.current / activeProgress.total;
+			}
+
+			return (
+				((currentChapIdx + currentChapPercent) / totalChapters) * 100
+			);
+		}
+
+		if (progresses.length === 0) return 0;
+		const total = progresses.reduce(
+			(acc, curr) => acc + (curr.total || 0),
+			0,
+		);
+		const current = progresses.reduce(
+			(acc, curr) => acc + (curr.current || 0),
+			0,
+		);
+		return total > 0 ? (current / total) * 100 : 0;
+	});
+
+	dashOffset = computed(() => {
+		// Circular progress ring length is ~70
+		const percent = this.downloadPercent();
+		return 70 - (70 * percent) / 100;
+	});
+
+	constructor() {
+		effect(() => {
+			const bookId = this.book()?.id;
+			if (bookId) {
+				this.downloadService
+					.isBookDownloaded(bookId)
+					.then((downloaded) => this.isDownloaded.set(downloaded));
+			}
+		});
+
+		effect((onCleanup) => {
+			const bookId = this.book()?.id;
+			if (bookId) {
+				const sub = this.downloadService
+					.getBookDownloadProgress(bookId)
+					.subscribe((progresses) => {
+						this.downloadProgress.set(progresses);
+					});
+				onCleanup(() => sub.unsubscribe());
+			}
+		});
+	}
 
 	onRemove(event: MouseEvent) {
 		event.preventDefault();
@@ -197,6 +280,11 @@ export class ItemBookComponent {
 			if (!fullBook) throw new Error('Book not found');
 
 			this.modalService.close(); // Close the initial 'Aguarde' modal or confirmation modal if any
+			this.isDownloadingBook.set(true);
+			this.downloadingTotalChapters.set(chapters.length);
+			this.downloadingCurrentChapter.set(0);
+			this.cdr.markForCheck();
+
 			this.notificationService.info(
 				`Baixando ${chapters.length} capítulos em segundo plano.`,
 				'Download iniciado',
@@ -206,38 +294,54 @@ export class ItemBookComponent {
 			const delay = (ms: number) =>
 				new Promise((resolve) => setTimeout(resolve, ms));
 
+			let currentIdx = 0;
 			let downloadedCount = 0;
 			for (const chapterInfo of chapters) {
+				this.downloadingCurrentChapter.set(currentIdx);
+				this.cdr.markForCheck();
 				try {
 					const isDownloaded =
 						await this.downloadService.isChapterDownloaded(
 							chapterInfo.id,
 						);
-					if (isDownloaded) continue;
+					if (isDownloaded) {
+						currentIdx++;
+						continue;
+					}
 
 					const fullChapter = await firstValueFrom(
 						this.chapterService.getChapter(chapterInfo.id),
 					);
-					if (!fullChapter) continue;
+					if (!fullChapter) {
+						currentIdx++;
+						continue;
+					}
 
 					await this.downloadService.downloadChapter(
 						fullBook,
 						fullChapter,
 					);
 					downloadedCount++;
+					currentIdx++;
 					await delay(500); // Small delay to be nice
 				} catch (e) {
 					console.error('Error downloading chapter', e);
 				}
 			}
 
+			this.downloadingCurrentChapter.set(chapters.length);
 			this.modalService.close();
+			this.isDownloadingBook.set(false);
+			this.isDownloaded.set(true);
+			this.cdr.markForCheck();
 			this.notificationService.success(
 				`${downloadedCount} novos capítulos baixados de "${this.book().title}".`,
 				'Download concluído',
 			);
 		} catch (e) {
 			console.error('Error starting download', e);
+			this.isDownloadingBook.set(false);
+			this.cdr.markForCheck();
 			this.modalService.show(
 				'Erro',
 				'Erro ao iniciar download.',
@@ -259,6 +363,7 @@ export class ItemBookComponent {
 					callback: async () => {
 						await this.downloadService.deleteBook(this.book().id);
 						this.modalService.close();
+						this.isDownloaded.set(false);
 						this.notificationService.success(
 							'Livro removido dos downloads.',
 						);

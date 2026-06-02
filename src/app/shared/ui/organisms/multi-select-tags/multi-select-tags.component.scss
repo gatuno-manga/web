@@ -15,29 +15,31 @@
 	gap: 8px;
 	min-height: 40px;
 
-	.badge {
-		height: 32px;
-		padding: 0 14px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 6px;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 8px;
-		color: rgba(255, 255, 255, 0.7);
-		font-size: 13px;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		background: transparent;
-		user-select: none;
-		text-transform: capitalize;
+	app-button.badge {
+		::ng-deep button {
+			height: 32px;
+			padding: 0 14px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 6px;
+			border: 1px solid rgba(255, 255, 255, 0.2);
+			border-radius: 8px;
+			color: rgba(255, 255, 255, 0.7);
+			font-size: 13px;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			background: transparent;
+			user-select: none;
+			text-transform: capitalize;
 
-		&:hover {
-			background-color: rgba(255, 255, 255, 0.1);
-			color: white;
+			&:hover {
+				background-color: rgba(255, 255, 255, 0.1);
+				color: white;
+			}
 		}
 
-		&.selected {
+		&.selected ::ng-deep button {
 			background-color: var(--primary-color);
 			border-color: var(--primary-color);
 			color: white;
@@ -45,7 +47,7 @@
 			box-shadow: 0 4px 8px rgb(from var(--primary-color) r g b / 0.2);
 		}
 
-		&.excluded {
+		&.excluded ::ng-deep button {
 			background-color: var(--dark-red);
 			border-color: var(--dark-red);
 			color: white;

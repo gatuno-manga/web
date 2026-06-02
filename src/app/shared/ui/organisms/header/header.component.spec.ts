@@ -3,8 +3,11 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { BookService } from '@core/services/book.service';
 import { ThemeService } from '@core/services/theme.service';
+import { UserService } from '@core/services/user.service';
 import { UserTokenService } from '@core/services/user-token.service';
+import { of } from 'rxjs';
 import { HeaderComponent } from './header.component';
 
 describe('HeaderComponent', () => {
@@ -21,6 +24,14 @@ describe('HeaderComponent', () => {
 		hasValidAccessTokenSignal: signal(true),
 		isAdminSignal: signal(true),
 	};
+	const mockUserService = {
+		profileSignal: signal({ profileImageUrl: 'test-url' }),
+	};
+	const mockBookService = {
+		getBooks: jasmine
+			.createSpy('getBooks')
+			.and.returnValue(of({ data: [] })),
+	};
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
@@ -31,6 +42,8 @@ describe('HeaderComponent', () => {
 				{ provide: Location, useValue: mockLocation },
 				{ provide: ThemeService, useValue: mockThemeService },
 				{ provide: UserTokenService, useValue: mockUserTokenService },
+				{ provide: UserService, useValue: mockUserService },
+				{ provide: BookService, useValue: mockBookService },
 			],
 		}).compileComponents();
 
@@ -52,5 +65,11 @@ describe('HeaderComponent', () => {
 		expect(component.isDarkTheme()).toBeTrue();
 		expect(component.isLoggedIn()).toBeTrue();
 		expect(component.isAdmin()).toBeTrue();
+	});
+
+	it('should display user avatar when profileImageUrl is present', () => {
+		const avatar = fixture.nativeElement.querySelector('.avatar');
+		expect(avatar).toBeTruthy();
+		expect(avatar.src).toContain('test-url');
 	});
 });

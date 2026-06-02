@@ -1,0 +1,114 @@
+@use 'dropdown-menu' as dropdown;
+
+:host {
+	display: block;
+}
+
+.icon-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: var(--app-text-color);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 5px;
+	transition: opacity 0.2s;
+	text-decoration: none;
+
+	&:hover {
+		opacity: 0.7;
+	}
+}
+
+.search-container {
+	display: flex;
+	align-items: center;
+	position: relative;
+	border-radius: 0.75rem;
+	transition: background-color 0.3s ease, outline 0.2s ease, box-shadow 0.2s ease;
+
+	.search-input {
+		width: 0;
+		padding: 0;
+		border: none;
+		background-color: transparent;
+		color: var(--app-text-color);
+		border-radius: 0.75rem;
+		transition: width 0.3s ease, padding 0.3s ease, opacity 0.25s ease;
+		outline: none;
+		font-family: inherit;
+		font-size: 0.9rem;
+		opacity: 0;
+		pointer-events: none; // não intercepta cliques quando oculto
+		overflow: hidden;
+	}
+
+	&.expanded {
+		background-color: var(--secondary-color);
+		border-radius: 0.75rem;
+		padding-left: 1rem;
+
+		&:focus-within {
+			outline: 1px solid var(--primary-color);
+			box-shadow: 0 0 1rem var(--secondary-color);
+		}
+
+		.search-input {
+			width: 250px;
+			padding: 8px 12px;
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
+
+	.search-dropdown {
+		@include dropdown.dropdown-menu-base;
+		position: absolute;
+		top: 100%;
+		right: 0;
+		margin-top: 10px;
+		width: 300px;
+		z-index: var(--z-dropdown, 1001);
+	}
+
+	.search-result-item {
+		@include dropdown.dropdown-menu-item;
+		text-decoration: none;
+
+		// Estado de foco por teclado — idêntico ao hover do mixin
+		&.focused,
+		&:focus-visible {
+			background-color: var(--primary-color);
+			outline: none;
+		}
+
+		.book-mini-cover {
+			width: 30px;
+			height: 45px;
+			object-fit: cover;
+			border-radius: 0.25rem;
+			flex-shrink: 0;
+			box-shadow: 0 2px 4px var(--shadow-color);
+		}
+
+		.book-title {
+			font-size: 0.9rem;
+			font-weight: 500;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
+}
+
+@media (max-width: 600px) {
+	.search-container.expanded .search-input {
+		width: 150px;
+	}
+
+	.search-container .search-dropdown {
+		width: calc(100vw - 30px);
+		right: -40px;
+	}
+}

@@ -1,0 +1,138 @@
+<ng-template #menuContent>
+	<div class="menu-content-wrapper">
+		@switch (currentView()) {
+			@case ('main') {
+				<div class="menu-section user-section">
+					@if (isLoggedIn()) {
+						<div class="user-info">
+							@if (userProfile()?.profileImageUrl) {
+								<div class="avatar-container">
+									<img [src]="userProfile()?.profileImageUrl" alt="Avatar" class="avatar" />
+								</div>
+							} @else {
+								<app-icons name="user" size="48" class="default-avatar" />
+							}
+							<div class="user-details">
+								<span class="user-name">{{ userProfile()?.name || userProfile()?.userName || 'Usuário' }}</span>
+							</div>
+						</div>
+						<div class="divider"></div>
+						<a [routerLink]="['/user/profile']" class="menu-item" (click)="close()">
+							<app-icons name="user" size="20" />
+							<span>Perfil</span>
+						</a>
+						<a [routerLink]="['/user/all']" class="menu-item" (click)="close()">
+							<app-icons name="settings" size="20" />
+							<span>Configurações</span>
+						</a>
+					} @else {
+						<a [routerLink]="['/auth/login']" class="menu-item login-link" (click)="close()">
+							<app-icons name="lock" size="20" />
+							<span>Entrar ou Registrar</span>
+						</a>
+					}
+				</div>
+
+				<div class="divider"></div>
+				
+				<div class="menu-section">
+					<button type="button" class="menu-item nav-item" (click)="setView('theme')">
+						<div class="item-left">
+							<app-icons name="sun" size="20" />
+							<span>Tema</span>
+						</div>
+						<app-icons name="arrow-right" size="18" class="chevron" />
+					</button>
+
+					<button type="button" class="menu-item nav-item" (click)="setView('filter')">
+						<div class="item-left">
+							<app-icons name="filter" size="20" />
+							<span>Filtro de Conteúdo</span>
+						</div>
+						<app-icons name="arrow-right" size="18" class="chevron" />
+					</button>
+				</div>
+
+				@if (isLoggedIn()) {
+					<div class="divider"></div>
+					<div class="menu-section">
+						<button type="button" class="menu-item logout-btn" (click)="logout()">
+							<app-icons name="arrow-left" size="20" />
+							<span>Sair</span>
+						</button>
+					</div>
+				}
+			}
+
+			@case ('theme') {
+				<div class="submenu-header">
+					<button type="button" class="back-btn" (click)="backToMain()">
+						<app-icons name="arrow-left" size="20" />
+					</button>
+					<span class="submenu-title">Tema</span>
+				</div>
+				<div class="menu-section">
+					<button type="button" class="menu-item option-item" [class.active]="currentTheme() === 'light'" (click)="setTheme('light')">
+						<div class="item-left">
+							<app-icons name="sun" size="20" />
+							<span>Claro</span>
+						</div>
+						@if (currentTheme() === 'light') { <app-icons name="check" size="18" class="active-icon" /> }
+					</button>
+					<button type="button" class="menu-item option-item" [class.active]="currentTheme() === 'dark'" (click)="setTheme('dark')">
+						<div class="item-left">
+							<app-icons name="moon" size="20" />
+							<span>Escuro</span>
+						</div>
+						@if (currentTheme() === 'dark') { <app-icons name="check" size="18" class="active-icon" /> }
+					</button>
+					<button type="button" class="menu-item option-item" [class.active]="currentTheme() === 'true-dark'" (click)="setTheme('true-dark')">
+						<div class="item-left">
+							<app-icons name="contrast" size="20" />
+							<span>Amoled</span>
+						</div>
+						@if (currentTheme() === 'true-dark') { <app-icons name="check" size="18" class="active-icon" /> }
+					</button>
+				</div>
+			}
+
+			@case ('filter') {
+				<div class="submenu-header">
+					<button type="button" class="back-btn" (click)="backToMain()">
+						<app-icons name="arrow-left" size="20" />
+					</button>
+					<span class="submenu-title">Filtro de Conteúdo</span>
+				</div>
+				<div class="menu-section">
+					@for (filter of availableFilters(); track filter.id) {
+						<button type="button" class="menu-item option-item" (click)="toggleFilter(filter.name)">
+							<span>{{ filter.name }}</span>
+							<div class="toggle-box" [class.checked]="isFilterActive(filter.name)">
+								@if (isFilterActive(filter.name)) { <app-icons name="check" size="14" /> }
+							</div>
+						</button>
+					}
+					<div class="divider"></div>
+					<a [routerLink]="['/user/filter']" class="menu-item" (click)="close()">
+						<app-icons name="settings" size="20" />
+						<span>Gerenciar Tags Bloqueadas</span>
+					</a>
+				</div>
+			}
+		}
+	</div>
+</ng-template>
+
+@if (isLargeScreen()) {
+	@if (isOpen()) {
+		<div class="desktop-menu">
+			<ng-container *ngTemplateOutlet="menuContent"></ng-container>
+		</div>
+	}
+} @else {
+	<app-aside position="right" [topOffset]="0" [(isOpen)]="isOpen">
+		<div class="mobile-menu-container">
+			<ng-container *ngTemplateOutlet="menuContent"></ng-container>
+		</div>
+	</app-aside>
+}

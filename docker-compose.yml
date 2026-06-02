@@ -1,8 +1,8 @@
-name: gatuno-web
+name: gatuno
 services:
-  app:
-    image: gatuno-app
-    container_name: gatuno-app
+  web:
+    image: gatuno-web
+    container_name: gatuno-web
     environment:
       - NODE_ENV=${NODE_ENV:-development}
       - API_URL=${API_URL:-http://localhost:3000}

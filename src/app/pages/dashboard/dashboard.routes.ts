@@ -3,7 +3,7 @@ import { HomeComponent } from './home/home.component';
 import { MonitoringComponent } from './monitoring/monitoring.component';
 import { TagsComponent } from './tags/tags.component';
 
-export const routes: Routes = [
+export const dashboardRoutes: Routes = [
 	{
 		path: '',
 		pathMatch: 'full',

@@ -125,7 +125,7 @@
 						@if (item.comment.profileImageUrl) {
 							<img
 								[src]="item.comment.profileImageUrl"
-								[alt]="'Avatar de ' + item.comment.userName"
+								alt="Avatar de {{ item.comment.userName }}"
 							/>
 						} @else {
 							<span>
@@ -226,6 +226,7 @@
 		@if (commentsPage(); as pageInfo) {
 			<div class="chapter-comments__pagination">
 				<button
+					type="button"
 					(click)="goToPreviousCommentsPage()"
 					[disabled]="pageInfo.metadata.page <= 1"
 				>
@@ -236,6 +237,7 @@
 					{{ pageInfo.metadata.lastPage }}
 				</span>
 				<button
+					type="button"
 					(click)="goToNextCommentsPage()"
 					[disabled]="
 						pageInfo.metadata.page >= pageInfo.metadata.lastPage

@@ -1,24 +1,33 @@
 <div class="home-container">
   <!-- Featured Carousel -->
   @if (featuredBooks().length > 0) {
-    <section class="featured-carousel-section">
-      <div class="carousel-track">
+    <section
+      class="featured-carousel-section"
+      aria-label="Livros em destaque"
+      aria-roledescription="carrossel"
+    >
+      <div class="carousel-track" aria-live="polite" aria-atomic="true">
         @for (book of featuredBooks(); track book.id; let i = $index) {
-          <div class="carousel-item" [class.active]="i === currentFeaturedIndex()">
+          <div
+            class="carousel-item"
+            [class.active]="i === currentFeaturedIndex()"
+            [attr.aria-hidden]="i !== currentFeaturedIndex()"
+          >
             <div class="item-background">
               @if (book.blurHash) {
                 <app-blurhash [hash]="book.blurHash" class="bg-blur" />
               }
-              <img [ngSrc]="book.cover" fill priority [alt]="book.title" class="bg-image" />
+              <img [ngSrc]="book.cover" fill priority alt="{{ book.title }}" class="bg-image" />
               <div class="gradient-overlay"></div>
             </div>
-            
+
             <div class="item-content">
               <div class="cover-container">
-                <img [ngSrc]="book.cover" [alt]="book.title" width="298" height="453" priority />
+                <img [ngSrc]="book.cover" alt="{{ book.title }}" width="298" height="453" priority />
               </div>
               <div class="info-container">
-                <h1>{{ book.title }}</h1>
+                <!-- h2 aqui (h1 único e estático fica fora do loop) -->
+                <h2 class="book-title-heading">{{ book.title }}</h2>
                 <p class="description">{{ book.description }}</p>
                 <div class="actions">
                   <a [routerLink]="['/books', book.id]" class="btn-primary">Ler agora</a>
@@ -28,26 +37,43 @@
           </div>
         }
       </div>
-      
-      <div class="carousel-dots">
+
+      <div class="carousel-dots" role="tablist" aria-label="Navegar entre livros em destaque">
         @for (dot of featuredBooks(); track $index; let i = $index) {
-          <button type="button" (click)="setFeatured(i)" [class.active]="i === currentFeaturedIndex()"></button>
+          <button
+            type="button"
+            role="tab"
+            (click)="setFeatured(i)"
+            [class.active]="i === currentFeaturedIndex()"
+            [attr.aria-selected]="i === currentFeaturedIndex()"
+            [attr.aria-label]="'Livro ' + (i + 1) + ': ' + dot.title"
+          ></button>
         }
       </div>
     </section>
   }
 
   <!-- Continue Reading Section -->
-  @if (continueReadingBooks().length > 0) {
+  @if (isLoadingContinueReading() || continueReadingBooks().length > 0) {
     <section class="home-section continue-reading">
       <h2 class="section-title">Continue a sua leitura</h2>
-      <div class="horizontal-scroll">
-        @for (book of continueReadingBooks(); track book.id) {
-          <div class="book-item-wrapper">
-            <app-item-book [book]="book" type="grid" />
-          </div>
-        }
-      </div>
+      @if (isLoadingContinueReading()) {
+        <div class="horizontal-scroll">
+          @for (i of [1,2,3,4,5]; track i) {
+            <div class="book-item-wrapper">
+              <div class="placeholder" style="width: 200px; height: 300px; border-radius: 0.75rem;"></div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="horizontal-scroll">
+          @for (book of continueReadingBooks(); track book.id) {
+            <div class="book-item-wrapper">
+              <app-item-book [book]="book" type="grid" />
+            </div>
+          }
+        </div>
+      }
     </section>
   }
 
@@ -57,11 +83,11 @@
       <h2 class="section-title">Atualizações Recentes</h2>
       <a routerLink="/books" [queryParams]="{ orderBy: 'updatedAt', order: 'DESC' }" class="view-more">Ver tudo</a>
     </div>
-    
-		<app-book-grid 
-			[books]="latestUpdatedBooks()" 
-			[isLoading]="isLoadingGrid()" 
-			type="grid" 
+
+		<app-book-grid
+			[books]="latestUpdatedBooks()"
+			[isLoading]="isLoadingGrid()"
+			type="grid"
 			[skeletonCount]="6"
 		/>
   </section>
@@ -72,11 +98,11 @@
       <h2 class="section-title">Novidades no Gatuno</h2>
       <a routerLink="/books" [queryParams]="{ orderBy: 'createdAt', order: 'DESC' }" class="view-more">Ver tudo</a>
     </div>
-    
-		<app-book-grid 
-			[books]="recentlyAddedBooks()" 
-			[isLoading]="isLoadingRecentlyAdded()" 
-			type="grid" 
+
+		<app-book-grid
+			[books]="recentlyAddedBooks()"
+			[isLoading]="isLoadingRecentlyAdded()"
+			type="grid"
 			[skeletonCount]="6"
 		/>
   </section>

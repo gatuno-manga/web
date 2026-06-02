@@ -1,4 +1,5 @@
 import {
+	ChangeDetectionStrategy,
 	Component,
 	computed,
 	effect,
@@ -20,6 +21,7 @@ import { UserService } from '@core/services/user.service';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 import { FileInputComponent } from '@ui/molecules/file-input/file-input.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
 	selector: 'app-profile',
@@ -31,6 +33,7 @@ import { FileInputComponent } from '@ui/molecules/file-input/file-input.componen
 	],
 	templateUrl: './profile.component.html',
 	styleUrl: './profile.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent {
 	private readonly searchService = inject(SearchService);
@@ -87,54 +90,54 @@ export class ProfileComponent {
 		});
 	}
 
-	saveProfile(): void {
+	async saveProfile(): Promise<void> {
 		if (this.profileForm.invalid || this.isLoading) return;
 
 		this.isLoading = true;
-		this.userService.updateProfile(this.profileForm.value).subscribe({
-			next: () => {
-				this.isLoading = false;
-				this.profileForm.markAsPristine();
-			},
-			error: () => {
-				this.isLoading = false;
-			},
-		});
+		try {
+			await firstValueFrom(
+				this.userService.updateProfile(this.profileForm.value),
+			);
+			this.profileForm.markAsPristine();
+		} catch (error) {
+			console.error('Error saving profile', error);
+		} finally {
+			this.isLoading = false;
+		}
 	}
 
-	onAvatarSelected(file: File | null): void {
+	async onAvatarSelected(file: File | null): Promise<void> {
 		if (file) {
 			this.isAvatarLoading.set(true);
-			this.userService.uploadAvatar(file).subscribe({
-				next: () => {
-					this.isAvatarLoading.set(false);
-				},
-				error: () => {
-					this.isAvatarLoading.set(false);
-				},
-			});
+			try {
+				await firstValueFrom(this.userService.uploadAvatar(file));
+			} catch (error) {
+				console.error('Error uploading avatar', error);
+			} finally {
+				this.isAvatarLoading.set(false);
+			}
 		}
 	}
 
-	onBannerSelected(file: File | null): void {
+	async onBannerSelected(file: File | null): Promise<void> {
 		if (file) {
 			this.isBannerLoading.set(true);
-			this.userService.uploadBanner(file).subscribe({
-				next: () => {
-					this.isBannerLoading.set(false);
-				},
-				error: () => {
-					this.isBannerLoading.set(false);
-				},
-			});
+			try {
+				await firstValueFrom(this.userService.uploadBanner(file));
+			} catch (error) {
+				console.error('Error uploading banner', error);
+			} finally {
+				this.isBannerLoading.set(false);
+			}
 		}
 	}
 
-	logout(): void {
-		this.authService.logout().subscribe({
-			next: () => {
-				this.router.navigate(['/']);
-			},
-		});
+	async logout(): Promise<void> {
+		try {
+			await firstValueFrom(this.authService.logout());
+			this.router.navigate(['/']);
+		} catch (error) {
+			console.error('Error logging out', error);
+		}
 	}
 }

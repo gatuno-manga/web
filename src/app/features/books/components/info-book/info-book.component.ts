@@ -43,6 +43,7 @@ import { ContextMenuItem } from '@models/context-menu.models';
 import { DownloadStatus } from '@models/offline.models';
 import { SavedPage } from '@models/saved-page.models';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
+import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
@@ -80,6 +81,7 @@ interface ModulesLoad {
 		RouterModule,
 		DecimalPipe,
 		ChapterIndexPipe,
+		FlagPipe,
 		IconsComponent,
 		ButtonComponent,
 		ImageViewerComponent,
@@ -244,7 +246,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		this.websocketSubscription = this.bookService
 			.watchBook(bookId)
 			.subscribe({
-				next: (event) => {
+				next: (event: unknown) => {
 					const typedEvent = event as { type: string; data: unknown };
 					console.log('📡 Evento WebSocket recebido:', typedEvent);
 
@@ -284,7 +286,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 							break;
 					}
 				},
-				error: (error) => {
+				error: (error: unknown) => {
 					console.error('❌ Erro no WebSocket:', error);
 				},
 			});
@@ -1816,7 +1818,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 									// mas vamos recarregar para ver se já aparece algo
 									setTimeout(() => this.loadCovers(), 2000);
 								},
-								error: (err: any) => {
+								error: (err: Error) => {
 									console.error('Error scraping cover:', err);
 									this.notificationService.error(
 										'Erro ao agendar captura de capa.',

@@ -98,7 +98,7 @@ export class NotificationFactory {
 			image: undefined,
 			link: undefined,
 			component: config.component,
-			componentData: config.componentData as Record<string, unknown>,
+			componentData: config.componentData as NotificationComponentData,
 		};
 		return { kind: 'toast', data: toast };
 	}
@@ -114,7 +114,7 @@ export class NotificationFactory {
 			type: this.mapLevelToVisualType(config.level),
 			buttons,
 			component: config.component,
-			componentData: config.componentData as Record<string, unknown>,
+			componentData: config.componentData as NotificationComponentData,
 			useBackdrop: config.useBackdrop,
 			backdropOpacity: config.backdropOpacity,
 		};

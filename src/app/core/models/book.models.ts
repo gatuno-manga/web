@@ -54,10 +54,29 @@ export interface BookBasic {
 	blurHash?: string;
 	dominantColor?: string;
 	metadata?: ImageMetadata;
+	originalLanguageCode?: string;
+}
+
+export interface AlternativeTitle {
+	id?: string;
+	title: string;
+	languageCode?: string | null;
+	rank?: number;
+}
+
+export interface LocalizedDescription {
+	id?: string;
+	description: string;
+	languageCode?: string | null;
+	rank?: number;
 }
 
 export interface BookDetail {
-	alternativeTitle: string[];
+	alternativeTitle?: string[];
+	alternativeTitles?: AlternativeTitle[];
+	localizedDescriptions?: LocalizedDescription[];
+	searchTerms?: string[];
+	originalLanguageCode?: string;
 	originalUrl: string[];
 	scrapingStatus: ScrapingStatus;
 	createdAt: Date;
@@ -69,6 +88,10 @@ export interface UpdateBookDto {
 	description?: string;
 	publication?: number;
 	alternativeTitle?: string[];
+	alternativeTitles?: AlternativeTitle[];
+	localizedDescriptions?: LocalizedDescription[];
+	searchTerms?: string[];
+	originalLanguageCode?: string;
 	originalUrl?: string[];
 	type?: TypeBook;
 	tags?: string[];
@@ -91,6 +114,7 @@ export interface Book {
 	blurHash?: string;
 	dominantColor?: string;
 	metadata?: ImageMetadata;
+	originalLanguageCode?: string;
 }
 
 export interface Author {

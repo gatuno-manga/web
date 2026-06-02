@@ -3,8 +3,8 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { OfflineBook } from '@models/offline.models';
 import { BookService } from './book.service';
-import { BookWebsocketService } from './book-websocket.service';
 import { DownloadService } from './download.service';
+import { MqttService } from './mqtt.service';
 import { SensitiveContentService } from './sensitive-content.service';
 import { UserTokenService } from './user-token.service';
 
@@ -13,7 +13,7 @@ describe('BookService', () => {
 	let downloadServiceSpy: jasmine.SpyObj<DownloadService>;
 	let sensitiveContentServiceSpy: jasmine.SpyObj<SensitiveContentService>;
 	let _userTokenServiceSpy: jasmine.SpyObj<UserTokenService>;
-	let _websocketServiceSpy: jasmine.SpyObj<BookWebsocketService>;
+	let _websocketServiceSpy: jasmine.SpyObj<MqttService>;
 
 	const mockBlob = new Blob([''], { type: 'image/jpeg' });
 
@@ -95,7 +95,7 @@ describe('BookService', () => {
 			hasValidAccessToken: false,
 			hasValidRefreshToken: false,
 		});
-		const websocketSpy = jasmine.createSpyObj('BookWebsocketService', [
+		const websocketSpy = jasmine.createSpyObj('MqttService', [
 			'connect',
 			'disconnect',
 		]);
@@ -107,7 +107,7 @@ describe('BookService', () => {
 				{ provide: DownloadService, useValue: downloadSpy },
 				{ provide: SensitiveContentService, useValue: sensitiveSpy },
 				{ provide: UserTokenService, useValue: userTokenSpy },
-				{ provide: BookWebsocketService, useValue: websocketSpy },
+				{ provide: MqttService, useValue: websocketSpy },
 			],
 		});
 
@@ -122,8 +122,8 @@ describe('BookService', () => {
 			UserTokenService,
 		) as jasmine.SpyObj<UserTokenService>;
 		_websocketServiceSpy = TestBed.inject(
-			BookWebsocketService,
-		) as jasmine.SpyObj<BookWebsocketService>;
+			MqttService,
+		) as jasmine.SpyObj<MqttService>;
 
 		// Default mock behavior
 		downloadServiceSpy.getAllBooks.and.returnValue(

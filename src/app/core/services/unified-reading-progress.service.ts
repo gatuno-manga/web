@@ -5,6 +5,7 @@ import {
 	RemoteReadingProgress,
 	SaveProgressDto,
 } from '@models/reading-progress-events.model';
+import { payloadToken } from '@models/user.models';
 import { jwtDecode } from 'jwt-decode';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -14,11 +15,6 @@ import {
 } from './reading-progress.service';
 import { ReadingProgressSyncService } from './reading-progress-sync.service';
 import { UserTokenService } from './user-token.service';
-
-interface JwtPayload {
-	sub: string;
-	[key: string]: unknown;
-}
 
 /**
  * Facade para gerenciamento unificado do progresso de leitura
@@ -70,7 +66,7 @@ export class UnifiedReadingProgressService implements OnDestroy {
 		if (!token) return null;
 
 		try {
-			const decoded = jwtDecode<JwtPayload>(token);
+			const decoded = jwtDecode<payloadToken>(token);
 			return decoded.sub || null;
 		} catch {
 			return null;

@@ -42,7 +42,7 @@ export class BlurhashComponent implements AfterViewInit {
 
 	private render() {
 		const hashValue = this.hash();
-		if (!hashValue) return;
+		if (!hashValue || hashValue.length < 6) return;
 
 		try {
 			const canvasEl = this.canvasRef()?.nativeElement;

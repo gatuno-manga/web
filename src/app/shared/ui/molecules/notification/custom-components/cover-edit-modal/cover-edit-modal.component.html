@@ -12,7 +12,7 @@
 			@if (hasImage() && !imageError()) {
 				<img
 					[src]="previewUrl()"
-					[alt]="cover.title"
+					alt="{{ cover.title }}"
 					(error)="onImageError()"
 				/>
 				<div class="upload-overlay">

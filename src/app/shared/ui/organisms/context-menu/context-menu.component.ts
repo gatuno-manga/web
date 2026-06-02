@@ -86,7 +86,10 @@ export class ContextMenuComponent {
 		}
 	}
 
-	onItemClick(event: MouseEvent, item: any) {
+	onItemClick(
+		event: MouseEvent,
+		item: { disabled?: boolean; type?: string; action?: () => void },
+	) {
 		event.stopPropagation();
 		if (item.disabled || item.type === 'separator') return;
 

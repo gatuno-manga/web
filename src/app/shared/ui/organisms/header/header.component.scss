@@ -16,7 +16,8 @@ header {
 	border-bottom: 2px solid var(--app-text-color);
 	background-image: var(--degrader);
 
-	.menu-btn {
+	.menu-btn,
+	.icon-btn {
 		background: none;
 		border: none;
 		cursor: pointer;
@@ -26,6 +27,7 @@ header {
 		justify-content: center;
 		padding: 5px;
 		transition: opacity 0.2s;
+		text-decoration: none;
 
 		&:hover {
 			opacity: 0.7;
@@ -43,14 +45,42 @@ header {
 		}
 	}
 
-	.icons {
+	.user-actions {
 		display: flex;
-		gap: 0.5rem;
+		align-items: center;
+		position: relative;
 
-		.user {
+		.user-btn {
+			background: none;
+			border: none;
+			cursor: pointer;
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			padding: 0;
+			color: var(--app-text-color);
+			transition: opacity 0.2s;
+
+			&:hover {
+				opacity: 0.7;
+			}
+
+			.avatar-container {
+				width: 36px;
+				height: 36px;
+				border-radius: 50%;
+				overflow: hidden;
+				border: 2px solid var(--primary-color);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+
+				.avatar {
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+				}
+			}
 		}
 	}
 
@@ -60,3 +90,12 @@ header {
 		gap: 20px;
 	}
 }
+
+
+
+@media (max-width: 600px) {
+	header {
+		padding: 0 15px;
+	}
+}
+

@@ -223,4 +223,24 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	resetProgress() {
 		this.maxReadPageIndex = 0;
 	}
+
+	getPageAspectRatio(page: Page): string {
+		if (page.metadata?.width && page.metadata?.height) {
+			return `${page.metadata.width} / ${page.metadata.height}`;
+		}
+		if (this.bookMetadata?.width && this.bookMetadata?.height) {
+			return `${this.bookMetadata.width} / ${this.bookMetadata.height}`;
+		}
+		return '2 / 3';
+	}
+
+	getPageMinHeight(page: Page): string {
+		if (page.metadata?.width && page.metadata?.height) {
+			return 'auto';
+		}
+		if (this.bookMetadata?.height) {
+			return 'auto';
+		}
+		return '600px';
+	}
 }

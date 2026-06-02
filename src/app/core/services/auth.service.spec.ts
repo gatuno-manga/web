@@ -9,6 +9,7 @@ import {
 	loginResponse,
 	registerRequest,
 } from '@models/user.models';
+import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { AuthService } from './auth.service';
 import { UnifiedReadingProgressService } from './unified-reading-progress.service';
 import { UserTokenService } from './user-token.service';
@@ -18,6 +19,19 @@ describe('AuthService', () => {
 	let httpMock: HttpTestingController;
 	let userTokenServiceSpy: jasmine.SpyObj<UserTokenService>;
 	let readingProgressServiceSpy: jasmine.SpyObj<UnifiedReadingProgressService>;
+
+	const mockAssertion: AuthenticationResponseJSON = {
+		id: 'cred',
+		rawId: 'cred',
+		response: {
+			clientDataJSON: '',
+			authenticatorData: '',
+			signature: '',
+			userHandle: '',
+		},
+		clientExtensionResults: {},
+		type: 'public-key',
+	};
 
 	beforeEach(() => {
 		const userTokenSpy = jasmine.createSpyObj(
@@ -63,7 +77,7 @@ describe('AuthService', () => {
 	});
 
 	describe('login', () => {
-		it('should call signin endpoint and set tokens on success', () => {
+		it('should call login endpoint and set tokens on success', () => {
 			const mockReq: loginRequest = {
 				email: 'test@example.com',
 				password: 'password',
@@ -84,15 +98,14 @@ describe('AuthService', () => {
 				).toHaveBeenCalled();
 			});
 
-			const req = httpMock.expectOne('/auth/signin');
+			const req = httpMock.expectOne('/auth/login');
 			expect(req.request.method).toBe('POST');
-			expect(req.request.withCredentials).toBeTrue();
 			req.flush(mockRes);
 		});
 	});
 
 	describe('verifyMfaLogin', () => {
-		it('should call verify-login endpoint and set tokens on success', () => {
+		it('should call verify endpoint and set tokens on success', () => {
 			const mockRes: authTokensResponse = {
 				accessToken: 'access',
 				csrfToken: 'csrf',
@@ -111,7 +124,7 @@ describe('AuthService', () => {
 					).toHaveBeenCalled();
 				});
 
-			const req = httpMock.expectOne('/auth/mfa/verify-login');
+			const req = httpMock.expectOne('/auth/mfa/verify');
 			expect(req.request.method).toBe('POST');
 			expect(req.request.body).toEqual({
 				mfaToken: 'mfa-token',
@@ -131,14 +144,13 @@ describe('AuthService', () => {
 			});
 
 			const req = httpMock.expectOne('/auth/logout');
-			expect(req.request.method).toBe('GET');
-			expect(req.request.headers.get('x-csrf-token')).toBe('mock-csrf');
+			expect(req.request.method).toBe('POST');
 			req.flush({});
 		});
 	});
 
 	describe('register', () => {
-		it('should call signup endpoint and set tokens on success', () => {
+		it('should call register endpoint and set tokens on success', () => {
 			const mockReq: registerRequest = {
 				email: 'new@example.com',
 				password: 'password',
@@ -159,20 +171,30 @@ describe('AuthService', () => {
 				).toHaveBeenCalled();
 			});
 
-			const req = httpMock.expectOne('/auth/signup');
+			const req = httpMock.expectOne('/auth/register');
 			expect(req.request.method).toBe('POST');
 			req.flush(mockRes);
 		});
 	});
 
 	describe('passkeys', () => {
-		it('beginPasskeyAuthentication should call options endpoint', () => {
+		it('beginPasskeyAuthentication should call options endpoint with email', () => {
 			service.beginPasskeyAuthentication('test@example.com').subscribe();
 			const req = httpMock.expectOne(
 				'/auth/passkeys/authenticate/options',
 			);
 			expect(req.request.method).toBe('POST');
 			expect(req.request.body).toEqual({ email: 'test@example.com' });
+			req.flush({});
+		});
+
+		it('beginPasskeyAuthentication should call options endpoint without email', () => {
+			service.beginPasskeyAuthentication().subscribe();
+			const req = httpMock.expectOne(
+				'/auth/passkeys/authenticate/options',
+			);
+			expect(req.request.method).toBe('POST');
+			expect(req.request.body).toEqual({});
 			req.flush({});
 		});
 
@@ -183,7 +205,7 @@ describe('AuthService', () => {
 			};
 
 			service
-				.verifyPasskeyAuthentication('test@example.com', { id: 'cred' })
+				.verifyPasskeyAuthentication(mockAssertion, 'test@example.com')
 				.subscribe((_response) => {
 					expect(userTokenServiceSpy.setTokens).toHaveBeenCalledWith(
 						'access',
@@ -198,7 +220,24 @@ describe('AuthService', () => {
 				'/auth/passkeys/authenticate/verify',
 			);
 			expect(req.request.method).toBe('POST');
+			expect(req.request.body).toEqual({
+				response: mockAssertion,
+				email: 'test@example.com',
+			});
 			req.flush(mockRes);
+		});
+
+		it('verifyPasskeyAuthentication should call verify endpoint without email', () => {
+			service.verifyPasskeyAuthentication(mockAssertion).subscribe();
+
+			const req = httpMock.expectOne(
+				'/auth/passkeys/authenticate/verify',
+			);
+			expect(req.request.method).toBe('POST');
+			expect(req.request.body).toEqual({
+				response: mockAssertion,
+			});
+			req.flush({});
 		});
 	});
 });

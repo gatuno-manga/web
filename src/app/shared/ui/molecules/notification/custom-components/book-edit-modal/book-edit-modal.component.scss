@@ -244,3 +244,16 @@
 	.input-grid { grid-template-columns: 1fr; .grid-span-2 { grid-column: span 1; } }
 	.modal-body { padding: 16px; }
 }
+
+.title-with-flag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+.flag-icon {
+    width: 24px;
+    height: 18px;
+    border-radius: 2px;
+    object-fit: cover;
+}

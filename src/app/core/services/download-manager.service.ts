@@ -216,7 +216,8 @@ export class DownloadManagerService {
 				`Download de "${fileName}" concluído com sucesso!`,
 				'Download completo',
 			);
-		} catch (error: any) {
+		} catch (err) {
+			const error = err as Error;
 			if (error.name === 'AbortError') {
 				// Já tratado no cancelDownload
 				return;

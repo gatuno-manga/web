@@ -73,22 +73,22 @@
 	.controller {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		grid-template-areas: 
+		grid-template-areas:
 			"mode view"
 			"pages pages";
 		height: auto;
 		padding: 15px 20px;
-		
+
 		.mode-switch {
 			grid-area: mode;
 			justify-content: flex-start;
 		}
-		
+
 		.view-options {
 			grid-area: view;
 			justify-content: flex-end;
 		}
-		
+
 		.pages {
 			grid-area: pages;
 			margin-top: 15px;

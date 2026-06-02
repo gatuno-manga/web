@@ -1,0 +1,57 @@
+<div class="search-container" [class.expanded]="isSearchExpanded()">
+	<input
+		#searchInput
+		type="text"
+		[formControl]="searchControl"
+		placeholder="Pesquisar livros..."
+		(blur)="onSearchBlur($event)"
+		(keydown)="onKeydown($event)"
+		class="search-input"
+		[attr.aria-hidden]="!isSearchExpanded()"
+		[tabIndex]="isSearchExpanded() ? 0 : -1"
+			role="combobox" aria-expanded="false"
+		
+		aria-autocomplete="list"
+		aria-haspopup="listbox"
+		[attr.aria-expanded]="searchResults().length > 0"
+		[attr.aria-activedescendant]="focusedIndex() >= 0 ? 'search-result-' + focusedIndex() : null"
+	/>
+
+	@if (isSearchExpanded() && searchResults().length > 0) {
+		<div
+			class="search-dropdown"
+			role="listbox"
+			aria-label="Resultados da pesquisa"
+			(mousedown)="preventBlur($event)"
+		>
+			@for (book of searchResults(); track book.id; let i = $index) {
+				<a
+					#resultItem
+					[id]="'search-result-' + i"
+					[routerLink]="['/books', book.id]"
+					class="search-result-item"
+					[class.focused]="focusedIndex() === i"
+					role="option"
+					[attr.aria-selected]="focusedIndex() === i"
+					(click)="clearSearch()"
+					(keydown)="onKeydown($event)"
+				>
+					@if (book.cover) {
+						<img [src]="book.cover" alt="" class="book-mini-cover" />
+					}
+					<span class="book-title">{{ book.title }}</span>
+				</a>
+			}
+		</div>
+	}
+
+	<button
+		#searchBtn
+		type="button"
+		class="icon-btn search-btn"
+		(click)="toggleSearch()"
+		aria-label="Pesquisar"
+	>
+		<app-icons name="search" size="24" />
+	</button>
+</div>

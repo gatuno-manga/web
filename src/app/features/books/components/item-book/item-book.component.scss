@@ -1,9 +1,11 @@
-$width: 250px;
-$width-mobile: 150px;
+:host {
+	display: block;
+	width: 100%;
+}
 
 .cover-image-container {
 	position: relative;
-	width: $width;
+	width: 100%;
 	height: 355px;
 	overflow: hidden;
 	border-radius: 12px;
@@ -11,7 +13,6 @@ $width-mobile: 150px;
 	z-index: 1;
 
 	@media (max-width: 768px) {
-		width: $width-mobile;
 		height: 220px;
 	}
 
@@ -75,23 +76,101 @@ $width-mobile: 150px;
 		}
 	}
 
-	.progress-badge {
+	.top-left-badges {
 		position: absolute;
 		top: 10px;
 		left: 10px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		z-index: 100;
+	}
+
+	.progress-badge {
 		background-color: var(--primary-color);
 		color: white;
 		padding: 4px 8px;
 		border-radius: 4px;
 		font-size: 0.75rem;
 		font-weight: 600;
-		z-index: 100;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 		max-width: 120px;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		backdrop-filter: blur(4px);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.downloaded-badge {
+		background-color: var(--success-color, #28a745);
+		color: white;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 24px;
+		height: 24px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+		backdrop-filter: blur(4px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.downloading-badge,
+	.offline-badge {
+		color: white;
+		z-index: 100;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		backdrop-filter: blur(4px);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		position: relative;
+
+		&.circle {
+			width: 28px;
+			height: 28px;
+			border-radius: 50%;
+			flex-shrink: 0;
+		}
+
+		.progress-ring {
+			transform: rotate(-90deg);
+			transform-origin: 50% 50%;
+		}
+
+		.progress-ring__circle {
+			stroke-dasharray: 70;
+			transition: stroke-dashoffset 0.35s;
+			transform: rotate(0);
+			transform-origin: 50% 50%;
+		}
+
+		.center-icon {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			animation: spin-center 2s linear infinite;
+		}
+	}
+
+	.offline-badge {
+		background-color: var(--success-color, #28a745);
+	}
+
+	.downloading-badge {
+		background-color: var(--secondary-color);
+	}
+
+	@keyframes spin-center {
+		from {
+			transform: translate(-50%, -50%) rotate(0deg);
+		}
+		to {
+			transform: translate(-50%, -50%) rotate(360deg);
+		}
 	}
 }
 
@@ -166,11 +245,7 @@ $width-mobile: 150px;
 .grid {
 	align-items: center;
 	flex-direction: column;
-	width: $width;
-
-	@media (max-width: 768px) {
-		width: $width-mobile;
-	}
+	width: 100%;
 
 	.info {
 		padding: 20px;
@@ -200,13 +275,9 @@ $width-mobile: 150px;
 .cover {
 	align-items: center;
 	flex-direction: column;
-	width: $width;
+	width: 100%;
 	border: none;
 	background: transparent;
-
-	@media (max-width: 768px) {
-		width: $width-mobile;
-	}
 
 	&:hover {
 		transform: scale(1.05);
@@ -253,12 +324,11 @@ $width-mobile: 150px;
 .grid,
 .cover {
 	.cover-placeholder {
-		width: $width;
+		width: 100%;
 		height: 355px;
 		border-radius: 1px; // Slight radius to match card
 
 		@media (max-width: 768px) {
-			width: $width-mobile;
 			height: 220px;
 		}
 

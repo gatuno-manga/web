@@ -4,7 +4,7 @@ import {
 	ChapterCommentNode,
 	ChapterCommentsPageOptions,
 } from '@models/book.models';
-import { Page } from '@models/miscellaneous.models';
+import { Paginated } from '@models/miscellaneous.models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -16,13 +16,13 @@ export class ChapterCommentsService {
 	listChapterComments(
 		chapterId: string,
 		options: ChapterCommentsPageOptions,
-	): Observable<Page<ChapterCommentNode>> {
+	): Observable<Paginated<ChapterCommentNode>> {
 		const params = new URLSearchParams();
 		params.set('page', String(options.page));
 		params.set('limit', String(options.limit));
 		params.set('maxDepth', String(options.maxDepth));
 
-		return this.http.get<Page<ChapterCommentNode>>(
+		return this.http.get<Paginated<ChapterCommentNode>>(
 			`chapters/${chapterId}/comments?${params.toString()}`,
 		);
 	}

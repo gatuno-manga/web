@@ -175,9 +175,9 @@ export class UserTokenService {
 			}
 
 			for (const domain of domainsToTry) {
-				document.cookie = `${this.ACCESSKEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+				this.cookieService.delete(this.ACCESSKEY, false, domain);
 			}
-			document.cookie = `${this.ACCESSKEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+			this.cookieService.delete(this.ACCESSKEY, false);
 		}
 
 		this.csrfService.clear();
@@ -307,45 +307,45 @@ export class UserTokenService {
 		refreshToken?: string;
 		csrfToken?: string;
 	}> {
-		if (!this.refreshObservable) {
-			const csrfToken = this.csrfToken?.trim();
+		if (this.refreshObservable) {
+			return this.refreshObservable;
+		}
 
-			if (!csrfToken) {
-				return throwError(
-					() =>
-						new Error(
-							'CRITICAL: Token CSRF não encontrado para refresh',
-						),
-				);
-			}
+		const csrfToken = this.csrfToken?.trim();
 
-			this.refreshObservable = this.http
-				.post<{
-					accessToken: string;
-					refreshToken?: string;
-					csrfToken?: string;
-				}>('/auth/refresh', null, {
-					withCredentials: true,
-					headers: { 'x-csrf-token': csrfToken },
-				})
-				.pipe(
-					tap((body) => {
-						if (body?.accessToken) {
-							this.setTokens(body.accessToken, body.csrfToken);
-						}
-					}),
-					finalize(() => {
-						this.refreshObservable = null;
-					}),
-					shareReplay(1),
-					catchError((err) => throwError(() => err)),
-				) as Observable<{
+		if (!csrfToken) {
+			return throwError(
+				() =>
+					new Error(
+						'CRITICAL: Token CSRF não encontrado para refresh',
+					),
+			);
+		}
+
+		const obs = this.http
+			.post<{
 				accessToken: string;
 				refreshToken?: string;
 				csrfToken?: string;
-			}>;
-		}
-		return this.refreshObservable!;
+			}>('/auth/refresh', null, {
+				withCredentials: true,
+				headers: { 'x-csrf-token': csrfToken },
+			})
+			.pipe(
+				tap((body) => {
+					if (body?.accessToken) {
+						this.setTokens(body.accessToken, body.csrfToken);
+					}
+				}),
+				finalize(() => {
+					this.refreshObservable = null;
+				}),
+				shareReplay(1),
+				catchError((err) => throwError(() => err)),
+			);
+
+		this.refreshObservable = obs;
+		return obs;
 	}
 
 	get isAdmin(): boolean {

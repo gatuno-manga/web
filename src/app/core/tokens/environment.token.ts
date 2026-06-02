@@ -8,6 +8,7 @@ export interface Environment {
 	production: boolean;
 	apiURL: string;
 	apiURLServer?: string;
+	mqttBrokerUrl?: string;
 }
 
 /**

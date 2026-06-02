@@ -1,5 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, groupBy, mergeMap } from 'rxjs/operators';
 
 export interface ReadingProgress {
 	id: string; // Chave composta: `${userId}_${chapterId}`
@@ -33,10 +35,32 @@ export class ReadingProgressService {
 	private isBrowser: boolean;
 	private currentUserId: string = GUEST_USER_ID;
 
-	constructor(@Inject(PLATFORM_ID) platformId: Object) {
+	private saveSubject = new Subject<{
+		chapterId: string;
+		bookId: string;
+		pageIndex: number;
+		userId: string;
+	}>();
+
+	constructor(@Inject(PLATFORM_ID) platformId: object) {
 		this.isBrowser = isPlatformBrowser(platformId);
 		if (this.isBrowser) {
 			this.dbPromise = this.initDB();
+
+			// Setup do debounce para I/O: agrupa por key e espera 1s após a última emissão
+			this.saveSubject
+				.pipe(
+					groupBy((data) => `${data.userId}_${data.chapterId}`),
+					mergeMap((group) => group.pipe(debounceTime(1000))),
+				)
+				.subscribe(async (data) => {
+					await this.executeSaveProgress(
+						data.chapterId,
+						data.bookId,
+						data.pageIndex,
+						data.userId,
+					);
+				});
 		}
 	}
 
@@ -122,8 +146,27 @@ export class ReadingProgressService {
 
 		const targetUserId = userId || this.currentUserId;
 
+		// Envia para o Subject que fará o debounce
+		this.saveSubject.next({
+			chapterId,
+			bookId,
+			pageIndex,
+			userId: targetUserId,
+		});
+		return Promise.resolve();
+	}
+
+	private async executeSaveProgress(
+		chapterId: string,
+		bookId: string,
+		pageIndex: number,
+		userId: string,
+	): Promise<void> {
+		const targetUserId = userId || this.currentUserId;
+
 		try {
 			const db = await this.dbPromise;
+			if (!db) return;
 			return new Promise((resolve, reject) => {
 				const transaction = db.transaction(
 					[this.storeName],

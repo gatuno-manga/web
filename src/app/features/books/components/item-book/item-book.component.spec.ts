@@ -1,17 +1,35 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DownloadService } from '@core/services/download.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
+import { of } from 'rxjs';
 
 import { ItemBookComponent } from './item-book.component';
 
 describe('ItemBookComponent', () => {
 	let component: ItemBookComponent;
 	let fixture: ComponentFixture<ItemBookComponent>;
+	let downloadService: jasmine.SpyObj<DownloadService>;
 
 	beforeEach(async () => {
+		const downloadSpy = jasmine.createSpyObj('DownloadService', [
+			'isBookDownloaded',
+			'getBookDownloadProgress',
+			'deleteBook',
+			'downloadChapter',
+			'isChapterDownloaded',
+			'syncBook',
+		]);
+		downloadSpy.isBookDownloaded.and.returnValue(Promise.resolve(false));
+		downloadSpy.getBookDownloadProgress.and.returnValue(of([]));
+
 		await TestBed.configureTestingModule({
 			imports: [ItemBookComponent, SharedTestingModule],
+			providers: [{ provide: DownloadService, useValue: downloadSpy }],
 		}).compileComponents();
 
+		downloadService = TestBed.inject(
+			DownloadService,
+		) as jasmine.SpyObj<DownloadService>;
 		fixture = TestBed.createComponent(ItemBookComponent);
 		component = fixture.componentInstance;
 		fixture.componentRef.setInput('book', {
@@ -19,6 +37,8 @@ describe('ItemBookComponent', () => {
 			title: 'Test',
 			authors: [],
 			covers: [],
+			cover: 'test-cover.jpg',
+			totalChapters: 10,
 		} as any);
 		fixture.detectChanges();
 	});
@@ -79,5 +99,30 @@ describe('ItemBookComponent', () => {
 		component.fixCovers();
 
 		expect(bookService.fixAllCovers).toHaveBeenCalledWith('b1');
+	});
+
+	it('should check if book is downloaded and show badge', async () => {
+		downloadService.isBookDownloaded
+			.withArgs('b1')
+			.and.returnValue(Promise.resolve(true));
+
+		// Re-trigger the input setting and change detection to run the effect
+		fixture.componentRef.setInput('book', {
+			id: 'b1',
+			title: 'Test Book',
+			cover: 'test.jpg',
+		} as any);
+		fixture.detectChanges();
+
+		// Wait for promise in effect to resolve
+		await fixture.whenStable();
+		fixture.detectChanges(); // Trigger update for template based on signal
+
+		expect(downloadService.isBookDownloaded).toHaveBeenCalledWith('b1');
+		expect(component.isDownloaded()).toBeTrue();
+
+		const compiled = fixture.nativeElement as HTMLElement;
+		const badge = compiled.querySelector('.downloaded-badge');
+		expect(badge).toBeTruthy();
 	});
 });

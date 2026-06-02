@@ -58,4 +58,33 @@ describe('BookFilterComponent', () => {
 	it('should create', () => {
 		expect(component).toBeTruthy();
 	});
+
+	describe('Sensitive Content Changes', () => {
+		it('should refetch tags and cleanup orphans when sensitive content changes', () => {
+			// Arrange
+			const initialTags = [
+				{ id: 'tag1', name: 'Tag 1', description: '' },
+				{ id: 'tag2', name: 'Tag 2', description: '' },
+			];
+			const updatedTags = [
+				{ id: 'tag1', name: 'Tag 1', description: '' },
+			]; // tag2 is gone
+
+			_tagsServiceSpy.getTags.and.returnValue(of(initialTags));
+			(component as any).fetchTags(); // Initial load
+
+			component.selectedTags.set(['tag1', 'tag2']);
+			component.excludedTags.set(['tag2']);
+
+			// Act
+			_tagsServiceSpy.getTags.and.returnValue(of(updatedTags));
+			component.onSensitiveContentChange(['new-sensitive-id']);
+
+			// Assert
+			expect(_tagsServiceSpy.getTags).toHaveBeenCalled();
+			expect(component.selectedTags()).toEqual(['tag1']);
+			expect(component.excludedTags()).toEqual([]);
+			expect(component.availableTags()).toEqual(updatedTags);
+		});
+	});
 });

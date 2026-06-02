@@ -1,6 +1,24 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 
+interface HighlightRegistry {
+	set(name: string, highlight: object): void;
+	delete(name: string): void;
+	clear(): void;
+}
+
+interface Highlight {
+	new (...ranges: Range[]): object;
+}
+
+interface CustomCSS {
+	highlights: HighlightRegistry;
+}
+
+interface CustomWindow extends Window {
+	Highlight: Highlight;
+}
+
 @Injectable({
 	providedIn: 'root',
 })
@@ -11,9 +29,8 @@ export class HighlightService {
 
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
-			this.isSupported.set(
-				typeof (CSS as any)?.highlights !== 'undefined',
-			);
+			const css = (globalThis as { CSS?: CustomCSS }).CSS;
+			this.isSupported.set(typeof css?.highlights !== 'undefined');
 		}
 	}
 
@@ -21,8 +38,10 @@ export class HighlightService {
 		if (!this.isSupported()) return;
 
 		try {
-			const highlight = new (window as any).Highlight(...ranges);
-			(CSS as any).highlights.set(name, highlight);
+			const customWindow = window as unknown as CustomWindow;
+			const highlight = new customWindow.Highlight(...ranges);
+			const css = (globalThis as { CSS: CustomCSS }).CSS;
+			css.highlights.set(name, highlight);
 		} catch (err) {
 			console.error(`Highlight API Error: ${err}`);
 		}
@@ -30,12 +49,14 @@ export class HighlightService {
 
 	clearHighlight(name: string) {
 		if (!this.isSupported()) return;
-		(CSS as any).highlights.delete(name);
+		const css = (globalThis as { CSS: CustomCSS }).CSS;
+		css.highlights.delete(name);
 	}
 
 	clearAllHighlights() {
 		if (!this.isSupported()) return;
-		(CSS as any).highlights.clear();
+		const css = (globalThis as { CSS: CustomCSS }).CSS;
+		css.highlights.clear();
 	}
 
 	getSelectionRanges(): Range[] {

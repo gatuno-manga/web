@@ -16,7 +16,7 @@ import {
 } from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
-export type SelectOption = { value: any; label: string };
+export type SelectOption = { value: string | number | boolean; label: string };
 
 @Component({
 	selector: 'app-select',

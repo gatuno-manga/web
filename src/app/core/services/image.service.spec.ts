@@ -14,7 +14,7 @@ describe('ImageService', () => {
 		const canvas = document.createElement('canvas');
 		canvas.width = 2;
 		canvas.height = 2;
-		const ctx = canvas.getContext('2d')!;
+		const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 		ctx.fillStyle = 'rgb(255,0,0)';
 		ctx.fillRect(0, 0, 2, 2);
 		const dataUrl = canvas.toDataURL();

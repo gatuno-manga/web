@@ -9,6 +9,7 @@ import {
 	output,
 	signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NotificationService } from '@core/services/notification.service';
@@ -29,7 +30,7 @@ import {
 	RandomFilterResult,
 } from '@ui/molecules/notification/custom-components/random-filter-modal/random-filter-modal.component';
 import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';
-import { Observable, tap } from 'rxjs';
+import { debounceTime, Observable, Subject, tap } from 'rxjs';
 
 interface ActiveFilter {
 	id: string;
@@ -154,6 +155,16 @@ export class BookFilterComponent implements OnInit {
 	loadingTags = signal<boolean>(false);
 	tagSearchQuery = signal<string>('');
 	private pendingSensitiveNames = signal<string[]>([]);
+
+	private searchSubject = new Subject<string>();
+
+	constructor() {
+		this.searchSubject
+			.pipe(debounceTime(500), takeUntilDestroyed())
+			.subscribe(() => {
+				this.onSearch();
+			});
+	}
 
 	displayTagsForComponent = computed(() => {
 		const excludedGlobal = new Set(this.tagsService.excludedTagsSignal());
@@ -309,6 +320,27 @@ export class BookFilterComponent implements OnInit {
 				next: (tags) => {
 					this.availableTags.set(tags);
 					this.loadingTags.set(false);
+
+					// Clean up selected and excluded tags that are no longer available
+					const availableIds = new Set(tags.map((t) => t.id));
+
+					const currentSelected = this.selectedTags();
+					const filteredSelected = currentSelected.filter((id) =>
+						availableIds.has(id),
+					);
+
+					if (currentSelected.length !== filteredSelected.length) {
+						this.selectedTags.set(filteredSelected);
+					}
+
+					const currentExcluded = this.excludedTags();
+					const filteredExcluded = currentExcluded.filter((id) =>
+						availableIds.has(id),
+					);
+
+					if (currentExcluded.length !== filteredExcluded.length) {
+						this.excludedTags.set(filteredExcluded);
+					}
 				},
 				error: () => {
 					this.loadingTags.set(false);
@@ -386,6 +418,7 @@ export class BookFilterComponent implements OnInit {
 
 	onSearchInput(value: string) {
 		this.searchValue.set(value);
+		this.searchSubject.next(value);
 	}
 
 	toggleType(type: TypeBook) {
@@ -435,6 +468,11 @@ export class BookFilterComponent implements OnInit {
 
 	isSensitiveContentSelected(id: string): boolean {
 		return this.selectedSensitiveContent().includes(id);
+	}
+
+	onSensitiveContentChange(newIds: string[]) {
+		this.selectedSensitiveContent.set(newIds);
+		this.fetchTags();
 	}
 
 	onPublicationOperatorChange(value: string) {

@@ -119,15 +119,31 @@ export class AccountSecurityService {
 
 	beginPasskeyRegistration() {
 		return this.http
-			.post<Record<string, unknown> | { data: Record<string, unknown> }>(
-				'/auth/passkeys/register/options',
-				{},
-			)
+			.post<
+				| Record<
+						string,
+						object | string | number | boolean | null | undefined
+				  >
+				| {
+						data: Record<
+							string,
+							| object
+							| string
+							| number
+							| boolean
+							| null
+							| undefined
+						>;
+				  }
+			>('/auth/passkeys/register/options', {})
 			.pipe(map((response) => this.unwrapData(response)));
 	}
 
 	verifyPasskeyRegistration(
-		response: Record<string, unknown>,
+		response: Record<
+			string,
+			object | string | number | boolean | null | undefined
+		>,
 		name?: string,
 	) {
 		return this.http

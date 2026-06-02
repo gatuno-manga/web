@@ -4,19 +4,6 @@
 	<span (click)="selectTab(tab.covers, $event)">Artes</span>
 	<span (click)="selectTab(tab.extraInfo, $event)">Informações extras</span>
 	<span (click)="selectTab(tab.savedPages, $event)">Páginas Salvas</span>
-	
-	@if (userTokenService.isAdminSignal()) {
-		<div class="header-actions">
-			<app-button
-				variant="text"
-				size="small"
-				(click)="openBookEditModal()"
-				title="Editar informações do livro"
-			>
-				<app-icons name="edit" size="20" />
-			</app-button>
-		</div>
-	}
 </div>
 <div
 	id="container"
@@ -326,7 +313,7 @@
 						@if (cover.url && !coverImageErrors().has(cover.id)) {
 							<img
 								[src]="cover.url"
-								[alt]="'Cover ' + cover.id"
+								alt="Cover {{ cover.id }}"
 								(error)="onCoverImageError(cover.id)"
 							/>
 						} @else {
@@ -359,10 +346,13 @@
 				<div>
 					@defer (when modulesLoad[tab.extraInfo].load()) {
 						@for (
-							title of extraInfo().alternativeTitle;
+							title of extraInfo().alternativeTitles;
 							track $index
 						) {
-							<p class="item">{{ title }}</p>
+							<p class="item title-with-flag">
+								<img [src]="title.languageCode | flag" alt="Flag" class="flag-icon" />
+								<span>{{ title.title }}</span>
+							</p>
 						} @empty {
 							<p>Nenhum titulo alternativo disponível</p>
 						}
@@ -429,7 +419,7 @@
 						@if (savedPage.page.path) {
 							<img
 								[src]="savedPage.page.path"
-								[alt]="'Page ' + savedPage.page.index"
+								alt="Page {{ savedPage.page.index }}"
 								loading="lazy"
 							/>
 						} @else {

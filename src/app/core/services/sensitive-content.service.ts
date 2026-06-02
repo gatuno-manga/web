@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { SensitiveContentResponse } from '@models/book.models';
+import { of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { CookieService } from './cookie.service';
 
 @Injectable({
@@ -35,7 +37,9 @@ export class SensitiveContentService {
 	}
 
 	getSensitiveContent() {
-		return this.http.get<SensitiveContentResponse[]>('sensitive-content');
+		return this.http
+			.get<SensitiveContentResponse[]>('sensitive-content')
+			.pipe(catchError(() => of([])));
 	}
 
 	isAllowed(contents: { name: string }[] | string[]): boolean {

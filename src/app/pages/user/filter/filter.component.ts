@@ -16,7 +16,7 @@ import { TagsService } from '@core/services/tags.service';
 import { SensitiveContentResponse } from '@models/book.models';
 import { Tag } from '@models/tags.models';
 import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';
-import { finalize } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
 	selector: 'app-filter',
@@ -115,13 +115,17 @@ export class FilterComponent implements OnInit {
 		});
 	}
 
-	loadTags(allowedNames?: string[]) {
+	async loadTags(allowedNames?: string[]) {
 		const sensitiveContent =
 			allowedNames || this.sensitiveContentService.getContentAllow();
-		this.tagsService.getTags({ sensitiveContent }).subscribe({
-			next: (tags) => this.tagsList.set(tags),
-			error: (err) => console.error('Error loading tags', err),
-		});
+		try {
+			const tags = await firstValueFrom(
+				this.tagsService.getTags({ sensitiveContent }),
+			);
+			this.tagsList.set(tags);
+		} catch (err) {
+			console.error('Error loading tags', err);
+		}
 	}
 
 	private mapNamesToIds() {
@@ -133,51 +137,43 @@ export class FilterComponent implements OnInit {
 		this.isInitialized.set(true);
 	}
 
-	loadSensitiveContent() {
+	async loadSensitiveContent() {
 		this.isLoading.set(true);
-		this.sensitiveContentService
-			.getSensitiveContent()
-			.pipe(finalize(() => this.isLoading.set(false)))
-			.subscribe({
-				next: (list: SensitiveContentResponse[]) => {
-					this.sensitiveContentList.update((current) => [
-						...current,
-						...list,
-					]);
-					this.mapNamesToIds();
-				},
-				error: async () => {
-					try {
-						const offlineBooks =
-							await this.downloadService.getAllBooks();
-						const contentMap = new Map<
-							string,
-							SensitiveContentResponse
-						>();
+		try {
+			const list = await firstValueFrom(
+				this.sensitiveContentService.getSensitiveContent(),
+			);
+			this.sensitiveContentList.update((current) => [
+				...current,
+				...list,
+			]);
+			this.mapNamesToIds();
+		} catch (_err) {
+			try {
+				const offlineBooks = await this.downloadService.getAllBooks();
+				const contentMap = new Map<string, SensitiveContentResponse>();
 
-						for (const book of offlineBooks) {
-							if (book.sensitiveContent) {
-								for (const sc of book.sensitiveContent) {
-									contentMap.set(sc.id, sc);
-								}
-							}
+				for (const book of offlineBooks) {
+					if (book.sensitiveContent) {
+						for (const sc of book.sensitiveContent) {
+							contentMap.set(sc.id, sc);
 						}
-
-						const offlineList = Array.from(contentMap.values());
-						this.sensitiveContentList.update((current) => [
-							...current,
-							...offlineList,
-						]);
-					} catch (e) {
-						console.error(
-							'Error loading offline sensitive content',
-							e,
-						);
-					} finally {
-						this.mapNamesToIds();
 					}
-				},
-			});
+				}
+
+				const offlineList = Array.from(contentMap.values());
+				this.sensitiveContentList.update((current) => [
+					...current,
+					...offlineList,
+				]);
+			} catch (e) {
+				console.error('Error loading offline sensitive content', e);
+			} finally {
+				this.mapNamesToIds();
+			}
+		} finally {
+			this.isLoading.set(false);
+		}
 	}
 
 	setMetaData() {

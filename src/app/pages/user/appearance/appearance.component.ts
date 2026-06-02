@@ -9,6 +9,7 @@ import {
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { LanguageService } from '@core/services/language.service';
 import { LocalStorageService } from '@core/services/local-storage.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { SearchService } from '@core/services/search.service';
@@ -36,6 +37,7 @@ export class AppearanceComponent implements OnInit {
 	private readonly localStorage = inject(LocalStorageService);
 	private readonly settingsService = inject(SettingsService);
 	public readonly themeService = inject(ThemeService);
+	public readonly languageService = inject(LanguageService);
 
 	isListView = input<boolean>(false);
 	private globalSearchQuery = this.searchService.query;
@@ -58,9 +60,18 @@ export class AppearanceComponent implements OnInit {
 		{ value: 'true-dark', label: 'True Dark (OLED)' },
 	];
 
+	languageOptions = computed(() =>
+		this.languageService.languages().map((lang) => ({
+			value: lang.code,
+			label: lang.name,
+		})),
+	);
+
 	showPage = computed(() => {
 		const q = this.globalSearchQuery().toLowerCase();
-		return 'aparência visual tema cores layout livros listagem'.includes(q);
+		return 'aparência visual tema cores layout livros listagem idioma linguagem'.includes(
+			q,
+		);
 	});
 
 	constructor() {
@@ -112,9 +123,12 @@ export class AppearanceComponent implements OnInit {
 		}
 	}
 
-	onThemeChange(event: Event) {
-		const select = event.target as HTMLSelectElement;
-		this.themeService.setTheme(select.value as AppTheme);
+	onThemeChangeFromSelect(value: string) {
+		this.themeService.setTheme(value as AppTheme);
+	}
+
+	onLanguageChange(value: string) {
+		this.languageService.setLanguage(value);
 	}
 
 	onModeChange(event: Event) {

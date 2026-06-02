@@ -5,9 +5,10 @@ import {
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ENVIRONMENT } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
-import { WebSocketConnectionState } from '@models/websocket-state.model';
+import { SyncResponse } from '@models/reading-progress-events.model';
 import { Subject } from 'rxjs';
 import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
+import { MqttService } from './mqtt.service';
 import { NetworkStatusService } from './network-status.service';
 import { ReadingProgressService } from './reading-progress.service';
 import { ReadingProgressSyncService } from './reading-progress-sync.service';
@@ -20,7 +21,7 @@ describe('ReadingProgressSyncService', () => {
 	let localProgressServiceSpy: jasmine.SpyObj<ReadingProgressService>;
 	let _networkStatusServiceSpy: jasmine.SpyObj<NetworkStatusService>;
 	let backgroundSyncServiceSpy: jasmine.SpyObj<BackgroundSyncRegistrationService>;
-	let mockSocket: any;
+	let mqttServiceSpy: jasmine.SpyObj<MqttService>;
 
 	const mockEnv = {
 		apiURL: 'http://localhost:3000',
@@ -34,19 +35,6 @@ describe('ReadingProgressSyncService', () => {
 	};
 
 	beforeEach(() => {
-		mockSocket = {
-			connected: false,
-			on: jasmine.createSpy('on'),
-			once: jasmine.createSpy('once'),
-			off: jasmine.createSpy('off'),
-			emit: jasmine.createSpy('emit'),
-			disconnect: jasmine.createSpy('disconnect'),
-			io: {
-				on: jasmine.createSpy('io.on'),
-				opts: { reconnection: true },
-			},
-		};
-
 		const userTokenSpy = jasmine.createSpyObj('UserTokenService', [], {
 			accessToken: 'mock-token',
 			hasValidAccessToken: true,
@@ -67,6 +55,15 @@ describe('ReadingProgressSyncService', () => {
 			'BackgroundSyncRegistrationService',
 			['register'],
 		);
+		backgroundSyncSpy.register.and.returnValue(Promise.resolve());
+
+		const mqttSpy = jasmine.createSpyObj(
+			'MqttService',
+			['connect', 'disconnect', 'isConnected'],
+			{
+				progressSynced$: new Subject<SyncResponse>(),
+			},
+		);
 
 		TestBed.configureTestingModule({
 			imports: [HttpClientTestingModule],
@@ -79,15 +76,13 @@ describe('ReadingProgressSyncService', () => {
 					provide: BackgroundSyncRegistrationService,
 					useValue: backgroundSyncSpy,
 				},
+				{ provide: MqttService, useValue: mqttSpy },
 				{ provide: ENVIRONMENT, useValue: mockEnv },
 				{ provide: WINDOW, useValue: mockWindow },
 			],
 		});
 
 		service = TestBed.inject(ReadingProgressSyncService);
-		// spy on protected method
-		spyOn<any>(service, 'createSocket').and.returnValue(mockSocket);
-
 		httpMock = TestBed.inject(HttpTestingController);
 		_userTokenServiceSpy = TestBed.inject(
 			UserTokenService,
@@ -101,6 +96,9 @@ describe('ReadingProgressSyncService', () => {
 		backgroundSyncServiceSpy = TestBed.inject(
 			BackgroundSyncRegistrationService,
 		) as jasmine.SpyObj<BackgroundSyncRegistrationService>;
+		mqttServiceSpy = TestBed.inject(
+			MqttService,
+		) as jasmine.SpyObj<MqttService>;
 	});
 
 	it('should be created', () => {
@@ -108,26 +106,16 @@ describe('ReadingProgressSyncService', () => {
 	});
 
 	it('should initialize with DISCONNECTED state', () => {
-		expect(service.connectionState()).toBe(
-			WebSocketConnectionState.DISCONNECTED,
-		);
+		expect(service.syncStatus().connected).toBe(false);
 	});
 
 	it('should connect when connect() is called', () => {
 		service.connect();
-		expect((service as any).createSocket).toHaveBeenCalled();
-		expect(service.connectionState()).toBe(
-			WebSocketConnectionState.CONNECTING,
-		);
+		expect(mqttServiceSpy.connect).toHaveBeenCalled();
+		expect(service.syncStatus().connected).toBe(true);
 	});
 
-	it('should save progress locally and then via websocket if connected', fakeAsync(() => {
-		mockSocket.connected = true;
-		(service as any).socket = mockSocket;
-		// Transição válida via CONNECTING
-		(service as any).transitionTo(WebSocketConnectionState.CONNECTING);
-		(service as any).transitionTo(WebSocketConnectionState.CONNECTED);
-
+	it('should save progress locally and then via HTTP', fakeAsync(() => {
 		const progressData = {
 			chapterId: 'c1',
 			bookId: 'b1',
@@ -143,19 +131,13 @@ describe('ReadingProgressSyncService', () => {
 			'b1',
 			5,
 		);
-		expect(mockSocket.emit).toHaveBeenCalledWith(
-			'progress:update',
-			progressData,
-		);
+
+		const req = httpMock.expectOne('users/me/reading-progress');
+		expect(req.request.method).toBe('POST');
+		req.flush({ data: progressData });
 	}));
 
-	it('should save progress locally and register background sync if disconnected', fakeAsync(() => {
-		mockSocket.connected = false;
-		(service as any).socket = null;
-		(service as any).transitionTo(WebSocketConnectionState.DISCONNECTED);
-		backgroundSyncServiceSpy.register.and.returnValue(Promise.resolve());
-		localProgressServiceSpy.enqueueSync.and.returnValue(Promise.resolve());
-
+	it('should save progress locally and register background sync', fakeAsync(() => {
 		const progressData = {
 			chapterId: 'c2',
 			bookId: 'b1',
@@ -176,13 +158,11 @@ describe('ReadingProgressSyncService', () => {
 			'sync-reading-progress',
 		);
 
-		// Should also attempt HTTP sync
 		const req = httpMock.expectOne('users/me/reading-progress');
-		expect(req.request.method).toBe('POST');
 		req.flush({ data: {} });
 	}));
 
-	it('should return local progress in getProgress if socket not connected', async () => {
+	it('should return local progress in getProgress', async () => {
 		const mockLocalProgress = {
 			id: 'u1_c1',
 			chapterId: 'c1',
@@ -197,14 +177,5 @@ describe('ReadingProgressSyncService', () => {
 
 		const result = await service.getProgress('c1');
 		expect(result).toEqual(mockLocalProgress);
-	});
-
-	it('should update sync status correctly', () => {
-		(service as any).updateSyncStatus({ syncing: true });
-		expect(service.syncStatus().syncing).toBeTrue();
-
-		(service as any).updateSyncStatus({ pendingChanges: 5 });
-		expect(service.syncStatus().pendingChanges).toBe(5);
-		expect(service.syncStatus().syncing).toBeTrue(); // Should preserve previous values
 	});
 });
