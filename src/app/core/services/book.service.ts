@@ -142,31 +142,31 @@ export class BookService {
 				map((response) => {
 					const books = response.data.books;
 					// Mapear cover, blurHash e dominantColor da capa principal para o objeto BookList
-					books.data = books.data.map(
-						(book: {
-							covers?: {
-								isMain?: boolean;
-								url?: string;
-								blurHash?: string;
-								dominantColor?: string;
-								[key: string]: unknown;
-							}[];
-							[key: string]: unknown;
-						}) => {
-							const mainCover =
-								book.covers?.find((c) => c.isMain) ||
-								book.covers?.[0];
-							if (mainCover) {
-								book.cover = mainCover.url;
-								if (mainCover.metadata) {
-									book.blurHash = mainCover.metadata.blurHash;
-									book.dominantColor =
-										mainCover.metadata.dominantColor;
-								}
+					books.data = books.data.map((b) => {
+						const book =
+							b as import('@models/book.models').BookList & {
+								covers?: {
+									isMain?: boolean;
+									url?: string;
+									metadata?: {
+										blurHash?: string;
+										dominantColor?: string;
+									};
+								}[];
+							};
+						const mainCover =
+							book.covers?.find((c) => c.isMain) ||
+							book.covers?.[0];
+						if (mainCover) {
+							book.cover = mainCover.url as string;
+							if (mainCover.metadata) {
+								book.blurHash = mainCover.metadata.blurHash;
+								book.dominantColor =
+									mainCover.metadata.dominantColor;
 							}
-							return book;
-						},
-					);
+						}
+						return book as import('@models/book.models').BookList;
+					});
 					return books;
 				}),
 				catchError((err) => {

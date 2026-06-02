@@ -223,7 +223,7 @@ export class DownloadManagerService {
 			}
 
 			task.status = 'error';
-			task.error = error?.message || 'Erro desconhecido';
+			task.error = (error as Error)?.message || 'Erro desconhecido';
 			this.emitTasks();
 
 			this.notificationService.error(

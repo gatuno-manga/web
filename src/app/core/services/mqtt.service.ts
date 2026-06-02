@@ -277,8 +277,13 @@ export class MqttService implements OnDestroy {
 			// Lógica de notificação pessoal
 			if (topic.includes('/notifications')) {
 				this.notificationService.show(
-					data.payload.message || 'Nova notificação',
-					data.payload.type || 'info',
+					(data.payload as { message?: string }).message ||
+						'Nova notificação',
+					((data.payload as { type?: string }).type || 'info') as
+						| 'info'
+						| 'success'
+						| 'warning'
+						| 'error',
 				);
 				return;
 			}
@@ -286,48 +291,66 @@ export class MqttService implements OnDestroy {
 			// Roteamento de eventos Book
 			switch (data.event) {
 				case BookEvents.CREATED:
-					this.bookCreatedSubject.next(data.payload);
+					this.bookCreatedSubject.next(data.payload as BookEvent);
 					break;
 				case BookEvents.UPDATED:
 				case 'book.updated':
-					this.bookUpdatedSubject.next(data.payload);
+					this.bookUpdatedSubject.next(data.payload as BookEvent);
 					break;
 				case BookEvents.NEW_CHAPTERS:
-					this.bookNewChaptersSubject.next(data.payload);
+					this.bookNewChaptersSubject.next(
+						data.payload as NewChaptersEvent,
+					);
 					break;
 				case BookEvents.UPDATE_STARTED:
-					this.bookUpdateStartedSubject.next(data.payload);
+					this.bookUpdateStartedSubject.next(
+						data.payload as UpdateStartedEvent,
+					);
 					break;
 				case BookEvents.UPDATE_COMPLETED:
-					this.bookUpdateCompletedSubject.next(data.payload);
+					this.bookUpdateCompletedSubject.next(
+						data.payload as UpdateCompletedEvent,
+					);
 					break;
 				case BookEvents.UPDATE_FAILED:
-					this.bookUpdateFailedSubject.next(data.payload);
+					this.bookUpdateFailedSubject.next(
+						data.payload as UpdateFailedEvent,
+					);
 					break;
 				case BookEvents.CHAPTERS_UPDATED:
-					this.chaptersUpdatedSubject.next(data.payload);
+					this.chaptersUpdatedSubject.next(
+						data.payload as ChapterEvent,
+					);
 					break;
 				case BookEvents.CHAPTER_UPDATED:
-					this.chapterUpdatedSubject.next(data.payload);
+					this.chapterUpdatedSubject.next(
+						data.payload as ChapterEvent,
+					);
 					break;
 				case BookEvents.CHAPTERS_FIX:
-					this.chaptersFixSubject.next(data.payload);
+					this.chaptersFixSubject.next(data.payload as ChapterEvent);
 					break;
 				case BookEvents.SCRAPING_STARTED:
 				case 'chapter.scraping.started':
-					this.chapterScrapingStartedSubject.next(data.payload);
+					this.chapterScrapingStartedSubject.next(
+						data.payload as ScrapingEvent,
+					);
 					break;
 				case BookEvents.SCRAPING_COMPLETED:
-					this.chapterScrapingCompletedSubject.next(data.payload);
+					this.chapterScrapingCompletedSubject.next(
+						data.payload as ScrapingEvent,
+					);
 					break;
 				case BookEvents.SCRAPING_FAILED:
-					this.chapterScrapingFailedSubject.next(data.payload);
+					this.chapterScrapingFailedSubject.next(
+						data.payload as ScrapingEvent,
+					);
 					break;
 				case BookEvents.COVER_PROCESSED:
-					this.coverProcessedSubject.next(data.payload);
+					this.coverProcessedSubject.next(data.payload as CoverEvent);
 					break;
 				case BookEvents.COVER_SELECTED:
-					this.coverSelectedSubject.next(data.payload);
+					this.coverSelectedSubject.next(data.payload as CoverEvent);
 					break;
 				// Progresso pessoal
 				case 'progress:synced':
