@@ -12,6 +12,7 @@
 		"watch": "ng build --watch --configuration development",
 		"test": "ng test",
 		"test:headless": "ng test --browsers=ChromeHeadlessCI --watch=false",
+		"api:docs": "node scripts/swagger-helper.mjs",
 		"serve:ssr:front": "node dist/front/server/server.mjs"
 	},
 	"private": true,
