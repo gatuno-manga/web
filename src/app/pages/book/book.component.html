@@ -181,6 +181,37 @@
 					class="book-description"
 				></markdown>
 			</div>
+
+			@if (relatedBooks().length > 0) {
+				<div class="related-books-section">
+					<h2>Livros Relacionados</h2>
+					<div class="related-books-list">
+						@for (rel of relatedBooks(); track rel.relationId) {
+							<div
+								class="related-book-card"
+								(click)="navigateToRelatedBook(rel.relatedBook.id)"
+							>
+								<div class="card-cover">
+									<img
+										[ngSrc]="rel.relatedBook.cover"
+										[alt]="rel.relatedBook.title"
+										fill
+										sizes="(max-width: 768px) 100px, 150px"
+									/>
+									<span class="relation-badge">{{
+										getRelationTypeLabel(rel.relationType)
+									}}</span>
+								</div>
+								<div class="card-info">
+									<span class="title">{{
+										rel.relatedBook.title
+									}}</span>
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			}
 		</div>
 		<app-info-book [id]="b.id" [bookBasic]="b" (updated)="refreshBook()" />
 	}

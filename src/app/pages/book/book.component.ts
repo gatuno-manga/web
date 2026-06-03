@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
+import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { DownloadService } from '@core/services/download.service';
 import { DownloadManagerService } from '@core/services/download-manager.service';
@@ -23,6 +24,7 @@ import { UnifiedReadingProgressService } from '@core/services/unified-reading-pr
 import { UserTokenService } from '@core/services/user-token.service';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
+import { RelatedBookItem } from '@models/book-relationship.models';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
@@ -62,6 +64,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 export class BookComponent implements OnInit, OnDestroy {
 	ScrapingStatus = ScrapingStatus;
 	book = signal<BookBasic | undefined>(undefined);
+	relatedBooks = signal<RelatedBookItem[]>([]);
 	private userTokenService = inject(UserTokenService);
 	admin = computed(() => this.userTokenService.isAdminSignal());
 	isLoading = signal(true);
@@ -92,6 +95,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	private modalService = inject(ModalNotificationService);
 	private notificationService = inject(NotificationService);
 	private bookService = inject(BookService);
+	private relationshipService = inject(BookRelationshipService);
 	private activatedRoute = inject(ActivatedRoute);
 	private router = inject(Router);
 	private wsService = inject(MqttService);
@@ -147,6 +151,9 @@ export class BookComponent implements OnInit, OnDestroy {
 
 				// Carrega o último progresso de leitura
 				this.loadLastReadingProgress();
+
+				// Carrega livros relacionados
+				this.loadRelatedBooks(book.id);
 
 				// Conecta ao WebSocket apenas se autenticado
 				if (this.userTokenService.hasValidAccessTokenSignal()) {
@@ -1024,5 +1031,35 @@ export class BookComponent implements OnInit, OnDestroy {
 				);
 			});
 		}
+	}
+
+	private loadRelatedBooks(bookId: string) {
+		this.relationshipService.getBookRelationships(bookId).subscribe({
+			next: (page) => {
+				this.relatedBooks.set(page.items);
+			},
+			error: (err) => {
+				console.error('Erro ao carregar livros relacionados:', err);
+			},
+		});
+	}
+
+	navigateToRelatedBook(bookId: string) {
+		this.router.navigate(['/book', bookId]);
+		// Scroll to top
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	}
+
+	getRelationTypeLabel(type: string): string {
+		const labels: Record<string, string> = {
+			sequence: 'Sequência',
+			'spin-off': 'Spin-off',
+			doujinshi: 'Doujinshi',
+			'same-franchise': 'Mesma Franquia',
+			related: 'Relacionado',
+			adaptation: 'Adaptação',
+			crossover: 'Crossover',
+		};
+		return labels[type] || type;
 	}
 }
