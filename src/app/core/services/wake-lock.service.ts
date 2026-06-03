@@ -46,7 +46,7 @@ export class WakeLockService {
 		if (!this.isSupported()) return;
 
 		try {
-			const nav = navigator as unknown as NavigatorWithWakeLock;
+			const nav = navigator as Navigator & NavigatorWithWakeLock;
 			this.wakeLock = await nav.wakeLock.request('screen');
 			this.isActive.set(true);
 
