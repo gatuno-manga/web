@@ -2,7 +2,6 @@
 # Documentação: https://github.com/evilmartians/lefthook
 
 pre-commit:
-  parallel: true
   commands:
     check-secrets:
       run: npx secretlint {staged_files}
