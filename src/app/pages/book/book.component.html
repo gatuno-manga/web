@@ -211,7 +211,11 @@
 				></markdown>
 			</div>
 
-			<app-book-review-form [bookId]="b.id" />
+			@if (hasReadPartially() && userTokenService.hasValidAccessTokenSignal()) {
+				<app-book-review-form [bookId]="b.id" (reviewSubmitted)="reviewsList.loadReviews()" />
+			}
+
+			<app-book-reviews-list [bookId]="b.id" #reviewsList />
 
 			@if (relatedBooks().length > 0) {
 				<div class="related-books-section">

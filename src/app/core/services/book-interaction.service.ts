@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { ReviewBookDto } from '@models/book-interaction.models';
+import { BookReview, ReviewBookDto } from '@models/book-interaction.models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -8,6 +8,13 @@ import { Observable } from 'rxjs';
 })
 export class BookInteractionService {
 	private readonly http = inject(HttpClient);
+
+	/**
+	 * Busca as avaliações de um livro.
+	 */
+	getReviews(bookId: string): Observable<BookReview[]> {
+		return this.http.get<BookReview[]>(`books/${bookId}/reviews`);
+	}
 
 	/**
 	 * Marca um livro como favorito para o usuário logado.

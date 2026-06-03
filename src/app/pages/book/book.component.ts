@@ -24,6 +24,7 @@ import { SensitiveContentService } from '@core/services/sensitive-content.servic
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import { BookReviewFormComponent } from '@features/books/components/book-review-form/book-review-form.component';
+import { BookReviewsListComponent } from '@features/books/components/book-reviews-list/book-reviews-list.component';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
 import { RelatedBookItem } from '@models/book-relationship.models';
@@ -51,6 +52,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 		IconsComponent,
 		InfoBookComponent,
 		BookReviewFormComponent,
+		BookReviewsListComponent,
 		AsideComponent,
 		ButtonComponent,
 		MarkdownComponent,
@@ -69,12 +71,13 @@ export class BookComponent implements OnInit, OnDestroy {
 	ScrapingStatus = ScrapingStatus;
 	book = signal<BookBasic | undefined>(undefined);
 	relatedBooks = signal<RelatedBookItem[]>([]);
-	private userTokenService = inject(UserTokenService);
+	public userTokenService = inject(UserTokenService);
 	admin = computed(() => this.userTokenService.isAdminSignal());
 	isLoading = signal(true);
 	isImageLoaded = signal(false);
 	isFavorited = signal(false);
 	isSubscribed = signal(false);
+	hasReadPartially = signal(false);
 	private wsSubscription?: Subscription;
 	private coverUrl?: string;
 
@@ -585,6 +588,7 @@ export class BookComponent implements OnInit, OnDestroy {
 		if (progress) {
 			this.lastReadChapterId = progress.chapterId;
 			this.lastReadPage = progress.pageIndex;
+			this.hasReadPartially.set(true);
 		}
 	}
 
