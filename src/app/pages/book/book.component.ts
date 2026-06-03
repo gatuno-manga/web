@@ -22,6 +22,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
 import { UserTokenService } from '@core/services/user-token.service';
+import { BookReviewFormComponent } from '@features/books/components/book-review-form/book-review-form.component';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
 import { RelatedBookItem } from '@models/book-relationship.models';
@@ -48,6 +49,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 		RouterModule,
 		IconsComponent,
 		InfoBookComponent,
+		BookReviewFormComponent,
 		AsideComponent,
 		ButtonComponent,
 		MarkdownComponent,

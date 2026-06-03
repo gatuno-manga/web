@@ -1,0 +1,50 @@
+<form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
+	<h3>O que você achou deste livro?</h3>
+
+	<div class="rating-container">
+		<div class="stars">
+			@for (star of [1, 2, 3, 4, 5]; track star) {
+				<button
+					type="button"
+					class="star-btn"
+					[class.active]="star <= (hoverRating() || reviewForm.get('rating')?.value || 0)"
+					(mouseenter)="setHoverRating(star)"
+					(mouseleave)="setHoverRating(0)"
+					(click)="setRating(star)"
+					aria-label="Avaliar com {{ star }} estrelas"
+				>
+					<app-icons [name]="star <= (hoverRating() || reviewForm.get('rating')?.value || 0) ? 'bookmark' : 'bookmark'" />
+				</button>
+			}
+		</div>
+		@if (reviewForm.get('rating')?.value; as rating) {
+			<span class="rating-label">{{ rating }} / 5</span>
+		}
+	</div>
+
+	<div class="input-group">
+		<textarea
+			formControlName="content"
+			placeholder="Escreva sua opinião sobre o livro..."
+			rows="4"
+		></textarea>
+		@if (reviewForm.get('content')?.touched && reviewForm.get('content')?.errors?.['minlength']) {
+			<span class="error-text">A avaliação deve ter pelo menos 10 caracteres.</span>
+		}
+	</div>
+
+	<div class="actions">
+		<app-button
+			type="submit"
+			variant="primary"
+			[disabled]="reviewForm.invalid || isSubmitting()"
+		>
+			@if (isSubmitting()) {
+				<app-icons name="loader" class="spin" />
+				Enviando...
+			} @else {
+				Enviar Avaliação
+			}
+		</app-button>
+	</div>
+</form>
