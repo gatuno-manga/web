@@ -1,0 +1,43 @@
+<div class="add-to-collection-modal">
+	<header>
+		<h2>Adicionar à Coleção</h2>
+		<p class="subtitle">Selecione uma coleção para adicionar <strong>{{ bookTitle() }}</strong></p>
+	</header>
+
+	<div class="collections-list">
+		@if (isLoading()) {
+			<div class="loading">
+				<app-icons name="loader" class="spin" />
+				<span>Carregando suas coleções...</span>
+			</div>
+		} @else {
+			@if (collections().length > 0) {
+				@for (collection of collections(); track collection.id) {
+					<button
+						type="button"
+						class="collection-item"
+						(click)="addToCollection(collection.id)"
+					>
+						<div class="icon-box">
+							<app-icons name="list" />
+						</div>
+						<div class="info">
+							<span class="title">{{ collection.title }}</span>
+							<span class="count">{{ collection.collaboratorsCount || 0 }} colaboradores</span>
+						</div>
+						<app-icons name="plus" class="add-icon" />
+					</button>
+				}
+			} @else {
+				<div class="empty-state">
+					<app-icons name="list" />
+					<p>Você ainda não criou nenhuma coleção.</p>
+				</div>
+			}
+		}
+	</div>
+
+	<footer>
+		<app-button variant="outline" (click)="onClose()">Cancelar</app-button>
+	</footer>
+</div>

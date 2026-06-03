@@ -104,6 +104,13 @@
 								</app-button>
 								@if (showOptionsDropdown()) {
 									<div class="options-dropdown">
+										<button
+											type="button"
+											(click)="openAddToCollectionModal()"
+										>
+											<app-icons name="bookmark" />
+											<span>Adicionar à Coleção</span>
+										</button>
 										<button type="button" (click)="saveOffline()">
 											<app-icons name="smartphone" />
 											<span>Salvar no app</span>

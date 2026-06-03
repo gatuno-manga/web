@@ -30,9 +30,10 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
+	AddToCollectionModalComponent,
 	BookDownloadModalComponent,
 	BookDownloadResult,
-} from '@ui/molecules/notification/custom-components/book-download-modal/book-download-modal.component';
+} from '@ui/molecules/notification/custom-components';
 import {
 	BookEditModalComponent,
 	BookEditSaveEvent,
@@ -1031,6 +1032,33 @@ export class BookComponent implements OnInit, OnDestroy {
 				);
 			});
 		}
+	}
+
+	openAddToCollectionModal() {
+		this.closeOptionsDropdown();
+		const book = this.book();
+		if (!book) return;
+
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: AddToCollectionModalComponent,
+			componentData: {
+				bookId: book.id,
+				bookTitle: book.title,
+				close: (success: boolean) => {
+					this.modalService.close();
+					if (success) {
+						this.notificationService.success(
+							'Livro adicionado à coleção com sucesso!',
+						);
+					}
+				},
+			},
+			useBackdrop: true,
+			backdropOpacity: 0.5,
+		});
 	}
 
 	private loadRelatedBooks(bookId: string) {
