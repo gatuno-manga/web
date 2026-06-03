@@ -3,7 +3,7 @@ import {
 	DragDropModule,
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { DecimalPipe, isPlatformBrowser } from '@angular/common';
+import { DecimalPipe, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
@@ -16,11 +16,14 @@ import {
 	OnDestroy,
 	output,
 	PLATFORM_ID,
+	QueryList,
 	signal,
 	ViewChild,
+	ViewChildren,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
+import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
 import { DownloadService } from '@core/services/download.service';
@@ -39,6 +42,7 @@ import {
 	ImageMetadata,
 	ScrapingStatus,
 } from '@models/book.models';
+import { RelatedBookItem } from '@models/book-relationship.models';
 import { ContextMenuItem } from '@models/context-menu.models';
 import { DownloadStatus } from '@models/offline.models';
 import { SavedPage } from '@models/saved-page.models';
@@ -48,9 +52,10 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
+	AddRelatedBookModalComponent,
 	BookEditModalComponent,
 	BookEditSaveEvent,
-} from '@ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component';
+} from '@ui/molecules/notification/custom-components';
 import {
 	CoverEditModalComponent,
 	CoverEditSaveEvent,
@@ -68,6 +73,7 @@ enum tab {
 	covers = 1,
 	extraInfo = 2,
 	savedPages = 3,
+	relatedBooks = 4,
 }
 
 interface ModulesLoad {
@@ -87,6 +93,7 @@ interface ModulesLoad {
 		ImageViewerComponent,
 		BlurhashComponent,
 		DragDropModule,
+		NgOptimizedImage,
 	],
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
@@ -97,6 +104,7 @@ interface ModulesLoad {
 })
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	private bookService = inject(BookService);
+	private relationshipService = inject(BookRelationshipService);
 	private modalService = inject(ModalNotificationService);
 	private downloadService = inject(DownloadService);
 	private chapterService = inject(ChapterService);
@@ -119,6 +127,14 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	selectedTab = signal<tab>(tab.chapters);
 	sortAscending = signal(true);
 
+	tabsList = [
+		{ id: tab.chapters, label: 'Capítulos' },
+		{ id: tab.covers, label: 'Artes' },
+		{ id: tab.extraInfo, label: 'Informações extras' },
+		{ id: tab.savedPages, label: 'Páginas Salvas' },
+		{ id: tab.relatedBooks, label: 'Relacionados' },
+	];
+
 	private websocketSubscription?: Subscription;
 	private downloadSubscription?: Subscription;
 	private scrollSubscription?: Subscription;
@@ -140,6 +156,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			load: signal(false),
 			function: async () => this.loadSavedPages(),
 		},
+		{
+			load: signal(false),
+			function: async () => this.loadRelatedBooks(),
+		},
 	];
 	chapters = signal<Chapterlist[]>([]);
 	nextChaptersCursor = signal<string | null>(null);
@@ -152,6 +172,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	hasCoversChanged = signal(false);
 
 	savedPages = signal<SavedPage[]>([]);
+	relatedBooks = signal<RelatedBookItem[]>([]);
 	extraInfo = signal<BookDetail>({
 		alternativeTitle: [],
 		originalUrl: [],
@@ -182,15 +203,19 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	coverImageErrors = signal<Set<string>>(new Set());
 
 	@ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
-	@ViewChild('firstTab') firstTab!: ElementRef<HTMLSpanElement>;
+	@ViewChildren('tabEl') tabEls!: QueryList<ElementRef<HTMLSpanElement>>;
 	@ViewChild('container') containerElement!: ElementRef<HTMLDivElement>;
 
 	containerHeight = signal('auto');
 
 	ngAfterViewInit() {
-		if (this.firstTab) {
-			this.firstTab.nativeElement.click();
-		}
+		// Clique inicial na primeira aba disponível
+		setTimeout(() => {
+			const first = this.tabEls.first;
+			if (first) {
+				first.nativeElement.click();
+			}
+		});
 
 		if (isPlatformBrowser(this.platformId)) {
 			this.setupResizeObserver();
@@ -819,6 +844,78 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				console.error('Error loading saved pages:', error);
 			},
 		});
+	}
+
+	loadRelatedBooks() {
+		this.relationshipService.getBookRelationships(this.id()).subscribe({
+			next: (page) => {
+				this.relatedBooks.set(page.items);
+				this.scheduleHeightUpdate();
+			},
+			error: (error) => {
+				console.error('Error loading related books:', error);
+			},
+		});
+	}
+
+	openAddRelatedBookModal() {
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: AddRelatedBookModalComponent,
+			componentData: {
+				sourceBookId: this.id(),
+				close: (success: boolean) => {
+					this.modalService.close();
+					if (success) {
+						this.loadRelatedBooks();
+						this.updated.emit();
+					}
+				},
+			},
+			useBackdrop: true,
+			backdropOpacity: 0.5,
+		});
+	}
+
+	confirmDeleteRelationship(rel: RelatedBookItem) {
+		this.modalService.show(
+			'Remover Relacionamento',
+			`Tem certeza que deseja remover o vínculo com "${rel.relatedBook.title}"?`,
+			[
+				{ label: 'Cancelar', type: 'primary' },
+				{
+					label: 'Remover',
+					type: 'danger',
+					callback: () => {
+						this.relationshipService
+							.deleteRelationship(this.id(), rel.relationId)
+							.subscribe(() => {
+								this.notificationService.success(
+									'Relacionamento removido com sucesso!',
+								);
+								this.loadRelatedBooks();
+								this.updated.emit();
+							});
+					},
+				},
+			],
+			'warning',
+		);
+	}
+
+	getRelationTypeLabel(type: string): string {
+		const labels: Record<string, string> = {
+			sequence: 'Sequência',
+			'spin-off': 'Spin-off',
+			doujinshi: 'Doujinshi',
+			'same-franchise': 'Mesma Franquia',
+			related: 'Relacionado',
+			adaptation: 'Adaptação',
+			crossover: 'Crossover',
+		};
+		return labels[type] || type;
 	}
 
 	urlTransform(url: string): string {

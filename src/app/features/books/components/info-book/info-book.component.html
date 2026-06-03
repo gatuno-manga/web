@@ -1,9 +1,12 @@
 <div id="header">
 	<div class="selector" #selector></div>
-	<span #firstTab (click)="selectTab(tab.chapters, $event)">Capítulos</span>
-	<span (click)="selectTab(tab.covers, $event)">Artes</span>
-	<span (click)="selectTab(tab.extraInfo, $event)">Informações extras</span>
-	<span (click)="selectTab(tab.savedPages, $event)">Páginas Salvas</span>
+	@for (t of tabsList; track t.id) {
+		<span
+			[class.active]="selectedTab() === t.id"
+			(click)="selectTab(t.id, $event)"
+			#tabEl
+		>{{ t.label }}</span>
+	}
 </div>
 <div
 	id="container"
@@ -444,6 +447,65 @@
 			<div class="placeholder-container">
 				@for (i of [0,1,2,3,4,5,6,7,8,9]; track $index) {
 					<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor"></div>
+				}
+			</div>
+		}
+	</div>
+	<div
+		id="related-books"
+		[class.selected]="selectedTab() === tab.relatedBooks"
+		class="container"
+	>
+		@defer (when modulesLoad[tab.relatedBooks].load()) {
+			@if (userTokenService.isAdminSignal()) {
+				<div class="controls">
+					<app-button
+						variant="text"
+						size="small"
+						(click)="openAddRelatedBookModal()"
+					>
+						<app-icons name="plus" size="16" />
+						<span>Adicionar Relacionamento</span>
+					</app-button>
+				</div>
+			}
+			<div class="scrollable">
+				@for (rel of relatedBooks(); track rel.relationId) {
+					<div class="related-book-item">
+						<div class="book-info-row">
+							<img [ngSrc]="rel.relatedBook.cover" [alt]="rel.relatedBook.title" width="60" height="90" />
+							<div class="details">
+								<span class="title">{{ rel.relatedBook.title }}</span>
+								<span class="type-badge">{{ getRelationTypeLabel(rel.relationType) }}</span>
+								@if (rel.isBidirectional) {
+									<span class="bidirectional-tag"><app-icons name="refresh-ccw" size="12" /> Bidirecional</span>
+								}
+							</div>
+						</div>
+						@if (userTokenService.isAdminSignal()) {
+							<div class="item-actions">
+								<app-button
+									variant="text"
+									(click)="confirmDeleteRelationship(rel)"
+									padding="none"
+									class="delete-btn"
+								>
+									<app-icons name="trash" size="20" />
+								</app-button>
+							</div>
+						}
+					</div>
+				} @empty {
+					<div class="empty-state">
+						<app-icons name="book" size="48" />
+						<p>Nenhum livro relacionado encontrado.</p>
+					</div>
+				}
+			</div>
+		} @placeholder {
+			<div class="placeholder-container">
+				@for (i of [0,1,2,3]; track $index) {
+					<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor" style="height: 100px; margin: 10px 1rem; border-radius: 12px;"></div>
 				}
 			</div>
 		}
