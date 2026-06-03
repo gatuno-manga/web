@@ -88,6 +88,28 @@
 										: 'Começar a ler'
 								}}
 							</app-button>
+							<app-button
+								class="btn-actions"
+								[variant]="isFavorited() ? 'primary' : 'outline'"
+								radio="square"
+								rounded="small"
+								padding="none"
+								[aria-label]="isFavorited() ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+								(click)="toggleFavorite()"
+							>
+								<app-icons name="bookmark" />
+							</app-button>
+							<app-button
+								class="btn-actions"
+								[variant]="isSubscribed() ? 'primary' : 'outline'"
+								radio="square"
+								rounded="small"
+								padding="none"
+								[aria-label]="isSubscribed() ? 'Cancelar inscrição' : 'Inscrever-se para atualizações'"
+								(click)="toggleSubscribe()"
+							>
+								<app-icons name="eye" />
+							</app-button>
 							<div class="options-wrapper btn-actions">
 								<app-button
 									radio="square"

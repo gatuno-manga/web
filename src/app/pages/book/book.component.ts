@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
+import { BookInteractionService } from '@core/services/book-interaction.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { DownloadService } from '@core/services/download.service';
@@ -72,6 +73,8 @@ export class BookComponent implements OnInit, OnDestroy {
 	admin = computed(() => this.userTokenService.isAdminSignal());
 	isLoading = signal(true);
 	isImageLoaded = signal(false);
+	isFavorited = signal(false);
+	isSubscribed = signal(false);
 	private wsSubscription?: Subscription;
 	private coverUrl?: string;
 
@@ -99,6 +102,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	private notificationService = inject(NotificationService);
 	private bookService = inject(BookService);
 	private relationshipService = inject(BookRelationshipService);
+	private interactionService = inject(BookInteractionService);
 	private activatedRoute = inject(ActivatedRoute);
 	private router = inject(Router);
 	private wsService = inject(MqttService);
@@ -1034,6 +1038,48 @@ export class BookComponent implements OnInit, OnDestroy {
 				);
 			});
 		}
+	}
+
+	toggleFavorite() {
+		const b = this.book();
+		if (!b) return;
+
+		this.interactionService.favorite(b.id).subscribe({
+			next: () => {
+				this.isFavorited.update((v) => !v);
+				this.notificationService.success(
+					this.isFavorited()
+						? 'Livro adicionado aos favoritos!'
+						: 'Livro removido dos favoritos!',
+				);
+			},
+			error: () => {
+				this.notificationService.error(
+					'Erro ao processar favorito. Você está logado?',
+				);
+			},
+		});
+	}
+
+	toggleSubscribe() {
+		const b = this.book();
+		if (!b) return;
+
+		this.interactionService.subscribe(b.id).subscribe({
+			next: () => {
+				this.isSubscribed.update((v) => !v);
+				this.notificationService.success(
+					this.isSubscribed()
+						? 'Você se inscreveu para atualizações!'
+						: 'Você cancelou sua inscrição.',
+				);
+			},
+			error: () => {
+				this.notificationService.error(
+					'Erro ao processar inscrição. Você está logado?',
+				);
+			},
+		});
 	}
 
 	openAddToCollectionModal() {
