@@ -20,6 +20,7 @@ import {
 	Chapterlist,
 	SensitiveContentResponse,
 } from '@models/book.models';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { firstValueFrom } from 'rxjs';
@@ -47,6 +48,7 @@ export interface HistoryEntry {
 	imports: [
 		CommonModule,
 		RouterModule,
+		ButtonComponent,
 		IconsComponent,
 		NgOptimizedImage,
 		BlurhashComponent,
@@ -129,16 +131,7 @@ export class LatestReadsComponent implements OnInit {
 		this.showSensitiveContent.update((v) => !v);
 	}
 
-	async removeProgress(progressId: string, chapterId: string) {
-		try {
-			await this.readingProgressService.deleteProgress(chapterId);
-			this.historyEntries.update((list) =>
-				list.filter((item) => item.progressId !== progressId),
-			);
-		} catch (err) {
-			console.error('Erro ao remover progresso:', err);
-		}
-	}
+
 
 	private async loadHistory() {
 		this.isLoading.set(true);
