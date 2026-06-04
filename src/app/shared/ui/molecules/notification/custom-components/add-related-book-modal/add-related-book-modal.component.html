@@ -10,7 +10,10 @@
 			@if (selectedBook(); as book) {
 				<div class="selected-book-preview">
 					<div class="book-card-mini">
-						<img [ngSrc]="book.cover" [alt]="book.title" width="40" height="60" />
+						<img
+							[src]="book.cover"
+							alt="Capa de {{ book.title }}"
+						/>
 						<span class="title">{{ book.title }}</span>
 					</div>
 					<app-button variant="text" (click)="clearSelection()" padding="none">
@@ -34,7 +37,10 @@
 					<div class="search-results">
 						@for (book of searchResults(); track book.id) {
 							<button type="button" class="result-item" (click)="selectBook(book)">
-								<img [ngSrc]="book.cover" [alt]="book.title" width="30" height="45" />
+								<img
+									[src]="book.cover"
+									alt="Capa de {{ book.title }}"
+								/>
 								<span>{{ book.title }}</span>
 							</button>
 						}

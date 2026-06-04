@@ -207,11 +207,7 @@
 											ScrapingStatus.ERROR
 										"
 									>
-										{{
-											getScrapingStatusClass(
-												chapter.scrapingStatus
-											)
-										}}
+										{{ chapter.scrapingStatus | scrapingStatus }}
 									</div>
 								}
 							</div>
@@ -460,45 +456,46 @@
 			@if (userTokenService.isAdminSignal()) {
 				<div class="controls">
 					<app-button
-						variant="text"
+						variant="outline"
 						size="small"
-						(click)="openAddRelatedBookModal()"
+						(click)="toggleEditRelatedBooks()"
 					>
-						<app-icons name="plus" size="16" />
-						<span>Adicionar Relacionamento</span>
+						<app-icons [name]="isEditingRelatedBooks() ? 'check' : 'edit-2'" size="16" />
+						<span>{{ isEditingRelatedBooks() ? 'Concluir Edição' : 'Editar Relacionamentos' }}</span>
 					</app-button>
+
+					@if (isEditingRelatedBooks()) {
+						<app-button
+							variant="primary"
+							size="small"
+							(click)="openAddRelatedBookModal()"
+						>
+							<app-icons name="plus" size="16" />
+							<span>Adicionar Relacionamento</span>
+						</app-button>
+					}
 				</div>
 			}
-			<div class="scrollable">
-				@for (rel of relatedBooks(); track rel.relationId) {
-					<div class="related-book-item">
-						<div class="book-info-row">
-							<img [ngSrc]="rel.relatedBook.cover" [alt]="rel.relatedBook.title" width="60" height="90" />
-							<div class="details">
-								<span class="title">{{ rel.relatedBook.title }}</span>
-								<span class="type-badge">{{ getRelationTypeLabel(rel.relationType) }}</span>
-								@if (rel.isBidirectional) {
-									<span class="bidirectional-tag"><app-icons name="refresh-ccw" size="12" /> Bidirecional</span>
-								}
-							</div>
+			<div class="related-books-container">
+				@for (group of groupedRelatedBooks(); track group.type) {
+					<div class="related-group">
+						<h3 class="group-title">{{ group.label }}</h3>
+						<div class="related-books-grid">
+							@for (rel of group.items; track rel.relationId) {
+								<div class="book-wrapper">
+									<app-item-book
+										[book]="rel.relatedBook"
+										[canRemove]="isEditingRelatedBooks()"
+										(remove)="confirmDeleteRelationship(rel)"
+									/>
+								</div>
+							}
 						</div>
-						@if (userTokenService.isAdminSignal()) {
-							<div class="item-actions">
-								<app-button
-									variant="text"
-									(click)="confirmDeleteRelationship(rel)"
-									padding="none"
-									class="delete-btn"
-								>
-									<app-icons name="trash" size="20" />
-								</app-button>
-							</div>
-						}
 					</div>
 				} @empty {
 					<div class="empty-state">
-						<app-icons name="book" size="48" />
-						<p>Nenhum livro relacionado encontrado.</p>
+						<app-icons name="link" size="48" />
+						<p>Nenhum livro relacionado.</p>
 					</div>
 				}
 			</div>
@@ -506,6 +503,27 @@
 			<div class="placeholder-container">
 				@for (i of [0,1,2,3]; track $index) {
 					<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor" style="height: 100px; margin: 10px 1rem; border-radius: 12px;"></div>
+				}
+			</div>
+		}
+	</div>
+	<div
+		id="reviews"
+		[class.selected]="selectedTab() === tab.reviews"
+		class="container"
+	>
+		@defer (when modulesLoad[tab.reviews].load()) {
+			<div class="scrollable">
+				@if (hasReadPartially() && userTokenService.hasValidAccessTokenSignal()) {
+					<app-book-review-form [bookId]="id()" (reviewSubmitted)="reviewsList.loadReviews()" />
+				}
+				<app-book-reviews-list [bookId]="id()" #reviewsList />
+			</div>
+		} @placeholder {
+			<div class="placeholder-container">
+				<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor" style="height: 200px; margin: 20px 1rem; border-radius: 16px;"></div>
+				@for (i of [0,1,2]; track $index) {
+					<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor" style="height: 120px; margin: 10px 1rem; border-radius: 12px;"></div>
 				}
 			</div>
 		}

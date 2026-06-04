@@ -3,7 +3,10 @@ import {
 	DragDropModule,
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { DecimalPipe, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
+import {
+	DecimalPipe,
+	isPlatformBrowser,
+} from '@angular/common';
 import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
@@ -21,7 +24,7 @@ import {
 	ViewChild,
 	ViewChildren,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterLink, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
@@ -48,6 +51,7 @@ import { DownloadStatus } from '@models/offline.models';
 import { SavedPage } from '@models/saved-page.models';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
+import { ScrapingStatusPipe } from '@shared/utils/pipes/scraping-status.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
@@ -67,6 +71,9 @@ import {
 } from '@ui/molecules/notification/custom-components/source-add-modal/source-add-modal.component';
 import { ImageViewerComponent } from '@ui/organisms/image-viewer/image-viewer.component';
 import { firstValueFrom, fromEvent, Subscription, throttleTime } from 'rxjs';
+import { ItemBookComponent } from '../item-book/item-book.component';
+import { BookReviewFormComponent } from '../book-review-form/book-review-form.component';
+import { BookReviewsListComponent } from '../book-reviews-list/book-reviews-list.component';
 
 enum tab {
 	chapters = 0,
@@ -74,6 +81,7 @@ enum tab {
 	extraInfo = 2,
 	savedPages = 3,
 	relatedBooks = 4,
+	reviews = 5,
 }
 
 interface ModulesLoad {
@@ -88,12 +96,16 @@ interface ModulesLoad {
 		DecimalPipe,
 		ChapterIndexPipe,
 		FlagPipe,
+		ScrapingStatusPipe,
 		IconsComponent,
 		ButtonComponent,
 		ImageViewerComponent,
 		BlurhashComponent,
+		ItemBookComponent,
 		DragDropModule,
-		NgOptimizedImage,
+		BookReviewFormComponent,
+		BookReviewsListComponent,
+		RouterLink,
 	],
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
@@ -122,6 +134,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	id = input.required<string>();
 	bookBasic = input<BookBasic | undefined>();
+	hasReadPartially = input<boolean>(false);
 	updated = output<void>();
 
 	selectedTab = signal<tab>(tab.chapters);
@@ -133,6 +146,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		{ id: tab.extraInfo, label: 'Informações extras' },
 		{ id: tab.savedPages, label: 'Páginas Salvas' },
 		{ id: tab.relatedBooks, label: 'Relacionados' },
+		{ id: tab.reviews, label: 'Avaliações' },
 	];
 
 	private websocketSubscription?: Subscription;
@@ -160,6 +174,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			load: signal(false),
 			function: async () => this.loadRelatedBooks(),
 		},
+		{
+			load: signal(false),
+			function: async () => {
+				/* Reviews load handled by component */
+			},
+		},
 	];
 	chapters = signal<Chapterlist[]>([]);
 	nextChaptersCursor = signal<string | null>(null);
@@ -173,6 +193,23 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	savedPages = signal<SavedPage[]>([]);
 	relatedBooks = signal<RelatedBookItem[]>([]);
+	groupedRelatedBooks = computed(() => {
+		const groups = new Map<string, RelatedBookItem[]>();
+		for (const rel of this.relatedBooks()) {
+			const arr = groups.get(rel.relationType) || [];
+			arr.push(rel);
+			groups.set(rel.relationType, arr);
+		}
+		return Array.from(groups.entries())
+			.map(([type, items]) => ({
+				type,
+				label: this.getRelationTypeLabel(type),
+				items,
+			}))
+			.sort((a, b) => a.label.localeCompare(b.label));
+	});
+	relatedBooksTotal = signal(0);
+	isEditingRelatedBooks = signal(false);
 	extraInfo = signal<BookDetail>({
 		alternativeTitle: [],
 		originalUrl: [],
@@ -220,6 +257,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		if (isPlatformBrowser(this.platformId)) {
 			this.setupResizeObserver();
 			this.setupScrollListener();
+			window.addEventListener('resize', this.onWindowResize.bind(this));
 		}
 
 		this.subscribeToWebSocketEvents();
@@ -261,6 +299,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 		if (this.scrollSubscription) {
 			this.scrollSubscription.unsubscribe();
+		}
+		if (isPlatformBrowser(this.platformId)) {
+			window.removeEventListener('resize', this.onWindowResize.bind(this));
 		}
 	}
 
@@ -317,34 +358,58 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			});
 	}
 
+	private onWindowResize = () => {
+		this.updateSelectorPosition();
+	};
+
 	selectTab(tabName: tab, event?: Event) {
 		this.selectedTab.set(tabName);
 		this.loadResults(tabName);
 
-		if (event && this.selector) {
-			const clickedElement = event.target as HTMLSpanElement;
+		let clickedElement: HTMLSpanElement | undefined;
+
+		if (event) {
+			clickedElement = event.target as HTMLSpanElement;
+		} else {
+			// Find element by tab name if no event
+			const index = this.tabsList.findIndex((t) => t.id === tabName);
+			if (index >= 0) {
+				clickedElement = this.tabEls.toArray()[index].nativeElement;
+			}
+		}
+
+		if (clickedElement) {
 			clickedElement.scrollIntoView({
 				behavior: 'smooth',
 				block: 'nearest',
 				inline: 'center',
 			});
-			const headerElement = clickedElement.parentElement;
-
-			if (headerElement) {
-				const clickedRect = clickedElement.getBoundingClientRect();
-				const headerRect = headerElement.getBoundingClientRect();
-
-				const relativeLeft = clickedRect.left - headerRect.left;
-				const width = clickedRect.width;
-
-				const selectorEl = this.selector.nativeElement;
-				selectorEl.style.left = `${relativeLeft}px`;
-				selectorEl.style.width = `${width}px`;
-			}
+			this.updateSelectorPosition(clickedElement);
 		}
 
 		// Atualizar altura imediatamente e após animação
 		this.observeActiveTab();
+	}
+
+	private updateSelectorPosition(element?: HTMLSpanElement) {
+		if (!this.selector?.nativeElement) return;
+		
+		let targetElement = element;
+		if (!targetElement) {
+			const index = this.tabsList.findIndex((t) => t.id === this.selectedTab());
+			if (index >= 0 && this.tabEls?.length) {
+				targetElement = this.tabEls.toArray()[index].nativeElement;
+			}
+		}
+
+		if (targetElement) {
+			const left = targetElement.offsetLeft;
+			const width = targetElement.offsetWidth;
+			
+			const selectorEl = this.selector.nativeElement;
+			selectorEl.style.left = `${left}px`;
+			selectorEl.style.width = `${width}px`;
+		}
 	}
 
 	private setupResizeObserver() {
@@ -446,18 +511,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		});
 	}
 
-	getScrapingStatusClass(status: ScrapingStatus): string {
-		switch (status) {
-			case ScrapingStatus.READY:
-				return 'Pronto';
-			case ScrapingStatus.PROCESSING:
-				return 'Processando';
-			case ScrapingStatus.ERROR:
-				return 'error';
-			default:
-				return '';
-		}
-	}
 
 	getContentTypeIcon(chapter: Chapterlist): string {
 		const contentType = chapter.contentType || ContentTypes.IMAGE;
@@ -858,6 +911,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		});
 	}
 
+	toggleEditRelatedBooks() {
+		this.isEditingRelatedBooks.update((val) => !val);
+	}
+
 	openAddRelatedBookModal() {
 		this.notificationService.notify({
 			message: '',
@@ -906,16 +963,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	getRelationTypeLabel(type: string): string {
-		const labels: Record<string, string> = {
-			sequence: 'Sequência',
-			'spin-off': 'Spin-off',
-			doujinshi: 'Doujinshi',
-			'same-franchise': 'Mesma Franquia',
-			related: 'Relacionado',
-			adaptation: 'Adaptação',
-			crossover: 'Crossover',
-		};
-		return labels[type] || type;
+		return this.relationshipService.getRelationTypeLabel(type);
 	}
 
 	urlTransform(url: string): string {

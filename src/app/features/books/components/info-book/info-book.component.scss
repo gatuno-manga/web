@@ -37,6 +37,7 @@
 	overflow-x: auto;
 	overflow-y: hidden;
 	scrollbar-width: none; // Firefox
+	scroll-behavior: smooth;
 	&::-webkit-scrollbar {
 		display: none; // Chrome, Safari, Opera
 	}
@@ -48,22 +49,36 @@
 		height: 100%;
 		width: 100px;
 		background-color: var(--primary-color);
-		border-top-left-radius: 15px;
-		border-top-right-radius: 15px;
+		border-top-left-radius: 12px;
+		border-top-right-radius: 12px;
 		transition:
-			left 0.3s ease,
-			width 0.3s linear;
+			left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+			width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		z-index: 0;
 	}
+	
 	span {
-		display: inline-block;
-		padding: 0.8rem;
-		padding-bottom: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.8rem 1.25rem;
 		cursor: pointer;
 		white-space: nowrap;
 		position: relative;
 		z-index: 1;
 		flex-shrink: 0;
+		font-weight: 500;
+		color: var(--app-text-color);
+		transition: color 0.3s ease;
+
+		&.active {
+			color: var(--button-text-color);
+			font-weight: 600;
+		}
+
+		&:hover:not(.active) {
+			color: var(--primary-color);
+		}
 	}
 
 	.header-actions {
@@ -208,12 +223,6 @@
 				display: block;
 				width: 100%;
 				height: 100%;
-				
-				::ng-deep canvas {
-					width: 100% !important;
-					height: 100% !important;
-					object-fit: cover;
-				}
 			}
 		}
 
@@ -427,7 +436,7 @@
 				}
 
 				&.scrapingStatusError {
-					background-color: var(scraping-status-error-color);
+					background-color: var(--scraping-status-error-color);
 				}
 			}
 		}
@@ -491,7 +500,7 @@
 
 		&:hover {
 			transform: scale(1.05);
-			box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+			box-shadow: 0 10px 20px rgb(from var(--shadow-color) r g b / 0.4);
 		}
 
 		&.cdk-drag-preview {
@@ -534,20 +543,12 @@
 		}
 
 		.info {
-			position: absolute;
-			bottom: 0;
-			left: 0;
-			width: 100%;
+			@extend %cover-metadata-overlay;
 			padding: 40px 15px 15px;
-			background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
-			color: #fff;
-			text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+			text-shadow: 0 1px 4px rgb(from var(--black) r g b / 0.8);
 			z-index: 1;
-			text-align: center;
 			border-bottom-left-radius: 12px;
 			border-bottom-right-radius: 12px;
-			display: flex;
-			flex-direction: column;
 			gap: 4px;
 
 			span {
@@ -659,78 +660,41 @@
 		padding: 1rem;
 		display: flex;
 		justify-content: flex-end;
+		gap: 1rem;
 	}
-
-	.scrollable {
-		padding-bottom: 2rem;
-	}
-
-	.related-book-item {
+	.related-books-container {
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 1rem;
-		background-color: var(--secondary-color);
-		border: 1px solid var(--border-color);
-		border-radius: 12px;
-		margin: 0 1rem 1rem 1rem;
-		transition: all 0.2s ease;
+		flex-direction: column;
+		gap: 2rem;
+		padding: 0 1rem 2rem;
 
-		&:hover {
-			border-color: var(--primary-color);
-			transform: translateX(4px);
-		}
-
-		.book-info-row {
+		.related-group {
 			display: flex;
-			gap: 1.5rem;
-			align-items: center;
+			flex-direction: column;
+			gap: 1rem;
 
-			img {
-				border-radius: 8px;
-				object-fit: cover;
-				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			.group-title {
+				font-size: 1.25rem;
+				font-weight: 600;
+				color: var(--app-text-color);
+				border-bottom: 2px solid rgb(from var(--border-color) r g b / 0.5);
+				padding-bottom: 0.5rem;
+				margin: 0;
 			}
 
-			.details {
-				display: flex;
-				flex-direction: column;
-				gap: 0.5rem;
+			.related-books-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+				align-items: start;
+				gap: 1.5rem;
 
-				.title {
-					font-weight: 600;
-					font-size: 1.1rem;
+				@media (max-width: 768px) {
+					grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+					gap: 1rem;
 				}
 
-				.type-badge {
-					display: inline-block;
-					padding: 2px 8px;
-					background-color: rgb(from var(--primary-color) r g b / 0.1);
-					color: var(--primary-color);
-					border-radius: 6px;
-					font-size: 0.8rem;
-					text-transform: uppercase;
-					font-weight: bold;
-					width: fit-content;
-				}
-
-				.bidirectional-tag {
-					display: flex;
-					align-items: center;
-					gap: 0.3rem;
-					font-size: 0.8rem;
-					opacity: 0.7;
-					color: var(--green);
-				}
-			}
-		}
-
-		.item-actions {
-			.delete-btn {
-				color: var(--danger-color);
-				opacity: 0.5;
-				&:hover {
-					opacity: 1;
+				.book-wrapper {
+					position: relative;
 				}
 			}
 		}
@@ -750,6 +714,12 @@
 			width: 48px;
 			height: 48px;
 		}
+	}
+}
+
+#reviews {
+	.scrollable {
+		padding: 0 1rem 2rem 1rem;
 	}
 }
 
@@ -791,7 +761,9 @@
 	}
 }
 
-// Global styles for drag preview to ensure it matches the list item appearance
+// O CDK renderiza o drag preview fora do escopo do componente (no <body>),
+// por isso este estilo global com ::ng-deep é necessário aqui.
+// Alternativa: mover para global.scss se este padrão se repetir em outros componentes.
 ::ng-deep .cdk-drag-preview.cover {
 	width: 225px;
 	height: 350px;
@@ -818,14 +790,15 @@
 }
 
 .title-with-flag {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
+
 .flag-icon {
-    width: 24px;
-    height: 18px;
-    border-radius: 2px;
-    object-fit: cover;
-    display: inline-block;
+	width: 24px;
+	height: 18px;
+	border-radius: 2px;
+	object-fit: cover;
+	display: inline-block;
 }

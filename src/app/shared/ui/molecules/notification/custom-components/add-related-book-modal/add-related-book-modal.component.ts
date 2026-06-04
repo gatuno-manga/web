@@ -1,11 +1,9 @@
-import { NgOptimizedImage } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
 	inject,
 	input,
 	OnInit,
-	output,
 	signal,
 } from '@angular/core';
 import {
@@ -40,7 +38,6 @@ import {
 		ReactiveFormsModule,
 		IconsComponent,
 		ButtonComponent,
-		NgOptimizedImage,
 	],
 	templateUrl: './add-related-book-modal.component.html',
 	styleUrl: './add-related-book-modal.component.scss',
@@ -53,7 +50,7 @@ export class AddRelatedBookModalComponent implements OnInit {
 	private readonly notificationService = inject(NotificationService);
 
 	sourceBookId = input.required<string>();
-	close = output<boolean>();
+	close = input.required<(success: boolean) => void>();
 
 	form = this.fb.group({
 		targetBookId: ['', Validators.required],
@@ -124,7 +121,7 @@ export class AddRelatedBookModalComponent implements OnInit {
 	}
 
 	onClose() {
-		this.close.emit(false);
+		this.close()(false);
 	}
 
 	submit() {
@@ -141,7 +138,7 @@ export class AddRelatedBookModalComponent implements OnInit {
 						'Relacionamento adicionado com sucesso!',
 					);
 					this.isSubmitting.set(false);
-					this.close.emit(true);
+					this.close()(true);
 				},
 				error: (err) => {
 					console.error('Erro ao adicionar relacionamento:', err);

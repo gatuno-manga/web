@@ -77,7 +77,13 @@
 				text-align: left;
 
 				&:hover { background-color: var(--hover-color); }
-				img { border-radius: 4px; object-fit: cover; }
+				img { 
+					border-radius: 4px; 
+					object-fit: cover;
+					width: 40px;
+					height: 60px;
+					flex-shrink: 0;
+				}
 				span { font-size: 0.9rem; font-weight: 500; }
 			}
 		}
@@ -95,7 +101,13 @@
 				display: flex;
 				align-items: center;
 				gap: 1rem;
-				img { border-radius: 4px; }
+				img { 
+					border-radius: 4px; 
+					object-fit: cover;
+					width: 48px;
+					height: 72px;
+					flex-shrink: 0;
+				}
 				.title { font-weight: 600; font-size: 1rem; }
 			}
 		}

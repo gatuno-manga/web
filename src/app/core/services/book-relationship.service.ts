@@ -72,4 +72,20 @@ export class BookRelationshipService {
 			`books/${sourceBookId}/relationships/${relationshipId}`,
 		);
 	}
+
+	/**
+	 * Retorna o label legível para um tipo de relacionamento entre livros.
+	 */
+	getRelationTypeLabel(type: string): string {
+		const labels: Record<string, string> = {
+			sequence: 'Sequência',
+			'spin-off': 'Spin-off',
+			doujinshi: 'Doujinshi',
+			'same-franchise': 'Mesma Franquia',
+			related: 'Relacionado',
+			adaptation: 'Adaptação',
+			crossover: 'Crossover',
+		};
+		return labels[type] || type;
+	}
 }
