@@ -54,6 +54,20 @@ export class HomeComponent {
 
 	currentFeaturedIndex = signal(0);
 	private carouselInterval?: ReturnType<typeof setInterval>;
+	
+	coverImageErrors = signal<Set<string>>(new Set());
+
+	onImageError(bookId: string) {
+		this.coverImageErrors.update((errors) => {
+			const newErrors = new Set(errors);
+			newErrors.add(bookId);
+			return newErrors;
+		});
+	}
+
+	hasImageError(bookId: string): boolean {
+		return this.coverImageErrors().has(bookId);
+	}
 
 	constructor() {
 		this.setMetaData();
@@ -181,7 +195,17 @@ export class HomeComponent {
 	stopCarousel() {
 		if (this.carouselInterval) {
 			clearInterval(this.carouselInterval);
+			this.carouselInterval = undefined;
 		}
+	}
+
+	pauseCarousel() {
+		this.stopCarousel();
+	}
+
+	resumeCarousel() {
+		this.stopCarousel();
+		this.startCarousel();
 	}
 
 	nextFeatured() {
