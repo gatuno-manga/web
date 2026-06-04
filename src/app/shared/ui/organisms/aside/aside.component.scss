@@ -30,10 +30,10 @@
 	overflow-y: auto;
 	padding: 1.5rem;
 	will-change: transform;
-	box-shadow: 0 0 2rem rgba(0, 0, 0, 0.5);
+	box-shadow: 0 0 2rem rgb(from var(--black) r g b / 0.5);
 
 	// Glassmorphism effect
-	background-color: rgba(from var(--app-background-color) r g b / 0.95);
+	background-color: rgb(from var(--app-background-color) r g b / 0.95);
 	backdrop-filter: blur(16px);
 	-webkit-backdrop-filter: blur(16px);
 
@@ -42,11 +42,11 @@
 	}
 
 	&.position-right {
-		border-left: 1px solid rgba(255, 255, 255, 0.1);
+		border-left: 1px solid var(--border-color);
 	}
 
 	&.position-left {
-		border-right: 1px solid rgba(255, 255, 255, 0.1);
+		border-right: 1px solid var(--border-color);
 	}
 }
 
@@ -62,7 +62,7 @@
 	transition: color 0.2s, transform 0.2s;
 
 	&:hover {
-		color: var(--white);
+		color: var(--app-text-color);
 		transform: scale(1.1);
 	}
 }

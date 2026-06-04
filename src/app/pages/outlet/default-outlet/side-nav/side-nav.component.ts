@@ -5,15 +5,17 @@ import {
 	inject,
 	output,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { ThemeService } from '@core/services/theme.service';
 import { UserTokenService } from '@core/services/user-token.service';
+import { BookService } from '@core/services/book.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 interface NavItem {
 	label: string;
 	icon: string;
-	route: string;
+	route?: string;
+	action?: () => void;
 }
 
 interface NavGroup {
@@ -32,6 +34,8 @@ export class SideNavComponent {
 	close = output<void>();
 	private themeService = inject(ThemeService);
 	private userTokenService = inject(UserTokenService);
+	private bookService = inject(BookService);
+	private router = inject(Router);
 
 	isDarkTheme = computed(() => this.themeService.currentTheme() === 'dark');
 	isLoggedIn = this.userTokenService.hasValidAccessTokenSignal;
@@ -59,7 +63,11 @@ export class SideNavComponent {
 						icon: 'clock',
 						route: '/latest-reads',
 					},
-					{ label: 'Livro aleatório', icon: 'shuffle', route: '#' },
+					{
+						label: 'Livro aleatório', 
+						icon: 'shuffle', 
+						action: () => this.goToRandomBook() 
+					},
 				],
 			},
 			...(this.isAdmin()
@@ -80,5 +88,17 @@ export class SideNavComponent {
 
 	onClose() {
 		this.close.emit();
+	}
+
+	goToRandomBook() {
+		this.onClose();
+		this.bookService.randomBook().subscribe({
+			next: (book) => {
+				this.router.navigate(['/books', book.id]);
+			},
+			error: (err) => {
+				console.error('Erro ao buscar livro aleatório:', err);
+			}
+		});
 	}
 }

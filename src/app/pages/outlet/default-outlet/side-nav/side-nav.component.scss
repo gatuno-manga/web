@@ -47,7 +47,7 @@
 		flex-grow: 1;
 
 		.title {
-			font-family: 'Inknut Antiqua', serif;
+			font-family: var(--font-display);
 			font-weight: 500;
 			font-size: 1.1rem;
 			color: var(--app-text-color);
@@ -94,6 +94,11 @@
 	transition: all 0.2s ease;
 	border-radius: 0 50px 50px 0;
 	margin-right: 12px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	text-align: left;
+	font-family: inherit;
 
 	&:hover {
 		background-color: rgba(from var(--primary-color) r g b / 0.1);
@@ -107,7 +112,7 @@
 	}
 
 	.label {
-		font-family: 'Inknut Antiqua', serif;
+		font-family: var(--font-display);
 		font-weight: 500;
 		font-size: 0.95rem;
 		line-height: 1;
