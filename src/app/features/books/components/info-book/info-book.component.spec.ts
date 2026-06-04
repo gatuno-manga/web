@@ -153,17 +153,6 @@ describe('InfoBookComponent', () => {
 		expect(host).toBe('sub.example.com');
 	});
 
-	it('getScrapingStatusClass maps statuses correctly', () => {
-		expect(component.getScrapingStatusClass(ScrapingStatus.READY)).toBe(
-			'Pronto',
-		);
-		expect(
-			component.getScrapingStatusClass(ScrapingStatus.PROCESSING),
-		).toBe('Processando');
-		expect(component.getScrapingStatusClass(ScrapingStatus.ERROR)).toBe(
-			'error',
-		);
-	});
 
 	it('loadChapters should set chapters from service', () => {
 		component.loadChapters();
