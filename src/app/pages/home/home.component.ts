@@ -54,7 +54,7 @@ export class HomeComponent {
 
 	currentFeaturedIndex = signal(0);
 	private carouselInterval?: ReturnType<typeof setInterval>;
-	
+
 	coverImageErrors = signal<Set<string>>(new Set());
 
 	onImageError(bookId: string) {

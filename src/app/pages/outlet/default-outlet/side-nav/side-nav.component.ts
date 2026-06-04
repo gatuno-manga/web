@@ -5,10 +5,10 @@ import {
 	inject,
 	output,
 } from '@angular/core';
-import { RouterModule, Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { BookService } from '@core/services/book.service';
 import { ThemeService } from '@core/services/theme.service';
 import { UserTokenService } from '@core/services/user-token.service';
-import { BookService } from '@core/services/book.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 interface NavItem {
@@ -64,9 +64,9 @@ export class SideNavComponent {
 						route: '/latest-reads',
 					},
 					{
-						label: 'Livro aleatório', 
-						icon: 'shuffle', 
-						action: () => this.goToRandomBook() 
+						label: 'Livro aleatório',
+						icon: 'shuffle',
+						action: () => this.goToRandomBook(),
 					},
 				],
 			},
@@ -98,7 +98,7 @@ export class SideNavComponent {
 			},
 			error: (err) => {
 				console.error('Erro ao buscar livro aleatório:', err);
-			}
+			},
 		});
 	}
 }

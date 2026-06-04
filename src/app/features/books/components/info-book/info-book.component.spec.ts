@@ -153,7 +153,6 @@ describe('InfoBookComponent', () => {
 		expect(host).toBe('sub.example.com');
 	});
 
-
 	it('loadChapters should set chapters from service', () => {
 		component.loadChapters();
 		expect(mockBookService.getChapters).toHaveBeenCalledWith('book-1', {

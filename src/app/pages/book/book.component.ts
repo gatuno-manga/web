@@ -23,6 +23,7 @@ import { UnifiedReadingProgressService } from '@core/services/unified-reading-pr
 import { UserTokenService } from '@core/services/user-token.service';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
+import { TooltipDirective } from '@shared/ui/atoms/tooltip/tooltip.directive';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
@@ -39,8 +40,6 @@ import {
 import { AsideComponent } from '@ui/organisms/aside/aside.component';
 import { MarkdownComponent } from 'ngx-markdown';
 import { firstValueFrom, Subscription } from 'rxjs';
-
-import { TooltipDirective } from '@shared/ui/atoms/tooltip/tooltip.directive';
 
 @Component({
 	selector: 'app-book',
@@ -120,7 +119,9 @@ export class BookComponent implements OnInit, OnDestroy {
 		this.routeSub = this.activatedRoute.paramMap.subscribe((params) => {
 			const id = params.get('id');
 			if (!id) {
-				this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+				this.router.navigate(['../'], {
+					relativeTo: this.activatedRoute,
+				});
 				return;
 			}
 			this.loadBook(id);
@@ -347,7 +348,6 @@ export class BookComponent implements OnInit, OnDestroy {
 			url: `https://example.com/books/${b.id}`,
 		});
 	}
-
 
 	getAuthorNames(): string {
 		return (

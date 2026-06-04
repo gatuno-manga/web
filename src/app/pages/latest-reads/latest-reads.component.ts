@@ -20,8 +20,8 @@ import {
 	Chapterlist,
 	SensitiveContentResponse,
 } from '@models/book.models';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { firstValueFrom } from 'rxjs';
 
@@ -130,8 +130,6 @@ export class LatestReadsComponent implements OnInit {
 	toggleSensitiveContent() {
 		this.showSensitiveContent.update((v) => !v);
 	}
-
-
 
 	private async loadHistory() {
 		this.isLoading.set(true);

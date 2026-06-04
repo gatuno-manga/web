@@ -1,12 +1,20 @@
-import { Directive, ElementRef, HostListener, input, Renderer2, inject, OnDestroy } from '@angular/core';
+import {
+	Directive,
+	ElementRef,
+	HostListener,
+	inject,
+	input,
+	OnDestroy,
+	Renderer2,
+} from '@angular/core';
 
 @Directive({
 	selector: '[appTooltip]',
-	standalone: true
+	standalone: true,
 })
 export class TooltipDirective implements OnDestroy {
 	appTooltip = input<string>('');
-	
+
 	private el = inject(ElementRef);
 	private renderer = inject(Renderer2);
 	private tooltipElement: HTMLElement | null = null;
@@ -14,7 +22,7 @@ export class TooltipDirective implements OnDestroy {
 
 	@HostListener('mouseenter') onMouseEnter() {
 		if (!this.appTooltip()) return;
-		
+
 		// Pequeno delay para exibir, como MangaDex
 		this.timeoutId = setTimeout(() => {
 			this.createTooltip();
@@ -25,7 +33,7 @@ export class TooltipDirective implements OnDestroy {
 		clearTimeout(this.timeoutId);
 		this.removeTooltip();
 	}
-	
+
 	@HostListener('click') onClick() {
 		clearTimeout(this.timeoutId);
 		this.removeTooltip();
@@ -37,20 +45,28 @@ export class TooltipDirective implements OnDestroy {
 		this.tooltipElement = this.renderer.createElement('div');
 		const text = this.renderer.createText(this.appTooltip());
 		this.renderer.appendChild(this.tooltipElement, text);
-		
+
 		this.renderer.addClass(this.tooltipElement, 'gatuno-custom-tooltip');
 		this.renderer.appendChild(document.body, this.tooltipElement);
-		
+
 		const hostPos = this.el.nativeElement.getBoundingClientRect();
 		const tooltipPos = this.tooltipElement!.getBoundingClientRect();
-		
+
 		// Centraliza o tooltip em cima do elemento
 		const top = hostPos.top - tooltipPos.height - 10;
 		const left = hostPos.left + (hostPos.width - tooltipPos.width) / 2;
-		
-		this.renderer.setStyle(this.tooltipElement, 'top', `${top + window.scrollY}px`);
-		this.renderer.setStyle(this.tooltipElement, 'left', `${left + window.scrollX}px`);
-		
+
+		this.renderer.setStyle(
+			this.tooltipElement,
+			'top',
+			`${top + window.scrollY}px`,
+		);
+		this.renderer.setStyle(
+			this.tooltipElement,
+			'left',
+			`${left + window.scrollX}px`,
+		);
+
 		// Trigger animação no próximo frame
 		requestAnimationFrame(() => {
 			this.renderer.addClass(this.tooltipElement, 'show');

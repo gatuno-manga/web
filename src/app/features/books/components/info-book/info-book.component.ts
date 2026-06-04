@@ -3,10 +3,7 @@ import {
 	DragDropModule,
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import {
-	DecimalPipe,
-	isPlatformBrowser,
-} from '@angular/common';
+import { DecimalPipe, isPlatformBrowser } from '@angular/common';
 import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
@@ -71,9 +68,9 @@ import {
 } from '@ui/molecules/notification/custom-components/source-add-modal/source-add-modal.component';
 import { ImageViewerComponent } from '@ui/organisms/image-viewer/image-viewer.component';
 import { firstValueFrom, fromEvent, Subscription, throttleTime } from 'rxjs';
-import { ItemBookComponent } from '../item-book/item-book.component';
 import { BookReviewFormComponent } from '../book-review-form/book-review-form.component';
 import { BookReviewsListComponent } from '../book-reviews-list/book-reviews-list.component';
+import { ItemBookComponent } from '../item-book/item-book.component';
 
 enum tab {
 	chapters = 0,
@@ -301,7 +298,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			this.scrollSubscription.unsubscribe();
 		}
 		if (isPlatformBrowser(this.platformId)) {
-			window.removeEventListener('resize', this.onWindowResize.bind(this));
+			window.removeEventListener(
+				'resize',
+				this.onWindowResize.bind(this),
+			);
 		}
 	}
 
@@ -393,10 +393,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	private updateSelectorPosition(element?: HTMLSpanElement) {
 		if (!this.selector?.nativeElement) return;
-		
+
 		let targetElement = element;
 		if (!targetElement) {
-			const index = this.tabsList.findIndex((t) => t.id === this.selectedTab());
+			const index = this.tabsList.findIndex(
+				(t) => t.id === this.selectedTab(),
+			);
 			if (index >= 0 && this.tabEls?.length) {
 				targetElement = this.tabEls.toArray()[index].nativeElement;
 			}
@@ -405,7 +407,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		if (targetElement) {
 			const left = targetElement.offsetLeft;
 			const width = targetElement.offsetWidth;
-			
+
 			const selectorEl = this.selector.nativeElement;
 			selectorEl.style.left = `${left}px`;
 			selectorEl.style.width = `${width}px`;
@@ -510,7 +512,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			setTimeout(() => this.onWindowScroll(), 150);
 		});
 	}
-
 
 	getContentTypeIcon(chapter: Chapterlist): string {
 		const contentType = chapter.contentType || ContentTypes.IMAGE;
