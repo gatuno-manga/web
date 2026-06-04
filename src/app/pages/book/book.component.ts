@@ -1,4 +1,3 @@
-import { NgOptimizedImage } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -11,7 +10,6 @@ import {
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { BookInteractionService } from '@core/services/book-interaction.service';
-import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { DownloadService } from '@core/services/download.service';
 import { DownloadManagerService } from '@core/services/download-manager.service';
@@ -23,11 +21,8 @@ import { NotificationService } from '@core/services/notification.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
 import { UserTokenService } from '@core/services/user-token.service';
-import { BookReviewFormComponent } from '@features/books/components/book-review-form/book-review-form.component';
-import { BookReviewsListComponent } from '@features/books/components/book-reviews-list/book-reviews-list.component';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
-import { RelatedBookItem } from '@models/book-relationship.models';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
@@ -45,20 +40,20 @@ import { AsideComponent } from '@ui/organisms/aside/aside.component';
 import { MarkdownComponent } from 'ngx-markdown';
 import { firstValueFrom, Subscription } from 'rxjs';
 
+import { TooltipDirective } from '@shared/ui/atoms/tooltip/tooltip.directive';
+
 @Component({
 	selector: 'app-book',
 	imports: [
 		RouterModule,
 		IconsComponent,
 		InfoBookComponent,
-		BookReviewFormComponent,
-		BookReviewsListComponent,
 		AsideComponent,
 		ButtonComponent,
 		MarkdownComponent,
-		NgOptimizedImage,
 		BlurhashComponent,
 		FlagPipe,
+		TooltipDirective,
 	],
 	templateUrl: './book.component.html',
 	styleUrl: './book.component.scss',
@@ -68,9 +63,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 	},
 })
 export class BookComponent implements OnInit, OnDestroy {
-	ScrapingStatus = ScrapingStatus;
 	book = signal<BookBasic | undefined>(undefined);
-	relatedBooks = signal<RelatedBookItem[]>([]);
 	public userTokenService = inject(UserTokenService);
 	admin = computed(() => this.userTokenService.isAdminSignal());
 	isLoading = signal(true);
@@ -104,7 +97,6 @@ export class BookComponent implements OnInit, OnDestroy {
 	private modalService = inject(ModalNotificationService);
 	private notificationService = inject(NotificationService);
 	private bookService = inject(BookService);
-	private relationshipService = inject(BookRelationshipService);
 	private interactionService = inject(BookInteractionService);
 	private activatedRoute = inject(ActivatedRoute);
 	private router = inject(Router);
@@ -122,12 +114,24 @@ export class BookComponent implements OnInit, OnDestroy {
 		this.coverImageError = true;
 	}
 
+	private routeSub?: Subscription;
+
 	ngOnInit() {
-		const id = this.activatedRoute.snapshot.paramMap.get('id');
-		if (!id) {
-			this.router.navigate(['../'], { relativeTo: this.activatedRoute });
-			return;
-		}
+		this.routeSub = this.activatedRoute.paramMap.subscribe((params) => {
+			const id = params.get('id');
+			if (!id) {
+				this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+				return;
+			}
+			this.loadBook(id);
+		});
+	}
+
+	private loadBook(id: string) {
+		this.isLoading.set(true);
+		this.book.set(undefined); // Reseta o livro para forçar a recriação do app-info-book
+		this.coverImageError = false;
+		this.wsSubscription?.unsubscribe();
 
 		this.bookService.getBook(id).subscribe({
 			next: (book) => {
@@ -161,9 +165,6 @@ export class BookComponent implements OnInit, OnDestroy {
 
 				// Carrega o último progresso de leitura
 				this.loadLastReadingProgress();
-
-				// Carrega livros relacionados
-				this.loadRelatedBooks(book.id);
 
 				// Conecta ao WebSocket apenas se autenticado
 				if (this.userTokenService.hasValidAccessTokenSignal()) {
@@ -239,6 +240,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
+		this.routeSub?.unsubscribe();
 		// Limpa a inscrição do WebSocket
 		this.wsSubscription?.unsubscribe();
 		const bookId = this.book()?.id;
@@ -346,18 +348,6 @@ export class BookComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	getScrapingStatusClass(status: ScrapingStatus): string {
-		switch (status) {
-			case ScrapingStatus.READY:
-				return 'Pronto';
-			case ScrapingStatus.PROCESSING:
-				return 'Processando';
-			case ScrapingStatus.ERROR:
-				return 'error';
-			default:
-				return '';
-		}
-	}
 
 	getAuthorNames(): string {
 		return (
@@ -1111,35 +1101,5 @@ export class BookComponent implements OnInit, OnDestroy {
 			useBackdrop: true,
 			backdropOpacity: 0.5,
 		});
-	}
-
-	private loadRelatedBooks(bookId: string) {
-		this.relationshipService.getBookRelationships(bookId).subscribe({
-			next: (page) => {
-				this.relatedBooks.set(page.items);
-			},
-			error: (err) => {
-				console.error('Erro ao carregar livros relacionados:', err);
-			},
-		});
-	}
-
-	navigateToRelatedBook(bookId: string) {
-		this.router.navigate(['/book', bookId]);
-		// Scroll to top
-		window.scrollTo({ top: 0, behavior: 'smooth' });
-	}
-
-	getRelationTypeLabel(type: string): string {
-		const labels: Record<string, string> = {
-			sequence: 'Sequência',
-			'spin-off': 'Spin-off',
-			doujinshi: 'Doujinshi',
-			'same-franchise': 'Mesma Franquia',
-			related: 'Relacionado',
-			adaptation: 'Adaptação',
-			crossover: 'Crossover',
-		};
-		return labels[type] || type;
 	}
 }

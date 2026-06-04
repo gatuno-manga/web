@@ -37,11 +37,8 @@
 							</div>
 						}
 						<img
-							[ngSrc]="b.cover"
+							[src]="b.cover"
 							alt="Capa do livro {{ b.title }}"
-							width="200"
-							height="350"
-							priority
 							[class.loaded]="isImageLoaded()"
 							(load)="onImageLoad()"
 							(error)="onCoverImageError()"
@@ -95,6 +92,7 @@
 								rounded="small"
 								padding="none"
 								[aria-label]="isFavorited() ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+								[appTooltip]="isFavorited() ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
 								(click)="toggleFavorite()"
 							>
 								<app-icons name="bookmark" />
@@ -106,9 +104,37 @@
 								rounded="small"
 								padding="none"
 								[aria-label]="isSubscribed() ? 'Cancelar inscrição' : 'Inscrever-se para atualizações'"
+								[appTooltip]="isSubscribed() ? 'Cancelar inscrição' : 'Inscrever-se para atualizações'"
 								(click)="toggleSubscribe()"
 							>
 								<app-icons name="eye" />
+							</app-button>
+							<app-button
+								class="btn-actions"
+								variant="primary"
+								radio="square"
+								rounded="small"
+								padding="none"
+								[disabled]="!admin()"
+								[aria-label]="
+									b.autoUpdate
+										? 'Desativar atualizações automáticas'
+										: 'Ativar atualizações automáticas'
+								"
+								[appTooltip]="
+									b.autoUpdate
+										? 'Desativar atualizações automáticas'
+										: 'Ativar atualizações automáticas'
+								"
+								(click)="toggleAutoUpdate()"
+							>
+								<app-icons
+									[name]="
+										b.autoUpdate
+											? 'refresh-ccw'
+											: 'refresh-cw-off'
+									"
+								/>
 							</app-button>
 							<div class="options-wrapper btn-actions">
 								<app-button
@@ -117,6 +143,7 @@
 									padding="none"
 									class="options-btn"
 									aria-label="Mais opções"
+									appTooltip="Mais opções"
 									(click)="
 										toggleOptionsDropdown();
 										$event.stopPropagation()
@@ -147,11 +174,16 @@
 												<span>Excluir download</span>
 											</button>
 										}
+										<button type="button" (click)="downloadFiles()">
+											<app-icons name="download" />
+											<span>Baixar arquivos</span>
+										</button>
 										<button type="button" (click)="shareBook()">
 											<app-icons name="share" />
 											<span>Compartilhar</span>
 										</button>
 										@if (admin()) {
+											<div class="dropdown-divider"></div>
 											<button type="button" (click)="openBookEditModal()">
 												<app-icons name="edit" />
 												<span>Editar Livro</span>
@@ -161,35 +193,9 @@
 												<span>Forçar atualização</span>
 											</button>
 										}
-										<button type="button" (click)="downloadFiles()">
-											<app-icons name="download" />
-											<span>Baixar arquivos</span>
-										</button>
 									</div>
 								}
 							</div>
-							<app-button
-								class="btn-actions"
-								variant="primary"
-								radio="square"
-								rounded="small"
-								padding="none"
-								[disabled]="!admin()"
-								[aria-label]="
-									b.autoUpdate
-										? 'Desativar atualizações automáticas'
-										: 'Ativar atualizações automáticas'
-								"
-								(click)="toggleAutoUpdate()"
-							>
-								<app-icons
-									[name]="
-										b.autoUpdate
-											? 'refresh-ccw'
-											: 'refresh-cw-off'
-									"
-								/>
-							</app-button>
 						</div>
 					</div>
 				</div>
@@ -210,45 +216,13 @@
 					class="book-description"
 				></markdown>
 			</div>
-
-			@if (hasReadPartially() && userTokenService.hasValidAccessTokenSignal()) {
-				<app-book-review-form [bookId]="b.id" (reviewSubmitted)="reviewsList.loadReviews()" />
-			}
-
-			<app-book-reviews-list [bookId]="b.id" #reviewsList />
-
-			@if (relatedBooks().length > 0) {
-				<div class="related-books-section">
-					<h2>Livros Relacionados</h2>
-					<div class="related-books-list">
-						@for (rel of relatedBooks(); track rel.relationId) {
-							<div
-								class="related-book-card"
-								(click)="navigateToRelatedBook(rel.relatedBook.id)"
-							>
-								<div class="card-cover">
-									<img
-										[ngSrc]="rel.relatedBook.cover"
-										[alt]="rel.relatedBook.title"
-										fill
-										sizes="(max-width: 768px) 100px, 150px"
-									/>
-									<span class="relation-badge">{{
-										getRelationTypeLabel(rel.relationType)
-									}}</span>
-								</div>
-								<div class="card-info">
-									<span class="title">{{
-										rel.relatedBook.title
-									}}</span>
-								</div>
-							</div>
-						}
-					</div>
-				</div>
-			}
 		</div>
-		<app-info-book [id]="b.id" [bookBasic]="b" (updated)="refreshBook()" />
+		<app-info-book
+			[id]="b.id"
+			[bookBasic]="b"
+			[hasReadPartially]="hasReadPartially()"
+			(updated)="refreshBook()"
+		/>
 	}
 } @placeholder {
 	<div class="background-container">
