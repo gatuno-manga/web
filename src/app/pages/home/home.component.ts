@@ -18,6 +18,7 @@ import { ItemBookComponent } from '@features/books/components/item-book/item-boo
 import { BookList } from '@models/book.models';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { firstValueFrom, forkJoin } from 'rxjs';
 
 @Component({
@@ -29,6 +30,7 @@ import { firstValueFrom, forkJoin } from 'rxjs';
 		RouterModule,
 		NgOptimizedImage,
 		ItemBookComponent,
+		ButtonComponent,
 	],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',

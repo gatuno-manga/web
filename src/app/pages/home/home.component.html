@@ -1,4 +1,11 @@
 <div class="home-container">
+  <div class="aurora-scene" aria-hidden="true">
+    <div class="aurora-orb aurora-orb--warm"></div>
+    <div class="aurora-orb aurora-orb--cold"></div>
+    <div class="aurora-orb aurora-orb--accent"></div>
+    <div class="aurora-mesh"></div>
+  </div>
+
   <h1 class="visually-hidden">Início Gatuno</h1>
   <!-- Featured Carousel -->
   @if (featuredBooks().length > 0) {
@@ -48,7 +55,7 @@
                   <h2 class="book-title-heading">{{ book.title }}</h2>
                   <p class="description">{{ book.description || 'Nenhuma descrição fornecida.' }}</p>
                   <div class="actions">
-                    <a [routerLink]="['/books', book.id]" class="btn-primary">Ler agora</a>
+                    <app-button [routerLink]="['/books', book.id]" variant="primary" rounded="small" padding="normal">Ler agora</app-button>
                   </div>
                 </div>
               </div>
