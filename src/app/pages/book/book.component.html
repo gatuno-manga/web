@@ -1,5 +1,11 @@
 @defer (when !isLoading()) {
 	@if (book(); as b) {
+		<div class="aurora-scene" aria-hidden="true">
+			<div class="aurora-orb aurora-orb--warm"></div>
+			<div class="aurora-orb aurora-orb--cold"></div>
+			<div class="aurora-orb aurora-orb--accent"></div>
+			<div class="aurora-mesh"></div>
+		</div>
 		<div
 			class="background-container"
 			[style.background-color]="b.dominantColor"
@@ -25,7 +31,8 @@
 			}
 		</div>
 		<div class="book">
-			<div class="book-header">
+			<div class="glass-panel">
+				<div class="book-header">
 				<div class="book-cover">
 					@if (b.cover && !coverImageError) {
 						@if (b.blurHash) {
@@ -63,7 +70,14 @@
 							[class.long-title]="b.title.length > 90"
 							[class.very-long-title]="b.title.length > 140"
 						>
-							{{ b.title }}
+							<span>{{ b.title }}</span>
+							@if (b.autoUpdate) {
+								<app-icons 
+									name="refresh-ccw" 
+									class="auto-update-icon"
+									appTooltip="Atualização Automática: Este livro recebe novos capítulos automaticamente"
+								/>
+							}
 						</h1>
 						<h6>
 							{{ getAuthorNames() }}
@@ -85,57 +99,60 @@
 										: 'Começar a ler'
 								}}
 							</app-button>
-							<app-button
-								class="btn-actions"
-								[variant]="isFavorited() ? 'primary' : 'outline'"
-								radio="square"
-								rounded="small"
-								padding="none"
-								[aria-label]="isFavorited() ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-								[appTooltip]="isFavorited() ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-								(click)="toggleFavorite()"
-							>
-								<app-icons name="bookmark" />
-							</app-button>
-							<app-button
-								class="btn-actions"
-								[variant]="isSubscribed() ? 'primary' : 'outline'"
-								radio="square"
-								rounded="small"
-								padding="none"
-								[aria-label]="isSubscribed() ? 'Cancelar inscrição' : 'Inscrever-se para atualizações'"
-								[appTooltip]="isSubscribed() ? 'Cancelar inscrição' : 'Inscrever-se para atualizações'"
-								(click)="toggleSubscribe()"
-							>
-								<app-icons name="eye" />
-							</app-button>
-							<app-button
-								class="btn-actions"
-								variant="primary"
-								radio="square"
-								rounded="small"
-								padding="none"
-								[disabled]="!admin()"
-								[aria-label]="
-									b.autoUpdate
-										? 'Desativar atualizações automáticas'
-										: 'Ativar atualizações automáticas'
-								"
-								[appTooltip]="
-									b.autoUpdate
-										? 'Desativar atualizações automáticas'
-										: 'Ativar atualizações automáticas'
-								"
-								(click)="toggleAutoUpdate()"
-							>
-								<app-icons
-									[name]="
+							@if (isLoggedIn()) {
+								<app-button
+									class="btn-actions"
+									[variant]="isFavorited() ? 'primary' : 'outline'"
+									radio="square"
+									rounded="small"
+									padding="none"
+									[aria-label]="isFavorited() ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+									[appTooltip]="isFavorited() ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+									(click)="toggleFavorite()"
+								>
+									<app-icons name="bookmark" />
+								</app-button>
+								<app-button
+									class="btn-actions"
+									[variant]="isSubscribed() ? 'primary' : 'outline'"
+									radio="square"
+									rounded="small"
+									padding="none"
+									[aria-label]="isSubscribed() ? 'Cancelar inscrição' : 'Inscrever-se para atualizações'"
+									[appTooltip]="isSubscribed() ? 'Cancelar inscrição' : 'Inscrever-se para atualizações'"
+									(click)="toggleSubscribe()"
+								>
+									<app-icons name="eye" />
+								</app-button>
+							}
+							@if (admin()) {
+								<app-button
+									class="btn-actions"
+									[variant]="b.autoUpdate ? 'primary' : 'outline'"
+									radio="square"
+									rounded="small"
+									padding="none"
+									[aria-label]="
 										b.autoUpdate
-											? 'refresh-ccw'
-											: 'refresh-cw-off'
+											? 'Desativar atualizações automáticas'
+											: 'Ativar atualizações automáticas'
 									"
-								/>
-							</app-button>
+									[appTooltip]="
+										b.autoUpdate
+											? 'Desativar atualizações automáticas'
+											: 'Ativar atualizações automáticas'
+									"
+									(click)="toggleAutoUpdate()"
+								>
+									<app-icons
+										[name]="
+											b.autoUpdate
+												? 'refresh-ccw'
+												: 'refresh-cw-off'
+										"
+									/>
+								</app-button>
+							}
 							<div class="options-wrapper btn-actions">
 								<app-button
 									radio="square"
@@ -153,13 +170,15 @@
 								</app-button>
 								@if (showOptionsDropdown()) {
 									<div class="options-dropdown">
-										<button
-											type="button"
-											(click)="openAddToCollectionModal()"
-										>
-											<app-icons name="bookmark" />
-											<span>Adicionar à Coleção</span>
-										</button>
+										@if (isLoggedIn()) {
+											<button
+												type="button"
+												(click)="openAddToCollectionModal()"
+											>
+												<app-icons name="bookmark" />
+												<span>Adicionar à Coleção</span>
+											</button>
+										}
 										<button type="button" (click)="saveOffline()">
 											<app-icons name="smartphone" />
 											<span>Salvar no app</span>
@@ -200,10 +219,11 @@
 					</div>
 				</div>
 			</div>
+			</div>
 			<div class="book-info-plus">
 				<div class="tags">
 					@for (content of b.sensitiveContent || []; track content) {
-						<span class="sensitive">{{ content.name }}</span>
+						<span class="sensitive" (click)="filterBySensitive(content.id)">{{ content.name }}</span>
 					}
 					@for (tag of b.tags || []; track tag.id) {
 						<span class="tag" (click)="filterByTag(tag.id)">{{
@@ -225,11 +245,18 @@
 		/>
 	}
 } @placeholder {
+	<div class="aurora-scene" aria-hidden="true">
+		<div class="aurora-orb aurora-orb--warm"></div>
+		<div class="aurora-orb aurora-orb--cold"></div>
+		<div class="aurora-orb aurora-orb--accent"></div>
+		<div class="aurora-mesh"></div>
+	</div>
 	<div class="background-container">
 		<div class="book-background placeholder-background"></div>
 	</div>
 	<div class="book">
-		<div class="book-header">
+		<div class="glass-panel">
+			<div class="book-header">
 			<div class="book-cover placeholder" [style.background-color]="book()?.dominantColor">
 				@if (book()?.blurHash) {
 					<app-blurhash [hash]="book()?.blurHash" [width]="32" [height]="32" />
@@ -245,6 +272,7 @@
 					<div class="release placeholder"></div>
 				</div>
 			</div>
+		</div>
 		</div>
 		<div class="book-info-plus">
 			<div class="tags">

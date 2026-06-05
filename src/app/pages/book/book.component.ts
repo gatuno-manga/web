@@ -65,6 +65,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	book = signal<BookBasic | undefined>(undefined);
 	public userTokenService = inject(UserTokenService);
 	admin = computed(() => this.userTokenService.isAdminSignal());
+	isLoggedIn = computed(() => this.userTokenService.hasValidAccessTokenSignal());
 	isLoading = signal(true);
 	isImageLoaded = signal(false);
 	isFavorited = signal(false);
@@ -358,6 +359,10 @@ export class BookComponent implements OnInit, OnDestroy {
 	}
 	filterByTag(tagId: string) {
 		this.router.navigate(['/books'], { queryParams: { tags: tagId } });
+	}
+
+	filterBySensitive(id: string) {
+		this.router.navigate(['/books'], { queryParams: { sensitiveContent: id } });
 	}
 
 	openBookEditModal() {
