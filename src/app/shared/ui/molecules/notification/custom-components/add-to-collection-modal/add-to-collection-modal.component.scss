@@ -127,10 +127,31 @@
 		}
 	}
 
+	.create-collection-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1rem;
+		background: rgb(from var(--primary-color) r g b / 0.05);
+		border-radius: 8px;
+		border: 1px dashed var(--primary-color);
+		
+		.create-actions {
+			display: flex;
+			justify-content: flex-end;
+			gap: 0.5rem;
+		}
+	}
+
 	footer {
 		display: flex;
-		justify-content: flex-end;
+		align-items: center;
+		justify-content: flex-start;
 		margin-top: 1rem;
+
+		.spacer {
+			flex: 1;
+		}
 	}
 }
 

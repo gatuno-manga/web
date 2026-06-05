@@ -117,26 +117,23 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1.5rem;
-		align-items: flex-end;
+		align-items: center;
+		margin-bottom: 1.5rem;
 
 		@media (max-width: 600px) {
 			grid-template-columns: 1fr;
 			gap: 1rem;
 		}
-	}
 
-	.checkbox-group {
-		margin-bottom: 1.5rem;
+		.relation-select {
+			width: 100%;
+		}
 
-		.checkbox-container {
+		.checkbox-wrapper {
 			display: flex;
 			align-items: center;
-			gap: 0.5rem;
-			cursor: pointer;
-			font-size: 0.9rem;
-			user-select: none;
-
-			input { width: 18px; height: 18px; cursor: pointer; }
+			height: 48px; /* Altura padrão para alinhar com inputs e selects */
+			margin-top: 24px; /* Compensar a altura da label do select (caso tenha) */
 		}
 	}
 

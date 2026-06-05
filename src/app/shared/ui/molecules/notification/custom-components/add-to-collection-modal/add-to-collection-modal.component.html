@@ -31,13 +31,40 @@
 			} @else {
 				<div class="empty-state">
 					<app-icons name="list" />
-					<p>Você ainda não criou nenhuma coleção.</p>
+					<p>Você ainda não tem nenhuma coleção.</p>
 				</div>
 			}
 		}
 	</div>
 
+	@if (isCreating()) {
+		<div class="create-collection-section">
+			<app-input
+				type="text"
+				placeholder="Nome da nova coleção"
+				[ngModel]="newCollectionTitle()"
+				(ngModelChange)="newCollectionTitle.set($event)"
+				(keyup.enter)="createCollection()"
+				[disabled]="isSubmitting()"
+			/>
+			<div class="create-actions">
+				<app-button variant="outline" (click)="toggleCreate()" [disabled]="isSubmitting()">Cancelar</app-button>
+				<app-button variant="primary" (click)="createCollection()" [disabled]="isSubmitting() || !newCollectionTitle().trim()">
+					@if (isSubmitting()) {
+						<app-icons name="loader" class="spin" />
+					} @else {
+						Salvar
+					}
+				</app-button>
+			</div>
+		</div>
+	}
+
 	<footer>
-		<app-button variant="outline" (click)="onClose()">Cancelar</app-button>
+		@if (!isCreating()) {
+			<app-button variant="outline" (click)="toggleCreate()">Criar nova coleção</app-button>
+		}
+		<span class="spacer"></span>
+		<app-button variant="outline" (click)="onClose()">Sair</app-button>
 	</footer>
 </div>

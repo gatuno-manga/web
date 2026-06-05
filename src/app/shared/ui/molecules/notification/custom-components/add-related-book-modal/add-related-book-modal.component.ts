@@ -22,6 +22,9 @@ import {
 } from '@models/book-relationship.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
+import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
+import { CheckboxComponent } from '@ui/atoms/inputs/checkbox/checkbox.component';
 import {
 	catchError,
 	debounceTime,
@@ -38,6 +41,9 @@ import {
 		ReactiveFormsModule,
 		IconsComponent,
 		ButtonComponent,
+		TextInputComponent,
+		SelectComponent,
+		CheckboxComponent,
 	],
 	templateUrl: './add-related-book-modal.component.html',
 	styleUrl: './add-related-book-modal.component.scss',
@@ -104,8 +110,7 @@ export class AddRelatedBookModalComponent implements OnInit {
 			});
 	}
 
-	onSearchChange(event: Event) {
-		const query = (event.target as HTMLInputElement).value;
+	onSearchChange(query: string) {
 		this.searchQuery.next(query);
 	}
 

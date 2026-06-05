@@ -65,11 +65,10 @@
 
 			<div class="select-all-wrapper">
 				<label class="checkbox-label select-all">
-					<input
-						type="checkbox"
-						[checked]="allSelected()"
+					<app-checkbox
+						[ngModel]="allSelected()"
 						[indeterminate]="someSelected()"
-						(change)="toggleSelectAll()"
+						(ngModelChange)="toggleSelectAll()"
 						aria-label="Selecionar todos os capítulos"
 					/>
 					<span>Selecionar todos ({{ chapters.length }})</span>
@@ -87,10 +86,9 @@
 						[class.selected]="isChapterSelected(chapter.id)"
 						role="listitem"
 					>
-						<input
-							type="checkbox"
-							[checked]="isChapterSelected(chapter.id)"
-							(change)="toggleChapter(chapter.id)"
+						<app-checkbox
+							[ngModel]="isChapterSelected(chapter.id)"
+							(ngModelChange)="toggleChapter(chapter.id)"
 							[attr.aria-label]="getChapterLabel(chapter)"
 						/>
 						<span>{{ getChapterLabel(chapter) }}</span>
