@@ -1,32 +1,308 @@
+// ─── Host ────────────────────────────────────────────────────────────────────
 :host {
 	display: flex;
 	flex-direction: column;
-	height: 100dvh;
+	min-height: 100dvh;
+	background-color: var(--app-background-color);
+	overflow: hidden;
 }
 
-header {
-	position: sticky;
+// ─── Aurora Background ───────────────────────────────────────────────────────
+.aurora-scene {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.aurora-orb {
+	position: absolute;
+	border-radius: 50%;
+	filter: blur(90px);
+	will-change: transform;
+
+	&--warm {
+		width: 700px;
+		height: 500px;
+		background: radial-gradient(
+			circle,
+			rgba(241, 133, 34, 0.22) 0%,
+			rgba(241, 133, 34, 0.08) 60%,
+			transparent 100%
+		);
+		top: -15%;
+		right: -10%;
+		animation: orb-float-a 22s ease-in-out infinite;
+	}
+
+	&--cold {
+		width: 500px;
+		height: 500px;
+		background: radial-gradient(
+			circle,
+			rgba(169, 114, 255, 0.18) 0%,
+			rgba(169, 114, 255, 0.06) 60%,
+			transparent 100%
+		);
+		bottom: 5%;
+		left: -8%;
+		animation: orb-float-b 28s ease-in-out infinite;
+		animation-delay: -10s;
+	}
+
+	&--accent {
+		width: 350px;
+		height: 350px;
+		background: radial-gradient(
+			circle,
+			rgba(23, 162, 184, 0.12) 0%,
+			transparent 70%
+		);
+		top: 55%;
+		right: 20%;
+		animation: orb-float-a 18s ease-in-out infinite;
+		animation-delay: -5s;
+	}
+}
+
+.aurora-mesh {
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(
+			ellipse at 15% 40%,
+			rgba(241, 133, 34, 0.06) 0%,
+			transparent 55%
+		),
+		radial-gradient(
+			ellipse at 85% 15%,
+			rgba(169, 114, 255, 0.08) 0%,
+			transparent 50%
+		),
+		radial-gradient(
+			ellipse at 50% 90%,
+			rgba(23, 162, 184, 0.05) 0%,
+			transparent 50%
+		);
+}
+
+.aurora-grid {
+	position: absolute;
+	inset: 0;
+	background-image:
+		linear-gradient(
+			rgba(255, 255, 255, 0.015) 1px,
+			transparent 1px
+		),
+		linear-gradient(
+			90deg,
+			rgba(255, 255, 255, 0.015) 1px,
+			transparent 1px
+		);
+	background-size: 60px 60px;
+	mask-image: radial-gradient(
+		ellipse at 50% 50%,
+		rgba(0, 0, 0, 0.4) 0%,
+		transparent 70%
+	);
+}
+
+// ─── Header ──────────────────────────────────────────────────────────────────
+.auth-header {
+	position: relative;
+	z-index: 10;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 2rem;
+	height: 64px;
+	flex-shrink: 0;
+	background: color-mix(
+		in srgb,
+		var(--app-background-color) 60%,
+		transparent
+	);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border-bottom: 1px solid var(--border-color);
+}
 
-	a {
-		display: flex;
+.back-btn {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 14px;
+	color: var(--white-muted);
+	padding: 6px 10px;
+	border-radius: 8px;
+	transition: color 0.2s ease, background 0.2s ease;
+
+	&:hover {
+		color: var(--app-text-color);
+		background: var(--hover-color);
+	}
+
+	span {
+		font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
 	}
 }
 
-main {
-	height: 100%;
+.logo-link {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+
+	.logo-icon {
+		filter: drop-shadow(0 0 12px rgb(from var(--primary-color) r g b / 0.5));
+		transition: filter 0.3s ease;
+	}
+
+	&:hover .logo-icon {
+		filter: drop-shadow(0 0 20px rgb(from var(--primary-color) r g b / 0.8));
+	}
+}
+
+.header-spacer {
+	// Espelha o back-btn para manter o logo centralizado
+	width: 100px;
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+.auth-main {
+	position: relative;
+	z-index: 1;
+	flex: 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	padding: 2rem 1rem;
+}
 
-	.forms {
-		border: solid 4px var(--primary-color);
-		border-radius: 0.625rem; // 10px
-		padding: 1.5rem;
-		width: 100%;
-		max-width: 420px;
+// ─── Auth Card ────────────────────────────────────────────────────────────────
+.auth-card {
+	position: relative;
+	width: 100%;
+	max-width: 440px;
+	border-radius: 20px;
+	overflow: hidden;
+
+	// Glass base
+	background: color-mix(
+		in srgb,
+		var(--secondary-color) 60%,
+		transparent
+	);
+	backdrop-filter: blur(24px) saturate(180%);
+	-webkit-backdrop-filter: blur(24px) saturate(180%);
+
+	border: 1px solid var(--border-color);
+	box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+
+	animation: card-appear 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+// Linha de glow removida — mantido apenas como espaço reservado para o elemento HTML
+.card-glow-line {
+	display: none;
+}
+
+// Reflexo de luz no topo
+.card-shimmer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 60px;
+	background: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.03) 0%,
+		transparent 100%
+	);
+	pointer-events: none;
+	z-index: 1;
+}
+
+.card-content {
+	position: relative;
+	z-index: 2;
+	padding: 2.5rem 2rem;
+}
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
+.auth-footer {
+	position: relative;
+	z-index: 10;
+	text-align: center;
+	padding: 1rem;
+	font-size: 11px;
+	color: var(--white-muted);
+	font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
+	letter-spacing: 0.02em;
+}
+
+// ─── Animations ───────────────────────────────────────────────────────────────
+@keyframes orb-float-a {
+	0%, 100% { transform: translate(0, 0) scale(1); }
+	33%       { transform: translate(-30px, 40px) scale(1.06); }
+	66%       { transform: translate(20px, -20px) scale(0.96); }
+}
+
+@keyframes orb-float-b {
+	0%, 100% { transform: translate(0, 0) scale(1); }
+	25%       { transform: translate(40px, -30px) scale(1.04); }
+	75%       { transform: translate(-20px, 30px) scale(0.98); }
+}
+
+@keyframes card-appear {
+	from {
+		opacity: 0;
+		transform: translateY(20px) scale(0.97);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+@media (max-width: 480px) {
+	.auth-header {
+		padding: 0 1rem;
+
+		.back-btn span {
+			display: none;
+		}
+	}
+
+	.card-content {
+		padding: 2rem 1.25rem;
+	}
+
+	.auth-card {
+		border-radius: 16px;
+	}
+
+	.aurora-orb--warm {
+		width: 350px;
+		height: 300px;
+	}
+
+	.aurora-orb--cold {
+		width: 280px;
+		height: 280px;
+	}
+}
+
+// ─── Reduced motion ──────────────────────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+	.aurora-orb {
+		animation: none;
+	}
+
+	.auth-card {
+		animation: none;
 	}
 }

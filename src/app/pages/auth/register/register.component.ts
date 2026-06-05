@@ -17,6 +17,8 @@ import {
 	PasswordInputComponent,
 	TextInputComponent,
 } from '@ui/atoms/inputs/text-input/text-input.component';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
+
 
 @Component({
 	selector: 'app-register',
@@ -26,6 +28,7 @@ import {
 		ButtonComponent,
 		ReactiveFormsModule,
 		RouterModule,
+		IconsComponent,
 	],
 	templateUrl: './register.component.html',
 	styleUrl: './register.component.scss',

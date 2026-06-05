@@ -1,12 +1,43 @@
-<header>
-	<a [routerLink]="['/']" aria-label="Voltar para o início">
-		<app-icons name="arrow-left" size="36" />
-	</a>
-	<app-icons name="logo" size="72" />
-	<div class="spacer"></div>
+<!-- Aurora decorative background -->
+<div class="aurora-scene" aria-hidden="true">
+  <div class="aurora-orb aurora-orb--warm"></div>
+  <div class="aurora-orb aurora-orb--cold"></div>
+  <div class="aurora-orb aurora-orb--accent"></div>
+  <div class="aurora-mesh"></div>
+  <div class="aurora-grid"></div>
+</div>
+
+<!-- Header -->
+<header class="auth-header">
+  <a [routerLink]="['/']" aria-label="Voltar para o início" class="back-btn">
+    <app-icons name="arrow-left" size="20px" />
+    <span>Voltar</span>
+  </a>
+
+  <a [routerLink]="['/']" class="logo-link" aria-label="Gatuno - página inicial">
+    <app-icons name="logo" size="48px" class="logo-icon" />
+  </a>
+
+  <div class="header-spacer"></div>
 </header>
-<main>
-	<div class="forms">
-		<router-outlet />
-	</div>
+
+<!-- Main content -->
+<main class="auth-main">
+  <div class="auth-card">
+    <!-- Top glow line -->
+    <div class="card-glow-line" aria-hidden="true"></div>
+
+    <!-- Card shimmer overlay -->
+    <div class="card-shimmer" aria-hidden="true"></div>
+
+    <!-- Form content -->
+    <div class="card-content">
+      <router-outlet />
+    </div>
+  </div>
 </main>
+
+<!-- Footer -->
+<footer class="auth-footer">
+  <span>© 2025 Gatuno · Todos os direitos reservados</span>
+</footer>
