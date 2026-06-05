@@ -52,9 +52,34 @@ export class TooltipDirective implements OnDestroy {
 		const hostPos = this.el.nativeElement.getBoundingClientRect();
 		const tooltipPos = this.tooltipElement!.getBoundingClientRect();
 
-		// Centraliza o tooltip em cima do elemento
-		const top = hostPos.top - tooltipPos.height - 10;
-		const left = hostPos.left + (hostPos.width - tooltipPos.width) / 2;
+		const margin = 10;
+		let top = hostPos.top - tooltipPos.height - margin;
+		let left = hostPos.left + (hostPos.width - tooltipPos.width) / 2;
+
+		const viewportWidth = document.documentElement.clientWidth;
+		const viewportHeight = document.documentElement.clientHeight;
+
+		// Se o tooltip for vazar por cima, coloca ele abaixo do elemento
+		if (top < margin) {
+			top = hostPos.bottom + margin;
+		}
+
+		// Se vazar por baixo da tela
+		if (top + tooltipPos.height > viewportHeight - margin) {
+			top = viewportHeight - tooltipPos.height - margin;
+			// Prevenção extra caso a tela seja muito pequena
+			if (top < margin) top = margin;
+		}
+
+		// Se vazar pela esquerda
+		if (left < margin) {
+			left = margin;
+		}
+
+		// Se vazar pela direita
+		if (left + tooltipPos.width > viewportWidth - margin) {
+			left = viewportWidth - tooltipPos.width - margin;
+		}
 
 		this.renderer.setStyle(
 			this.tooltipElement,
