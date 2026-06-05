@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { UserProfile } from '@models/user.models';
+import { Role, UserProfile } from '@models/user.models';
 import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
 import { UserTokenService } from './user-token.service';
 
@@ -44,6 +44,20 @@ export class UserService {
 				return of(null);
 			}),
 		);
+	}
+
+	hasPermission(permission: string | string[]): boolean {
+		const profile = this.profileSignal();
+		if (!profile) return false;
+
+		// Admin bypassing permissions just in case
+		if (profile.roles.includes(Role.ADMIN)) return true;
+
+		const permissionsToCheck = Array.isArray(permission)
+			? permission
+			: [permission];
+
+		return permissionsToCheck.some((p) => profile.permissions?.includes(p));
 	}
 
 	updateProfile(data: { userName?: string; name?: string }) {
