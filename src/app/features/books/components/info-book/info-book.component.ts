@@ -23,6 +23,7 @@ import {
 } from '@angular/core';
 import { RouterLink, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
+import { UserService } from '@core/services/user.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
@@ -71,6 +72,7 @@ import { firstValueFrom, fromEvent, Subscription, throttleTime } from 'rxjs';
 import { BookReviewFormComponent } from '../book-review-form/book-review-form.component';
 import { BookReviewsListComponent } from '../book-reviews-list/book-reviews-list.component';
 import { ItemBookComponent } from '../item-book/item-book.component';
+import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
 
 enum tab {
 	chapters = 0,
@@ -103,6 +105,7 @@ interface ModulesLoad {
 		BookReviewFormComponent,
 		BookReviewsListComponent,
 		RouterLink,
+		HasPermissionDirective,
 	],
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
@@ -112,6 +115,7 @@ interface ModulesLoad {
 	},
 })
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
+	public userService = inject(UserService);
 	private bookService = inject(BookService);
 	private relationshipService = inject(BookRelationshipService);
 	private modalService = inject(ModalNotificationService);
@@ -1309,7 +1313,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				(id) => !status.get(id) || status.get(id) === 'error',
 			);
 
-			if (hasNotDownloaded) {
+			if (hasNotDownloaded && this.userService.hasPermission('books:download')) {
 				items.push({
 					label: `Baixar ${selectedCount} Capítulos`,
 					icon: 'download',
@@ -1317,7 +1321,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				});
 			}
 
-			if (hasDownloaded) {
+			if (hasDownloaded && this.userService.hasPermission('books:download')) {
 				items.push({
 					label: `Excluir ${selectedCount} Downloads`,
 					icon: 'trash',
@@ -1332,15 +1336,20 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			);
 			const hasReadChapter = selectedChapters.some((c) => c.read);
 
+			if (this.userService.hasPermission('reading-progress:manage')) {
+				items.push(
+					{ type: 'separator' },
+					{
+						label: hasReadChapter
+							? `Marcar ${selectedCount} como Não Lidos`
+							: `Marcar ${selectedCount} como Lidos`,
+						icon: hasReadChapter ? 'eye-close' : 'eye',
+						action: () => this.toggleSelectedReadStatus(),
+					}
+				);
+			}
+
 			items.push(
-				{ type: 'separator' },
-				{
-					label: hasReadChapter
-						? `Marcar ${selectedCount} como Não Lidos`
-						: `Marcar ${selectedCount} como Lidos`,
-					icon: hasReadChapter ? 'eye-close' : 'eye',
-					action: () => this.toggleSelectedReadStatus(),
-				},
 				{ type: 'separator' },
 				{
 					label: 'Limpar Seleção',
@@ -1356,14 +1365,14 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		// Menu para capítulo único
 		const downloadStatus = this.chaptersDownloadStatus().get(chapter.id);
 
-		if (downloadStatus === 'downloaded') {
+		if (downloadStatus === 'downloaded' && this.userService.hasPermission('books:download')) {
 			items.push({
 				label: 'Excluir Download',
 				icon: 'trash',
 				danger: true,
 				action: () => this.deleteChapterDownload(chapter),
 			});
-		} else if (!downloadStatus || downloadStatus === 'error') {
+		} else if ((!downloadStatus || downloadStatus === 'error') && this.userService.hasPermission('books:download')) {
 			items.push({
 				label: 'Baixar Capítulo',
 				icon: 'download',

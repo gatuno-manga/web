@@ -21,9 +21,11 @@ import { NotificationService } from '@core/services/notification.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
 import { UserTokenService } from '@core/services/user-token.service';
+import { UserService } from '@core/services/user.service';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
 import { TooltipDirective } from '@shared/ui/atoms/tooltip/tooltip.directive';
+import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
@@ -53,6 +55,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 		BlurhashComponent,
 		FlagPipe,
 		TooltipDirective,
+		HasPermissionDirective,
 	],
 	templateUrl: './book.component.html',
 	styleUrl: './book.component.scss',
@@ -93,6 +96,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	// Estado para erro de imagem de capa
 	coverImageError = false;
 
+	public userService = inject(UserService);
 	private metaService = inject(MetaDataService);
 	private modalService = inject(ModalNotificationService);
 	private notificationService = inject(NotificationService);

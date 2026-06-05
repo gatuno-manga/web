@@ -101,6 +101,7 @@
 							</app-button>
 							@if (isLoggedIn()) {
 								<app-button
+									*appHasPermission="'interactions:manage'"
 									class="btn-actions"
 									[variant]="isFavorited() ? 'primary' : 'outline'"
 									radio="square"
@@ -113,6 +114,7 @@
 									<app-icons name="bookmark" />
 								</app-button>
 								<app-button
+									*appHasPermission="'interactions:manage'"
 									class="btn-actions"
 									[variant]="isSubscribed() ? 'primary' : 'outline'"
 									radio="square"
@@ -125,7 +127,7 @@
 									<app-icons name="eye" />
 								</app-button>
 							}
-							@if (admin()) {
+							@if (userService.hasPermission('internal:books:edit')) {
 								<app-button
 									class="btn-actions"
 									[variant]="b.autoUpdate ? 'primary' : 'outline'"
@@ -170,7 +172,7 @@
 								</app-button>
 								@if (showOptionsDropdown()) {
 									<div class="options-dropdown">
-										@if (isLoggedIn()) {
+										@if (isLoggedIn() && userService.hasPermission('collections:manage')) {
 											<button
 												type="button"
 												(click)="openAddToCollectionModal()"
@@ -179,11 +181,11 @@
 												<span>Adicionar à Coleção</span>
 											</button>
 										}
-										<button type="button" (click)="saveOffline()">
+										<button *appHasPermission="'sync:all'" type="button" (click)="saveOffline()">
 											<app-icons name="smartphone" />
 											<span>Salvar no app</span>
 										</button>
-										@if (isBookDownloaded()) {
+										@if (isBookDownloaded() && userService.hasPermission('sync:all')) {
 											<button
 												type="button"
 												(click)="deleteDownloadedBook()"
@@ -193,7 +195,7 @@
 												<span>Excluir download</span>
 											</button>
 										}
-										<button type="button" (click)="downloadFiles()">
+										<button *appHasPermission="'books:download'" type="button" (click)="downloadFiles()">
 											<app-icons name="download" />
 											<span>Baixar arquivos</span>
 										</button>
@@ -201,7 +203,7 @@
 											<app-icons name="share" />
 											<span>Compartilhar</span>
 										</button>
-										@if (admin()) {
+										@if (userService.hasPermission('internal:books:edit')) {
 											<div class="dropdown-divider"></div>
 											<button type="button" (click)="openBookEditModal()">
 												<app-icons name="edit" />
@@ -289,7 +291,7 @@
 		}
 	</div>
 }
-@if (admin() && book()) {
+@if (userService.hasPermission('internal:books:maintenance') && book()) {
 	<app-aside>
 		<h1><app-icons name="book" /> {{ book()?.title }}</h1>
 		<div class="line"></div>

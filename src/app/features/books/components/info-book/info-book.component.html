@@ -41,6 +41,7 @@
 						</div>
 						<div class="selection-actions">
 							<app-button
+								*appHasPermission="'books:download'"
 								(click)="downloadSelectedChapters()"
 								variant="text"
 								size="small"
@@ -48,7 +49,7 @@
 								<app-icons name="download" size="16" />
 								<span>Baixar</span>
 							</app-button>
-							@if (hasDownloadedInSelection()) {
+							@if (hasDownloadedInSelection() && userService.hasPermission('books:download')) {
 								<app-button
 									(click)="deleteSelectedChaptersDownloads()"
 									variant="text"
@@ -183,6 +184,7 @@
 										/>
 									} @else {
 										<app-icons
+											*appHasPermission="'books:download'"
 											name="download"
 											class="icon-download"
 											(click)="
@@ -242,7 +244,7 @@
 		class="container"
 	>
 		@defer (when modulesLoad[tab.covers].load()) {
-			@if (userTokenService.isAdminSignal()) {
+			@if (userService.hasPermission('internal:books:edit')) {
 				<div class="covers-toolbar">
 					<div class="toolbar-info"></div>
 					<div class="toolbar-actions">
@@ -297,7 +299,7 @@
 				cdkDropList
 				cdkDropListOrientation="mixed"
 				(cdkDropListDropped)="onCoverDrop($event)"
-				[cdkDropListDisabled]="!userTokenService.isAdminSignal()"
+				[cdkDropListDisabled]="!userService.hasPermission('internal:books:edit')"
 			>
 				@for (cover of covers(); track cover.id) {
 					<div
@@ -306,7 +308,7 @@
 						(click)="onCoverClick(cover)"
 						(contextmenu)="onCoverContextMenu($event, cover)"
 						cdkDrag
-						[cdkDragDisabled]="!userTokenService.isAdminSignal()"
+						[cdkDragDisabled]="!userService.hasPermission('internal:books:edit')"
 					>
 						<div class="drag-placeholder" *cdkDragPlaceholder></div>
 						@if (cover.url && !coverImageErrors().has(cover.id)) {
@@ -365,7 +367,7 @@
 			<div class="sources">
 				<div class="sources-header">
 					<h1>Fontes</h1>
-					@if (userTokenService.isAdminSignal()) {
+					@if (userService.hasPermission('internal:books:edit')) {
 						<app-button
 							variant="text"
 							size="small"
@@ -453,7 +455,7 @@
 		class="container"
 	>
 		@defer (when modulesLoad[tab.relatedBooks].load()) {
-			@if (userTokenService.isAdminSignal()) {
+			@if (userService.hasPermission('internal:books:relationships:manage')) {
 				<div class="controls">
 					<app-button
 						variant="outline"
@@ -514,7 +516,7 @@
 	>
 		@defer (when modulesLoad[tab.reviews].load()) {
 			<div class="scrollable">
-				@if (hasReadPartially() && userTokenService.hasValidAccessTokenSignal()) {
+				@if (hasReadPartially() && userTokenService.hasValidAccessTokenSignal() && userService.hasPermission('interactions:manage')) {
 					<app-book-review-form [bookId]="id()" (reviewSubmitted)="reviewsList.loadReviews()" />
 				}
 				<app-book-reviews-list [bookId]="id()" #reviewsList />
