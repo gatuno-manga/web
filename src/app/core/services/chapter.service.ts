@@ -28,7 +28,7 @@ export class ChapterService {
 	}
 
 	markAsRead(idChapter: string) {
-		return this.http.get(`chapters/${idChapter}/read`);
+		return this.http.post(`chapters/${idChapter}/read`, {});
 	}
 
 	markAsUnread(idChapter: string) {

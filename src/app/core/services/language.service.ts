@@ -44,7 +44,7 @@ export class LanguageService {
 	}
 
 	private loadSupportedLanguages(): void {
-		this.http.get<SupportedLanguage[]>('/api/languages').subscribe({
+		this.http.get<SupportedLanguage[]>('languages').subscribe({
 			next: (langs) => {
 				this.languages.set(langs);
 				// After loading, we could verify if the currentLanguage is in the list,

@@ -24,7 +24,7 @@ export class AuthService {
 
 	login(payload: loginRequest) {
 		return this.http
-			.post<loginResponse>('/auth/login', payload, {
+			.post<loginResponse>('/auth/signin', payload, {
 				observe: 'response',
 			})
 			.pipe(
@@ -45,7 +45,7 @@ export class AuthService {
 	verifyMfaLogin(mfaToken: string, code: string) {
 		return this.http
 			.post<authTokensResponse>(
-				'/auth/mfa/verify',
+				'/auth/mfa/verify-login',
 				{ mfaToken, code },
 				{ observe: 'response' },
 			)
@@ -65,7 +65,7 @@ export class AuthService {
 	}
 
 	logout() {
-		return this.http.post<void>('/auth/logout', {}).pipe(
+		return this.http.get<void>('/auth/logout').pipe(
 			tap(() => {
 				this.userTokenService.removeTokens();
 				this.readingProgressService.onUserLogout();
@@ -75,7 +75,7 @@ export class AuthService {
 
 	register(payload: registerRequest) {
 		return this.http
-			.post<authTokensResponse>('/auth/register', payload, {
+			.post<authTokensResponse>('/auth/signup', payload, {
 				observe: 'response',
 			})
 			.pipe(
