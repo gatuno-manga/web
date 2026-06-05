@@ -20,6 +20,7 @@ import {
 export class CheckboxComponent extends CheckboxControlValueAccessor {
 	@Input() value: boolean = false;
 	@Input() disabled: boolean = false;
+	@Input() indeterminate: boolean = false;
 
 	onCheckboxChange(event: Event): void {
 		const input = event.target as HTMLInputElement;

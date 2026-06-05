@@ -1,8 +1,9 @@
-<label class="checkbox-container">
+<label class="checkbox-container" [class.disabled]="disabled">
 	<input
 		type="checkbox"
 		[checked]="value"
 		[disabled]="disabled"
+		[indeterminate]="indeterminate"
 		(change)="onCheckboxChange($event)"
 	/>
 	<span class="checkmark"></span>
