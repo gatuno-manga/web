@@ -1,4 +1,4 @@
-const http = require('http');
+const http = require('node:http');
 
 const url =
 	'http://localhost:9000/books/3a/019e5172-c3f6-7159-a251-cf912879273a.webp';
