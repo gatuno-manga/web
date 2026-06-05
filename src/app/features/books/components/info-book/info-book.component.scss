@@ -284,9 +284,13 @@
 		width: 100%;
 		transition:
 			background-color 0.3s,
+			border-color 0.3s,
 			box-shadow 0.3s,
 			transform 0.2s;
-		background-color: rgb(from var(--secondary-color) r g b / 0.7);
+		background-color: color-mix(in srgb, var(--app-background-color) 40%, transparent);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid var(--border-color);
 		flex: none;
 		display: flex;
 		align-items: center;
@@ -294,13 +298,15 @@
 		position: relative;
 
 		&:hover {
-			background-color: var(--primary-color);
-			border-color: var(--primary-color);
+			background-color: rgb(from var(--primary-color) r g b / 0.1);
+			border-color: rgb(from var(--primary-color) r g b / 0.3);
 		}
 
 		&.selected {
-			background-color: var(--primary-color);
-			box-shadow: 0 0 0 3px rgb(from var(--primary-color) r g b / 0.3);
+			background-color: rgb(from var(--primary-color) r g b / 0.2);
+			border-color: var(--primary-color);
+			outline: 2px solid var(--primary-color);
+			outline-offset: 2px;
 			transform: scale(1.02);
 
 			&::before {
@@ -574,7 +580,8 @@
 		}
 
 		&.selected {
-			border: 4px solid var(--primary-color);
+			outline: 3px solid var(--primary-color);
+			outline-offset: 2px;
 		}
 	}
 
@@ -635,14 +642,19 @@
 		}
 
 		.item {
-			background-color: var(--primary-color);
-			padding: 5px;
-			border-radius: 15px;
+			background: rgb(from var(--app-background-color) r g b / 0.4);
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
+			border: 1px solid var(--border-color);
+			color: var(--primary-color);
+			padding: 5px 12px;
+			border-radius: 12px;
 			cursor: pointer;
-			transition: opacity 0.2s ease;
+			transition: background-color 0.2s ease, border-color 0.2s ease;
 
 			&:hover {
-				opacity: 0.8;
+				background-color: rgb(from var(--primary-color) r g b / 0.1);
+				border-color: rgb(from var(--primary-color) r g b / 0.3);
 			}
 		}
 		.placeholder {
