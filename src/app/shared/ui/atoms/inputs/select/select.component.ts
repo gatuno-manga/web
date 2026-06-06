@@ -138,7 +138,11 @@ export class SelectComponent implements ControlValueAccessor {
 	}
 
 	iconSize(): string {
-		const map: Record<SelectSize, string> = { sm: '14px', md: '16px', lg: '18px' };
+		const map: Record<SelectSize, string> = {
+			sm: '14px',
+			md: '16px',
+			lg: '18px',
+		};
 		return map[this.size()];
 	}
 

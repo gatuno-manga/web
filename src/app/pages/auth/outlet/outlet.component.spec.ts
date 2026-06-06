@@ -44,13 +44,17 @@ describe('OutletComponent', () => {
 	it('should render the back button link', () => {
 		const backBtn = fixture.debugElement.query(By.css('.back-btn'));
 		expect(backBtn).toBeTruthy();
-		expect(backBtn.nativeElement.getAttribute('aria-label')).toBe('Voltar para o início');
+		expect(backBtn.nativeElement.getAttribute('aria-label')).toBe(
+			'Voltar para o início',
+		);
 	});
 
 	it('should render the logo link centered in header', () => {
 		const logoLink = fixture.debugElement.query(By.css('.logo-link'));
 		expect(logoLink).toBeTruthy();
-		expect(logoLink.nativeElement.getAttribute('aria-label')).toContain('Gatuno');
+		expect(logoLink.nativeElement.getAttribute('aria-label')).toContain(
+			'Gatuno',
+		);
 	});
 
 	it('should render the card glow line decoration', () => {

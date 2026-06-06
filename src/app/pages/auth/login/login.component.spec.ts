@@ -37,15 +37,19 @@ describe('LoginComponent', () => {
 	});
 
 	it('should render the step indicator', () => {
-		const stepIndicator = fixture.debugElement.query(By.css('.step-indicator'));
+		const stepIndicator = fixture.debugElement.query(
+			By.css('.step-indicator'),
+		);
 		expect(stepIndicator).toBeTruthy();
 	});
 
 	it('should render the passkey button with rich design', () => {
 		const passkeyBtn = fixture.debugElement.query(By.css('.passkey-btn'));
 		expect(passkeyBtn).toBeTruthy();
-		expect(passkeyBtn.nativeElement.querySelector('.passkey-btn__label').textContent)
-			.toContain('Chave de acesso');
+		expect(
+			passkeyBtn.nativeElement.querySelector('.passkey-btn__label')
+				.textContent,
+		).toContain('Chave de acesso');
 	});
 
 	it('should advance to password step on nextStep() when email is valid', () => {
@@ -84,6 +88,8 @@ describe('LoginComponent', () => {
 	it('should have loginFailed error set on form after failed password step', () => {
 		// Testa a lógica de erros no formulário (não o DOM)
 		component.form.setErrors({ loginFailed: 'Credenciais inválidas' });
-		expect(component.form.errors?.['loginFailed']).toBe('Credenciais inválidas');
+		expect(component.form.errors?.['loginFailed']).toBe(
+			'Credenciais inválidas',
+		);
 	});
 });

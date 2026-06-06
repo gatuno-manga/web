@@ -66,7 +66,11 @@ describe('RegisterComponent', () => {
 
 	it('should store registrationFailed error in form errors', () => {
 		// Testa a lógica de erros no formulário (não o DOM) para evitar NG0100
-		component.form.setErrors({ registrationFailed: 'Este e-mail já está em uso' });
-		expect(component.form.errors?.['registrationFailed']).toBe('Este e-mail já está em uso');
+		component.form.setErrors({
+			registrationFailed: 'Este e-mail já está em uso',
+		});
+		expect(component.form.errors?.['registrationFailed']).toBe(
+			'Este e-mail já está em uso',
+		);
 	});
 });

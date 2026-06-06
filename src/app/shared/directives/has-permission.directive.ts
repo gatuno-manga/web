@@ -1,10 +1,10 @@
 import {
 	Directive,
+	effect,
 	Input,
+	inject,
 	TemplateRef,
 	ViewContainerRef,
-	inject,
-	effect,
 } from '@angular/core';
 import { UserService } from '@core/services/user.service';
 

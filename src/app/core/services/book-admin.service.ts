@@ -68,7 +68,10 @@ export class BookAdminService {
 		bookId: string;
 		chapters: Partial<Chapterlist>[];
 	}): Observable<void> {
-		return this.http.post<void>(`books/${data.bookId}/batch/chapters`, data);
+		return this.http.post<void>(
+			`books/${data.bookId}/batch/chapters`,
+			data,
+		);
 	}
 
 	/**

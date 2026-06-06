@@ -32,6 +32,7 @@ describe('AddToCollectionModalComponent', () => {
 		component = fixture.componentInstance;
 		fixture.componentRef.setInput('bookId', 'test-id');
 		fixture.componentRef.setInput('bookTitle', 'Test Book');
+		fixture.componentRef.setInput('close', () => {});
 		fixture.detectChanges();
 	});
 
@@ -43,8 +44,9 @@ describe('AddToCollectionModalComponent', () => {
 		expect(collectionService.getMyCollections).toHaveBeenCalled();
 	});
 
-	it('should add book to collection and emit close', () => {
-		const emitSpy = spyOn(component.close, 'emit');
+	it('should add book to collection and call close', () => {
+		const closeSpy = jasmine.createSpy('close');
+		fixture.componentRef.setInput('close', closeSpy);
 		collectionService.addBookToCollection.and.returnValue(of(undefined));
 
 		component.addToCollection('col-id');
@@ -53,6 +55,6 @@ describe('AddToCollectionModalComponent', () => {
 			'col-id',
 			{ bookId: 'test-id' },
 		);
-		expect(emitSpy).toHaveBeenCalledWith(true);
+		expect(closeSpy).toHaveBeenCalledWith(true);
 	});
 });

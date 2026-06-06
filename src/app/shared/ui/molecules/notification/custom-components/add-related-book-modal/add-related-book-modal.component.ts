@@ -22,9 +22,9 @@ import {
 } from '@models/book-relationship.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
-import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
 import { CheckboxComponent } from '@ui/atoms/inputs/checkbox/checkbox.component';
+import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
+import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
 import {
 	catchError,
 	debounceTime,

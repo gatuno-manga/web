@@ -20,12 +20,12 @@ import { NotificationSeverity } from '@core/services/notification/notification-s
 import { NotificationService } from '@core/services/notification.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
-import { UserTokenService } from '@core/services/user-token.service';
 import { UserService } from '@core/services/user.service';
+import { UserTokenService } from '@core/services/user-token.service';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
-import { TooltipDirective } from '@shared/ui/atoms/tooltip/tooltip.directive';
 import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
+import { TooltipDirective } from '@shared/ui/atoms/tooltip/tooltip.directive';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
@@ -68,7 +68,9 @@ export class BookComponent implements OnInit, OnDestroy {
 	book = signal<BookBasic | undefined>(undefined);
 	public userTokenService = inject(UserTokenService);
 	admin = computed(() => this.userTokenService.isAdminSignal());
-	isLoggedIn = computed(() => this.userTokenService.hasValidAccessTokenSignal());
+	isLoggedIn = computed(() =>
+		this.userTokenService.hasValidAccessTokenSignal(),
+	);
 	isLoading = signal(true);
 	isImageLoaded = signal(false);
 	isFavorited = signal(false);
@@ -366,7 +368,9 @@ export class BookComponent implements OnInit, OnDestroy {
 	}
 
 	filterBySensitive(id: string) {
-		this.router.navigate(['/books'], { queryParams: { sensitiveContent: id } });
+		this.router.navigate(['/books'], {
+			queryParams: { sensitiveContent: id },
+		});
 	}
 
 	openBookEditModal() {

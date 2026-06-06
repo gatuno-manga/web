@@ -23,7 +23,6 @@ import {
 } from '@angular/core';
 import { RouterLink, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { UserService } from '@core/services/user.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
@@ -32,6 +31,7 @@ import { ModalNotificationService } from '@core/services/modal-notification.serv
 import { NotificationSeverity } from '@core/services/notification';
 import { NotificationService } from '@core/services/notification.service';
 import { SavedPagesService } from '@core/services/saved-pages.service';
+import { UserService } from '@core/services/user.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import {
 	Book,
@@ -47,6 +47,7 @@ import { RelatedBookItem } from '@models/book-relationship.models';
 import { ContextMenuItem } from '@models/context-menu.models';
 import { DownloadStatus } from '@models/offline.models';
 import { SavedPage } from '@models/saved-page.models';
+import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { ScrapingStatusPipe } from '@shared/utils/pipes/scraping-status.pipe';
@@ -72,7 +73,6 @@ import { firstValueFrom, fromEvent, Subscription, throttleTime } from 'rxjs';
 import { BookReviewFormComponent } from '../book-review-form/book-review-form.component';
 import { BookReviewsListComponent } from '../book-reviews-list/book-reviews-list.component';
 import { ItemBookComponent } from '../item-book/item-book.component';
-import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
 
 enum tab {
 	chapters = 0,
@@ -1313,7 +1313,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				(id) => !status.get(id) || status.get(id) === 'error',
 			);
 
-			if (hasNotDownloaded && this.userService.hasPermission('books:download')) {
+			if (
+				hasNotDownloaded &&
+				this.userService.hasPermission('books:download')
+			) {
 				items.push({
 					label: `Baixar ${selectedCount} Capítulos`,
 					icon: 'download',
@@ -1321,7 +1324,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				});
 			}
 
-			if (hasDownloaded && this.userService.hasPermission('books:download')) {
+			if (
+				hasDownloaded &&
+				this.userService.hasPermission('books:download')
+			) {
 				items.push({
 					label: `Excluir ${selectedCount} Downloads`,
 					icon: 'trash',
@@ -1345,7 +1351,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 							: `Marcar ${selectedCount} como Lidos`,
 						icon: hasReadChapter ? 'eye-close' : 'eye',
 						action: () => this.toggleSelectedReadStatus(),
-					}
+					},
 				);
 			}
 
@@ -1365,14 +1371,20 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		// Menu para capítulo único
 		const downloadStatus = this.chaptersDownloadStatus().get(chapter.id);
 
-		if (downloadStatus === 'downloaded' && this.userService.hasPermission('books:download')) {
+		if (
+			downloadStatus === 'downloaded' &&
+			this.userService.hasPermission('books:download')
+		) {
 			items.push({
 				label: 'Excluir Download',
 				icon: 'trash',
 				danger: true,
 				action: () => this.deleteChapterDownload(chapter),
 			});
-		} else if ((!downloadStatus || downloadStatus === 'error') && this.userService.hasPermission('books:download')) {
+		} else if (
+			(!downloadStatus || downloadStatus === 'error') &&
+			this.userService.hasPermission('books:download')
+		) {
 			items.push({
 				label: 'Baixar Capítulo',
 				icon: 'download',

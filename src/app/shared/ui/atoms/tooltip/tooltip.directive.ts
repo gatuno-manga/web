@@ -18,7 +18,7 @@ export class TooltipDirective implements OnDestroy {
 	private el = inject(ElementRef);
 	private renderer = inject(Renderer2);
 	private tooltipElement: HTMLElement | null = null;
-	private timeoutId: any;
+	private timeoutId?: ReturnType<typeof setTimeout>;
 
 	@HostListener('mouseenter') onMouseEnter() {
 		if (!this.appTooltip()) return;
@@ -50,7 +50,8 @@ export class TooltipDirective implements OnDestroy {
 		this.renderer.appendChild(document.body, this.tooltipElement);
 
 		const hostPos = this.el.nativeElement.getBoundingClientRect();
-		const tooltipPos = this.tooltipElement!.getBoundingClientRect();
+		const tooltipPos = this.tooltipElement?.getBoundingClientRect();
+		if (!tooltipPos) return;
 
 		const margin = 10;
 		let top = hostPos.top - tooltipPos.height - margin;
@@ -113,7 +114,7 @@ export class TooltipDirective implements OnDestroy {
 
 	ngOnDestroy() {
 		clearTimeout(this.timeoutId);
-		if (this.tooltipElement && this.tooltipElement.parentNode) {
+		if (this.tooltipElement?.parentNode) {
 			this.renderer.removeChild(document.body, this.tooltipElement);
 		}
 	}

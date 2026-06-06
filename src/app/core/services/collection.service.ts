@@ -6,7 +6,7 @@ import {
 	CreateCollectionDto,
 	ShareCollectionDto,
 } from '@models/collection.models';
-import { Observable, tap, map } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 
 @Injectable({
 	providedIn: 'root',
@@ -22,15 +22,17 @@ export class CollectionService {
 	 * Busca as coleções do usuário atual e atualiza o sinal de estado.
 	 */
 	getMyCollections(): Observable<Collection[]> {
-		return this.http.get<any>('collections').pipe(
-			map((response: any) => {
-				if (Array.isArray(response)) return response;
-				return response?.data || [];
-			}),
-			tap((collections) => {
-				this.myCollectionsSignal.set(collections);
-			}),
-		);
+		return this.http
+			.get<Collection[] | { data: Collection[] }>('collections')
+			.pipe(
+				map((response: Collection[] | { data: Collection[] }) => {
+					if (Array.isArray(response)) return response;
+					return response?.data || [];
+				}),
+				tap((collections) => {
+					this.myCollectionsSignal.set(collections);
+				}),
+			);
 	}
 
 	/**

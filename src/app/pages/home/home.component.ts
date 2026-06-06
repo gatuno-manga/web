@@ -16,9 +16,9 @@ import { SensitiveContentService } from '@core/services/sensitive-content.servic
 import { TagsService } from '@core/services/tags.service';
 import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
 import { BookList } from '@models/book.models';
+import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
-import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { firstValueFrom, forkJoin } from 'rxjs';
 
 @Component({

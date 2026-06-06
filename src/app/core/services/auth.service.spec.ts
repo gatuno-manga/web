@@ -98,7 +98,7 @@ describe('AuthService', () => {
 				).toHaveBeenCalled();
 			});
 
-			const req = httpMock.expectOne('/auth/login');
+			const req = httpMock.expectOne('/auth/signin');
 			expect(req.request.method).toBe('POST');
 			req.flush(mockRes);
 		});
@@ -124,7 +124,7 @@ describe('AuthService', () => {
 					).toHaveBeenCalled();
 				});
 
-			const req = httpMock.expectOne('/auth/mfa/verify');
+			const req = httpMock.expectOne('/auth/mfa/verify-login');
 			expect(req.request.method).toBe('POST');
 			expect(req.request.body).toEqual({
 				mfaToken: 'mfa-token',
@@ -144,7 +144,7 @@ describe('AuthService', () => {
 			});
 
 			const req = httpMock.expectOne('/auth/logout');
-			expect(req.request.method).toBe('POST');
+			expect(req.request.method).toBe('GET');
 			req.flush({});
 		});
 	});
@@ -171,7 +171,7 @@ describe('AuthService', () => {
 				).toHaveBeenCalled();
 			});
 
-			const req = httpMock.expectOne('/auth/register');
+			const req = httpMock.expectOne('/auth/signup');
 			expect(req.request.method).toBe('POST');
 			req.flush(mockRes);
 		});

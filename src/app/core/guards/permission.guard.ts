@@ -4,7 +4,9 @@ import { UserService } from '@core/services/user.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import { map } from 'rxjs';
 
-export const permissionGuard = (permissions: string | string[]): CanActivateFn => {
+export const permissionGuard = (
+	permissions: string | string[],
+): CanActivateFn => {
 	return () => {
 		const userService = inject(UserService);
 		const userTokenService = inject(UserTokenService);
@@ -28,8 +30,6 @@ export const permissionGuard = (permissions: string | string[]): CanActivateFn =
 		}
 
 		// Se não estiver em cache, aguarda o fetchMe finalizar
-		return userService.fetchMe().pipe(
-			map(() => check())
-		);
+		return userService.fetchMe().pipe(map(() => check()));
 	};
 };

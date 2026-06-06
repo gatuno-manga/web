@@ -101,7 +101,10 @@ export const routes: Routes = [
 			},
 			{
 				path: 'dashboard',
-				canActivate: [networkGuard, permissionGuard(['internal:books:dashboard:view'])],
+				canActivate: [
+					networkGuard,
+					permissionGuard(['internal:books:dashboard:view']),
+				],
 				data: { ssr: { renderMode: RenderMode.Client } },
 				loadChildren: () =>
 					import('./pages/dashboard/dashboard.routes').then(

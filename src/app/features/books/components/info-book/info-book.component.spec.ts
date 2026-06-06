@@ -27,7 +27,10 @@ describe('InfoBookComponent', () => {
 	let mockBookService: any;
 	let mockModalService: any;
 	let mockContextMenuService: any;
-	let mockUserTokenService: { isAdminSignal: WritableSignal<boolean> };
+	let mockUserTokenService: {
+		isAdminSignal: WritableSignal<boolean>;
+		hasValidAccessTokenSignal: WritableSignal<boolean>;
+	};
 	let mockDownloadService: any;
 	let mockChapterService: any;
 	let mockSavedPagesService: any;
@@ -77,6 +80,7 @@ describe('InfoBookComponent', () => {
 
 		mockUserTokenService = {
 			isAdminSignal: signal(false),
+			hasValidAccessTokenSignal: signal(false),
 		};
 
 		mockDownloadService = {
