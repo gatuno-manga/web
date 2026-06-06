@@ -63,3 +63,10 @@ This section contains mandatory rules for any AI agent or developer working on t
 - **Testing Coverage:** You MUST create new unit tests for every new feature implemented or bug fixed. A task is not considered finished until its logic is verified by automated tests.
 - **Clean Code:** Apply Clean Code principles rigorously. Focus on meaningful names, small functions, single responsibility, and removal of dead code or commented-out blocks.
 - **Validation:** Finality is only achieved when the behavioral correctness and structural integrity are confirmed within the full project context.
+
+### 6. AI & Tooling
+- **API Documentation:** Use the `scripts/swagger-helper.mjs` script to fetch and read the API Swagger/OpenAPI documentation.
+  - `npm run api:docs -- --fetch [url]` to update the local `swagger.json`.
+  - `npm run api:docs -- --summary` to see all available endpoints.
+  - `npm run api:docs -- --path /api/v1/resource` to see details of a specific endpoint.
+  - `npm run api:docs -- --model ResourceName` to see the schema for a specific model.

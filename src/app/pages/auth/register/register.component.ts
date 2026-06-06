@@ -12,6 +12,7 @@ import { MetaDataService } from '@core/services/meta-data.service';
 import { minNumberValidator } from '@shared/validators/min-number.validator';
 import { minSymbolValidator } from '@shared/validators/min-symbol.validator';
 import { minUppercaseValidator } from '@shared/validators/min-uppercase.validator';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import {
 	PasswordInputComponent,
@@ -26,6 +27,7 @@ import {
 		ButtonComponent,
 		ReactiveFormsModule,
 		RouterModule,
+		IconsComponent,
 	],
 	templateUrl: './register.component.html',
 	styleUrl: './register.component.scss',

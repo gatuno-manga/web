@@ -1,101 +1,203 @@
 @switch (step) {
-	@case ('email') {
-		<h1>Entre na sua conta</h1>
-		<form [formGroup]="form" (ngSubmit)="nextStep()">
-			<app-input
-				formControlName="email"
-				placeholder="Email"
-				id="email"
-				type="email"
-				leftIcon="email"
-				autocomplete="username webauthn"
-				[errors]="this.form.get('email')?.errors"
-				[touched]="this.form.get('email')?.touched ?? false"
-			/>
-			<app-button type="submit" rounded="large" [disabled]="form.get('email')?.invalid || isLoading">Continuar</app-button>
 
-			<div class="divider">
-				<span>OU</span>
-			</div>
+  <!-- ── Step: Email ─────────────────────────────────────────────────────── -->
+  @case ('email') {
+    <div class="form-block" id="step-email">
+      <!-- Header -->
+      <div class="form-header">
+        <div class="form-icon-wrap">
+          <app-icons name="user" size="32px" class="form-header-icon" />
+        </div>
+        <h1 class="form-title">Entre na sua conta</h1>
+        <p class="form-subtitle">Use seu e-mail ou uma chave de acesso</p>
+      </div>
 
-			<app-button type="button" rounded="large" (click)="signInWithPasskey()">
-				<app-icons name="fingerprint" />
-				Utilize uma chave de acesso
-			</app-button>
+      <!-- Step indicator -->
+      <div class="step-indicator" aria-label="Passo 1 de 2">
+        <span class="step-dot active" aria-current="step"></span>
+        <span class="step-line"></span>
+        <span class="step-dot"></span>
+      </div>
 
-			@if(form.errors?.['passkeyFailed']){
-			<div class="error">
-				{{ form.errors?.['passkeyFailed'] }}
-			</div>
-			}
+      <form [formGroup]="form" (ngSubmit)="nextStep()" class="auth-form" novalidate>
+        <app-input
+          formControlName="email"
+          placeholder="seu@email.com"
+          id="email"
+          type="email"
+          leftIcon="email"
+          autocomplete="username webauthn"
+          [errors]="this.form.get('email')?.errors"
+          [touched]="this.form.get('email')?.touched ?? false"
+        />
 
-			<div class="link">
-				Não tem uma conta? <a [routerLink]="['../', 'register']">crie uma</a>
-			</div>
-		</form>
-	}
+        <app-button
+          type="submit"
+          rounded="large"
+          [disabled]="form.get('email')?.invalid || isLoading"
+          id="btn-continue"
+        >
+          @if (isLoading) {
+            <app-icons name="loader" size="18px" class="spin-icon" />
+          }
+          Continuar
+        </app-button>
 
-	@case ('password') {
-		<h1>Entre na sua conta</h1>
-		<form [formGroup]="form" (ngSubmit)="submit()">
-			<app-input
-				formControlName="password"
-				placeholder="Senha"
-				id="password"
-				type="password"
-				leftIcon="lock"
-				[errors]="this.form.get('password')?.errors"
-				[touched]="this.form.get('password')?.touched ?? false"
-			/>
+        <div class="divider" aria-hidden="true">
+          <span>ou</span>
+        </div>
 
-			@if(form.errors?.['loginFailed']){
-			<div class="error">
-				{{ form.errors?.['loginFailed'] }}
-			</div>
-			}
+        <button
+          type="button"
+          class="passkey-btn"
+          (click)="signInWithPasskey()"
+          id="btn-passkey"
+        >
+          <span class="passkey-btn__icon">
+            <app-icons name="fingerprint" size="20px" />
+          </span>
+          <span class="passkey-btn__text">
+            <span class="passkey-btn__label">Chave de acesso</span>
+            <span class="passkey-btn__sub">Autentique sem senha</span>
+          </span>
+          <app-icons name="arrow-right" size="16px" class="passkey-btn__arrow" />
+        </button>
 
-			<app-button type="submit" rounded="large" [disabled]="form.get('password')?.invalid || isLoading">Entrar</app-button>
+        @if (form.errors?.['passkeyFailed']) {
+          <div class="feedback-msg feedback-msg--error" role="alert">
+            <app-icons name="alert-circle" size="16px" />
+            <span>{{ form.errors?.['passkeyFailed'] }}</span>
+          </div>
+        }
 
-			<div class="divider">
-				<span>OU</span>
-			</div>
+        <p class="auth-link">
+          Não tem uma conta?
+          <a [routerLink]="['../', 'register']" id="link-register">Crie uma agora</a>
+        </p>
+      </form>
+    </div>
+  }
 
-			<app-button type="button" rounded="large" (click)="signInWithPasskey()">
-				<app-icons name="fingerprint" />
-				Utilize uma chave de acesso
-			</app-button>
+  <!-- ── Step: Senha ─────────────────────────────────────────────────────── -->
+  @case ('password') {
+    <div class="form-block" id="step-password">
+      <!-- Header -->
+      <div class="form-header">
+        <div class="form-icon-wrap">
+          <app-icons name="lock" size="32px" class="form-header-icon" />
+        </div>
+        <h1 class="form-title">Entre na sua conta</h1>
+        <p class="form-subtitle">Digite sua senha para continuar</p>
+      </div>
 
-			@if(form.errors?.['passkeyFailed']){
-			<div class="error">
-				{{ form.errors?.['passkeyFailed'] }}
-			</div>
-			}
-		</form>
-	}
+      <!-- Step indicator -->
+      <div class="step-indicator" aria-label="Passo 2 de 2">
+        <span class="step-dot done"></span>
+        <span class="step-line active"></span>
+        <span class="step-dot active" aria-current="step"></span>
+      </div>
 
-	@case ('mfa') {
-		<div class="mfa-header">
-			<h1>Verifique sua conta</h1>
-			<p>Insira o codigo de 6 digitos MFA / 2FA (TOTP)</p>
-		</div>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+        <app-input
+          formControlName="password"
+          placeholder="Sua senha"
+          id="password"
+          type="password"
+          leftIcon="lock"
+          [errors]="this.form.get('password')?.errors"
+          [touched]="this.form.get('password')?.touched ?? false"
+        />
 
-		<form [formGroup]="form" (ngSubmit)="submit()">
-			<app-mfa-input formControlName="mfaCode" />
+        @if (form.errors?.['loginFailed']) {
+          <div class="feedback-msg feedback-msg--error" role="alert">
+            <app-icons name="alert-circle" size="16px" />
+            <span>{{ form.errors?.['loginFailed'] }}</span>
+          </div>
+        }
 
-			@if(form.errors?.['mfaRequired']){
-			<div class="warning">
-				{{ form.errors?.['mfaRequired'] }}
-			</div>
-			}
+        <app-button
+          type="submit"
+          rounded="large"
+          [disabled]="form.get('password')?.invalid || isLoading"
+          id="btn-login"
+        >
+          @if (isLoading) {
+            <app-icons name="loader" size="18px" class="spin-icon" />
+          }
+          Entrar
+        </app-button>
 
-			@if(form.errors?.['mfaFailed']){
-			<div class="error">
-				{{ form.errors?.['mfaFailed'] }}
-			</div>
-			}
+        <div class="divider" aria-hidden="true">
+          <span>ou</span>
+        </div>
 
-			<app-button type="submit" rounded="large" [disabled]="form.get('mfaCode')?.invalid || !form.get('mfaCode')?.value || isLoading">Verificar</app-button>
-		</form>
-	}
+        <button
+          type="button"
+          class="passkey-btn"
+          (click)="signInWithPasskey()"
+          id="btn-passkey-pw"
+        >
+          <span class="passkey-btn__icon">
+            <app-icons name="fingerprint" size="20px" />
+          </span>
+          <span class="passkey-btn__text">
+            <span class="passkey-btn__label">Chave de acesso</span>
+            <span class="passkey-btn__sub">Autentique sem senha</span>
+          </span>
+          <app-icons name="arrow-right" size="16px" class="passkey-btn__arrow" />
+        </button>
+
+        @if (form.errors?.['passkeyFailed']) {
+          <div class="feedback-msg feedback-msg--error" role="alert">
+            <app-icons name="alert-circle" size="16px" />
+            <span>{{ form.errors?.['passkeyFailed'] }}</span>
+          </div>
+        }
+      </form>
+    </div>
+  }
+
+  <!-- ── Step: MFA ──────────────────────────────────────────────────────── -->
+  @case ('mfa') {
+    <div class="form-block" id="step-mfa">
+      <!-- Header -->
+      <div class="form-header">
+        <div class="form-icon-wrap form-icon-wrap--purple">
+          <app-icons name="check-circle" size="32px" class="form-header-icon form-header-icon--purple" />
+        </div>
+        <h1 class="form-title">Verificação em 2 etapas</h1>
+        <p class="form-subtitle">Insira o código de 6 dígitos do seu app autenticador</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+        <app-mfa-input formControlName="mfaCode" />
+
+        @if (form.errors?.['mfaRequired']) {
+          <div class="feedback-msg feedback-msg--info" role="status">
+            <app-icons name="alert-triangle" size="16px" />
+            <span>{{ form.errors?.['mfaRequired'] }}</span>
+          </div>
+        }
+
+        @if (form.errors?.['mfaFailed']) {
+          <div class="feedback-msg feedback-msg--error" role="alert">
+            <app-icons name="alert-circle" size="16px" />
+            <span>{{ form.errors?.['mfaFailed'] }}</span>
+          </div>
+        }
+
+        <app-button
+          type="submit"
+          rounded="large"
+          [disabled]="form.get('mfaCode')?.invalid || !form.get('mfaCode')?.value || isLoading"
+          id="btn-mfa-verify"
+        >
+          @if (isLoading) {
+            <app-icons name="loader" size="18px" class="spin-icon" />
+          }
+          Verificar
+        </app-button>
+      </form>
+    </div>
+  }
 }
-

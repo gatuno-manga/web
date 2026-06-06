@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { RenderMode } from '@angular/ssr';
 import { networkGuard } from '@core/guards/network.guard';
+import { permissionGuard } from '@core/guards/permission.guard';
 
 /**
  * Helpers para configuração de SSR e Cache
@@ -100,7 +101,10 @@ export const routes: Routes = [
 			},
 			{
 				path: 'dashboard',
-				canActivate: [networkGuard],
+				canActivate: [
+					networkGuard,
+					permissionGuard(['internal:books:dashboard:view']),
+				],
 				data: { ssr: { renderMode: RenderMode.Client } },
 				loadChildren: () =>
 					import('./pages/dashboard/dashboard.routes').then(

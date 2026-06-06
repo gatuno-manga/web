@@ -1,9 +1,12 @@
 <div id="header">
 	<div class="selector" #selector></div>
-	<span #firstTab (click)="selectTab(tab.chapters, $event)">Capítulos</span>
-	<span (click)="selectTab(tab.covers, $event)">Artes</span>
-	<span (click)="selectTab(tab.extraInfo, $event)">Informações extras</span>
-	<span (click)="selectTab(tab.savedPages, $event)">Páginas Salvas</span>
+	@for (t of tabsList; track t.id) {
+		<span
+			[class.active]="selectedTab() === t.id"
+			(click)="selectTab(t.id, $event)"
+			#tabEl
+		>{{ t.label }}</span>
+	}
 </div>
 <div
 	id="container"
@@ -38,6 +41,7 @@
 						</div>
 						<div class="selection-actions">
 							<app-button
+								*appHasPermission="'books:download'"
 								(click)="downloadSelectedChapters()"
 								variant="text"
 								size="small"
@@ -45,7 +49,7 @@
 								<app-icons name="download" size="16" />
 								<span>Baixar</span>
 							</app-button>
-							@if (hasDownloadedInSelection()) {
+							@if (hasDownloadedInSelection() && userService.hasPermission('books:download')) {
 								<app-button
 									(click)="deleteSelectedChaptersDownloads()"
 									variant="text"
@@ -180,6 +184,7 @@
 										/>
 									} @else {
 										<app-icons
+											*appHasPermission="'books:download'"
 											name="download"
 											class="icon-download"
 											(click)="
@@ -204,11 +209,7 @@
 											ScrapingStatus.ERROR
 										"
 									>
-										{{
-											getScrapingStatusClass(
-												chapter.scrapingStatus
-											)
-										}}
+										{{ chapter.scrapingStatus | scrapingStatus }}
 									</div>
 								}
 							</div>
@@ -243,7 +244,7 @@
 		class="container"
 	>
 		@defer (when modulesLoad[tab.covers].load()) {
-			@if (userTokenService.isAdminSignal()) {
+			@if (userService.hasPermission('internal:books:edit')) {
 				<div class="covers-toolbar">
 					<div class="toolbar-info"></div>
 					<div class="toolbar-actions">
@@ -298,7 +299,7 @@
 				cdkDropList
 				cdkDropListOrientation="mixed"
 				(cdkDropListDropped)="onCoverDrop($event)"
-				[cdkDropListDisabled]="!userTokenService.isAdminSignal()"
+				[cdkDropListDisabled]="!userService.hasPermission('internal:books:edit')"
 			>
 				@for (cover of covers(); track cover.id) {
 					<div
@@ -307,7 +308,7 @@
 						(click)="onCoverClick(cover)"
 						(contextmenu)="onCoverContextMenu($event, cover)"
 						cdkDrag
-						[cdkDragDisabled]="!userTokenService.isAdminSignal()"
+						[cdkDragDisabled]="!userService.hasPermission('internal:books:edit')"
 					>
 						<div class="drag-placeholder" *cdkDragPlaceholder></div>
 						@if (cover.url && !coverImageErrors().has(cover.id)) {
@@ -366,7 +367,7 @@
 			<div class="sources">
 				<div class="sources-header">
 					<h1>Fontes</h1>
-					@if (userTokenService.isAdminSignal()) {
+					@if (userService.hasPermission('internal:books:edit')) {
 						<app-button
 							variant="text"
 							size="small"
@@ -444,6 +445,87 @@
 			<div class="placeholder-container">
 				@for (i of [0,1,2,3,4,5,6,7,8,9]; track $index) {
 					<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor"></div>
+				}
+			</div>
+		}
+	</div>
+	<div
+		id="related-books"
+		[class.selected]="selectedTab() === tab.relatedBooks"
+		class="container"
+	>
+		@defer (when modulesLoad[tab.relatedBooks].load()) {
+			@if (userService.hasPermission('internal:books:relationships:manage')) {
+				<div class="controls">
+					<app-button
+						variant="outline"
+						size="small"
+						(click)="toggleEditRelatedBooks()"
+					>
+						<app-icons [name]="isEditingRelatedBooks() ? 'check' : 'edit-2'" size="16" />
+						<span>{{ isEditingRelatedBooks() ? 'Concluir Edição' : 'Editar Relacionamentos' }}</span>
+					</app-button>
+
+					@if (isEditingRelatedBooks()) {
+						<app-button
+							variant="primary"
+							size="small"
+							(click)="openAddRelatedBookModal()"
+						>
+							<app-icons name="plus" size="16" />
+							<span>Adicionar Relacionamento</span>
+						</app-button>
+					}
+				</div>
+			}
+			<div class="related-books-container">
+				@for (group of groupedRelatedBooks(); track group.type) {
+					<div class="related-group">
+						<h3 class="group-title">{{ group.label }}</h3>
+						<div class="related-books-grid">
+							@for (rel of group.items; track rel.relationId) {
+								<div class="book-wrapper">
+									<app-item-book
+										[book]="rel.relatedBook"
+										[canRemove]="isEditingRelatedBooks()"
+										(remove)="confirmDeleteRelationship(rel)"
+									/>
+								</div>
+							}
+						</div>
+					</div>
+				} @empty {
+					<div class="empty-state">
+						<app-icons name="link" size="48" />
+						<p>Nenhum livro relacionado.</p>
+					</div>
+				}
+			</div>
+		} @placeholder {
+			<div class="placeholder-container">
+				@for (i of [0,1,2,3]; track $index) {
+					<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor" style="height: 100px; margin: 10px 1rem; border-radius: 12px;"></div>
+				}
+			</div>
+		}
+	</div>
+	<div
+		id="reviews"
+		[class.selected]="selectedTab() === tab.reviews"
+		class="container"
+	>
+		@defer (when modulesLoad[tab.reviews].load()) {
+			<div class="scrollable">
+				@if (hasReadPartially() && userTokenService.hasValidAccessTokenSignal() && userService.hasPermission('interactions:manage')) {
+					<app-book-review-form [bookId]="id()" (reviewSubmitted)="reviewsList.loadReviews()" />
+				}
+				<app-book-reviews-list [bookId]="id()" #reviewsList />
+			</div>
+		} @placeholder {
+			<div class="placeholder-container">
+				<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor" style="height: 200px; margin: 20px 1rem; border-radius: 16px;"></div>
+				@for (i of [0,1,2]; track $index) {
+					<div class="placeholder" [style.background-color]="bookBasic()?.dominantColor" style="height: 120px; margin: 10px 1rem; border-radius: 12px;"></div>
 				}
 			</div>
 		}

@@ -55,6 +55,7 @@ export interface UserProfile {
 	profileImageUrl?: string;
 	profileBannerUrl?: string;
 	roles: Role[];
+	permissions?: string[];
 	createdAt: string;
 	updatedAt: string;
 }

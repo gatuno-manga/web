@@ -1,36 +1,62 @@
 <div class="home-container">
+  <div class="aurora-scene" aria-hidden="true">
+    <div class="aurora-orb aurora-orb--warm"></div>
+    <div class="aurora-orb aurora-orb--cold"></div>
+    <div class="aurora-orb aurora-orb--accent"></div>
+    <div class="aurora-mesh"></div>
+  </div>
+
+  <h1 class="visually-hidden">Início Gatuno</h1>
   <!-- Featured Carousel -->
   @if (featuredBooks().length > 0) {
     <section
       class="featured-carousel-section"
       aria-label="Livros em destaque"
       aria-roledescription="carrossel"
+      (mouseenter)="pauseCarousel()"
+      (mouseleave)="resumeCarousel()"
+      (focusin)="pauseCarousel()"
+      (focusout)="resumeCarousel()"
     >
-      <div class="carousel-track" aria-live="polite" aria-atomic="true">
+      <div class="carousel-track" aria-live="off">
         @for (book of featuredBooks(); track book.id; let i = $index) {
           <div
             class="carousel-item"
+            role="tabpanel"
+            [id]="'carousel-panel-' + i"
+            [attr.aria-labelledby]="'carousel-tab-' + i"
             [class.active]="i === currentFeaturedIndex()"
             [attr.aria-hidden]="i !== currentFeaturedIndex()"
           >
-            <div class="item-background">
+            <div class="item-background" aria-hidden="true" [style.background-color]="book.dominantColor || 'var(--secondary-color)'">
               @if (book.blurHash) {
                 <app-blurhash [hash]="book.blurHash" class="bg-blur" />
               }
-              <img [ngSrc]="book.cover" fill priority alt="{{ book.title }}" class="bg-image" />
+              @if (book.cover && !hasImageError(book.id)) {
+                <img [ngSrc]="book.cover" fill priority alt="" class="bg-image" (error)="onImageError(book.id)" />
+              }
               <div class="gradient-overlay"></div>
             </div>
 
             <div class="item-content">
-              <div class="cover-container">
-                <img [ngSrc]="book.cover" alt="{{ book.title }}" width="298" height="453" priority />
-              </div>
-              <div class="info-container">
-                <!-- h2 aqui (h1 único e estático fica fora do loop) -->
-                <h2 class="book-title-heading">{{ book.title }}</h2>
-                <p class="description">{{ book.description }}</p>
-                <div class="actions">
-                  <a [routerLink]="['/books', book.id]" class="btn-primary">Ler agora</a>
+              <div class="glass-panel">
+                <div class="cover-container" [style.background-color]="book.dominantColor || 'var(--secondary-color)'">
+                  <!-- Capa é decorativa aqui pois o título já está logo abaixo como h2 -->
+                  @if (book.cover && !hasImageError(book.id)) {
+                    <img [ngSrc]="book.cover" alt="" width="298" height="453" priority (error)="onImageError(book.id)" />
+                  } @else {
+                    <div class="cover-placeholder">
+                      <img src="assets/icons/image-placeholder-14824e.svg" alt="Sem capa" class="placeholder-icon" />
+                    </div>
+                  }
+                </div>
+                <div class="info-container">
+                  <!-- h2 aqui (h1 único e estático fica fora do loop) -->
+                  <h2 class="book-title-heading">{{ book.title }}</h2>
+                  <p class="description">{{ book.description || 'Nenhuma descrição fornecida.' }}</p>
+                  <div class="actions">
+                    <app-button [routerLink]="['/books', book.id]" variant="primary" rounded="small" padding="normal">Ler agora</app-button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -43,10 +69,13 @@
           <button
             type="button"
             role="tab"
+            [id]="'carousel-tab-' + i"
+            [attr.aria-controls]="'carousel-panel-' + i"
             (click)="setFeatured(i)"
             [class.active]="i === currentFeaturedIndex()"
             [attr.aria-selected]="i === currentFeaturedIndex()"
             [attr.aria-label]="'Livro ' + (i + 1) + ': ' + dot.title"
+            [tabindex]="i === currentFeaturedIndex() ? 0 : -1"
           ></button>
         }
       </div>
@@ -58,15 +87,15 @@
     <section class="home-section continue-reading">
       <h2 class="section-title">Continue a sua leitura</h2>
       @if (isLoadingContinueReading()) {
-        <div class="horizontal-scroll">
+        <div class="horizontal-scroll" aria-busy="true" aria-label="Carregando livros...">
           @for (i of [1,2,3,4,5]; track i) {
-            <div class="book-item-wrapper">
+            <div class="book-item-wrapper" aria-hidden="true">
               <div class="placeholder" style="width: 200px; height: 300px; border-radius: 0.75rem;"></div>
             </div>
           }
         </div>
       } @else {
-        <div class="horizontal-scroll">
+        <div class="horizontal-scroll" tabindex="0" aria-label="Lista de livros para continuar lendo">
           @for (book of continueReadingBooks(); track book.id) {
             <div class="book-item-wrapper">
               <app-item-book [book]="book" type="grid" />
@@ -81,7 +110,7 @@
   <section class="home-section latest-updates">
     <div class="section-header">
       <h2 class="section-title">Atualizações Recentes</h2>
-      <a routerLink="/books" [queryParams]="{ orderBy: 'updatedAt', order: 'DESC' }" class="view-more">Ver tudo</a>
+      <a routerLink="/books" [queryParams]="{ orderBy: 'updatedAt', order: 'DESC' }" class="view-more" aria-label="Ver todas as atualizações recentes">Ver tudo</a>
     </div>
 
 		<app-book-grid
@@ -96,7 +125,7 @@
   <section class="home-section recently-added">
     <div class="section-header">
       <h2 class="section-title">Novidades no Gatuno</h2>
-      <a routerLink="/books" [queryParams]="{ orderBy: 'createdAt', order: 'DESC' }" class="view-more">Ver tudo</a>
+      <a routerLink="/books" [queryParams]="{ orderBy: 'createdAt', order: 'DESC' }" class="view-more" aria-label="Ver todas as novidades no Gatuno">Ver tudo</a>
     </div>
 
 		<app-book-grid

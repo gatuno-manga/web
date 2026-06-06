@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { SensitiveContentResponse } from '@models/book.models';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { CookieService } from './cookie.service';
 
@@ -40,6 +40,47 @@ export class SensitiveContentService {
 		return this.http
 			.get<SensitiveContentResponse[]>('sensitive-content')
 			.pipe(catchError(() => of([])));
+	}
+
+	/**
+	 * Cria uma nova tag de conteúdo sensível.
+	 */
+	createSensitiveContent(name: string): Observable<SensitiveContentResponse> {
+		return this.http.post<SensitiveContentResponse>('sensitive-content', {
+			name,
+		});
+	}
+
+	/**
+	 * Atualiza uma tag de conteúdo sensível existente.
+	 */
+	updateSensitiveContent(
+		id: string,
+		name: string,
+	): Observable<SensitiveContentResponse> {
+		return this.http.put<SensitiveContentResponse>(
+			`sensitive-content/${id}`,
+			{ name },
+		);
+	}
+
+	/**
+	 * Remove uma tag de conteúdo sensível.
+	 */
+	deleteSensitiveContent(id: string): Observable<void> {
+		return this.http.delete<void>(`sensitive-content/${id}`);
+	}
+
+	/**
+	 * Mescla tags de conteúdo sensível.
+	 */
+	mergeSensitiveContent(
+		contentId: string,
+		targetId: string,
+	): Observable<void> {
+		return this.http.patch<void>(`sensitive-content/${contentId}/merge`, {
+			targetId,
+		});
 	}
 
 	isAllowed(contents: { name: string }[] | string[]): boolean {

@@ -7,7 +7,6 @@
 	@if (book().blurHash) {
 		<div
 			class="card-blur-background"
-			[class.fade-out]="isImageLoaded()"
 		>
 			<app-blurhash [hash]="book().blurHash" [width]="book().metadata?.width || 32" [height]="book().metadata?.height || 32" />
 		</div>

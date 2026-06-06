@@ -1,58 +1,113 @@
 <div
   class="custom-select"
-  [class.disabled]="isDisabled"
-  [class.is-open]="isOpen"
+  [class.disabled]="isDisabled()"
+  [class.is-open]="isOpen()"
   >
-  @if (isOpen) {
+  @if (isOpen()) {
     <div class="overlay" (click)="closeDropdown()"></div>
   }
 
   <div
     class="select-trigger"
     (click)="toggleDropdown()"
-    [class.open]="isOpen"
-    [class.has-value]="value"
+    [class.open]="isOpen()"
+    [class.has-value]="hasValue()"
+    aria-expanded="{{ isOpen() }}"
+    aria-haspopup="listbox"
+    role="combobox"
+    tabindex="0"
+    (keydown.enter)="toggleDropdown()"
+    (keydown.space)="toggleDropdown()"
+    (keydown.escape)="closeDropdown()"
     >
-		<div class="trigger-content">
-			@if (leftIcon()) {
-				<app-icons [name]="leftIcon()!" class="left-icon" />
-			}
-    	<span class="selected-value">{{ getSelectedLabel() }}</span>
-		</div>
-    <app-icons [name]="chevronIcon()" class="arrow" [class.rotate]="isOpen" />
+    @if (label()) {
+      <span class="floating-label" [class.active]="hasValue() || isOpen()">
+        {{ label() }}
+      </span>
+    }
+
+    <div class="trigger-content">
+      @if (leftIcon()) {
+        <app-icons
+          [name]="leftIcon()!"
+          [size]="iconSize()"
+          class="left-icon"
+        />
+      } @else if (selectedOption()?.icon) {
+        <app-icons
+          [name]="selectedOption()!.icon!"
+          [size]="iconSize()"
+          class="left-icon selected-icon"
+        />
+      }
+
+      <span class="selected-value" [class.placeholder]="!hasValue()">
+        {{ getSelectedLabel() }}
+      </span>
+    </div>
+
+    <app-icons
+      [name]="chevronIcon()"
+      [size]="iconSize()"
+      class="arrow"
+      [class.rotate]="isOpen()"
+    />
   </div>
 
-  @if (isOpen) {
-    <div class="select-dropdown">
-			@if (searchable()) {
-				<div class="search-bar" (click)="$event.stopPropagation()">
-					<app-icons name="search" size="16px" />
-					<input
-						type="text"
-						[placeholder]="'Pesquisar...'"
-						[ngModel]="searchQuery()"
-						(ngModelChange)="searchQuery.set($event)"
-						(input)="onSearchInput($event)"
-					/>
-				</div>
-			}
+  @if (isOpen()) {
+    <div class="select-dropdown" role="listbox">
+      @if (searchable()) {
+        <div class="search-bar" (click)="$event.stopPropagation()">
+          <app-icons name="search" size="14px" class="search-icon" />
+          <input
+            type="text"
+            [placeholder]="'Pesquisar...'"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            (input)="onSearchInput($event)"
+            autocomplete="off"
+          />
+        </div>
+      }
 
-			<div class="options-list">
-				@for (option of filteredOptions(); track option.value) {
-					<div
-						class="select-option"
-						(click)="selectOption(option)"
-						[class.selected]="option.value === value"
-						>
-						<span class="option-label">{{ option.label }}</span>
-						@if (option.value === value) {
-							<app-icons name="check" size="16px" class="check-icon" />
-						}
-					</div>
-				} @empty {
-					<div class="no-options">Nenhum resultado encontrado</div>
-				}
-			</div>
+      <div class="options-list">
+        @for (option of filteredOptions(); track option.value) {
+          <div
+            class="select-option"
+            [class.selected]="isSelected(option)"
+            [class.disabled]="option.disabled"
+            (click)="selectOption(option)"
+            role="option"
+            [attr.aria-selected]="isSelected(option)"
+            [attr.aria-disabled]="option.disabled"
+            >
+            <div class="option-inner">
+              @if (option.icon) {
+                <app-icons
+                  [name]="option.icon"
+                  [size]="iconSize()"
+                  class="option-icon"
+                />
+              }
+              <div class="option-text">
+                <span class="option-label">{{ option.label }}</span>
+                @if (option.description) {
+                  <span class="option-description">{{ option.description }}</span>
+                }
+              </div>
+            </div>
+
+            @if (isSelected(option)) {
+              <app-icons name="check" size="14px" class="check-icon" />
+            }
+          </div>
+        } @empty {
+          <div class="no-options">
+            <app-icons name="search-x" size="20px" class="no-options-icon" />
+            <span>Nenhum resultado encontrado</span>
+          </div>
+        }
+      </div>
     </div>
   }
 </div>

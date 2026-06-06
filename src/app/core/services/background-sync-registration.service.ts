@@ -36,7 +36,7 @@ export class BackgroundSyncRegistrationService {
 
 		try {
 			const registration = await navigator.serviceWorker.ready;
-			// Usando 'any' pois SyncManager não está no tipo padrão de ServiceWorkerRegistration em todos os ambientes
+			// Usando interseção de tipos pois SyncManager não está no tipo padrão de ServiceWorkerRegistration em todos os ambientes
 			await (
 				registration as ServiceWorkerRegistration & {
 					sync: { register: (tag: string) => Promise<void> };

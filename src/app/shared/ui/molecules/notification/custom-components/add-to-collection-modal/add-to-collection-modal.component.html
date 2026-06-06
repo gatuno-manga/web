@@ -1,0 +1,70 @@
+<div class="add-to-collection-modal">
+	<header>
+		<h2>Adicionar à Coleção</h2>
+		<p class="subtitle">Selecione uma coleção para adicionar <strong>{{ bookTitle() }}</strong></p>
+	</header>
+
+	<div class="collections-list">
+		@if (isLoading()) {
+			<div class="loading">
+				<app-icons name="loader" class="spin" />
+				<span>Carregando suas coleções...</span>
+			</div>
+		} @else {
+			@if (collections().length > 0) {
+				@for (collection of collections(); track collection.id) {
+					<button
+						type="button"
+						class="collection-item"
+						(click)="addToCollection(collection.id)"
+					>
+						<div class="icon-box">
+							<app-icons name="list" />
+						</div>
+						<div class="info">
+							<span class="title">{{ collection.title }}</span>
+							<span class="count">{{ collection.collaboratorsCount || 0 }} colaboradores</span>
+						</div>
+						<app-icons name="plus" class="add-icon" />
+					</button>
+				}
+			} @else {
+				<div class="empty-state">
+					<app-icons name="list" />
+					<p>Você ainda não tem nenhuma coleção.</p>
+				</div>
+			}
+		}
+	</div>
+
+	@if (isCreating()) {
+		<div class="create-collection-section">
+			<app-input
+				type="text"
+				placeholder="Nome da nova coleção"
+				[ngModel]="newCollectionTitle()"
+				(ngModelChange)="newCollectionTitle.set($event)"
+				(keyup.enter)="createCollection()"
+				[disabled]="isSubmitting()"
+			/>
+			<div class="create-actions">
+				<app-button variant="outline" (click)="toggleCreate()" [disabled]="isSubmitting()">Cancelar</app-button>
+				<app-button variant="primary" (click)="createCollection()" [disabled]="isSubmitting() || !newCollectionTitle().trim()">
+					@if (isSubmitting()) {
+						<app-icons name="loader" class="spin" />
+					} @else {
+						Salvar
+					}
+				</app-button>
+			</div>
+		</div>
+	}
+
+	<footer>
+		@if (!isCreating()) {
+			<app-button variant="outline" (click)="toggleCreate()">Criar nova coleção</app-button>
+		}
+		<span class="spacer"></span>
+		<app-button variant="outline" (click)="onClose()">Sair</app-button>
+	</footer>
+</div>

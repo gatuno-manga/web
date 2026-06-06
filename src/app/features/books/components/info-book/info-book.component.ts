@@ -16,11 +16,14 @@ import {
 	OnDestroy,
 	output,
 	PLATFORM_ID,
+	QueryList,
 	signal,
 	ViewChild,
+	ViewChildren,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterLink, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
+import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
 import { DownloadService } from '@core/services/download.service';
@@ -28,6 +31,7 @@ import { ModalNotificationService } from '@core/services/modal-notification.serv
 import { NotificationSeverity } from '@core/services/notification';
 import { NotificationService } from '@core/services/notification.service';
 import { SavedPagesService } from '@core/services/saved-pages.service';
+import { UserService } from '@core/services/user.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import {
 	Book,
@@ -39,18 +43,22 @@ import {
 	ImageMetadata,
 	ScrapingStatus,
 } from '@models/book.models';
+import { RelatedBookItem } from '@models/book-relationship.models';
 import { ContextMenuItem } from '@models/context-menu.models';
 import { DownloadStatus } from '@models/offline.models';
 import { SavedPage } from '@models/saved-page.models';
+import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
+import { ScrapingStatusPipe } from '@shared/utils/pipes/scraping-status.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
+	AddRelatedBookModalComponent,
 	BookEditModalComponent,
 	BookEditSaveEvent,
-} from '@ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component';
+} from '@ui/molecules/notification/custom-components';
 import {
 	CoverEditModalComponent,
 	CoverEditSaveEvent,
@@ -62,12 +70,17 @@ import {
 } from '@ui/molecules/notification/custom-components/source-add-modal/source-add-modal.component';
 import { ImageViewerComponent } from '@ui/organisms/image-viewer/image-viewer.component';
 import { firstValueFrom, fromEvent, Subscription, throttleTime } from 'rxjs';
+import { BookReviewFormComponent } from '../book-review-form/book-review-form.component';
+import { BookReviewsListComponent } from '../book-reviews-list/book-reviews-list.component';
+import { ItemBookComponent } from '../item-book/item-book.component';
 
 enum tab {
 	chapters = 0,
 	covers = 1,
 	extraInfo = 2,
 	savedPages = 3,
+	relatedBooks = 4,
+	reviews = 5,
 }
 
 interface ModulesLoad {
@@ -82,11 +95,17 @@ interface ModulesLoad {
 		DecimalPipe,
 		ChapterIndexPipe,
 		FlagPipe,
+		ScrapingStatusPipe,
 		IconsComponent,
 		ButtonComponent,
 		ImageViewerComponent,
 		BlurhashComponent,
+		ItemBookComponent,
 		DragDropModule,
+		BookReviewFormComponent,
+		BookReviewsListComponent,
+		RouterLink,
+		HasPermissionDirective,
 	],
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
@@ -96,7 +115,9 @@ interface ModulesLoad {
 	},
 })
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
+	public userService = inject(UserService);
 	private bookService = inject(BookService);
+	private relationshipService = inject(BookRelationshipService);
 	private modalService = inject(ModalNotificationService);
 	private downloadService = inject(DownloadService);
 	private chapterService = inject(ChapterService);
@@ -114,10 +135,20 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	id = input.required<string>();
 	bookBasic = input<BookBasic | undefined>();
+	hasReadPartially = input<boolean>(false);
 	updated = output<void>();
 
 	selectedTab = signal<tab>(tab.chapters);
 	sortAscending = signal(true);
+
+	tabsList = [
+		{ id: tab.chapters, label: 'Capítulos' },
+		{ id: tab.covers, label: 'Artes' },
+		{ id: tab.extraInfo, label: 'Informações extras' },
+		{ id: tab.savedPages, label: 'Páginas Salvas' },
+		{ id: tab.relatedBooks, label: 'Relacionados' },
+		{ id: tab.reviews, label: 'Avaliações' },
+	];
 
 	private websocketSubscription?: Subscription;
 	private downloadSubscription?: Subscription;
@@ -140,6 +171,16 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			load: signal(false),
 			function: async () => this.loadSavedPages(),
 		},
+		{
+			load: signal(false),
+			function: async () => this.loadRelatedBooks(),
+		},
+		{
+			load: signal(false),
+			function: async () => {
+				/* Reviews load handled by component */
+			},
+		},
 	];
 	chapters = signal<Chapterlist[]>([]);
 	nextChaptersCursor = signal<string | null>(null);
@@ -152,6 +193,24 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	hasCoversChanged = signal(false);
 
 	savedPages = signal<SavedPage[]>([]);
+	relatedBooks = signal<RelatedBookItem[]>([]);
+	groupedRelatedBooks = computed(() => {
+		const groups = new Map<string, RelatedBookItem[]>();
+		for (const rel of this.relatedBooks()) {
+			const arr = groups.get(rel.relationType) || [];
+			arr.push(rel);
+			groups.set(rel.relationType, arr);
+		}
+		return Array.from(groups.entries())
+			.map(([type, items]) => ({
+				type,
+				label: this.getRelationTypeLabel(type),
+				items,
+			}))
+			.sort((a, b) => a.label.localeCompare(b.label));
+	});
+	relatedBooksTotal = signal(0);
+	isEditingRelatedBooks = signal(false);
 	extraInfo = signal<BookDetail>({
 		alternativeTitle: [],
 		originalUrl: [],
@@ -182,19 +241,24 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	coverImageErrors = signal<Set<string>>(new Set());
 
 	@ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
-	@ViewChild('firstTab') firstTab!: ElementRef<HTMLSpanElement>;
+	@ViewChildren('tabEl') tabEls!: QueryList<ElementRef<HTMLSpanElement>>;
 	@ViewChild('container') containerElement!: ElementRef<HTMLDivElement>;
 
 	containerHeight = signal('auto');
 
 	ngAfterViewInit() {
-		if (this.firstTab) {
-			this.firstTab.nativeElement.click();
-		}
+		// Clique inicial na primeira aba disponível
+		setTimeout(() => {
+			const first = this.tabEls.first;
+			if (first) {
+				first.nativeElement.click();
+			}
+		});
 
 		if (isPlatformBrowser(this.platformId)) {
 			this.setupResizeObserver();
 			this.setupScrollListener();
+			window.addEventListener('resize', this.onWindowResize.bind(this));
 		}
 
 		this.subscribeToWebSocketEvents();
@@ -236,6 +300,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 		if (this.scrollSubscription) {
 			this.scrollSubscription.unsubscribe();
+		}
+		if (isPlatformBrowser(this.platformId)) {
+			window.removeEventListener(
+				'resize',
+				this.onWindowResize.bind(this),
+			);
 		}
 	}
 
@@ -292,34 +362,60 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			});
 	}
 
+	private onWindowResize = () => {
+		this.updateSelectorPosition();
+	};
+
 	selectTab(tabName: tab, event?: Event) {
 		this.selectedTab.set(tabName);
 		this.loadResults(tabName);
 
-		if (event && this.selector) {
-			const clickedElement = event.target as HTMLSpanElement;
+		let clickedElement: HTMLSpanElement | undefined;
+
+		if (event) {
+			clickedElement = event.target as HTMLSpanElement;
+		} else {
+			// Find element by tab name if no event
+			const index = this.tabsList.findIndex((t) => t.id === tabName);
+			if (index >= 0) {
+				clickedElement = this.tabEls.toArray()[index].nativeElement;
+			}
+		}
+
+		if (clickedElement) {
 			clickedElement.scrollIntoView({
 				behavior: 'smooth',
 				block: 'nearest',
 				inline: 'center',
 			});
-			const headerElement = clickedElement.parentElement;
-
-			if (headerElement) {
-				const clickedRect = clickedElement.getBoundingClientRect();
-				const headerRect = headerElement.getBoundingClientRect();
-
-				const relativeLeft = clickedRect.left - headerRect.left;
-				const width = clickedRect.width;
-
-				const selectorEl = this.selector.nativeElement;
-				selectorEl.style.left = `${relativeLeft}px`;
-				selectorEl.style.width = `${width}px`;
-			}
+			this.updateSelectorPosition(clickedElement);
 		}
 
 		// Atualizar altura imediatamente e após animação
 		this.observeActiveTab();
+	}
+
+	private updateSelectorPosition(element?: HTMLSpanElement) {
+		if (!this.selector?.nativeElement) return;
+
+		let targetElement = element;
+		if (!targetElement) {
+			const index = this.tabsList.findIndex(
+				(t) => t.id === this.selectedTab(),
+			);
+			if (index >= 0 && this.tabEls?.length) {
+				targetElement = this.tabEls.toArray()[index].nativeElement;
+			}
+		}
+
+		if (targetElement) {
+			const left = targetElement.offsetLeft;
+			const width = targetElement.offsetWidth;
+
+			const selectorEl = this.selector.nativeElement;
+			selectorEl.style.left = `${left}px`;
+			selectorEl.style.width = `${width}px`;
+		}
 	}
 
 	private setupResizeObserver() {
@@ -419,19 +515,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			setTimeout(() => this.onWindowScroll(), 50);
 			setTimeout(() => this.onWindowScroll(), 150);
 		});
-	}
-
-	getScrapingStatusClass(status: ScrapingStatus): string {
-		switch (status) {
-			case ScrapingStatus.READY:
-				return 'Pronto';
-			case ScrapingStatus.PROCESSING:
-				return 'Processando';
-			case ScrapingStatus.ERROR:
-				return 'error';
-			default:
-				return '';
-		}
 	}
 
 	getContentTypeIcon(chapter: Chapterlist): string {
@@ -821,6 +904,73 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		});
 	}
 
+	loadRelatedBooks() {
+		this.relationshipService.getBookRelationships(this.id()).subscribe({
+			next: (page) => {
+				this.relatedBooks.set(page.items);
+				this.scheduleHeightUpdate();
+			},
+			error: (error) => {
+				console.error('Error loading related books:', error);
+			},
+		});
+	}
+
+	toggleEditRelatedBooks() {
+		this.isEditingRelatedBooks.update((val) => !val);
+	}
+
+	openAddRelatedBookModal() {
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: AddRelatedBookModalComponent,
+			componentData: {
+				sourceBookId: this.id(),
+				close: (success: boolean) => {
+					this.modalService.close();
+					if (success) {
+						this.loadRelatedBooks();
+						this.updated.emit();
+					}
+				},
+			},
+			useBackdrop: true,
+			backdropOpacity: 0.5,
+		});
+	}
+
+	confirmDeleteRelationship(rel: RelatedBookItem) {
+		this.modalService.show(
+			'Remover Relacionamento',
+			`Tem certeza que deseja remover o vínculo com "${rel.relatedBook.title}"?`,
+			[
+				{ label: 'Cancelar', type: 'primary' },
+				{
+					label: 'Remover',
+					type: 'danger',
+					callback: () => {
+						this.relationshipService
+							.deleteRelationship(this.id(), rel.relationId)
+							.subscribe(() => {
+								this.notificationService.success(
+									'Relacionamento removido com sucesso!',
+								);
+								this.loadRelatedBooks();
+								this.updated.emit();
+							});
+					},
+				},
+			],
+			'warning',
+		);
+	}
+
+	getRelationTypeLabel(type: string): string {
+		return this.relationshipService.getRelationTypeLabel(type);
+	}
+
 	urlTransform(url: string): string {
 		try {
 			return new URL(url).hostname;
@@ -1163,7 +1313,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				(id) => !status.get(id) || status.get(id) === 'error',
 			);
 
-			if (hasNotDownloaded) {
+			if (
+				hasNotDownloaded &&
+				this.userService.hasPermission('books:download')
+			) {
 				items.push({
 					label: `Baixar ${selectedCount} Capítulos`,
 					icon: 'download',
@@ -1171,7 +1324,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				});
 			}
 
-			if (hasDownloaded) {
+			if (
+				hasDownloaded &&
+				this.userService.hasPermission('books:download')
+			) {
 				items.push({
 					label: `Excluir ${selectedCount} Downloads`,
 					icon: 'trash',
@@ -1186,15 +1342,20 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			);
 			const hasReadChapter = selectedChapters.some((c) => c.read);
 
+			if (this.userService.hasPermission('reading-progress:manage')) {
+				items.push(
+					{ type: 'separator' },
+					{
+						label: hasReadChapter
+							? `Marcar ${selectedCount} como Não Lidos`
+							: `Marcar ${selectedCount} como Lidos`,
+						icon: hasReadChapter ? 'eye-close' : 'eye',
+						action: () => this.toggleSelectedReadStatus(),
+					},
+				);
+			}
+
 			items.push(
-				{ type: 'separator' },
-				{
-					label: hasReadChapter
-						? `Marcar ${selectedCount} como Não Lidos`
-						: `Marcar ${selectedCount} como Lidos`,
-					icon: hasReadChapter ? 'eye-close' : 'eye',
-					action: () => this.toggleSelectedReadStatus(),
-				},
 				{ type: 'separator' },
 				{
 					label: 'Limpar Seleção',
@@ -1210,14 +1371,20 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		// Menu para capítulo único
 		const downloadStatus = this.chaptersDownloadStatus().get(chapter.id);
 
-		if (downloadStatus === 'downloaded') {
+		if (
+			downloadStatus === 'downloaded' &&
+			this.userService.hasPermission('books:download')
+		) {
 			items.push({
 				label: 'Excluir Download',
 				icon: 'trash',
 				danger: true,
 				action: () => this.deleteChapterDownload(chapter),
 			});
-		} else if (!downloadStatus || downloadStatus === 'error') {
+		} else if (
+			(!downloadStatus || downloadStatus === 'error') &&
+			this.userService.hasPermission('books:download')
+		) {
 			items.push({
 				label: 'Baixar Capítulo',
 				icon: 'download',

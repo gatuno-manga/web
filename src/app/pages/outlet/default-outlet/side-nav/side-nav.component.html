@@ -18,16 +18,27 @@
 		@for (group of navGroups; track $index) {
 			<nav class="group">
 				@for (item of group.items; track item.label) {
-					<a
-						[routerLink]="item.route"
-						routerLinkActive="active"
-						[routerLinkActiveOptions]="{ exact: item.route === '/' }"
-						class="nav-item"
-						(click)="onClose()"
-					>
-						<app-icons [name]="item.icon" size="22" />
-						<span class="label">{{ item.label }}</span>
-					</a>
+					@if (item.route) {
+						<a
+							[routerLink]="item.route"
+							routerLinkActive="active"
+							[routerLinkActiveOptions]="{ exact: item.route === '/' }"
+							class="nav-item"
+							(click)="onClose()"
+						>
+							<app-icons [name]="item.icon" size="22" />
+							<span class="label">{{ item.label }}</span>
+						</a>
+					} @else {
+						<button
+							type="button"
+							class="nav-item"
+							(click)="item.action ? item.action() : onClose()"
+						>
+							<app-icons [name]="item.icon" size="22" />
+							<span class="label">{{ item.label }}</span>
+						</button>
+					}
 				}
 			</nav>
 			@if (!$last) {

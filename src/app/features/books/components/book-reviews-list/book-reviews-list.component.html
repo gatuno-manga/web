@@ -1,0 +1,49 @@
+<div class="reviews-list">
+	<h2>Resenhas dos Leitores</h2>
+
+	@if (isLoading()) {
+		<div class="loading">
+			<app-icons name="loader" class="spin" />
+			<span>Carregando resenhas...</span>
+		</div>
+	} @else {
+		@if (reviews().length > 0) {
+			<div class="reviews-grid">
+				@for (review of reviews(); track review.id) {
+					<div class="review-card">
+						<div class="user-info">
+							@if (review.userAvatar) {
+								<img
+									[ngSrc]="review.userAvatar"
+									alt="Avatar de {{ review.userName }}"
+									width="40"
+									height="40"
+									class="avatar"
+								/>
+							} @else {
+								<div class="avatar-placeholder">
+									<app-icons name="user" size="20" />
+								</div>
+							}
+							<div class="name-date">
+								<span class="username">{{ review.userName }}</span>
+								<span class="date">{{ review.createdAt | date: 'dd/MM/yyyy' }}</span>
+							</div>
+						</div>
+						<div class="rating">
+							@for (star of getStars(review.rating); track $index) {
+								<app-icons name="bookmark" [class.filled]="$index < review.rating" size="14" />
+							}
+						</div>
+						<p class="content">{{ review.content }}</p>
+					</div>
+				}
+			</div>
+		} @else {
+			<div class="empty-state">
+				<app-icons name="file-text" size="48" />
+				<p>Ainda não há resenhas para este livro. Seja o primeiro a avaliar!</p>
+			</div>
+		}
+	}
+</div>

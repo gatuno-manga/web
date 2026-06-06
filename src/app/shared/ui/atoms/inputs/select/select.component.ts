@@ -16,7 +16,18 @@ import {
 } from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
-export type SelectOption = { value: string | number | boolean; label: string };
+export type SelectOption = {
+	value: string | number | boolean;
+	label: string;
+	/** Ícone opcional exibido ao lado do label */
+	icon?: string;
+	/** Texto secundário exibido abaixo do label */
+	description?: string;
+	/** Desabilita a opção individualmente */
+	disabled?: boolean;
+};
+
+export type SelectSize = 'sm' | 'md' | 'lg';
 
 @Component({
 	selector: 'app-select',
@@ -33,23 +44,26 @@ export type SelectOption = { value: string | number | boolean; label: string };
 		},
 	],
 	host: {
-		'[class.select-open]': 'isOpen',
+		'[class.select-open]': 'isOpen()',
+		'[attr.data-size]': 'size()',
 	},
 })
 export class SelectComponent implements ControlValueAccessor {
 	placeholder = input<string>('Selecione uma opção');
-	options = input<{ value: string; label: string }[]>([]);
+	label = input<string | null>(null);
+	options = input<SelectOption[]>([]);
 	name = input<string>('');
 	searchable = input<boolean>(false);
 	leftIcon = input<string | null>(null);
 	chevronIcon = input<string>('chevron-down');
+	size = input<SelectSize>('md');
 
 	valueChange = output<string>();
 	change = output<string>();
 
-	value: string = '';
-	isOpen: boolean = false;
-	isDisabled: boolean = false;
+	value = signal<string>('');
+	isOpen = signal<boolean>(false);
+	isDisabled = signal<boolean>(false);
 
 	searchQuery = signal<string>('');
 
@@ -61,13 +75,19 @@ export class SelectComponent implements ControlValueAccessor {
 		);
 	});
 
+	selectedOption = computed(() =>
+		this.options().find((opt) => String(opt.value) === this.value()),
+	);
+
+	hasValue = computed(() => !!this.value());
+
 	private host = inject(ElementRef<HTMLElement>);
 
 	private onChange: (value: string) => void = () => {};
 	private onTouched: () => void = () => {};
 
 	writeValue(value: string): void {
-		this.value = value || '';
+		this.value.set(value || '');
 	}
 
 	registerOnChange(fn: (value: string) => void): void {
@@ -79,40 +99,54 @@ export class SelectComponent implements ControlValueAccessor {
 	}
 
 	setDisabledState(isDisabled: boolean): void {
-		this.isDisabled = isDisabled;
+		this.isDisabled.set(isDisabled);
 	}
 
 	toggleDropdown(): void {
-		if (!this.isDisabled) {
-			this.isOpen = !this.isOpen;
-			if (this.isOpen) {
-				this.searchQuery.set(''); // Reset search on open
-				this.onTouched();
-			}
+		if (this.isDisabled()) return;
+		const next = !this.isOpen();
+		this.isOpen.set(next);
+		if (next) {
+			this.searchQuery.set('');
+			this.onTouched();
 		}
 	}
 
-	selectOption(option: { value: string; label: string }): void {
-		this.valueChange.emit(option.value);
-		this.change.emit(option.value);
+	selectOption(option: SelectOption): void {
+		if (option.disabled) return;
+		const val = String(option.value);
+		this.value.set(val);
+		this.onChange(val);
+		this.valueChange.emit(val);
+		this.change.emit(val);
 		this.host.nativeElement.dispatchEvent(
-			new CustomEvent('change', { detail: option.value, bubbles: true }),
+			new CustomEvent('change', { detail: val, bubbles: true }),
 		);
-		this.value = option.value;
-		this.onChange(this.value);
-		this.isOpen = false;
+		this.isOpen.set(false);
 	}
 
 	getSelectedLabel(): string {
-		const selected = this.options().find((opt) => opt.value === this.value);
-		return selected ? selected.label : this.placeholder();
+		return this.selectedOption()?.label ?? this.placeholder();
 	}
 
 	closeDropdown(): void {
-		this.isOpen = false;
+		this.isOpen.set(false);
 	}
 
 	onSearchInput(event: Event) {
-		event.stopPropagation(); // Prevent closing dropdown
+		event.stopPropagation();
+	}
+
+	iconSize(): string {
+		const map: Record<SelectSize, string> = {
+			sm: '14px',
+			md: '16px',
+			lg: '18px',
+		};
+		return map[this.size()];
+	}
+
+	isSelected(option: SelectOption): boolean {
+		return String(option.value) === this.value();
 	}
 }

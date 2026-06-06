@@ -10,40 +10,20 @@
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 40px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	border-bottom: 1px solid var(--border-color);
 	padding-bottom: 20px;
 
 	.page-title {
-		font-family: 'Inknut Antiqua', serif;
+		font-family: var(--font-display);
 		font-size: 2rem;
 		margin: 0;
-		color: var(--white);
+		color: var(--app-text-color);
 	}
 
 	.page-subtitle {
-		color: var(--white-muted);
+		color: var(--app-text-color-secondary);
 		font-size: 1rem;
 		margin-top: 5px;
-	}
-}
-
-.action-btn {
-	background: var(--secondary-color);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	color: var(--white-muted);
-	padding: 10px;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: all 0.3s ease;
-
-	&:hover {
-		background: rgba(255, 255, 255, 0.1);
-		color: var(--white);
-	}
-
-	&.active {
-		color: var(--primary-color);
-		border-color: var(--primary-color);
 	}
 }
 
@@ -54,7 +34,7 @@
 }
 
 .group-date {
-	font-family: 'Inknut Antiqua', serif;
+	font-family: var(--font-display);
 	font-size: 1.2rem;
 	color: var(--primary-color);
 	margin-bottom: 20px;
@@ -73,13 +53,13 @@
 	align-items: center;
 	gap: 20px;
 	padding: 12px;
-	background: rgba(255, 255, 255, 0.03);
+	background: rgb(from var(--app-background-color) r g b / 0.03);
 	border-radius: 12px;
-	border: 1px solid rgba(255, 255, 255, 0.05);
+	border: 1px solid var(--border-color);
 	transition: transform 0.2s ease, background 0.2s ease;
 
 	&:hover {
-		background: rgba(255, 255, 255, 0.06);
+		background: var(--hover-color);
 		transform: translateX(5px);
 	}
 
@@ -91,7 +71,7 @@
 		border-radius: 8px;
 		overflow: hidden;
 		cursor: pointer;
-		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+		box-shadow: 0 4px 15px rgb(from var(--black) r g b / 0.4);
 
 		@media (max-width: 600px) {
 			width: 100px;
@@ -118,17 +98,24 @@
 		gap: 12px;
 		min-width: 0;
 
-		.book-title {
-			color: var(--white);
-			font-weight: 600;
-			font-size: 1.2rem;
-			text-decoration: none;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
+		.book-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 12px;
 
-			&:hover {
-				text-decoration: underline;
+			.book-title {
+				color: var(--app-text-color);
+				font-weight: 600;
+				font-size: 1.2rem;
+				text-decoration: none;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+
+				&:hover {
+					text-decoration: underline;
+				}
 			}
 		}
 
@@ -146,7 +133,7 @@
 			}
 
 			&::-webkit-scrollbar-track {
-				background: rgba(255, 255, 255, 0.05);
+				background: rgb(from var(--app-text-color) r g b / 0.05);
 				border-radius: 10px;
 			}
 
@@ -162,7 +149,7 @@
 			align-items: center;
 			justify-content: space-between;
 			padding: 4px 8px;
-			background: rgba(255, 255, 255, 0.02);
+			background: rgb(from var(--app-background-color) r g b / 0.02);
 			border-radius: 6px;
 			gap: 10px;
 
@@ -187,48 +174,12 @@
 			}
 
 			.read-time {
-				color: var(--white-muted);
+				color: var(--app-text-color-secondary);
 				font-size: 0.75rem;
 			}
 		}
 	}
 
-	.item-actions {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		flex-shrink: 0;
-
-		.remove-btn {
-			background: transparent;
-			border: none;
-			color: var(--white-muted);
-			cursor: pointer;
-			padding: 8px;
-			border-radius: 6px;
-			transition: color 0.2s, background 0.2s;
-
-			&:hover {
-				color: var(--dark-red);
-				background: rgba(234, 67, 53, 0.1);
-			}
-		}
-
-		.resume-btn {
-			background: var(--primary-color);
-			color: white;
-			padding: 6px 14px;
-			border-radius: 6px;
-			font-size: 0.8rem;
-			font-weight: 600;
-			text-decoration: none;
-			transition: filter 0.2s;
-
-			&:hover {
-				filter: brightness(1.1);
-			}
-		}
-	}
 }
 
 .empty-state {
@@ -237,20 +188,11 @@
 	align-items: center;
 	justify-content: center;
 	padding: 80px 0;
-	color: var(--white-muted);
+	color: var(--app-text-color-secondary);
 	gap: 20px;
 
 	p {
 		font-size: 1.2rem;
-	}
-
-	.explore-btn {
-		background: var(--primary-color);
-		color: white;
-		padding: 12px 30px;
-		border-radius: 8px;
-		text-decoration: none;
-		font-weight: bold;
 	}
 }
 
@@ -274,13 +216,8 @@
 	.history-item {
 		gap: 12px;
 		
-		.item-content .book-title {
+		.item-content .book-header .book-title {
 			font-size: 1rem;
-		}
-
-		.item-actions .resume-btn {
-			padding: 6px 12px;
-			font-size: 0.8rem;
 		}
 	}
 }

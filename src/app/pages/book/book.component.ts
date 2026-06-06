@@ -1,4 +1,3 @@
-import { NgOptimizedImage } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -10,6 +9,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
+import { BookInteractionService } from '@core/services/book-interaction.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { DownloadService } from '@core/services/download.service';
 import { DownloadManagerService } from '@core/services/download-manager.service';
@@ -20,17 +20,21 @@ import { NotificationSeverity } from '@core/services/notification/notification-s
 import { NotificationService } from '@core/services/notification.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
+import { UserService } from '@core/services/user.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
+import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
+import { TooltipDirective } from '@shared/ui/atoms/tooltip/tooltip.directive';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
+	AddToCollectionModalComponent,
 	BookDownloadModalComponent,
 	BookDownloadResult,
-} from '@ui/molecules/notification/custom-components/book-download-modal/book-download-modal.component';
+} from '@ui/molecules/notification/custom-components';
 import {
 	BookEditModalComponent,
 	BookEditSaveEvent,
@@ -48,9 +52,10 @@ import { firstValueFrom, Subscription } from 'rxjs';
 		AsideComponent,
 		ButtonComponent,
 		MarkdownComponent,
-		NgOptimizedImage,
 		BlurhashComponent,
 		FlagPipe,
+		TooltipDirective,
+		HasPermissionDirective,
 	],
 	templateUrl: './book.component.html',
 	styleUrl: './book.component.scss',
@@ -60,12 +65,17 @@ import { firstValueFrom, Subscription } from 'rxjs';
 	},
 })
 export class BookComponent implements OnInit, OnDestroy {
-	ScrapingStatus = ScrapingStatus;
 	book = signal<BookBasic | undefined>(undefined);
-	private userTokenService = inject(UserTokenService);
+	public userTokenService = inject(UserTokenService);
 	admin = computed(() => this.userTokenService.isAdminSignal());
+	isLoggedIn = computed(() =>
+		this.userTokenService.hasValidAccessTokenSignal(),
+	);
 	isLoading = signal(true);
 	isImageLoaded = signal(false);
+	isFavorited = signal(false);
+	isSubscribed = signal(false);
+	hasReadPartially = signal(false);
 	private wsSubscription?: Subscription;
 	private coverUrl?: string;
 
@@ -88,10 +98,12 @@ export class BookComponent implements OnInit, OnDestroy {
 	// Estado para erro de imagem de capa
 	coverImageError = false;
 
+	public userService = inject(UserService);
 	private metaService = inject(MetaDataService);
 	private modalService = inject(ModalNotificationService);
 	private notificationService = inject(NotificationService);
 	private bookService = inject(BookService);
+	private interactionService = inject(BookInteractionService);
 	private activatedRoute = inject(ActivatedRoute);
 	private router = inject(Router);
 	private wsService = inject(MqttService);
@@ -108,12 +120,26 @@ export class BookComponent implements OnInit, OnDestroy {
 		this.coverImageError = true;
 	}
 
+	private routeSub?: Subscription;
+
 	ngOnInit() {
-		const id = this.activatedRoute.snapshot.paramMap.get('id');
-		if (!id) {
-			this.router.navigate(['../'], { relativeTo: this.activatedRoute });
-			return;
-		}
+		this.routeSub = this.activatedRoute.paramMap.subscribe((params) => {
+			const id = params.get('id');
+			if (!id) {
+				this.router.navigate(['../'], {
+					relativeTo: this.activatedRoute,
+				});
+				return;
+			}
+			this.loadBook(id);
+		});
+	}
+
+	private loadBook(id: string) {
+		this.isLoading.set(true);
+		this.book.set(undefined); // Reseta o livro para forçar a recriação do app-info-book
+		this.coverImageError = false;
+		this.wsSubscription?.unsubscribe();
 
 		this.bookService.getBook(id).subscribe({
 			next: (book) => {
@@ -222,6 +248,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
+		this.routeSub?.unsubscribe();
 		// Limpa a inscrição do WebSocket
 		this.wsSubscription?.unsubscribe();
 		const bookId = this.book()?.id;
@@ -329,19 +356,6 @@ export class BookComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	getScrapingStatusClass(status: ScrapingStatus): string {
-		switch (status) {
-			case ScrapingStatus.READY:
-				return 'Pronto';
-			case ScrapingStatus.PROCESSING:
-				return 'Processando';
-			case ScrapingStatus.ERROR:
-				return 'error';
-			default:
-				return '';
-		}
-	}
-
 	getAuthorNames(): string {
 		return (
 			this.book()
@@ -351,6 +365,12 @@ export class BookComponent implements OnInit, OnDestroy {
 	}
 	filterByTag(tagId: string) {
 		this.router.navigate(['/books'], { queryParams: { tags: tagId } });
+	}
+
+	filterBySensitive(id: string) {
+		this.router.navigate(['/books'], {
+			queryParams: { sensitiveContent: id },
+		});
 	}
 
 	openBookEditModal() {
@@ -571,6 +591,7 @@ export class BookComponent implements OnInit, OnDestroy {
 		if (progress) {
 			this.lastReadChapterId = progress.chapterId;
 			this.lastReadPage = progress.pageIndex;
+			this.hasReadPartially.set(true);
 		}
 	}
 
@@ -1024,5 +1045,74 @@ export class BookComponent implements OnInit, OnDestroy {
 				);
 			});
 		}
+	}
+
+	toggleFavorite() {
+		const b = this.book();
+		if (!b) return;
+
+		this.interactionService.favorite(b.id).subscribe({
+			next: () => {
+				this.isFavorited.update((v) => !v);
+				this.notificationService.success(
+					this.isFavorited()
+						? 'Livro adicionado aos favoritos!'
+						: 'Livro removido dos favoritos!',
+				);
+			},
+			error: () => {
+				this.notificationService.error(
+					'Erro ao processar favorito. Você está logado?',
+				);
+			},
+		});
+	}
+
+	toggleSubscribe() {
+		const b = this.book();
+		if (!b) return;
+
+		this.interactionService.subscribe(b.id).subscribe({
+			next: () => {
+				this.isSubscribed.update((v) => !v);
+				this.notificationService.success(
+					this.isSubscribed()
+						? 'Você se inscreveu para atualizações!'
+						: 'Você cancelou sua inscrição.',
+				);
+			},
+			error: () => {
+				this.notificationService.error(
+					'Erro ao processar inscrição. Você está logado?',
+				);
+			},
+		});
+	}
+
+	openAddToCollectionModal() {
+		this.closeOptionsDropdown();
+		const book = this.book();
+		if (!book) return;
+
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: AddToCollectionModalComponent,
+			componentData: {
+				bookId: book.id,
+				bookTitle: book.title,
+				close: (success: boolean) => {
+					this.modalService.close();
+					if (success) {
+						this.notificationService.success(
+							'Livro adicionado à coleção com sucesso!',
+						);
+					}
+				},
+			},
+			useBackdrop: true,
+			backdropOpacity: 0.5,
+		});
 	}
 }

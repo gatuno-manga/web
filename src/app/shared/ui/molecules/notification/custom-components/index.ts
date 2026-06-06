@@ -1,3 +1,5 @@
+export * from './add-related-book-modal/add-related-book-modal.component';
+export * from './add-to-collection-modal/add-to-collection-modal.component';
 export * from './book-download-modal/book-download-modal.component';
 export * from './book-edit-modal/book-edit-modal.component';
 export * from './confirmation-notification/confirmation-notification.component';

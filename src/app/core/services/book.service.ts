@@ -17,6 +17,7 @@ import {
 	ScrapingStatus,
 	UpdateBookDto,
 } from '@models/book.models';
+import { BookTitleCheckResult } from '@models/book-admin.models';
 import { Paginated } from '@models/miscellaneous.models';
 import { firstValueFrom, from, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -583,5 +584,24 @@ export class BookService {
 		return this.http.get<{ id: string }>('books/random', {
 			params: { ...opts },
 		});
+	}
+
+	/**
+	 * Verifica se já existe um livro com o título informado ou títulos alternativos.
+	 */
+	checkBookTitle(
+		title: string,
+		alternativeTitles?: string[],
+	): Observable<BookTitleCheckResult> {
+		const params: Record<string, string> = {};
+		if (alternativeTitles && alternativeTitles.length > 0) {
+			params['alternativeTitles'] = alternativeTitles.join(',');
+		}
+		return this.http.get<BookTitleCheckResult>(
+			`books/check-title/${title}`,
+			{
+				params,
+			},
+		);
 	}
 }

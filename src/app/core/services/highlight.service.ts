@@ -38,7 +38,7 @@ export class HighlightService {
 		if (!this.isSupported()) return;
 
 		try {
-			const customWindow = window as unknown as CustomWindow;
+			const customWindow = window as Window & CustomWindow;
 			const highlight = new customWindow.Highlight(...ranges);
 			const css = (globalThis as { CSS: CustomCSS }).CSS;
 			css.highlights.set(name, highlight);

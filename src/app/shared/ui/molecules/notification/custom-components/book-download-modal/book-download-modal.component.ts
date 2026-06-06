@@ -14,10 +14,12 @@ export interface BookDownloadResult {
 	chapterIds: string[];
 }
 
+import { CheckboxComponent } from '@ui/atoms/inputs/checkbox/checkbox.component';
+
 @Component({
 	selector: 'app-book-download-modal',
 	standalone: true,
-	imports: [FormsModule, ButtonComponent, IconsComponent],
+	imports: [FormsModule, ButtonComponent, IconsComponent, CheckboxComponent],
 	templateUrl: './book-download-modal.component.html',
 	styleUrls: ['./book-download-modal.component.scss'],
 })

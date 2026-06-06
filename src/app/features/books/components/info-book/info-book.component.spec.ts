@@ -27,7 +27,10 @@ describe('InfoBookComponent', () => {
 	let mockBookService: any;
 	let mockModalService: any;
 	let mockContextMenuService: any;
-	let mockUserTokenService: { isAdminSignal: WritableSignal<boolean> };
+	let mockUserTokenService: {
+		isAdminSignal: WritableSignal<boolean>;
+		hasValidAccessTokenSignal: WritableSignal<boolean>;
+	};
 	let mockDownloadService: any;
 	let mockChapterService: any;
 	let mockSavedPagesService: any;
@@ -77,6 +80,7 @@ describe('InfoBookComponent', () => {
 
 		mockUserTokenService = {
 			isAdminSignal: signal(false),
+			hasValidAccessTokenSignal: signal(false),
 		};
 
 		mockDownloadService = {
@@ -151,18 +155,6 @@ describe('InfoBookComponent', () => {
 	it('urlTransform should return hostname', () => {
 		const host = component.urlTransform('https://sub.example.com/path?x=1');
 		expect(host).toBe('sub.example.com');
-	});
-
-	it('getScrapingStatusClass maps statuses correctly', () => {
-		expect(component.getScrapingStatusClass(ScrapingStatus.READY)).toBe(
-			'Pronto',
-		);
-		expect(
-			component.getScrapingStatusClass(ScrapingStatus.PROCESSING),
-		).toBe('Processando');
-		expect(component.getScrapingStatusClass(ScrapingStatus.ERROR)).toBe(
-			'error',
-		);
 	});
 
 	it('loadChapters should set chapters from service', () => {

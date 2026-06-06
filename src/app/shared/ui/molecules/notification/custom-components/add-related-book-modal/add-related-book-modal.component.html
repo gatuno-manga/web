@@ -1,0 +1,84 @@
+<div class="add-related-book-modal">
+	<header>
+		<h2>Adicionar Livro Relacionado</h2>
+		<p class="subtitle">Vincule outro livro a este para criar sequências ou franquias.</p>
+	</header>
+
+	<form [formGroup]="form" (ngSubmit)="submit()">
+		<div class="form-group search-section">
+			<label>Buscar Livro</label>
+			@if (selectedBook(); as book) {
+				<div class="selected-book-preview">
+					<div class="book-card-mini">
+						<img
+							[src]="book.cover"
+							alt="Capa de {{ book.title }}"
+						/>
+						<span class="title">{{ book.title }}</span>
+					</div>
+					<app-button variant="text" (click)="clearSelection()" padding="none">
+						<app-icons name="close" size="18" />
+					</app-button>
+				</div>
+			} @else {
+				<div class="search-input-wrapper">
+					<app-input
+						type="text"
+						placeholder="Digite o título do livro..."
+						[ngModel]="''"
+						[ngModelOptions]="{standalone: true}"
+						(ngModelChange)="onSearchChange($event)"
+						leftIcon="search"
+					/>
+					@if (isSearching()) {
+						<app-icons name="loader" class="spin loader-icon" size="18" />
+					}
+				</div>
+				@if (searchResults().length > 0) {
+					<div class="search-results">
+						@for (book of searchResults(); track book.id) {
+							<button type="button" class="result-item" (click)="selectBook(book)">
+								<img
+									[src]="book.cover"
+									alt="Capa de {{ book.title }}"
+								/>
+								<span>{{ book.title }}</span>
+							</button>
+						}
+					</div>
+				}
+			}
+		</div>
+
+		<div class="form-row">
+			<app-select
+				id="relationType"
+				formControlName="relationType"
+				[options]="relationTypes"
+				label="Tipo de Relação"
+				class="relation-select"
+			/>
+			<div class="checkbox-wrapper">
+				<app-checkbox formControlName="isBidirectional">
+					Relacionamento Bidirecional
+				</app-checkbox>
+			</div>
+		</div>
+
+		<footer>
+			<app-button variant="outline" (click)="onClose()" [disabled]="isSubmitting()">Cancelar</app-button>
+			<app-button
+				type="submit"
+				variant="primary"
+				[disabled]="form.invalid || isSubmitting()"
+			>
+				@if (isSubmitting()) {
+					<app-icons name="loader" class="spin" />
+					Adicionando...
+				} @else {
+					Adicionar
+				}
+			</app-button>
+		</footer>
+	</form>
+</div>
