@@ -31,6 +31,17 @@
 			}
 		</div>
 		<div class="book">
+			<div class="back-navigation">
+				<app-button
+					variant="text"
+					(click)="goBack()"
+					padding="none"
+					aria-label="Voltar para a listagem"
+					appTooltip="Voltar para a listagem"
+				>
+					<app-icons name="arrow-left" />
+				</app-button>
+			</div>
 			<div class="glass-panel">
 				<div class="book-header">
 				<div class="book-cover">

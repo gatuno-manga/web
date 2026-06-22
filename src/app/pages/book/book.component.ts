@@ -7,6 +7,7 @@ import {
 	OnInit,
 	signal,
 } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { BookInteractionService } from '@core/services/book-interaction.service';
@@ -111,6 +112,11 @@ export class BookComponent implements OnInit, OnDestroy {
 	private readingProgressService = inject(UnifiedReadingProgressService);
 	private chapterService = inject(ChapterService);
 	private sensitiveContentService = inject(SensitiveContentService);
+	private location = inject(Location);
+
+	goBack() {
+		this.location.back();
+	}
 
 	onDocumentClick() {
 		this.closeOptionsDropdown();

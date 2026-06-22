@@ -7,9 +7,11 @@ import {
 	NgZone,
 	OnDestroy,
 	OnInit,
+	PLATFORM_ID,
 	signal,
 	ViewChild,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { DownloadService } from '@core/services/download.service';
@@ -17,6 +19,7 @@ import { LocalStorageService } from '@core/services/local-storage.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NetworkStatusService } from '@core/services/network-status.service';
+import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { TagsService } from '@core/services/tags.service';
 import { BookFilterComponent } from '@features/books/components/book-filter/book-filter.component';
@@ -76,6 +79,18 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private modalService = inject(ModalNotificationService);
 	private networkStatus = inject(NetworkStatusService);
 	private ngZone = inject(NgZone);
+	private scrollRestoration = inject(ScrollRestorationService);
+	private readonly platformId = inject(PLATFORM_ID);
+	private readonly isBrowser = isPlatformBrowser(this.platformId);
+
+	/** Key used to store/retrieve scroll position in sessionStorage */
+	private readonly scrollKey = 'books-list';
+	/** Pending scroll/page state to restore after books are rendered */
+	private pendingRestoreState: import('@core/services/scroll-restoration.service').ScrollRestorationState | null = null;
+	/** Debounce timer for scroll position saving */
+	private scrollSaveTimer: ReturnType<typeof setTimeout> | null = null;
+	/** Bound scroll handler so it can be removed on destroy */
+	private readonly onScroll = () => this.scheduleScrollSave();
 
 	constructor() {
 		// Re-load books when global filters change
@@ -244,6 +259,12 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	ngOnDestroy() {
+		if (this.isBrowser) {
+			window.removeEventListener('scroll', this.onScroll);
+		}
+		if (this.scrollSaveTimer !== null) {
+			clearTimeout(this.scrollSaveTimer);
+		}
 		this.clearCoverUrls();
 		if (this.observer) {
 			this.observer.disconnect();
@@ -252,6 +273,71 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	ngAfterViewInit() {
 		this.setupInfiniteScroll();
+		this.restoreScrollIfNeeded();
+		if (!this.isBrowser) return;
+		// Listen to scroll events to continuously save the position.
+		// We use a native listener (outside NgZone) to avoid triggering
+		// unnecessary change detection on every scroll event.
+		this.ngZone.runOutsideAngular(() => {
+			window.addEventListener('scroll', this.onScroll, { passive: true });
+		});
+	}
+
+	/**
+	 * Schedules a debounced save of the current scroll position.
+	 * Using debounce (150ms) avoids writing to sessionStorage on every pixel scrolled.
+	 */
+	private scheduleScrollSave(): void {
+		if (this.scrollSaveTimer !== null) {
+			clearTimeout(this.scrollSaveTimer);
+		}
+		this.scrollSaveTimer = setTimeout(() => {
+			this.saveScrollPosition();
+			this.scrollSaveTimer = null;
+		}, 150);
+	}
+
+	/**
+	 * Persists the current scroll position (and infinite-scroll page state)
+	 * so it can be restored when the user navigates back.
+	 */
+	private saveScrollPosition(): void {
+		const extra =
+			this.listSettings.listMode === 'infinite-scroll'
+				? { infiniteScrollPage: this.currentPage }
+				: undefined;
+		this.scrollRestoration.save(this.scrollKey, extra);
+	}
+
+	/**
+	 * Checks if there is a saved scroll position and, if so, schedules
+	 * it to be applied after the initial book load completes.
+	 *
+	 * For infinite-scroll mode: when multiple pages were loaded previously,
+	 * we trigger sequential page loads until we reach the saved page count,
+	 * then restore the scroll position.
+	 */
+	private restoreScrollIfNeeded(): void {
+		const state = this.scrollRestoration.get(this.scrollKey);
+		if (!state || state.scrollY <= 0) return;
+
+		// Save the state. The actual loading of additional pages and scrolling
+		// will be handled by applyPendingScrollRestore() after each loadBooks()
+		// completes, ensuring we don't have overlapping requests.
+		this.pendingRestoreState = state;
+	}
+
+	/**
+	 * Sequentially loads pages from (currentPage + 1) up to targetPage,
+	 * used exclusively during scroll restoration in infinite-scroll mode.
+	 */
+	private loadPagesUpTo(targetPage: number): void {
+		if (this.currentPage >= targetPage) return;
+		this.currentPage++;
+		this.loadBooks();
+		// The next iteration is triggered from applyPendingScrollRestore once
+		// isLoading becomes false — we check hasNextPage there instead of
+		// calling this recursively, to avoid blocking the event loop.
 	}
 
 	setupInfiniteScroll() {
@@ -266,7 +352,10 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 				if (
 					entries[0].isIntersecting &&
 					!this.isLoading() &&
-					this.hasNextPage
+					this.hasNextPage &&
+					// Don't let the observer fire during scroll restoration;
+					// page loading is driven by applyPendingScrollRestore instead.
+					!this.pendingRestoreState
 				) {
 					this.ngZone.run(() => {
 						this.loadMore();
@@ -422,6 +511,8 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.hasNextPage = this.currentPage < this.lastPage;
 			this.pagesToShow = this.getPagesToShow();
 
+			this.applyPendingScrollRestore();
+
 			// Manually trigger a check if the anchor is visible after loading
 			if (
 				this.hasNextPage &&
@@ -521,6 +612,8 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 				this.pagesToShow = this.getPagesToShow();
 				this.isLoading.set(false);
 
+				this.applyPendingScrollRestore();
+
 				// Manually trigger a check if the anchor is visible after loading
 				if (
 					this.hasNextPage &&
@@ -549,6 +642,36 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 				this.loadOfflineBooks();
 			},
 		});
+	}
+
+	/**
+	 * If a scroll restore is pending and we are not loading more pages,
+	 * applies it and clears the pending state.
+	 *
+	 * For infinite-scroll: if more pages still need loading before reaching
+	 * the target, triggers the next page load instead of scrolling.
+	 */
+	private applyPendingScrollRestore(): void {
+		if (!this.pendingRestoreState) return;
+		if (this.isLoading()) return;
+
+		const { scrollY, infiniteScrollPage } = this.pendingRestoreState;
+
+		// In infinite-scroll mode, keep loading pages until we reach the target
+		if (
+			this.listSettings.listMode === 'infinite-scroll' &&
+			infiniteScrollPage &&
+			this.currentPage < infiniteScrollPage &&
+			this.hasNextPage
+		) {
+			this.loadPagesUpTo(infiniteScrollPage);
+			return;
+		}
+
+		this.pendingRestoreState = null;
+		// Consume the saved state so it won't be re-applied on future visits
+		this.scrollRestoration.consume(this.scrollKey);
+		this.scrollRestoration.restoreAfterRender(scrollY);
 	}
 
 	getPagesToShow(): number[] {
