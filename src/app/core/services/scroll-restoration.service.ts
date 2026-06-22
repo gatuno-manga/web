@@ -87,11 +87,17 @@ export class ScrollRestorationService {
 
 		const attempt = (remaining: number) => {
 			requestAnimationFrame(() => {
-				window.scrollTo({ top: scrollY, behavior: 'instant' });
+				const mainEl = document.querySelector('main');
+				const isMainScrollable = mainEl && window.getComputedStyle(mainEl).overflowY === 'auto';
+				const scrollContainer = isMainScrollable ? mainEl : window;
+				
+				scrollContainer.scrollTo({ top: scrollY, behavior: 'instant' });
+
+				const currentScrollY = isMainScrollable ? mainEl.scrollTop : window.scrollY;
 
 				// If the browser couldn't reach the target yet (DOM still growing),
 				// retry after a short delay.
-				if (remaining > 0 && Math.abs(window.scrollY - scrollY) > 80) {
+				if (remaining > 0 && Math.abs(currentScrollY - scrollY) > 80) {
 					setTimeout(() => attempt(remaining - 1), 200);
 				}
 			});

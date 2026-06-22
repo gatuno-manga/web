@@ -12,16 +12,17 @@ import {
 	ViewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule, NavigationStart } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { BookService } from '@core/services/book.service';
 import { DownloadService } from '@core/services/download.service';
 import { LocalStorageService } from '@core/services/local-storage.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NetworkStatusService } from '@core/services/network-status.service';
-import { ScrollRestorationService } from '@core/services/scroll-restoration.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { TagsService } from '@core/services/tags.service';
+import { ScrollRestorationService, ScrollRestorationState } from '@core/services/scroll-restoration.service';
 import { BookFilterComponent } from '@features/books/components/book-filter/book-filter.component';
 import {
 	BookFilterInput,
@@ -86,11 +87,17 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	/** Key used to store/retrieve scroll position in sessionStorage */
 	private readonly scrollKey = 'books-list';
 	/** Pending scroll/page state to restore after books are rendered */
-	private pendingRestoreState: import('@core/services/scroll-restoration.service').ScrollRestorationState | null = null;
+	private pendingRestoreState: ScrollRestorationState | null = null;
 	/** Debounce timer for scroll position saving */
 	private scrollSaveTimer: ReturnType<typeof setTimeout> | null = null;
 	/** Bound scroll handler so it can be removed on destroy */
-	private readonly onScroll = () => this.scheduleScrollSave();
+	private lastScrollY = 0;
+	private readonly onScroll = (event: Event) => {
+		const target = event.target as HTMLElement | Document;
+		this.lastScrollY = target instanceof Document ? window.scrollY : (target as HTMLElement).scrollTop;
+		this.scheduleScrollSave();
+	};
+	private routerEventsSub?: Subscription;
 
 	constructor() {
 		// Re-load books when global filters change
@@ -176,6 +183,14 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.bookOptions = savedLayout;
 		}
 
+		this.restoreScrollIfNeeded();
+
+		this.routerEventsSub = this.router.events.subscribe((event) => {
+			if (event instanceof NavigationStart) {
+				this.saveScrollPosition();
+			}
+		});
+
 		this.route.queryParams.subscribe((rawParams) => {
 			const params = rawParams as BookQueryParams;
 			const pageFromUrl = params.page
@@ -260,11 +275,12 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	ngOnDestroy() {
 		if (this.isBrowser) {
-			window.removeEventListener('scroll', this.onScroll);
+			window.removeEventListener('scroll', this.onScroll, { capture: true } as any);
 		}
 		if (this.scrollSaveTimer !== null) {
 			clearTimeout(this.scrollSaveTimer);
 		}
+		this.routerEventsSub?.unsubscribe();
 		this.clearCoverUrls();
 		if (this.observer) {
 			this.observer.disconnect();
@@ -273,13 +289,13 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	ngAfterViewInit() {
 		this.setupInfiniteScroll();
-		this.restoreScrollIfNeeded();
 		if (!this.isBrowser) return;
 		// Listen to scroll events to continuously save the position.
 		// We use a native listener (outside NgZone) to avoid triggering
 		// unnecessary change detection on every scroll event.
+		// Use capture: true to catch scroll events from <main> or any inner container
 		this.ngZone.runOutsideAngular(() => {
-			window.addEventListener('scroll', this.onScroll, { passive: true });
+			window.addEventListener('scroll', this.onScroll, { passive: true, capture: true });
 		});
 	}
 
@@ -302,10 +318,13 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	 * so it can be restored when the user navigates back.
 	 */
 	private saveScrollPosition(): void {
-		const extra =
-			this.listSettings.listMode === 'infinite-scroll'
-				? { infiniteScrollPage: this.currentPage }
-				: undefined;
+		if (this.pendingRestoreState) return;
+		const extra: Partial<ScrollRestorationState> = {
+			scrollY: this.lastScrollY,
+		};
+		if (this.listSettings.listMode === 'infinite-scroll') {
+			extra.infiniteScrollPage = this.currentPage;
+		}
 		this.scrollRestoration.save(this.scrollKey, extra);
 	}
 
