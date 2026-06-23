@@ -3,7 +3,7 @@ import {
 	DragDropModule,
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { DecimalPipe, isPlatformBrowser } from '@angular/common';
+import { DecimalPipe, Location, isPlatformBrowser } from '@angular/common';
 import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
@@ -21,7 +21,7 @@ import {
 	ViewChild,
 	ViewChildren,
 } from '@angular/core';
-import { RouterLink, RouterModule } from '@angular/router';
+import { Router, RouterLink, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
@@ -127,6 +127,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	private notificationService = inject(NotificationService);
 	private platformId = inject(PLATFORM_ID);
 	private ngZone = inject(NgZone);
+	private router = inject(Router);
+	private location = inject(Location);
 	private resizeObserver?: ResizeObserver;
 	private mutationObserver?: MutationObserver;
 
@@ -1009,6 +1011,15 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				action: () => this.onSavedPageClick(savedPage),
 			},
 			{
+				label: 'Abrir imagem em nova aba',
+				icon: 'external-link',
+				action: () => {
+					if (savedPage.page.path) {
+						window.open(savedPage.page.path, '_blank');
+					}
+				},
+			},
+			{
 				label: 'Baixar Imagem',
 				icon: 'download',
 				action: () =>
@@ -1369,6 +1380,16 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 
 		// Menu para capítulo único
+		items.push({
+			label: 'Abrir em nova aba',
+			icon: 'external-link',
+			action: () => {
+				const urlTree = this.router.createUrlTree(['/books', this.id(), chapter.id]);
+				const url = this.location.prepareExternalUrl(this.router.serializeUrl(urlTree));
+				window.open(window.location.origin + url, '_blank');
+			},
+		});
+
 		const downloadStatus = this.chaptersDownloadStatus().get(chapter.id);
 
 		if (
@@ -1673,6 +1694,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		if (!this.userTokenService.isAdminSignal()) return;
 
 		const items: ContextMenuItem[] = [
+			{
+				label: 'Abrir em nova aba',
+				icon: 'external-link',
+				action: () => window.open(source, '_blank'),
+			},
 			{
 				label: 'Copiar URL',
 				icon: 'copy',
