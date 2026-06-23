@@ -7,7 +7,15 @@ import { Observable } from 'rxjs';
 	providedIn: 'root',
 })
 export class BookInteractionService {
+
 	private readonly http = inject(HttpClient);
+
+	/**
+	 * Busca os livros favoritos do usuario.
+	 */
+	getFavorites(limit = 20): Observable<any> {
+		return this.http.get<any>(`interactions/favorites?limit=${limit}`);
+	}
 
 	/**
 	 * Busca as avaliações de um livro.

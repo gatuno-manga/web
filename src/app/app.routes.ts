@@ -65,6 +65,14 @@ export const routes: Routes = [
 				data: SERVER_RENDER_CONFIG('books-list'),
 			},
 			{
+				path: 'library',
+				loadComponent: () =>
+					import('./pages/library/library.component').then(
+						(m) => m.LibraryComponent,
+					),
+				data: { ssr: { renderMode: RenderMode.Client } },
+			},
+			{
 				path: 'books/:id',
 				loadComponent: () =>
 					import('./pages/book/book.component').then(

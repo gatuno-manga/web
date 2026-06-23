@@ -63,6 +63,15 @@ export class SideNavComponent {
 						icon: 'clock',
 						route: '/latest-reads',
 					},
+					...(this.isLoggedIn()
+						? [
+								{
+									label: 'Minha Biblioteca',
+									icon: 'bookmark',
+									route: '/library',
+								},
+							]
+						: []),
 					{
 						label: 'Livro aleatório',
 						icon: 'shuffle',

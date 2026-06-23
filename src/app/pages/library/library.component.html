@@ -1,0 +1,66 @@
+<section class="library-page">
+	<header class="library-page__header">
+		<h1>Minha Biblioteca</h1>
+		<p>Gerencie suas coleções e livros favoritos.</p>
+	</header>
+
+	@if (isLoading()) {
+		<div class="library-page__state placeholder skeleton-text">Carregando sua biblioteca...</div>
+	} @else if (error()) {
+		<div class="library-page__state library-page__state--error">
+			{{ error() }}
+		</div>
+	} @else {
+		@if (selectedCollection(); as selected) {
+			<div class="library-page__selected-collection">
+				<button class="btn-back" (click)="clearSelection()" aria-label="Voltar para as coleções">
+					<app-icons name="arrow-left" size="20" />
+					<span>Voltar</span>
+				</button>
+				
+				<header class="collection-header">
+					<h2>{{ selected.title }}</h2>
+					@if (selected.description) {
+						<p>{{ selected.description }}</p>
+					}
+				</header>
+
+				@if (selected.books && selected.books.length > 0) {
+					<div class="books-grid">
+						@for (book of selected.books; track book.id) {
+							<app-item-book [book]="book" [type]="'grid'" />
+						}
+					</div>
+				} @else {
+					<p class="library-page__empty">Nenhum livro nesta coleção.</p>
+				}
+			</div>
+		} @else {
+			<div class="library-page__grid">
+				@if (collections().length === 0) {
+					<p class="library-page__empty">Nenhuma coleção ou favorito encontrado.</p>
+				} @else {
+					@for (collection of collections(); track collection.id) {
+						<article class="library-card" (click)="selectCollection(collection)" tabindex="0" role="button" aria-label="Ver coleção {{ collection.title }}">
+							<header class="library-card__header">
+								<h2>{{ collection.title }}</h2>
+								@if (collection.id === 'favorites') {
+									<span class="library-card__badge library-card__badge--special">Especial</span>
+								} @else {
+									<span class="library-card__badge">{{ collection.isPublic ? 'Pública' : 'Privada' }}</span>
+								}
+							</header>
+							@if (collection.description) {
+								<p class="library-card__description">{{ collection.description }}</p>
+							}
+							
+							<div class="library-card__content">
+								<p class="library-card__count">{{ collection.books ? collection.books.length : 0 }} livro(s)</p>
+							</div>
+						</article>
+					}
+				}
+			</div>
+		}
+	}
+</section>
