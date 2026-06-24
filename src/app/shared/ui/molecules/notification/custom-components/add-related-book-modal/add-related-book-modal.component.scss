@@ -3,14 +3,22 @@
 	flex-direction: column;
 	gap: 1.5rem;
 	width: 100%;
-	max-width: 500px;
-	padding: 1rem;
+	padding: 24px;
 	color: var(--app-text-color);
 
 	header {
 		text-align: center;
-		h2 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 0.5rem; }
-		.subtitle { color: var(--app-text-color-secondary); font-size: 0.9rem; }
+		padding: 0 32px;
+
+		h2 {
+			font-family: var(--font-display);
+			font-size: 1.5rem;
+			margin-bottom: 0.5rem;
+		}
+		.subtitle {
+			color: var(--app-text-color-secondary);
+			font-size: 0.9rem;
+		}
 	}
 
 	.form-group {
@@ -19,9 +27,13 @@
 		gap: 0.5rem;
 		margin-bottom: 1rem;
 
-		label { font-weight: 600; font-size: 0.9rem; }
+		label {
+			font-weight: 600;
+			font-size: 0.9rem;
+		}
 
-		input[type="text"], select {
+		input[type="text"],
+		select {
 			background-color: var(--secondary-color);
 			border: 1px solid var(--border-color);
 			border-radius: 8px;
@@ -44,9 +56,19 @@
 			display: flex;
 			align-items: center;
 
-			.search-icon { position: absolute; left: 12px; opacity: 0.5; }
-			input { width: 100%; padding-left: 40px; }
-			.loader-icon { position: absolute; right: 12px; }
+			.search-icon {
+				position: absolute;
+				left: 12px;
+				opacity: 0.5;
+			}
+			input {
+				width: 100%;
+				padding-left: 40px;
+			}
+			.loader-icon {
+				position: absolute;
+				right: 12px;
+			}
 		}
 
 		.search-results {
@@ -76,15 +98,20 @@
 				cursor: pointer;
 				text-align: left;
 
-				&:hover { background-color: var(--hover-color); }
-				img { 
-					border-radius: 4px; 
+				&:hover {
+					background-color: var(--hover-color);
+				}
+				img {
+					border-radius: 4px;
 					object-fit: cover;
 					width: 40px;
 					height: 60px;
 					flex-shrink: 0;
 				}
-				span { font-size: 0.9rem; font-weight: 500; }
+				span {
+					font-size: 0.9rem;
+					font-weight: 500;
+				}
 			}
 		}
 
@@ -101,29 +128,30 @@
 				display: flex;
 				align-items: center;
 				gap: 1rem;
-				img { 
-					border-radius: 4px; 
+				img {
+					border-radius: 4px;
 					object-fit: cover;
 					width: 48px;
 					height: 72px;
 					flex-shrink: 0;
 				}
-				.title { font-weight: 600; font-size: 1rem; }
+				.title {
+					font-weight: 600;
+					font-size: 1rem;
+				}
 			}
 		}
 	}
 
-	.form-row {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
+	.options-group {
+		display: flex;
+		flex-direction: column;
 		gap: 1.5rem;
-		align-items: center;
 		margin-bottom: 1.5rem;
-
-		@media (max-width: 600px) {
-			grid-template-columns: 1fr;
-			gap: 1rem;
-		}
+		padding: 1.5rem;
+		background-color: rgb(from var(--primary-color) r g b / 0.05);
+		border-radius: 8px;
+		border: 1px dashed var(--border-color);
 
 		.relation-select {
 			width: 100%;
@@ -132,8 +160,7 @@
 		.checkbox-wrapper {
 			display: flex;
 			align-items: center;
-			height: 48px; /* Altura padrão para alinhar com inputs e selects */
-			margin-top: 24px; /* Compensar a altura da label do select (caso tenha) */
+			padding-left: 4px;
 		}
 	}
 
@@ -144,7 +171,13 @@
 		margin-top: 1rem;
 	}
 
-	.spin { animation: spin 1s linear infinite; }
+	.spin {
+		animation: spin 1s linear infinite;
+	}
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}

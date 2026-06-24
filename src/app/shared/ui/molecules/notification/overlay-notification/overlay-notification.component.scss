@@ -57,7 +57,7 @@
 		flex-direction: column;
 		position: relative;
 		animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-		overflow: hidden; // Previne scroll duplo, o corpo que deve scrollar
+		overflow: visible; // Alterado para visible para permitir dropdowns de saírem do modal
 
 		.close-modal-btn {
 			position: absolute;

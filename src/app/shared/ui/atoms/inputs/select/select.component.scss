@@ -193,6 +193,15 @@
 		background: rgb(from var(--primary-color) r g b / 0.4);
 		border-radius: 10px;
 	}
+
+	&.drop-top {
+		top: auto;
+		bottom: 100%;
+		border-radius: var(--select-radius) var(--select-radius) 0 0;
+		border-bottom: none;
+		border-top: 1px solid var(--border-color);
+		animation: selectSlideUp 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+	}
 }
 
 // ─── Search bar ───────────────────────────────────────────────────────────────
@@ -363,6 +372,19 @@
 		opacity: 1;
 		transform: translateY(0) scaleY(1);
 		transform-origin: top;
+	}
+}
+
+@keyframes selectSlideUp {
+	from {
+		opacity: 0;
+		transform: translateY(6px) scaleY(0.96);
+		transform-origin: bottom;
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scaleY(1);
+		transform-origin: bottom;
 	}
 }
 

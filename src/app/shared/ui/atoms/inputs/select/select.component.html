@@ -55,7 +55,7 @@
   </div>
 
   @if (isOpen()) {
-    <div class="select-dropdown" role="listbox">
+    <div class="select-dropdown" [class.drop-top]="dropdownPosition() === 'top'" role="listbox">
       @if (searchable()) {
         <div class="search-bar" (click)="$event.stopPropagation()">
           <app-icons name="search" size="14px" class="search-icon" />
