@@ -13,6 +13,7 @@ import {
 import {
 	provideClientHydration,
 	withEventReplay,
+	withHttpTransferCacheOptions,
 } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withRouterConfig } from '@angular/router';
@@ -30,7 +31,10 @@ export const appConfig: ApplicationConfig = {
 			routes,
 			withRouterConfig({ onSameUrlNavigation: 'reload' }),
 		),
-		provideClientHydration(withEventReplay()),
+		provideClientHydration(
+			withEventReplay(),
+			withHttpTransferCacheOptions({ includePostRequests: true }),
+		),
 		provideAnimationsAsync(),
 		provideHttpClient(
 			withFetch(),
