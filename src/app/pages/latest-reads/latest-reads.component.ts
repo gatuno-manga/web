@@ -9,6 +9,8 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
+import { ChapterService } from '@core/services/chapter.service';
+import { Chapter } from '@models/book.models';
 import { MetaDataService } from '@core/services/meta-data.service';
 import {
 	ReadingProgress,
@@ -59,6 +61,7 @@ export interface HistoryEntry {
 })
 export class LatestReadsComponent implements OnInit {
 	private bookService = inject(BookService);
+	private chapterService = inject(ChapterService);
 	private readingProgressService = inject(ReadingProgressService);
 	private metaService = inject(MetaDataService);
 	private sensitiveContentService = inject(SensitiveContentService);
@@ -131,11 +134,10 @@ export class LatestReadsComponent implements OnInit {
 		this.showSensitiveContent.update((v) => !v);
 	}
 
-	private async loadHistory() {
+		private async loadHistory() {
 		this.isLoading.set(true);
 		try {
-			const progressList =
-				await this.readingProgressService.getAllProgress();
+			const progressList = await this.readingProgressService.getAllProgress();
 			if (progressList && progressList.length > 0) {
 				const sortedProgress = progressList
 					.sort(
@@ -145,23 +147,37 @@ export class LatestReadsComponent implements OnInit {
 					)
 					.slice(0, 100);
 
-				const results: HistoryEntry[] = [];
-				const bookCache = new Map<string, BookBasic>();
-				const chapterCache = new Map<string, Chapterlist[]>();
+				const uniqueBookIds = [...new Set(sortedProgress.map(p => p.bookId))];
+				const uniqueChapterIds = [...new Set(sortedProgress.map(p => p.chapterId))];
 
+				// Fetch chapters in batch
+				let chaptersMap = new Map<string, Chapter>();
+				try {
+					const chaptersBatch = await firstValueFrom(this.chapterService.getChaptersBatch(uniqueChapterIds));
+					chaptersBatch.forEach((c: Chapter) => chaptersMap.set(c.id, c));
+				} catch (e) {
+					console.error('Erro ao buscar capítulos em batch:', e);
+				}
+
+				// Fetch books using GraphQL batch
+				const bookCache = new Map<string, BookBasic>();
+				try {
+					const booksBatch = await firstValueFrom(this.bookService.getBooksBatchGraphQL(uniqueBookIds));
+					booksBatch.forEach(b => bookCache.set(b.id, b));
+				} catch (e) {
+					console.error('Erro ao buscar livros em batch:', e);
+				}
+
+				const results: HistoryEntry[] = [];
 				for (const p of sortedProgress) {
 					try {
-						const entry = await this.processProgressEntry(
-							p,
-							bookCache,
-							chapterCache,
-						);
+						const entry = this.buildProgressEntry(p, bookCache, chaptersMap);
 						if (entry) {
 							results.push(entry);
 						}
 					} catch (err) {
 						console.error(
-							`Erro ao carregar histórico para o livro ${p.bookId}:`,
+							`Erro ao processar histórico para o livro ${p.bookId}:`,
 							err,
 						);
 					}
@@ -175,31 +191,15 @@ export class LatestReadsComponent implements OnInit {
 		}
 	}
 
-	private async processProgressEntry(
+	private buildProgressEntry(
 		p: ReadingProgress,
 		bookCache: Map<string, BookBasic>,
-		chapterCache: Map<string, Chapterlist[]>,
-	): Promise<HistoryEntry | null> {
-		let bookBasic = bookCache.get(p.bookId);
-		if (!bookBasic) {
-			bookBasic = await firstValueFrom(
-				this.bookService.getBook(p.bookId),
-			);
-			if (bookBasic) bookCache.set(p.bookId, bookBasic);
-		}
-
+		chaptersMap: Map<string, Chapter>,
+	): HistoryEntry | null {
+		const bookBasic = bookCache.get(p.bookId);
 		if (!bookBasic) return null;
 
-		let chapters = chapterCache.get(p.bookId);
-		if (!chapters) {
-			const chaptersPage = await firstValueFrom(
-				this.bookService.getChapters(p.bookId, { limit: 500 }),
-			);
-			chapters = chaptersPage.data;
-			chapterCache.set(p.bookId, chapters);
-		}
-
-		const currentChapter = chapters.find((c) => c.id === p.chapterId);
+		const currentChapter = chaptersMap.get(p.chapterId);
 		if (!currentChapter) return null;
 
 		const index = currentChapter.index + 1;
@@ -224,7 +224,6 @@ export class LatestReadsComponent implements OnInit {
 			updatedAt: new Date(p.updatedAt),
 		};
 	}
-
 	formatDateGroup(d: Date): string {
 		const now = new Date();
 		const today = new Date(

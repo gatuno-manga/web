@@ -199,6 +199,74 @@ export class BookService {
 			);
 	}
 
+	getBooksBatchGraphQL(bookIds: string[]): Observable<BookBasic[]> {
+		if (!bookIds || bookIds.length === 0) return of([]);
+
+		const aliases = bookIds.map((id, index) => {
+			return `book${index}: book(id: "${id}") {
+				id
+				title
+				covers {
+					url
+					isMain
+					metadata {
+						blurHash
+						dominantColor
+					}
+				}
+			}`;
+		}).join('\n');
+
+		const query = `
+			query GetBatchBooks {
+				${aliases}
+			}
+		`;
+
+		return this.http.post<{ data: Record<string, any> }>('graphql', { query }).pipe(
+			map(response => {
+				const data = response.data;
+				const books: BookBasic[] = [];
+				for (const key in data) {
+					if (data[key]) {
+						const b = data[key];
+						let cover = '';
+						let blurHash = '';
+						let dominantColor = '';
+						const mainCover = b.covers?.find((c: any) => c.isMain) || b.covers?.[0];
+						if (mainCover) {
+							cover = mainCover.url;
+							if (mainCover.metadata) {
+								blurHash = mainCover.metadata.blurHash;
+								dominantColor = mainCover.metadata.dominantColor;
+							}
+						}
+						books.push({
+							id: b.id,
+							title: b.title,
+							cover: cover,
+							blurHash: blurHash,
+							dominantColor: dominantColor,
+							sensitiveContent: [],
+							description: '',
+							publication: 0,
+							scrapingStatus: ScrapingStatus.READY,
+							autoUpdate: false,
+							tags: [],
+							totalChapters: 0,
+							authors: []
+						} as BookBasic);
+					}
+				}
+				return books;
+			}),
+			catchError(err => {
+				console.error('Erro na batch query GraphQL', err);
+				return of([]);
+			})
+		);
+	}
+
 	getOfflineBooks(
 		options?: BookPageOptions,
 	): Observable<Paginated<BookList>> {
