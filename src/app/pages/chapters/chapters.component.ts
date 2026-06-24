@@ -1012,7 +1012,8 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 				title: 'Salvar Página',
 				message: 'Deseja adicionar uma nota a esta página?',
 				placeholder: 'Ex: Cena importante...',
-				close: (comment: string | null) => {
+				showIsPublicToggle: true,
+				close: (comment: string | null, isPublic?: boolean) => {
 					this.modalNotificationService.close();
 
 					if (comment !== null) {
@@ -1029,6 +1030,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 								chapterId: chapter.id,
 								bookId: chapter.bookId,
 								comment: comment,
+								isPublic: isPublic ?? false,
 							})
 							.subscribe({
 								next: () => {

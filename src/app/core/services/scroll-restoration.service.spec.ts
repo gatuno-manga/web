@@ -1,5 +1,5 @@
-import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import {
 	ScrollRestorationService,
 	ScrollRestorationState,
@@ -84,7 +84,9 @@ describe('ScrollRestorationService', () => {
 			const result = service.consume('test-key');
 
 			expect(result).toEqual(state);
-			expect(sessionStorage.getItem(`${storagePrefix}/test-key`)).toBeNull();
+			expect(
+				sessionStorage.getItem(`${storagePrefix}/test-key`),
+			).toBeNull();
 		});
 
 		it('should return null when key does not exist', () => {
@@ -102,7 +104,9 @@ describe('ScrollRestorationService', () => {
 
 			service.clear('test-key');
 
-			expect(sessionStorage.getItem(`${storagePrefix}/test-key`)).toBeNull();
+			expect(
+				sessionStorage.getItem(`${storagePrefix}/test-key`),
+			).toBeNull();
 		});
 	});
 

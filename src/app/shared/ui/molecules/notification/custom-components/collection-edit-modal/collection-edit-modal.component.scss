@@ -1,58 +1,59 @@
 .collection-edit-modal {
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-lg);
-	padding: var(--spacing-md);
-	min-width: 400px;
-	max-width: 500px;
+	gap: 1.5rem;
+	padding: 24px;
 	width: 100%;
+	overflow-y: auto;
+	max-height: 90vh;
 
 	.modal-header {
 		display: flex;
 		flex-direction: column;
-		gap: var(--spacing-xs);
+		gap: 0.5rem;
+		padding-right: 32px; // Evitar sobrepor o botão de fechar
 
 		h3 {
 			margin: 0;
-			font-size: var(--font-size-xl);
-			color: var(--text-color);
+			font-size: 1.5rem;
+			color: var(--app-text-color);
 		}
 
 		p {
 			margin: 0;
-			font-size: var(--font-size-sm);
-			color: var(--text-muted);
+			font-size: 0.9rem;
+			color: var(--text-color-secondary);
 		}
 	}
 
 	.modal-body {
 		display: flex;
 		flex-direction: column;
-		gap: var(--spacing-md);
+		gap: 1.25rem;
 
 		.form-group {
 			display: flex;
 			flex-direction: column;
-			gap: var(--spacing-xs);
+			gap: 0.5rem;
 
 			label {
-				font-size: var(--font-size-sm);
+				font-size: 0.9rem;
 				font-weight: 500;
-				color: var(--text-color);
+				color: var(--app-text-color);
 			}
 
 			.hint {
-				font-size: var(--font-size-xs);
-				color: var(--text-muted);
+				font-size: 0.8rem;
+				color: var(--text-color-secondary);
 			}
 
 			&.form-group-inline {
 				flex-direction: row;
 				align-items: center;
 				justify-content: space-between;
-				background: var(--surface-2);
-				padding: var(--spacing-sm) var(--spacing-md);
-				border-radius: var(--radius-md);
+				background: var(--secondary-color);
+				padding: 1rem;
+				border-radius: 8px;
 
 				.text {
 					display: flex;
@@ -65,8 +66,8 @@
 
 					p {
 						margin: 0;
-						font-size: var(--font-size-xs);
-						color: var(--text-muted);
+						font-size: 0.8rem;
+						color: var(--text-color-secondary);
 					}
 				}
 			}
@@ -76,14 +77,13 @@
 	.modal-actions {
 		display: flex;
 		justify-content: flex-end;
-		gap: var(--spacing-sm);
-		margin-top: var(--spacing-md);
+		gap: 1rem;
+		margin-top: 1rem;
 	}
 }
 
 @media (max-width: 768px) {
 	.collection-edit-modal {
-		min-width: 100%;
-		padding: var(--spacing-sm);
+		padding: 16px;
 	}
 }

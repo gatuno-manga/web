@@ -1,3 +1,4 @@
+import { isPlatformBrowser, Location } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -8,7 +9,6 @@ import {
 	PLATFORM_ID,
 	signal,
 } from '@angular/core';
-import { Location, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { BookInteractionService } from '@core/services/book-interaction.service';

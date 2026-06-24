@@ -8,12 +8,13 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
 import { TextAreaComponent } from '@ui/atoms/inputs/text-area/text-area.component';
 
 @Component({
 	selector: 'app-prompt-modal',
 	standalone: true,
-	imports: [FormsModule, ButtonComponent, TextAreaComponent],
+	imports: [FormsModule, ButtonComponent, TextAreaComponent, SwitchComponent],
 	templateUrl: './prompt-modal.component.html',
 	styleUrls: ['./prompt-modal.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,12 +24,15 @@ export class PromptModalComponent implements AfterViewInit {
 	message = input<string>('');
 	placeholder = input<string>('');
 	initialValue = input<string>('', { alias: 'value' });
+	showIsPublicToggle = input<boolean>(false);
 
-	close = input.required<(value: string | null) => void>();
+	close =
+		input.required<(value: string | null, isPublic?: boolean) => void>();
 
 	textArea = viewChild(TextAreaComponent);
 
 	inputValue = signal<string>('');
+	isPublic = signal<boolean>(false);
 
 	constructor() {
 		// Initialize local signal with initial value
@@ -48,7 +52,11 @@ export class PromptModalComponent implements AfterViewInit {
 	confirm(): void {
 		const closeFn = this.close();
 		if (closeFn) {
-			closeFn(this.inputValue());
+			if (this.showIsPublicToggle()) {
+				closeFn(this.inputValue(), this.isPublic());
+			} else {
+				closeFn(this.inputValue());
+			}
 		}
 	}
 

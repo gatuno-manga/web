@@ -1,5 +1,5 @@
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 
 export interface ScrollRestorationState {
 	scrollY: number;
@@ -88,12 +88,16 @@ export class ScrollRestorationService {
 		const attempt = (remaining: number) => {
 			requestAnimationFrame(() => {
 				const mainEl = document.querySelector('main');
-				const isMainScrollable = mainEl && window.getComputedStyle(mainEl).overflowY === 'auto';
+				const isMainScrollable =
+					mainEl &&
+					window.getComputedStyle(mainEl).overflowY === 'auto';
 				const scrollContainer = isMainScrollable ? mainEl : window;
-				
+
 				scrollContainer.scrollTo({ top: scrollY, behavior: 'instant' });
 
-				const currentScrollY = isMainScrollable ? mainEl.scrollTop : window.scrollY;
+				const currentScrollY = isMainScrollable
+					? mainEl.scrollTop
+					: window.scrollY;
 
 				// If the browser couldn't reach the target yet (DOM still growing),
 				// retry after a short delay.
