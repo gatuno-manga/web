@@ -1,79 +1,357 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CollectionService } from '@core/services/collection.service';
-import { BookInteractionService } from '@core/services/book-interaction.service';
+import { HttpClient } from '@angular/common/http';
 import { BookService } from '@core/services/book.service';
-import { Collection } from '@core/models/collection.models';
-import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
+import { ContextMenuService } from '@core/services/context-menu.service';
+import { ContextMenuItem } from '@core/models/context-menu.models';
+
+import { BookGridComponent } from '@shared/ui/organisms/book-grid/book-grid.component';
+import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { NotificationService } from '@core/services/notification.service';
+import { CollectionService } from '@core/services/collection.service';
+import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
+import { CollectionEditModalComponent } from '@ui/molecules/notification/custom-components/collection-edit-modal/collection-edit-modal.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { finalize } from 'rxjs';
+import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
+import { finalize, of, concatMap } from 'rxjs';
+import { BookList } from '@core/models/book.models';
+
+export interface LibraryCollection {
+	id: string;
+	title: string;
+	description?: string;
+	visibility?: string;
+	isSpecial?: boolean;
+	books: string[] | BookList[];
+	bookCovers?: any[];
+	coverUrl?: string | null;
+	bookCount: number;
+	isPublic?: boolean;
+}
+
+const LIBRARY_QUERY = `
+	query GetLibrary {
+		myCollections(limit: 50) {
+			data {
+				id
+				title
+				description
+				visibility
+				coverUrl
+				books
+				bookCovers(limit: 4) {
+					url
+					isMain
+					metadata {
+						blurHash
+						dominantColor
+					}
+				}
+			}
+		}
+		myFavorites(limit: 50) {
+			data {
+				book {
+					id
+					title
+					covers {
+						url
+						isMain
+						metadata {
+							blurHash
+							dominantColor
+						}
+					}
+				}
+			}
+		}
+	}
+`;
 
 @Component({
-  selector: 'app-library',
-  standalone: true,
-  imports: [CommonModule, ItemBookComponent, IconsComponent],
-  templateUrl: './library.component.html',
-  styleUrl: './library.component.scss',
+	selector: 'app-library',
+	standalone: true,
+	imports: [CommonModule, BookGridComponent, IconsComponent, BlurhashComponent],
+	templateUrl: './library.component.html',
+	styleUrl: './library.component.scss',
 })
 export class LibraryComponent implements OnInit {
-  private collectionService = inject(CollectionService);
-  private interactionService = inject(BookInteractionService);
-  private bookService = inject(BookService);
+	private http = inject(HttpClient);
+	private bookService = inject(BookService);
+	private contextMenuService = inject(ContextMenuService);
+	private modalService = inject(ModalNotificationService);
+	private notificationService = inject(NotificationService);
+	private collectionService = inject(CollectionService);
 
-  collections = signal<Collection[]>([]);
-  selectedCollection = signal<Collection | null>(null);
-  isLoading = signal(true);
-  error = signal<string | null>(null);
+	collections = signal<LibraryCollection[]>([]);
+	selectedCollection = signal<LibraryCollection | null>(null);
+	selectedBooks = signal<BookList[]>([]);
+	isLoading = signal(true);
+	isLoadingBooks = signal(false);
+	error = signal<string | null>(null);
 
-  selectCollection(collection: Collection) {
-    if (!collection.books || collection.books.length === 0) {
-      this.selectedCollection.set(collection);
-      return;
-    }
+	ngOnInit() {
+		this.fetchData();
+	}
 
-    const bookIds = collection.books
-      .map((b: any) => typeof b === 'string' ? b : (b?.bookId || b?.book?.id || b?.id))
-      .filter(id => !!id);
+	private fetchData() {
+		this.isLoading.set(true);
+		this.error.set(null);
 
-    this.isLoading.set(true);
-    this.bookService.getBooks({ ids: bookIds }).pipe(
-      finalize(() => this.isLoading.set(false))
-    ).subscribe({
-      next: (res) => {
-        const fullCollection = { ...collection, books: res.data };
-        this.selectedCollection.set(fullCollection);
-      },
-      error: (err) => {
-        console.error('Erro ao buscar detalhes dos livros, usando dados cacheados', err);
-        this.selectedCollection.set(collection);
-      }
-    });
-  }
+		this.http.post<any>('graphql', { query: LIBRARY_QUERY })
+			.pipe(finalize(() => this.isLoading.set(false)))
+			.subscribe({
+				next: (res) => {
+					const data = res.data;
+					const libraryList: LibraryCollection[] = [];
 
-  clearSelection() {
-    this.selectedCollection.set(null);
-  }
+					// 1. Map Favorites
+					if (data?.myFavorites?.data) {
+						const favoriteBooks: BookList[] = data.myFavorites.data.map((fav: any) => {
+							const b = fav.book;
+							const mainCover = b.covers?.find((c: any) => c.isMain) || b.covers?.[0];
+							return {
+								...b,
+								cover: mainCover?.url || b.cover,
+								metadata: mainCover?.metadata,
+								blurHash: mainCover?.metadata?.blurHash,
+								dominantColor: mainCover?.metadata?.dominantColor
+							} as BookList;
+						});
 
-  ngOnInit() {
-    this.fetchData();
-  }
+						libraryList.push({
+							id: 'favorites',
+							title: 'Favoritos',
+							description: 'Todos os seus livros marcados como favoritos',
+							isSpecial: true,
+							books: favoriteBooks,
+							bookCount: favoriteBooks.length,
+							bookCovers: favoriteBooks.map(b => [{
+								url: b.cover,
+								metadata: b.metadata,
+								isMain: true
+							}]).slice(0, 4)
+						});
+					}
 
-  private fetchData() {
-    this.isLoading.set(true);
-    this.error.set(null);
+					// 2. Map Collections
+					if (data?.myCollections?.data) {
+						const collections = data.myCollections.data.map((c: any) => ({
+							id: c.id,
+							title: c.title,
+							description: c.description,
+							visibility: c.visibility,
+							isPublic: c.visibility === 'PUBLIC',
+							coverUrl: c.coverUrl,
+							isSpecial: false,
+							books: c.books || [],
+							bookCount: (c.books || []).length,
+							bookCovers: c.bookCovers || []
+						}));
+						libraryList.push(...collections);
+					}
 
-    // Fetch collections
-    this.collectionService.getMyCollections().pipe(
-      finalize(() => this.isLoading.set(false))
-    ).subscribe({
-      next: (colls) => {
-        this.collections.set(colls);
-      },
-      error: (err) => {
-        console.error('Erro ao buscar coleções', err);
-        this.error.set('Não foi possível carregar a biblioteca. Tente novamente mais tarde.');
-        this.isLoading.set(false);
-      }
-    });
-  }
+					this.collections.set(libraryList);
+				},
+				error: (err) => {
+					console.error('Erro ao buscar biblioteca via GraphQL', err);
+					this.error.set('Não foi possível carregar a biblioteca. Tente novamente mais tarde.');
+				}
+			});
+	}
+
+	selectCollection(collection: LibraryCollection) {
+		this.selectedCollection.set(collection);
+
+		if (collection.isSpecial) {
+			// Favoritos já vieram com os livros completos do GraphQL
+			this.selectedBooks.set(collection.books as BookList[]);
+			return;
+		}
+
+		if (!collection.books || collection.books.length === 0) {
+			this.selectedBooks.set([]);
+			return;
+		}
+
+		// Para coleções, os books são apenas IDs, precisamos buscar os dados reais
+		this.isLoadingBooks.set(true);
+
+		this.bookService.getBooks({ ids: collection.books as string[] })
+			.pipe(finalize(() => this.isLoadingBooks.set(false)))
+			.subscribe({
+				next: (res) => {
+					this.selectedBooks.set(res.data as BookList[]);
+				},
+				error: (err) => {
+					console.error('Erro ao buscar livros da coleção', err);
+					this.selectedBooks.set([]);
+				}
+			});
+	}
+
+	clearSelection() {
+		this.selectedCollection.set(null);
+		this.selectedBooks.set([]);
+	}
+
+	getCovers(bookCovers: any[][]) {
+		if (!bookCovers || bookCovers.length === 0) return [];
+		return bookCovers
+			.filter(book => book && book.length > 0)
+			.map(book => book.find((c: any) => c.isMain) || book[0])
+			.slice(0, 4);
+	}
+
+	openContextMenu(event: MouseEvent, collection: LibraryCollection) {
+		console.log('Context menu triggered for:', collection.title);
+		event.preventDefault();
+		event.stopPropagation();
+
+		const items: ContextMenuItem[] = [];
+
+		if (collection.isSpecial) {
+			items.push({
+				label: 'Compartilhar Favoritos',
+				icon: 'share',
+				action: () => this.shareCollection(collection),
+			});
+		} else {
+			items.push(
+				{
+					label: 'Editar Coleção',
+					icon: 'edit',
+					action: () => this.editCollection(collection),
+				},
+				{
+					label: 'Compartilhar',
+					icon: 'share',
+					action: () => this.shareCollection(collection),
+				},
+				{ type: 'separator' },
+				{
+					label: 'Excluir',
+					icon: 'trash',
+					danger: true,
+					action: () => this.deleteCollection(collection),
+				}
+			);
+		}
+
+		this.contextMenuService.open(event, items);
+	}
+
+	editCollection(collection: LibraryCollection) {
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: CollectionEditModalComponent,
+			componentData: {
+				initialData: {
+					title: collection.title,
+					description: collection.description || '',
+					isPublic: collection.isPublic || false,
+					coverUrl: collection.coverUrl || '',
+				},
+				close: (newData: { title: string; description: string; isPublic: boolean; coverUrl: string; coverFile?: File | null } | null) => {
+					this.modalService.close();
+					if (!newData) return;
+
+					const hasChanges = newData.title !== collection.title ||
+						newData.description !== collection.description ||
+						newData.isPublic !== collection.isPublic ||
+						newData.coverUrl !== collection.coverUrl;
+
+					const updateDetails = () => {
+						if (!hasChanges) {
+							if (newData.coverFile) {
+								this.notificationService.success('Coleção atualizada com sucesso!');
+								this.collectionService.getMyCollections().subscribe();
+							}
+							return;
+						}
+							
+						const payload: any = {
+							title: newData.title,
+							isPublic: newData.isPublic,
+						};
+						
+						if (newData.description !== collection.description) {
+							payload.description = newData.description.trim() === '' ? null : newData.description;
+						}
+						
+						if (newData.coverUrl !== collection.coverUrl && !newData.coverFile) {
+							payload.coverUrl = newData.coverUrl.trim() === '' ? null : newData.coverUrl;
+						}
+
+						this.collectionService.updateCollection(collection.id, payload).subscribe({
+							next: () => {
+								this.notificationService.success('Coleção atualizada com sucesso!');
+								if (newData.coverFile) {
+									this.collectionService.getMyCollections().subscribe();
+								} else {
+									this.collections.update(cols => 
+										cols.map(c => c.id === collection.id ? { ...c, ...newData } : c)
+									);
+									if (this.selectedCollection()?.id === collection.id) {
+										this.selectedCollection.update(c => c ? { ...c, ...newData } : c);
+									}
+								}
+							},
+							error: () => this.notificationService.error('Erro ao atualizar coleção')
+						});
+					};
+
+					if (newData.coverFile) {
+						this.collectionService.uploadCover(collection.id, newData.coverFile).subscribe({
+							next: () => updateDetails(),
+							error: () => this.notificationService.error('Erro ao fazer upload da capa')
+						});
+					} else {
+						updateDetails();
+					}
+				}
+			}
+		});
+	}
+
+	shareCollection(collection: LibraryCollection) {
+		const shareUrl = `${window.location.origin}/collection/${collection.id}`;
+		navigator.clipboard.writeText(shareUrl).then(() => {
+			this.notificationService.success('Link copiado para a área de transferência!');
+		}).catch(() => {
+			this.notificationService.error('Erro ao copiar o link');
+		});
+	}
+
+	deleteCollection(collection: LibraryCollection) {
+		this.modalService.show(
+			'Excluir Coleção',
+			`Tem certeza que deseja excluir a coleção "${collection.title}"?`,
+			[
+				{ label: 'Cancelar', type: 'primary', callback: () => this.modalService.close() },
+				{
+					label: 'Excluir',
+					type: 'danger',
+					callback: () => {
+						this.collectionService.deleteCollection(collection.id).subscribe({
+							next: () => {
+								this.notificationService.success('Coleção excluída com sucesso!');
+								this.collections.update(cols => cols.filter(c => c.id !== collection.id));
+								if (this.selectedCollection()?.id === collection.id) {
+									this.clearSelection();
+								}
+								this.modalService.close();
+							},
+							error: () => {
+								this.notificationService.error('Erro ao excluir a coleção');
+								this.modalService.close();
+							}
+						});
+					}
+				}
+			]
+		);
+	}
 }

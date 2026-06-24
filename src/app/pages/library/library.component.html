@@ -19,18 +19,24 @@
 				</button>
 				
 				<header class="collection-header">
-					<h2>{{ selected.title }}</h2>
+					<h2>
+						@if (selected.isSpecial) {
+							<app-icons name="heart" size="24" class="special-icon" />
+						}
+						{{ selected.title }}
+					</h2>
 					@if (selected.description) {
 						<p>{{ selected.description }}</p>
 					}
+					<span class="collection-count">{{ selected.bookCount }} livro(s)</span>
 				</header>
 
-				@if (selected.books && selected.books.length > 0) {
-					<div class="books-grid">
-						@for (book of selected.books; track book.id) {
-							<app-item-book [book]="book" [type]="'grid'" />
-						}
-					</div>
+				@if (isLoadingBooks() || selectedBooks().length > 0) {
+					<app-book-grid
+						[books]="selectedBooks()"
+						[isLoading]="isLoadingBooks()"
+						type="grid"
+					/>
 				} @else {
 					<p class="library-page__empty">Nenhum livro nesta coleção.</p>
 				}
@@ -41,21 +47,64 @@
 					<p class="library-page__empty">Nenhuma coleção ou favorito encontrado.</p>
 				} @else {
 					@for (collection of collections(); track collection.id) {
-						<article class="library-card" (click)="selectCollection(collection)" tabindex="0" role="button" aria-label="Ver coleção {{ collection.title }}">
-							<header class="library-card__header">
-								<h2>{{ collection.title }}</h2>
-								@if (collection.id === 'favorites') {
-									<span class="library-card__badge library-card__badge--special">Especial</span>
-								} @else {
-									<span class="library-card__badge">{{ collection.isPublic ? 'Pública' : 'Privada' }}</span>
-								}
-							</header>
-							@if (collection.description) {
-								<p class="library-card__description">{{ collection.description }}</p>
-							}
+						<article class="item-collection" (click)="selectCollection(collection)" (contextmenu)="openContextMenu($event, collection)" tabindex="0" role="button" aria-label="Ver coleção {{ collection.title }}">
 							
-							<div class="library-card__content">
-								<p class="library-card__count">{{ collection.books ? collection.books.length : 0 }} livro(s)</p>
+							<div class="item-collection__cover-wrapper">
+								@if (collection.coverUrl) {
+									<div class="item-collection__collage" data-count="1">
+										<div class="collage-item">
+											<img [src]="collection.coverUrl" [alt]="collection.title" class="real-image" />
+										</div>
+									</div>
+								} @else if (getCovers(collection.bookCovers || []); as covers) {
+									@if (covers.length > 0) {
+										<div class="item-collection__collage" [attr.data-count]="covers.length">
+											@for (cover of covers; track cover.url) {
+												<div class="collage-item">
+													@if (cover.metadata?.blurHash) {
+														<div class="blur-placeholder">
+															<app-blurhash 
+																[hash]="cover.metadata?.blurHash"
+																[width]="cover.metadata?.width || 32"
+																[height]="cover.metadata?.height || 32">
+															</app-blurhash>
+														</div>
+													}
+													<img [src]="cover.url" [alt]="collection.title" class="real-image" />
+												</div>
+											}
+										</div>
+									} @else {
+										<!-- Placeholder se não tiver capas -->
+										<div class="item-collection__collage item-collection__collage--empty placeholder">
+											@if (collection.isSpecial) {
+												<app-icons name="heart" size="48" />
+											} @else {
+												<app-icons name="bookmark" size="48" />
+											}
+										</div>
+									}
+								}
+								
+								<div class="item-collection__badges">
+									@if (collection.isSpecial) {
+										<span class="badge badge--special">Especial</span>
+									} @else {
+										<span class="badge">{{ collection.visibility === 'PUBLIC' ? 'Pública' : 'Privada' }}</span>
+									}
+								</div>
+								
+								<div class="item-collection__count-overlay">
+									<app-icons name="book" size="14" />
+									<span>{{ collection.bookCount }}</span>
+								</div>
+							</div>
+
+							<div class="item-collection__info">
+								<h2 class="item-collection__title" [title]="collection.title">{{ collection.title }}</h2>
+								@if (collection.description) {
+									<p class="item-collection__description">{{ collection.description }}</p>
+								}
 							</div>
 						</article>
 					}

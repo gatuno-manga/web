@@ -77,4 +77,39 @@ export class CollectionService {
 			`users/${userId}/public/collections`,
 		);
 	}
+
+	/**
+	 * Deleta uma coleção.
+	 */
+	deleteCollection(collectionId: string): Observable<void> {
+		return this.http.delete<void>(`collections/${collectionId}`).pipe(
+			tap(() => {
+				this.myCollectionsSignal.update((current) => 
+					current.filter(c => c.id !== collectionId)
+				);
+			})
+		);
+	}
+
+	/**
+	 * Atualiza uma coleção.
+	 */
+	updateCollection(collectionId: string, data: Partial<CreateCollectionDto>): Observable<Collection> {
+		return this.http.put<Collection>(`collections/${collectionId}`, data).pipe(
+			tap((updatedCollection) => {
+				this.myCollectionsSignal.update((current) => 
+					current.map(c => c.id === collectionId ? updatedCollection : c)
+				);
+			})
+		);
+	}
+
+	/**
+	 * Upload da capa da coleção.
+	 */
+	uploadCover(collectionId: string, file: File): Observable<{ message: string }> {
+		const formData = new FormData();
+		formData.append('file', file);
+		return this.http.post<{ message: string }>(`collections/${collectionId}/cover/upload`, formData);
+	}
 }
