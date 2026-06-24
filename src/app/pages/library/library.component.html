@@ -13,10 +13,7 @@
 	} @else {
 		@if (selectedCollection(); as selected) {
 			<div class="library-page__selected-collection">
-				<button class="btn-back" (click)="clearSelection()" aria-label="Voltar para as coleções">
-					<app-icons name="arrow-left" size="20" />
-					<span>Voltar</span>
-				</button>
+				<app-icon-button name="arrow-left" class="btn-back" (click)="clearSelection()" aria-label="Voltar para as coleções"></app-icon-button>
 				
 				<header class="collection-header">
 					<h2>

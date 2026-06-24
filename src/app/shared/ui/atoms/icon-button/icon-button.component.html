@@ -1,0 +1,13 @@
+<button
+	[type]="type()"
+	class="icon-button"
+	[disabled]="disabled()"
+	[class]="variant()"
+	[class.hover-only]="hoverOnly()"
+	(mousedown)="createRipple($event)"
+>
+	<app-icons [name]="name()" [size]="size()" [color]="color()" />
+	@for (r of ripples(); track r.id) {
+		<span class="ripple-effect" [style.left.px]="r.x" [style.top.px]="r.y"></span>
+	}
+</button>

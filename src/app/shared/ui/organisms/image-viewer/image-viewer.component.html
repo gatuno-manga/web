@@ -4,9 +4,7 @@
             <app-blurhash [hash]="blurHash" [width]="metadata?.width || 32" [height]="metadata?.height || 32" />
         </div>
     }
-	<button type="button" class="close-btn" (click)="closeViewer()">
-		<app-icons name="close" />
-	</button>
+	<app-icon-button name="close" variant="overlay" class="close-btn" (click)="closeViewer()"></app-icon-button>
 	<div class="image-container">
 		<img [src]="imageUrl" alt="Visualização" [attr.alt]="imageTitle || 'Visualização'" (load)="onImageLoad()" />
 		@if(imageTitle) {

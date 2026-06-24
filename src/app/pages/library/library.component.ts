@@ -11,6 +11,7 @@ import { NotificationSeverity } from '@core/services/notification/notification-s
 import { NotificationService } from '@core/services/notification.service';
 import { BookGridComponent } from '@shared/ui/organisms/book-grid/book-grid.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { CollectionEditModalComponent } from '@ui/molecules/notification/custom-components/collection-edit-modal/collection-edit-modal.component';
 import { concatMap, finalize, of } from 'rxjs';
@@ -75,6 +76,7 @@ const LIBRARY_QUERY = `
 		BookGridComponent,
 		IconsComponent,
 		BlurhashComponent,
+		IconButtonComponent,
 	],
 	templateUrl: './library.component.html',
 	styleUrl: './library.component.scss',
