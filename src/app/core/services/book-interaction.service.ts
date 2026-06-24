@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
 	providedIn: 'root',
 })
 export class BookInteractionService {
-
 	private readonly http = inject(HttpClient);
 
 	/**

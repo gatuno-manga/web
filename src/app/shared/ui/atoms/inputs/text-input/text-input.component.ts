@@ -8,8 +8,8 @@ import {
 	input,
 	model,
 	output,
-	viewChild,
 	signal,
+	viewChild,
 } from '@angular/core';
 import {
 	ControlValueAccessor,

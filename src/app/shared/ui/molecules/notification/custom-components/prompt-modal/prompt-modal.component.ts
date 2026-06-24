@@ -8,8 +8,8 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { TextAreaComponent } from '@ui/atoms/inputs/text-area/text-area.component';
 import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
+import { TextAreaComponent } from '@ui/atoms/inputs/text-area/text-area.component';
 
 @Component({
 	selector: 'app-prompt-modal',
@@ -26,7 +26,8 @@ export class PromptModalComponent implements AfterViewInit {
 	initialValue = input<string>('', { alias: 'value' });
 	showIsPublicToggle = input<boolean>(false);
 
-	close = input.required<(value: string | null, isPublic?: boolean) => void>();
+	close =
+		input.required<(value: string | null, isPublic?: boolean) => void>();
 
 	textArea = viewChild(TextAreaComponent);
 
@@ -51,7 +52,11 @@ export class PromptModalComponent implements AfterViewInit {
 	confirm(): void {
 		const closeFn = this.close();
 		if (closeFn) {
-			closeFn(this.inputValue(), this.showIsPublicToggle() ? this.isPublic() : undefined);
+			if (this.showIsPublicToggle()) {
+				closeFn(this.inputValue(), this.isPublic());
+			} else {
+				closeFn(this.inputValue());
+			}
 		}
 	}
 

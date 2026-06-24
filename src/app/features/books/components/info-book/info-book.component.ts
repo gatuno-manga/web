@@ -3,7 +3,7 @@ import {
 	DragDropModule,
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { DecimalPipe, Location, isPlatformBrowser } from '@angular/common';
+import { DecimalPipe, isPlatformBrowser, Location } from '@angular/common';
 import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
@@ -1384,8 +1384,14 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			label: 'Abrir em nova aba',
 			icon: 'external-link',
 			action: () => {
-				const urlTree = this.router.createUrlTree(['/books', this.id(), chapter.id]);
-				const url = this.location.prepareExternalUrl(this.router.serializeUrl(urlTree));
+				const urlTree = this.router.createUrlTree([
+					'/books',
+					this.id(),
+					chapter.id,
+				]);
+				const url = this.location.prepareExternalUrl(
+					this.router.serializeUrl(urlTree),
+				);
 				window.open(window.location.origin + url, '_blank');
 			},
 		});

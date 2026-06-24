@@ -7,9 +7,9 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
 import { TextAreaComponent } from '@ui/atoms/inputs/text-area/text-area.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
-import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
 import { FileInputComponent } from '@ui/molecules/file-input/file-input.component';
 
 export interface CollectionEditData {
@@ -23,7 +23,14 @@ export interface CollectionEditData {
 @Component({
 	selector: 'app-collection-edit-modal',
 	standalone: true,
-	imports: [FormsModule, ButtonComponent, TextAreaComponent, TextInputComponent, SwitchComponent, FileInputComponent],
+	imports: [
+		FormsModule,
+		ButtonComponent,
+		TextAreaComponent,
+		TextInputComponent,
+		SwitchComponent,
+		FileInputComponent,
+	],
 	templateUrl: './collection-edit-modal.component.html',
 	styleUrls: ['./collection-edit-modal.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,7 +48,7 @@ export class CollectionEditModalComponent {
 	isValid = computed(() => this.title().trim().length > 0);
 
 	constructor() {
-		// Can't read inputs in constructor correctly if they are bound after creation in dynamic component, 
+		// Can't read inputs in constructor correctly if they are bound after creation in dynamic component,
 		// but NotificationService sets them before ngOnInit. Wait, it's better to use an effect or just `ngOnInit`
 	}
 
@@ -68,7 +75,7 @@ export class CollectionEditModalComponent {
 				description: this.description(),
 				isPublic: this.isPublic(),
 				coverUrl: this.coverUrl(),
-				coverFile: this.coverFile()
+				coverFile: this.coverFile(),
 			});
 		}
 	}
