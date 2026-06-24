@@ -50,13 +50,14 @@
 			}
 		</div>
 
-		<div class="form-row">
+		<div class="options-group">
 			<app-select
 				id="relationType"
 				formControlName="relationType"
 				[options]="relationTypes"
 				label="Tipo de Relação"
 				class="relation-select"
+				dropdownPosition="top"
 			/>
 			<div class="checkbox-wrapper">
 				<app-checkbox formControlName="isBidirectional">

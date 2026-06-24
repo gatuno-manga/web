@@ -8,13 +8,13 @@ import {
 	signal,
 } from '@angular/core';
 import { ImageMetadata } from '@models/book.models';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 
 @Component({
 	selector: 'app-image-viewer',
 	standalone: true,
-	imports: [CommonModule, IconsComponent, BlurhashComponent],
+	imports: [CommonModule, IconButtonComponent, BlurhashComponent],
 	templateUrl: './image-viewer.component.html',
 	styleUrl: './image-viewer.component.scss',
 })

@@ -31,6 +31,15 @@
 			}
 		</div>
 		<div class="book">
+			<div class="back-navigation">
+				<app-icon-button
+					name="arrow-left"
+					variant="overlay"
+					(click)="goBack()"
+					aria-label="Voltar para a listagem"
+					appTooltip="Voltar para a listagem"
+				></app-icon-button>
+			</div>
 			<div class="glass-panel">
 				<div class="book-header">
 				<div class="book-cover">

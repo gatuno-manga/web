@@ -8,6 +8,7 @@ import {
 	input,
 	model,
 	output,
+	signal,
 	viewChild,
 } from '@angular/core';
 import {
@@ -110,7 +111,11 @@ export class TextInputComponent implements ControlValueAccessor {
 		this.blur.emit();
 	}
 
-	setDisabledState?(_isDisabled: boolean): void {}
+	isDisabled = signal<boolean>(false);
+
+	setDisabledState(isDisabled: boolean): void {
+		this.isDisabled.set(isDisabled);
+	}
 
 	onTouchedInternal(): void {
 		this.onTouched();

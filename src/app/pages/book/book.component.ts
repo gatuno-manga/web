@@ -1,3 +1,4 @@
+import { isPlatformBrowser, Location } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -5,6 +6,7 @@ import {
 	inject,
 	OnDestroy,
 	OnInit,
+	PLATFORM_ID,
 	signal,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -27,6 +29,7 @@ import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
 import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
 import { TooltipDirective } from '@shared/ui/atoms/tooltip/tooltip.directive';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
+import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
@@ -51,6 +54,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 		InfoBookComponent,
 		AsideComponent,
 		ButtonComponent,
+		IconButtonComponent,
 		MarkdownComponent,
 		BlurhashComponent,
 		FlagPipe,
@@ -111,6 +115,12 @@ export class BookComponent implements OnInit, OnDestroy {
 	private readingProgressService = inject(UnifiedReadingProgressService);
 	private chapterService = inject(ChapterService);
 	private sensitiveContentService = inject(SensitiveContentService);
+	private location = inject(Location);
+	private platformId = inject(PLATFORM_ID);
+
+	goBack() {
+		this.location.back();
+	}
 
 	onDocumentClick() {
 		this.closeOptionsDropdown();
@@ -126,9 +136,7 @@ export class BookComponent implements OnInit, OnDestroy {
 		this.routeSub = this.activatedRoute.paramMap.subscribe((params) => {
 			const id = params.get('id');
 			if (!id) {
-				this.router.navigate(['../'], {
-					relativeTo: this.activatedRoute,
-				});
+				this.router.navigate(['/books']);
 				return;
 			}
 			this.loadBook(id);
@@ -144,9 +152,7 @@ export class BookComponent implements OnInit, OnDestroy {
 		this.bookService.getBook(id).subscribe({
 			next: (book) => {
 				if (!book) {
-					this.router.navigate(['../'], {
-						relativeTo: this.activatedRoute,
-					});
+					this.router.navigate(['/books']);
 					return;
 				}
 
@@ -180,6 +186,10 @@ export class BookComponent implements OnInit, OnDestroy {
 				}
 			},
 			error: async () => {
+				if (!isPlatformBrowser(this.platformId)) {
+					// Prevent SSR from redirecting. Let the client hydrate and retry fetching the book.
+					return;
+				}
 				try {
 					const offlineBook = await this.downloadService.getBook(id);
 					if (offlineBook) {
@@ -207,14 +217,10 @@ export class BookComponent implements OnInit, OnDestroy {
 						// Tenta carregar capítulos offline para habilitar "Começar a ler"
 						this.loadOfflineChapters();
 					} else {
-						this.router.navigate(['../'], {
-							relativeTo: this.activatedRoute,
-						});
+						this.router.navigate(['/books']);
 					}
 				} catch (_e) {
-					this.router.navigate(['../'], {
-						relativeTo: this.activatedRoute,
-					});
+					this.router.navigate(['/books']);
 				}
 			},
 		});

@@ -16,16 +16,22 @@
 					<button
 						type="button"
 						class="collection-item"
-						(click)="addToCollection(collection.id)"
+						[class.already-added]="isBookInCollection(collection)"
+						[disabled]="isBookInCollection(collection)"
+						(click)="!isBookInCollection(collection) ? addToCollection(collection.id) : null"
 					>
 						<div class="icon-box">
-							<app-icons name="list" />
+							<app-icons [name]="isBookInCollection(collection) ? 'check' : 'list'" />
 						</div>
 						<div class="info">
 							<span class="title">{{ collection.title }}</span>
-							<span class="count">{{ collection.collaboratorsCount || 0 }} colaboradores</span>
+							<span class="count">{{ collection.bookCount ?? collection.booksCount ?? collection._count?.books ?? collection.books?.length ?? 0 }} livros</span>
 						</div>
-						<app-icons name="plus" class="add-icon" />
+						@if (isBookInCollection(collection)) {
+							<span class="status-badge">Adicionado</span>
+						} @else {
+							<app-icons name="plus" class="add-icon" />
+						}
 					</button>
 				}
 			} @else {

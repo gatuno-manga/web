@@ -6,8 +6,8 @@
 		#pageRef
 		[attr.data-index]="$index"
 		[style.background-color]="page.metadata?.dominantColor || bookDominantColor"
-		[style.aspect-ratio]="getPageAspectRatio(page)"
-		[style.min-height]="getPageMinHeight(page)"
+		[style.aspect-ratio]="getPageAspectRatio(page, $index)"
+		[style.min-height]="getPageMinHeight(page, $index)"
 		(contextmenu)="onContextMenu($event, page, $index)"
 	>
 		<div

@@ -57,6 +57,7 @@ export class SelectComponent implements ControlValueAccessor {
 	leftIcon = input<string | null>(null);
 	chevronIcon = input<string>('chevron-down');
 	size = input<SelectSize>('md');
+	dropdownPosition = input<'bottom' | 'top'>('bottom');
 
 	valueChange = output<string>();
 	change = output<string>();

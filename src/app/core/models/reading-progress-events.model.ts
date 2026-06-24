@@ -21,7 +21,7 @@ export interface SaveProgressDto {
 	chapterId: string;
 	bookId: string;
 	pageIndex: number;
-	timestamp: number;
+	timestamp?: number;
 	totalPages?: number;
 	completed?: boolean;
 }

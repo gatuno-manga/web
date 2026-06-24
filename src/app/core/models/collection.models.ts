@@ -8,11 +8,18 @@ export interface Collection {
 	ownerId: string;
 	books?: BookList[];
 	collaboratorsCount?: number;
+	bookCount?: number;
+	booksCount?: number;
+	_count?: {
+		books?: number;
+		collaborators?: number;
+	};
 	createdAt: string;
 	updatedAt: string;
 }
 
 export interface CreateCollectionDto {
+	id?: string;
 	title: string;
 	description?: string;
 }

@@ -148,13 +148,13 @@ describe('CrossTabSyncService', () => {
 				oldValue: null,
 			});
 
-			// Não deve lançar erro
-			expect(() => {
-				storageEventListeners.forEach((listener) => {
-					listener(storageEvent);
-				});
-				tick();
-			}).not.toThrow();
+			spyOn(console, 'warn');
+
+			// Simula StorageEvent
+			storageEventListeners.forEach((listener) => {
+				listener(storageEvent);
+			});
+			tick();
 
 			expect(receivedMessages.length).toBe(0);
 		}));

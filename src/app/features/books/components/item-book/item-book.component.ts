@@ -1,4 +1,4 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule, Location, NgOptimizedImage } from '@angular/common';
 import {
 	ChangeDetectorRef,
 	Component,
@@ -9,7 +9,7 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
@@ -57,6 +57,8 @@ export class ItemBookComponent {
 	private chapterService = inject(ChapterService);
 	public userTokenService = inject(UserTokenService);
 	private cdr = inject(ChangeDetectorRef);
+	private router = inject(Router);
+	private location = inject(Location);
 
 	imageError = false;
 	isImageLoaded = signal(false);
@@ -187,6 +189,20 @@ export class ItemBookComponent {
 		event.stopPropagation();
 
 		const items: ContextMenuItem[] = [
+			{
+				label: 'Abrir em nova aba',
+				icon: 'external-link',
+				action: () => {
+					const urlTree = this.router.createUrlTree([
+						'/books',
+						this.book().id,
+					]);
+					const url = this.location.prepareExternalUrl(
+						this.router.serializeUrl(urlTree),
+					);
+					window.open(window.location.origin + url, '_blank');
+				},
+			},
 			{
 				label: 'Baixar Livro',
 				icon: 'download',

@@ -39,14 +39,36 @@ export class CollectionService {
 	 * Cria uma nova coleção.
 	 */
 	createCollection(data: CreateCollectionDto): Observable<Collection> {
-		return this.http.post<Collection>('collections', data).pipe(
-			tap((newCollection) => {
-				this.myCollectionsSignal.update((current) => {
-					const arr = Array.isArray(current) ? current : [];
-					return [newCollection, ...arr];
-				});
-			}),
-		);
+		if (!data.id) {
+			data.id = crypto.randomUUID();
+		}
+
+		return this.http
+			.post<Collection | { data: Collection }>('collections', data)
+			.pipe(
+				map((response: any) => {
+					const resData = response?.data ? response.data : response;
+					return resData?.id
+						? resData
+						: ({
+								id: data.id,
+								title: data.title,
+								description: data.description,
+								isPublic: false,
+								ownerId: 'me',
+								books: [],
+								bookCount: 0,
+								createdAt: new Date().toISOString(),
+								updatedAt: new Date().toISOString(),
+							} as Collection);
+				}),
+				tap((newCollection: Collection) => {
+					this.myCollectionsSignal.update((current) => {
+						const arr = Array.isArray(current) ? current : [];
+						return [newCollection, ...arr];
+					});
+				}),
+			);
 	}
 
 	/**
@@ -75,6 +97,60 @@ export class CollectionService {
 	getPublicCollections(userId: string): Observable<Collection[]> {
 		return this.http.get<Collection[]>(
 			`users/${userId}/public/collections`,
+		);
+	}
+
+	/**
+	 * Deleta uma coleção.
+	 */
+	deleteCollection(collectionId: string): Observable<void> {
+		return this.http.delete<void>(`collections/${collectionId}`).pipe(
+			tap(() => {
+				this.myCollectionsSignal.update((current) =>
+					current.filter((c) => c.id !== collectionId),
+				);
+			}),
+		);
+	}
+
+	/**
+	 * Atualiza uma coleção.
+	 */
+	updateCollection(
+		collectionId: string,
+		data: Partial<CreateCollectionDto>,
+	): Observable<Collection> {
+		return this.http
+			.put<Collection | { data: Collection }>(
+				`collections/${collectionId}`,
+				data,
+			)
+			.pipe(
+				map((response: any) => {
+					return response?.data ? response.data : response;
+				}),
+				tap((updatedCollection: Collection) => {
+					this.myCollectionsSignal.update((current) =>
+						current.map((c) =>
+							c.id === collectionId ? updatedCollection : c,
+						),
+					);
+				}),
+			);
+	}
+
+	/**
+	 * Upload da capa da coleção.
+	 */
+	uploadCover(
+		collectionId: string,
+		file: File,
+	): Observable<{ message: string }> {
+		const formData = new FormData();
+		formData.append('file', file);
+		return this.http.post<{ message: string }>(
+			`collections/${collectionId}/cover/upload`,
+			formData,
 		);
 	}
 }

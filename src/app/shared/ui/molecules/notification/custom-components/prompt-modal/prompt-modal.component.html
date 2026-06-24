@@ -16,6 +16,22 @@
 				aria-describedby="prompt-title"
 			></app-text-area>
 		</div>
+
+		@if (showIsPublicToggle()) {
+			<div class="setting-item switch-row">
+				<div class="label-col">
+					<label for="prompt-public">Público</label>
+					<span class="hint">Visível para outros usuários</span>
+				</div>
+				<div class="action-col">
+					<app-switch
+						id="prompt-public"
+						[ngModel]="isPublic()"
+						(ngModelChange)="isPublic.set($event)"
+					></app-switch>
+				</div>
+			</div>
+		}
 	</div>
 	<div class="settings-footer">
 		<app-button (click)="cancel()" variant="text">Cancelar</app-button>

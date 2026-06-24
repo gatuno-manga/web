@@ -9,12 +9,15 @@
 	align-items: center;
 	justify-content: center;
 	z-index: 10000;
-	backdrop-filter: blur(8px);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
 }
 
 .setup-card {
-	background-color: var(--app-background-color);
-	border: 1px solid var(--secondary-color);
+	background: rgb(from var(--app-background-color) r g b / 0.75);
+	backdrop-filter: blur(96px) saturate(200%);
+	-webkit-backdrop-filter: blur(96px) saturate(200%);
+	border: 1px solid var(--border-color);
 	border-radius: 1.5rem;
 	padding: 2.5rem;
 	max-width: 600px;
@@ -112,7 +115,9 @@ footer {
 	font-weight: bold;
 	font-size: 1.1rem;
 	cursor: pointer;
-	transition: transform 0.2s ease, filter 0.2s ease;
+	transition:
+		transform 0.2s ease,
+		filter 0.2s ease;
 
 	&:hover {
 		filter: brightness(1.1);

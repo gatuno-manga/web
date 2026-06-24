@@ -270,17 +270,23 @@ export class UnifiedReadingProgressService implements OnDestroy {
 		try {
 			// Obtém todo o histórico local
 			const localProgress = await this.localService.getAllProgress();
+			const lastSyncAt = this.syncStatus().lastSyncAt;
 
-			if (localProgress.length === 0) {
+			const progressToSync = lastSyncAt
+				? localProgress.filter(
+						(p) => new Date(p.updatedAt) > lastSyncAt,
+					)
+				: localProgress;
+
+			if (progressToSync.length === 0) {
 				return;
 			}
 
 			// Converte para o formato de DTO esperado pela API
-			const progressDtos: SaveProgressDto[] = localProgress.map((p) => ({
+			const progressDtos: SaveProgressDto[] = progressToSync.map((p) => ({
 				chapterId: p.chapterId,
 				bookId: p.bookId,
 				pageIndex: Math.max(0, p.pageIndex),
-				timestamp: Date.now(),
 			}));
 
 			// Envia todos os progressos em uma única chamada
@@ -332,6 +338,10 @@ export class UnifiedReadingProgressService implements OnDestroy {
 					remoteProgress.chapterId,
 					remoteProgress.bookId,
 					remoteProgress.pageIndex,
+					undefined,
+					remoteProgress.updatedAt
+						? new Date(remoteProgress.updatedAt)
+						: new Date(remoteProgress.timestamp),
 				);
 			});
 

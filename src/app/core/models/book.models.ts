@@ -226,6 +226,7 @@ export interface Page {
 }
 
 export interface BookPageOptions extends PageRequest {
+	ids?: string[];
 	type?: TypeBook[];
 	sensitiveContent?: string[];
 	search?: string;

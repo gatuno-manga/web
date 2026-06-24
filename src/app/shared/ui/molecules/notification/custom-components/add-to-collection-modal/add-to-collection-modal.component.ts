@@ -54,6 +54,14 @@ export class AddToCollectionModalComponent implements OnInit {
 			});
 	}
 
+	isBookInCollection(collection: any): boolean {
+		if (!collection.books || !Array.isArray(collection.books)) return false;
+		return collection.books.some((b: any) => {
+			if (typeof b === 'string') return b === this.bookId();
+			return b.id === this.bookId();
+		});
+	}
+
 	toggleCreate() {
 		this.isCreating.update((v) => !v);
 		this.newCollectionTitle.set('');

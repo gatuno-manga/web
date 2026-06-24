@@ -224,9 +224,12 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.maxReadPageIndex = 0;
 	}
 
-	getPageAspectRatio(page: Page): string {
+	getPageAspectRatio(page: Page, index: number): string {
 		if (page.metadata?.width && page.metadata?.height) {
 			return `${page.metadata.width} / ${page.metadata.height}`;
+		}
+		if (this.loadedPages.has(index)) {
+			return 'auto';
 		}
 		if (this.bookMetadata?.width && this.bookMetadata?.height) {
 			return `${this.bookMetadata.width} / ${this.bookMetadata.height}`;
@@ -234,8 +237,11 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 		return '2 / 3';
 	}
 
-	getPageMinHeight(page: Page): string {
+	getPageMinHeight(page: Page, index: number): string {
 		if (page.metadata?.width && page.metadata?.height) {
+			return 'auto';
+		}
+		if (this.loadedPages.has(index)) {
 			return 'auto';
 		}
 		if (this.bookMetadata?.height) {

@@ -1,0 +1,54 @@
+<div class="collection-edit-modal">
+	<div class="modal-header">
+		<h3>Editar Coleção</h3>
+		<p>Atualize os detalhes da sua coleção</p>
+	</div>
+
+	<div class="modal-body">
+		<div class="form-group">
+			<label>Título</label>
+			<app-input
+				type="text"
+				placeholder="Nome da coleção"
+				[ngModel]="title()"
+				(ngModelChange)="title.set($event)"
+			/>
+		</div>
+
+		<div class="form-group">
+			<label>Descrição</label>
+			<app-text-area
+				placeholder="Uma breve descrição sobre a coleção..."
+				[ngModel]="description()"
+				(ngModelChange)="description.set($event)"
+			></app-text-area>
+		</div>
+
+		<div class="form-group">
+			<label>Capa</label>
+			<app-file-input
+				[initialPreviewUrl]="coverUrl()"
+				(fileSelected)="onFileSelected($event)"
+				accept="image/png, image/jpeg, image/webp"
+				[maxSize]="5"
+			></app-file-input>
+			<small class="hint">Adicione uma imagem de capa (opcional). Limite de 5MB.</small>
+		</div>
+
+		<div class="form-group form-group-inline">
+			<div class="text">
+				<label>Coleção Pública</label>
+				<p>Outros usuários poderão ver e acessar esta coleção pelo link.</p>
+			</div>
+			<app-switch
+				[value]="isPublic()"
+				(valueChange)="isPublic.set($event)"
+			></app-switch>
+		</div>
+	</div>
+
+	<div class="modal-actions">
+		<app-button variant="outline" (click)="cancel()">Cancelar</app-button>
+		<app-button variant="primary" (click)="confirm()" [disabled]="!isValid()">Salvar Alterações</app-button>
+	</div>
+</div>
