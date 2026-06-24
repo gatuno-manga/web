@@ -10,11 +10,11 @@ import { ModalNotificationService } from '@core/services/modal-notification.serv
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
 import { NotificationService } from '@core/services/notification.service';
 import { BookGridComponent } from '@shared/ui/organisms/book-grid/book-grid.component';
-import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
+import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { CollectionEditModalComponent } from '@ui/molecules/notification/custom-components/collection-edit-modal/collection-edit-modal.component';
-import { concatMap, finalize, of } from 'rxjs';
+import { finalize } from 'rxjs';
 
 export interface LibraryCollection {
 	id: string;

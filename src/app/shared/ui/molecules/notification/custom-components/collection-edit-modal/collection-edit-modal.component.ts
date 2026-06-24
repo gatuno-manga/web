@@ -47,11 +47,6 @@ export class CollectionEditModalComponent {
 
 	isValid = computed(() => this.title().trim().length > 0);
 
-	constructor() {
-		// Can't read inputs in constructor correctly if they are bound after creation in dynamic component,
-		// but NotificationService sets them before ngOnInit. Wait, it's better to use an effect or just `ngOnInit`
-	}
-
 	ngOnInit() {
 		const data = this.initialData();
 		this.title.set(data.title || '');

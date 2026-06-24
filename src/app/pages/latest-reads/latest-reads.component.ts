@@ -10,7 +10,6 @@ import {
 import { RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { ChapterService } from '@core/services/chapter.service';
-import { Chapter } from '@models/book.models';
 import { MetaDataService } from '@core/services/meta-data.service';
 import {
 	ReadingProgress,
@@ -19,7 +18,7 @@ import {
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import {
 	BookBasic,
-	Chapterlist,
+	Chapter,
 	SensitiveContentResponse,
 } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
@@ -134,10 +133,11 @@ export class LatestReadsComponent implements OnInit {
 		this.showSensitiveContent.update((v) => !v);
 	}
 
-		private async loadHistory() {
+	private async loadHistory() {
 		this.isLoading.set(true);
 		try {
-			const progressList = await this.readingProgressService.getAllProgress();
+			const progressList =
+				await this.readingProgressService.getAllProgress();
 			if (progressList && progressList.length > 0) {
 				const sortedProgress = progressList
 					.sort(
@@ -147,14 +147,22 @@ export class LatestReadsComponent implements OnInit {
 					)
 					.slice(0, 100);
 
-				const uniqueBookIds = [...new Set(sortedProgress.map(p => p.bookId))];
-				const uniqueChapterIds = [...new Set(sortedProgress.map(p => p.chapterId))];
+				const uniqueBookIds = [
+					...new Set(sortedProgress.map((p) => p.bookId)),
+				];
+				const uniqueChapterIds = [
+					...new Set(sortedProgress.map((p) => p.chapterId)),
+				];
 
 				// Fetch chapters in batch
-				let chaptersMap = new Map<string, Chapter>();
+				const chaptersMap = new Map<string, Chapter>();
 				try {
-					const chaptersBatch = await firstValueFrom(this.chapterService.getChaptersBatch(uniqueChapterIds));
-					chaptersBatch.forEach((c: Chapter) => chaptersMap.set(c.id, c));
+					const chaptersBatch = await firstValueFrom(
+						this.chapterService.getChaptersBatch(uniqueChapterIds),
+					);
+					chaptersBatch.forEach((c: Chapter) => {
+						chaptersMap.set(c.id, c);
+					});
 				} catch (e) {
 					console.error('Erro ao buscar capítulos em batch:', e);
 				}
@@ -162,8 +170,12 @@ export class LatestReadsComponent implements OnInit {
 				// Fetch books using GraphQL batch
 				const bookCache = new Map<string, BookBasic>();
 				try {
-					const booksBatch = await firstValueFrom(this.bookService.getBooksBatchGraphQL(uniqueBookIds));
-					booksBatch.forEach(b => bookCache.set(b.id, b));
+					const booksBatch = await firstValueFrom(
+						this.bookService.getBooksBatchGraphQL(uniqueBookIds),
+					);
+					booksBatch.forEach((b) => {
+						bookCache.set(b.id, b);
+					});
 				} catch (e) {
 					console.error('Erro ao buscar livros em batch:', e);
 				}
@@ -171,7 +183,11 @@ export class LatestReadsComponent implements OnInit {
 				const results: HistoryEntry[] = [];
 				for (const p of sortedProgress) {
 					try {
-						const entry = this.buildProgressEntry(p, bookCache, chaptersMap);
+						const entry = this.buildProgressEntry(
+							p,
+							bookCache,
+							chaptersMap,
+						);
 						if (entry) {
 							results.push(entry);
 						}

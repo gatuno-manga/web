@@ -29,9 +29,9 @@ import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
 import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
 import { TooltipDirective } from '@shared/ui/atoms/tooltip/tooltip.directive';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
+import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
 	AddToCollectionModalComponent,

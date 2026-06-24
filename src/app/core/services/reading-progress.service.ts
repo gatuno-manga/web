@@ -60,7 +60,7 @@ export class ReadingProgressService {
 						data.bookId,
 						data.pageIndex,
 						data.userId,
-						data.updatedAt
+						data.updatedAt,
 					);
 				});
 		}

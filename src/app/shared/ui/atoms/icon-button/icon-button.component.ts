@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	input,
+	signal,
+} from '@angular/core';
 import { IconsComponent } from '../icons/icons.component';
 
 @Component({

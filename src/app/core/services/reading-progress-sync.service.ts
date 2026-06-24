@@ -79,10 +79,14 @@ export class ReadingProgressSyncService implements OnDestroy {
 		if (this.isBrowser) {
 			this.setupNetworkListener();
 			this.setupMqttListeners();
-			
-			const savedSync = this.localStorageService.get<string>('last_sync_at');
+
+			const savedSync =
+				this.localStorageService.get<string>('last_sync_at');
 			if (savedSync) {
-				this._syncStatus.update(state => ({ ...state, lastSyncAt: new Date(savedSync) }));
+				this._syncStatus.update((state) => ({
+					...state,
+					lastSyncAt: new Date(savedSync),
+				}));
 			}
 		}
 	}
@@ -118,7 +122,9 @@ export class ReadingProgressSyncService implements OnDestroy {
 						progress.bookId,
 						progress.pageIndex,
 						undefined,
-						progress.updatedAt ? new Date(progress.updatedAt) : new Date(progress.timestamp)
+						progress.updatedAt
+							? new Date(progress.updatedAt)
+							: new Date(progress.timestamp),
 					);
 					this.progressSyncedSubject.next(progress);
 				}
@@ -261,7 +267,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private async syncBulkViaHttp(
 		progress: SaveProgressDto[],
 	): Promise<SyncResponse> {
-		const sanitizedProgress = progress.map(p => {
+		const sanitizedProgress = progress.map((p) => {
 			const { timestamp, ...rest } = p as any;
 			return rest;
 		});
@@ -351,7 +357,9 @@ export class ReadingProgressSyncService implements OnDestroy {
 						progress.bookId,
 						progress.pageIndex,
 						undefined,
-						progress.updatedAt ? new Date(progress.updatedAt) : new Date(progress.timestamp)
+						progress.updatedAt
+							? new Date(progress.updatedAt)
+							: new Date(progress.timestamp),
 					);
 				}
 			}
@@ -376,7 +384,10 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private updateSyncStatus(partial: Partial<SyncStatus>): void {
 		this._syncStatus.update((state) => {
 			if (partial.lastSyncAt) {
-				this.localStorageService.set('last_sync_at', partial.lastSyncAt.toISOString());
+				this.localStorageService.set(
+					'last_sync_at',
+					partial.lastSyncAt.toISOString(),
+				);
 			}
 			return {
 				...state,
