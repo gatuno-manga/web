@@ -125,6 +125,33 @@
 				opacity: 0.3;
 				transition: all 0.2s ease;
 			}
+
+			&.already-added {
+				cursor: default;
+				opacity: 0.7;
+				background-color: var(--secondary-color);
+				border-color: transparent;
+				
+				&:hover {
+					transform: none;
+					background-color: var(--secondary-color);
+					border-color: transparent;
+				}
+
+				.icon-box {
+					background-color: rgb(from var(--success-color, #4caf50) r g b / 0.1);
+					color: var(--success-color, #4caf50);
+				}
+			}
+
+			.status-badge {
+				font-size: 0.75rem;
+				font-weight: 600;
+				color: var(--success-color, #4caf50);
+				background: rgb(from var(--success-color, #4caf50) r g b / 0.1);
+				padding: 4px 8px;
+				border-radius: 4px;
+			}
 		}
 	}
 

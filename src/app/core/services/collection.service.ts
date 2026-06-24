@@ -39,8 +39,26 @@ export class CollectionService {
 	 * Cria uma nova coleção.
 	 */
 	createCollection(data: CreateCollectionDto): Observable<Collection> {
-		return this.http.post<Collection>('collections', data).pipe(
-			tap((newCollection) => {
+		if (!data.id) {
+			data.id = crypto.randomUUID();
+		}
+		
+		return this.http.post<Collection | { data: Collection }>('collections', data).pipe(
+			map((response: any) => {
+				const resData = response?.data ? response.data : response;
+				return resData?.id ? resData : {
+					id: data.id,
+					title: data.title,
+					description: data.description,
+					isPublic: false,
+					ownerId: 'me',
+					books: [],
+					bookCount: 0,
+					createdAt: new Date().toISOString(),
+					updatedAt: new Date().toISOString()
+				} as Collection;
+			}),
+			tap((newCollection: Collection) => {
 				this.myCollectionsSignal.update((current) => {
 					const arr = Array.isArray(current) ? current : [];
 					return [newCollection, ...arr];
@@ -95,8 +113,11 @@ export class CollectionService {
 	 * Atualiza uma coleção.
 	 */
 	updateCollection(collectionId: string, data: Partial<CreateCollectionDto>): Observable<Collection> {
-		return this.http.put<Collection>(`collections/${collectionId}`, data).pipe(
-			tap((updatedCollection) => {
+		return this.http.put<Collection | { data: Collection }>(`collections/${collectionId}`, data).pipe(
+			map((response: any) => {
+				return response?.data ? response.data : response;
+			}),
+			tap((updatedCollection: Collection) => {
 				this.myCollectionsSignal.update((current) => 
 					current.map(c => c.id === collectionId ? updatedCollection : c)
 				);
