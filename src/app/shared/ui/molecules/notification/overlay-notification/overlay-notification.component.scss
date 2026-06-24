@@ -16,10 +16,13 @@
 	width: 100vw;
 	height: 100vh;
 	background: var(--overlay-bg);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
 	pointer-events: all;
 	z-index: 11000;
 	opacity: 0;
 	transition: opacity 0.3s ease;
+	transform: translateZ(0);
 
 	&.show {
 		opacity: 1;
@@ -41,8 +44,8 @@
 	.modal-content {
 		pointer-events: all;
 		background: rgb(from var(--app-background-color) r g b / 0.75);
-		backdrop-filter: blur(24px) saturate(180%);
-		-webkit-backdrop-filter: blur(24px) saturate(180%);
+		backdrop-filter: blur(96px) saturate(200%);
+		-webkit-backdrop-filter: blur(96px) saturate(200%);
 		border: 1px solid var(--border-color);
 		border-radius: 16px;
 		box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
