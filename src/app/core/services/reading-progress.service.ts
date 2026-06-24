@@ -40,6 +40,7 @@ export class ReadingProgressService {
 		bookId: string;
 		pageIndex: number;
 		userId: string;
+		updatedAt?: Date;
 	}>();
 
 	constructor(@Inject(PLATFORM_ID) platformId: object) {
@@ -59,6 +60,7 @@ export class ReadingProgressService {
 						data.bookId,
 						data.pageIndex,
 						data.userId,
+						data.updatedAt
 					);
 				});
 		}
@@ -141,6 +143,7 @@ export class ReadingProgressService {
 		bookId: string,
 		pageIndex: number,
 		userId?: string,
+		updatedAt?: Date,
 	): Promise<void> {
 		if (!this.isBrowser || !this.dbPromise) return;
 
@@ -152,6 +155,7 @@ export class ReadingProgressService {
 			bookId,
 			pageIndex,
 			userId: targetUserId,
+			updatedAt,
 		});
 		return Promise.resolve();
 	}
@@ -161,6 +165,7 @@ export class ReadingProgressService {
 		bookId: string,
 		pageIndex: number,
 		userId: string,
+		updatedAt?: Date,
 	): Promise<void> {
 		const targetUserId = userId || this.currentUserId;
 
@@ -180,7 +185,7 @@ export class ReadingProgressService {
 					bookId,
 					userId: targetUserId,
 					pageIndex,
-					updatedAt: new Date(),
+					updatedAt: updatedAt || new Date(),
 				};
 
 				const request = store.put(progress);
