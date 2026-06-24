@@ -1,8 +1,5 @@
-import { Component, forwardRef, input, output } from '@angular/core';
-import {
-	CheckboxControlValueAccessor,
-	NG_VALUE_ACCESSOR,
-} from '@angular/forms';
+import { Component, forwardRef, model } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
 	selector: 'app-switch',
@@ -18,20 +15,34 @@ import {
 	templateUrl: './switch.component.html',
 	styleUrl: './switch.component.scss',
 })
-export class SwitchComponent extends CheckboxControlValueAccessor {
-	value = input<boolean>(false);
-	disabled = input<boolean>(false);
-	valueChange = output<boolean>();
+export class SwitchComponent implements ControlValueAccessor {
+	value = model<boolean>(false);
+	disabled = model<boolean>(false);
+
+	onChange: any = () => {};
+	onTouched: any = () => {};
 
 	onSwitchChange(event: Event): void {
 		const input = event.target as HTMLInputElement;
 		const newValue = input.checked;
-		this.valueChange.emit(newValue);
-		if (this.onChange) {
-			this.onChange(newValue);
-		}
-		if (this.onTouched) {
-			this.onTouched();
-		}
+		this.value.set(newValue);
+		this.onChange(newValue);
+		this.onTouched();
+	}
+
+	writeValue(value: any): void {
+		this.value.set(!!value);
+	}
+
+	registerOnChange(fn: any): void {
+		this.onChange = fn;
+	}
+
+	registerOnTouched(fn: any): void {
+		this.onTouched = fn;
+	}
+
+	setDisabledState(isDisabled: boolean): void {
+		this.disabled.set(isDisabled);
 	}
 }

@@ -5,6 +5,7 @@ export interface CreateSavedPageDto {
 	chapterId: string;
 	bookId: string;
 	comment?: string;
+	isPublic?: boolean;
 }
 
 export interface SavedPage {
