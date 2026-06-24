@@ -41,8 +41,8 @@
 				<p>Outros usuários poderão ver e acessar esta coleção pelo link.</p>
 			</div>
 			<app-switch
-				[ngModel]="isPublic()"
-				(ngModelChange)="isPublic.set($event)"
+				[value]="isPublic()"
+				(valueChange)="isPublic.set($event)"
 			></app-switch>
 		</div>
 	</div>
