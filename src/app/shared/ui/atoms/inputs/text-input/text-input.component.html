@@ -21,6 +21,7 @@
         [value]="value()"
         [placeholder]="!showLabel() ? placeholder() : ''"
         [autocomplete]="autocomplete()"
+        [disabled]="isDisabled()"
         (input)="onInput($event)"
         (blur)="onBlur(value()); isFocused = false"
         (focus)="onFocus()"

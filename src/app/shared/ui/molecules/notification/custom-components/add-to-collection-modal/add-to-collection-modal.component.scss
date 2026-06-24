@@ -1,16 +1,16 @@
-@use 'mixins';
+@use "mixins";
 
 .add-to-collection-modal {
 	display: flex;
 	flex-direction: column;
 	gap: 1.5rem;
 	width: 100%;
-	max-width: 450px;
-	padding: 1rem;
+	padding: 24px;
 	color: var(--app-text-color);
 
 	header {
 		text-align: center;
+		padding: 0 32px;
 
 		h2 {
 			font-family: var(--font-display);
@@ -45,7 +45,8 @@
 			border-radius: 10px;
 		}
 
-		.loading, .empty-state {
+		.loading,
+		.empty-state {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
@@ -135,7 +136,7 @@
 		background: rgb(from var(--primary-color) r g b / 0.05);
 		border-radius: 8px;
 		border: 1px dashed var(--primary-color);
-		
+
 		.create-actions {
 			display: flex;
 			justify-content: flex-end;
@@ -156,5 +157,7 @@
 }
 
 @keyframes spin {
-	to { transform: rotate(360deg); }
+	to {
+		transform: rotate(360deg);
+	}
 }
