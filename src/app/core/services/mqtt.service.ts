@@ -260,9 +260,12 @@ export class MqttService implements OnDestroy {
 
 			// Assinar tópicos globais automaticamente
 			const userId = this.userTokenService.userIdSignal();
+			console.log(`[MQTT_DEBUG] Verificando tópicos globais. UserID obtido:`, userId);
 			if (userId) {
 				this.subscribeTopic(`users/${userId}/reading-progress`);
 				this.subscribeTopic(`users/${userId}/notifications`);
+			} else {
+				console.warn(`[MQTT_DEBUG] ⚠️ Nenhum UserID encontrado, pulando tópicos globais!`);
 			}
 		});
 
@@ -298,8 +301,11 @@ export class MqttService implements OnDestroy {
 	}
 
 	private handleMessage(topic: string, messageStr: string): void {
+		console.log(`[MQTT_DEBUG] 📥 MENSAGEM RECEBIDA | Tópico: [${topic}] | Conteúdo:`, messageStr);
 		try {
-			const data = JSON.parse(messageStr) as MqttPayload;
+			const parsed = JSON.parse(messageStr);
+			// Extrai o dado real caso venha empacotado (ex: NestJS Microservices envia { pattern: "...", data: { ... } })
+			const data = (parsed.data ? parsed.data : parsed) as MqttPayload;
 
 			// Lógica de notificação pessoal
 			if (topic.includes('/notifications')) {
@@ -416,10 +422,18 @@ export class MqttService implements OnDestroy {
 	}
 
 	private subscribeTopic(topic: string): void {
-		if (!this.client || !this._connected()) return;
+		// Adiciona ao set de tópicos desejados imediatamente.
+		// Assim, quando conectar, o resubscribeAll() inscreverá nele.
+		this.subscribedTopics.add(topic);
+
+		if (!this.client || !this._connected()) {
+			console.warn(`[MQTT_DEBUG] ⏳ Cliente offline/conectando. Inscrição salva em fila para o tópico: ${topic}`);
+			return;
+		}
+		
 		this.client.subscribe(topic, { qos: 1 }, (err) => {
 			if (!err) {
-				this.subscribedTopics.add(topic);
+				console.log(`[MQTT_DEBUG] ✅ INSCRIÇÃO CONFIRMADA no tópico: ${topic}`);
 				logConnectionEvent(
 					this.serviceName,
 					'subscribe',
@@ -437,10 +451,12 @@ export class MqttService implements OnDestroy {
 	}
 
 	private unsubscribeTopic(topic: string): void {
-		if (!this.client) return;
-		this.client.unsubscribe(topic, (err) => {
-			if (!err) this.subscribedTopics.delete(topic);
-		});
+		// Remove do set imediatamente
+		this.subscribedTopics.delete(topic);
+		
+		if (!this.client || !this._connected()) return;
+		
+		this.client.unsubscribe(topic);
 	}
 
 	private resubscribeAll(): void {
