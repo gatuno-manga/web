@@ -1,9 +1,12 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
+	PLATFORM_ID,
 	effect,
+	inject,
 	input,
 	viewChild,
 } from '@angular/core';

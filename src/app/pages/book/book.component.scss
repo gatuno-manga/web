@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 @use 'dropdown-menu' as dropdown;
 
 $page-size: 1200px;
@@ -212,8 +213,7 @@ $page-size: 1200px;
 			var(--app-background-color) 75%,
 			transparent
 		);
-		backdrop-filter: blur(24px) saturate(180%);
-		-webkit-backdrop-filter: blur(24px) saturate(180%);
+		@include glass-panel;
 		border: 1px solid var(--border-color);
 		border-radius: 24px;
 		box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
@@ -510,8 +510,7 @@ $page-size: 1200px;
 				text-transform: capitalize;
 				cursor: pointer;
 				background: rgb(from var(--app-background-color) r g b / 0.4);
-				backdrop-filter: blur(8px);
-				-webkit-backdrop-filter: blur(8px);
+				@include glass-medium;
 				border: 1px solid var(--border-color);
 				position: relative;
 				overflow: hidden;

@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 %cover-grid-layout {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, 225px);
@@ -288,8 +289,7 @@
 			box-shadow 0.3s,
 			transform 0.2s;
 		background-color: color-mix(in srgb, var(--app-background-color) 40%, transparent);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
+		@include glass-overlay;
 		border: 1px solid var(--border-color);
 		flex: none;
 		display: flex;
@@ -643,8 +643,7 @@
 
 		.item {
 			background: rgb(from var(--app-background-color) r g b / 0.4);
-			backdrop-filter: blur(8px);
-			-webkit-backdrop-filter: blur(8px);
+			@include glass-medium;
 			border: 1px solid var(--border-color);
 			color: var(--primary-color);
 			padding: 5px 12px;

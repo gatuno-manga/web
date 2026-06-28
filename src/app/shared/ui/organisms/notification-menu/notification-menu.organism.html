@@ -10,8 +10,8 @@
 		<span class="badge">{{ unreadCount() }}</span>
 	}
 
-	@if (isOpen()) {
-		<div class="dropdown-menu" (click)="$event.stopPropagation()">
+	<ng-template #menuContent>
+		<div class="menu-content-wrapper">
 			<div class="header">
 				<h3>Notificações</h3>
 			</div>
@@ -27,7 +27,27 @@
 						</div>
 					</div>
 				}
+				@if (notifications().length === 0) {
+					<div class="empty-state">
+						<app-icons name="bell" size="32" class="empty-icon" />
+						<p>Nenhuma notificação por enquanto.</p>
+					</div>
+				}
 			</div>
 		</div>
+	</ng-template>
+
+	@if (isLargeScreen()) {
+		@if (isOpen()) {
+			<div class="desktop-menu" (click)="$event.stopPropagation()">
+				<ng-container *ngTemplateOutlet="menuContent"></ng-container>
+			</div>
+		}
+	} @else {
+		<app-aside position="right" [topOffset]="0" [(isOpen)]="isOpen">
+			<div class="mobile-menu-container">
+				<ng-container *ngTemplateOutlet="menuContent"></ng-container>
+			</div>
+		</app-aside>
 	}
 </div>

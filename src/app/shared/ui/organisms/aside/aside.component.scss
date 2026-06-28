@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 .aside-container {
 	position: fixed;
 	top: 0;
@@ -34,8 +35,7 @@
 
 	// Glassmorphism effect
 	background-color: rgb(from var(--app-background-color) r g b / 0.95);
-	backdrop-filter: blur(16px);
-	-webkit-backdrop-filter: blur(16px);
+	@include glass-overlay;
 
 	&:not([style*='calc']) {
 		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);

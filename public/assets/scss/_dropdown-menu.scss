@@ -1,9 +1,9 @@
+@use 'mixins' as *;
 // Mixin base para dropdowns e context menus
 @mixin dropdown-menu-base {
 	min-width: 180px;
 	background-color: var(--context-menu-bg);
-	backdrop-filter: blur(12px);
-	-webkit-backdrop-filter: blur(12px);
+	@include glass-overlay;
 	border: 1px solid var(--primary-color);
 	border-radius: 12px;
 	padding: 6px;

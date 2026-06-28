@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 // ─── Host ────────────────────────────────────────────────────────────────────
 :host {
 	display: block;
@@ -178,8 +179,7 @@
 	border: 1px solid var(--border-color);
 	border-top: none;
 	background: color-mix(in srgb, var(--secondary-color) 60%, transparent);
-	backdrop-filter: blur(16px) saturate(160%);
-	-webkit-backdrop-filter: blur(16px) saturate(160%);
+	@include glass-dropdown;
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
 	animation: selectSlideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 
