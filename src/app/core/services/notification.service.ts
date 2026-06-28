@@ -1,4 +1,5 @@
-import { Injectable, inject, signal, WritableSignal, computed } from '@angular/core';
+import { Injectable, inject, signal, WritableSignal, computed, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { NotificationFactory } from '@core/services/notification/notification.factory';
 import {
 	NotificationComponentData,
@@ -13,6 +14,15 @@ import {
 	HistoryNotification,
 	NotificationType
 } from '@models/notification.models';
+import { openDB, DBSchema, IDBPDatabase } from 'idb';
+
+interface GatunoNotificationsDB extends DBSchema {
+	notifications: {
+		key: string;
+		value: HistoryNotification;
+		indexes: { 'by-date': Date };
+	};
+}
 
 /**
  * Handle retornado ao criar uma notificação.
@@ -51,6 +61,44 @@ export class NotificationService {
 	// Factory injetado
 	private factory = inject(NotificationFactory);
 
+	private dbPromise: Promise<IDBPDatabase<GatunoNotificationsDB>> | null = null;
+	private platformId = inject(PLATFORM_ID);
+
+	constructor() {
+		if (isPlatformBrowser(this.platformId)) {
+			this.dbPromise = openDB<GatunoNotificationsDB>('GatunoNotificationsDB', 1, {
+				upgrade(db) {
+					const store = db.createObjectStore('notifications', { keyPath: 'id' });
+					store.createIndex('by-date', 'createdAt');
+				},
+			});
+
+			this.loadHistory();
+		}
+	}
+
+	private async loadHistory() {
+		if (!this.dbPromise) return;
+		try {
+			const db = await this.dbPromise;
+			// Pega as últimas 50 notificações ordenadas por data
+			const tx = db.transaction('notifications', 'readonly');
+			const store = tx.objectStore('notifications');
+			const index = store.index('by-date');
+			let cursor = await index.openCursor(null, 'prev');
+			
+			const loaded: HistoryNotification[] = [];
+			while (cursor && loaded.length < 50) {
+				loaded.push(cursor.value);
+				cursor = await cursor.continue();
+			}
+			
+			this._history.set(loaded);
+		} catch (e) {
+			console.error('Erro ao carregar histórico de notificações do IndexedDB', e);
+		}
+	}
+
 	// ─── API principal ───────────────────────────────
 
 	/**
@@ -88,7 +136,7 @@ export class NotificationService {
 
 	// ─── Histórico ───────────────────────────────────
 
-	addHistory(data: { title: string; message: string; type: NotificationType }): void {
+	async addHistory(data: { title: string; message: string; type: NotificationType }): Promise<void> {
 		const newNotif: HistoryNotification = {
 			id: crypto.randomUUID(),
 			title: data.title,
@@ -98,16 +146,55 @@ export class NotificationService {
 			createdAt: new Date(),
 		};
 		this._history.update((h) => [newNotif, ...h]);
+
+		if (!this.dbPromise) return;
+
+		try {
+			const db = await this.dbPromise;
+			await db.put('notifications', newNotif);
+		} catch (e) {
+			console.error('Erro ao salvar notificação no IndexedDB', e);
+		}
 	}
 
-	markAllAsRead(): void {
-		this._history.update((h) => h.map((n) => ({ ...n, read: true })));
+	async markAllAsRead(): Promise<void> {
+		const updated = this._history().map((n) => ({ ...n, read: true }));
+		this._history.set(updated);
+
+		if (!this.dbPromise) return;
+
+		try {
+			const db = await this.dbPromise;
+			const tx = db.transaction('notifications', 'readwrite');
+			for (const notif of updated) {
+				tx.store.put(notif);
+			}
+			await tx.done;
+		} catch (e) {
+			console.error('Erro ao atualizar notificações no IndexedDB', e);
+		}
 	}
 
-	markAsRead(id: string): void {
+	async markAsRead(id: string): Promise<void> {
+		let updatedNotif: HistoryNotification | undefined;
 		this._history.update((h) =>
-			h.map((n) => (n.id === id ? { ...n, read: true } : n)),
+			h.map((n) => {
+				if (n.id === id) {
+					updatedNotif = { ...n, read: true };
+					return updatedNotif;
+				}
+				return n;
+			}),
 		);
+
+		if (updatedNotif && this.dbPromise) {
+			try {
+				const db = await this.dbPromise;
+				await db.put('notifications', updatedNotif);
+			} catch (e) {
+				console.error('Erro ao atualizar notificação no IndexedDB', e);
+			}
+		}
 	}
 
 	// ─── Métodos de conveniência ─────────────────────

@@ -29,6 +29,10 @@
 				<app-icons name="book" size="24" />
 				<span>Leituras</span>
 			</a>
+			<a routerLink="notifications" routerLinkActive="active">
+				<app-icons name="bell" size="24" />
+				<span>Notificações</span>
+			</a>
 
 			@if (userTokenService.hasValidAccessTokenSignal()) {
 				<hr />
@@ -61,7 +65,13 @@
 
 	<main>
 		<div class="search-bar">
-			<app-input type="text" placeholder="Pesquisa" leftIcon="lock" [showLabel]="false" (input)="updateSearch($event)" />
+			<app-input
+				type="text"
+				placeholder="Pesquisa"
+				leftIcon="lock"
+				[showLabel]="false"
+				(input)="updateSearch($event)"
+			/>
 		</div>
 		<router-outlet />
 	</main>

@@ -68,6 +68,7 @@ export const STATE_TRANSITIONS: Record<
 > = {
 	[WebSocketConnectionState.DISCONNECTED]: [
 		WebSocketConnectionState.CONNECTING,
+		WebSocketConnectionState.RECONNECTING, // Se mqtt.js tentar reconectar automaticamente
 	],
 
 	[WebSocketConnectionState.CONNECTING]: [

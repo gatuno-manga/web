@@ -5,6 +5,7 @@
 		<app-filter [isListView]="true" />
 		<app-appearance [isListView]="true" />
 		<app-readings [isListView]="true" />
+		<app-user-notifications [isListView]="true" />
 		
 		@if (userTokenService.hasValidAccessTokenSignal()) {
 			<app-profile [isListView]="true" />

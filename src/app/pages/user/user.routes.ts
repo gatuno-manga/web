@@ -5,6 +5,7 @@ import { FilterComponent } from './filter/filter.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ReadingsComponent } from './readings/readings.component';
 import { SecurityComponent } from './security/security.component';
+import { NotificationsSettingsComponent } from './notifications/notifications.component';
 
 export const routes: Routes = [
 	{
@@ -35,5 +36,9 @@ export const routes: Routes = [
 	{
 		path: 'security',
 		component: SecurityComponent,
+	},
+	{
+		path: 'notifications',
+		component: NotificationsSettingsComponent,
 	},
 ];

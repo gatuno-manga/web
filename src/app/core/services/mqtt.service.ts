@@ -1,4 +1,5 @@
-import { Inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable, inject, OnDestroy, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { BookEvents } from '@constants/book-events.constants';
 import { ENVIRONMENT, Environment } from '@core/tokens/environment.token';
@@ -27,6 +28,7 @@ import {
 import mqtt, { MqttClient } from 'mqtt';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { NetworkStatusService } from './network-status.service';
+import { NotificationSettingsService } from './notification-settings.service';
 import { NotificationService } from './notification.service';
 import { UserTokenService } from './user-token.service';
 
@@ -66,6 +68,7 @@ export interface MqttWatchEvent {
 	providedIn: 'root',
 })
 export class MqttService implements OnDestroy {
+	private http = inject(HttpClient);
 	private client: MqttClient | null = null;
 
 	private readonly _connected = signal<boolean>(false);
@@ -97,6 +100,13 @@ export class MqttService implements OnDestroy {
 	private chapterScrapingCompletedSubject = new Subject<ScrapingEvent>();
 	private chapterScrapingFailedSubject = new Subject<ScrapingEvent>();
 	private progressSyncedSubject = new Subject<SyncResponse>();
+	private progressDeletedSubject = new Subject<any>();
+	private bookLikedSubject = new Subject<any>();
+	private bookUnlikedSubject = new Subject<any>();
+	private bookDeletedSubject = new Subject<any>();
+	private chapterDeletedSubject = new Subject<any>();
+	private commentCreatedSubject = new Subject<any>();
+	private commentDeletedSubject = new Subject<any>();
 	private errorSubject = new Subject<{ message: string }>();
 
 	// Observables públicos
@@ -122,12 +132,20 @@ export class MqttService implements OnDestroy {
 	public chapterScrapingFailed$ =
 		this.chapterScrapingFailedSubject.asObservable();
 	public progressSynced$ = this.progressSyncedSubject.asObservable();
+	public progressDeleted$ = this.progressDeletedSubject.asObservable();
+	public bookLiked$ = this.bookLikedSubject.asObservable();
+	public bookUnliked$ = this.bookUnlikedSubject.asObservable();
+	public bookDeleted$ = this.bookDeletedSubject.asObservable();
+	public chapterDeleted$ = this.chapterDeletedSubject.asObservable();
+	public commentCreated$ = this.commentCreatedSubject.asObservable();
+	public commentDeleted$ = this.commentDeletedSubject.asObservable();
 	public error$ = this.errorSubject.asObservable();
 
 	constructor(
 		private userTokenService: UserTokenService,
 		private networkStatusService: NetworkStatusService,
 		private notificationService: NotificationService,
+		private notificationSettings: NotificationSettingsService,
 		@Inject(ENVIRONMENT) private env: Environment,
 		@Inject(WINDOW) private window: Window,
 	) {
@@ -229,8 +247,13 @@ export class MqttService implements OnDestroy {
 			this.env.mqttBrokerUrl ||
 			`ws://${this.window.location?.hostname || 'localhost'}:8083/mqtt`;
 
+		const userId = this.userTokenService.userIdSignal();
+
 		this.client = mqtt.connect(brokerUrl, {
-			username: 'jwt',
+			protocolId: 'MQTT',
+			protocolVersion: 4,
+			clientId: `gatuno_web_${Math.random().toString(16).substring(2, 8)}`,
+			username: userId || 'gatuno-user',
 			password: token,
 			protocol: 'ws',
 			keepalive: 5,
@@ -258,14 +281,38 @@ export class MqttService implements OnDestroy {
 			this._connected.set(true);
 			this.resubscribeAll();
 
-			// Assinar tópicos globais automaticamente
+			// Assinar tópicos globais dinamicamente via API
 			const userId = this.userTokenService.userIdSignal();
-			console.log(`[MQTT_DEBUG] Verificando tópicos globais. UserID obtido:`, userId);
 			if (userId) {
-				this.subscribeTopic(`users/${userId}/reading-progress`);
-				this.subscribeTopic(`users/${userId}/notifications`);
+				console.log(
+					`[MQTT_DEBUG] Buscando tópicos dinâmicos na API...`,
+				);
+				this.http
+					.get<{ data: { topics: string[] } }>('/interactions/mqtt-topics')
+					.subscribe({
+						next: (response) => {
+							const topics = response.data?.topics;
+							console.log(
+								'[MQTT_DEBUG] Tópicos retornados pela API:',
+								topics,
+							);
+							if (topics && Array.isArray(topics)) {
+								topics.forEach((topic) => {
+									this.subscribeTopic(topic);
+								});
+							}
+						},
+						error: (err) => {
+							console.error(
+								'[MQTT_DEBUG] Falha ao buscar tópicos dinâmicos:',
+								err,
+							);
+						},
+					});
 			} else {
-				console.warn(`[MQTT_DEBUG] ⚠️ Nenhum UserID encontrado, pulando tópicos globais!`);
+				console.warn(
+					`[MQTT_DEBUG] ⚠️ Nenhum UserID encontrado, pulando requisição de tópicos!`,
+				);
 			}
 		});
 
@@ -301,7 +348,10 @@ export class MqttService implements OnDestroy {
 	}
 
 	private handleMessage(topic: string, messageStr: string): void {
-		console.log(`[MQTT_DEBUG] 📥 MENSAGEM RECEBIDA | Tópico: [${topic}] | Conteúdo:`, messageStr);
+		console.log(
+			`[MQTT_DEBUG] 📥 MENSAGEM RECEBIDA | Tópico: [${topic}] | Conteúdo:`,
+			messageStr,
+		);
 		try {
 			const parsed = JSON.parse(messageStr);
 			// Extrai o dado real caso venha empacotado (ex: NestJS Microservices envia { pattern: "...", data: { ... } })
@@ -309,21 +359,28 @@ export class MqttService implements OnDestroy {
 
 			// Lógica de notificação pessoal
 			if (topic.includes('/notifications')) {
-				const notification = data.payload as NotificationPayload;
+				if (!this.notificationSettings.enableAllNotifications()) {
+					console.log('[MQTT_DEBUG] 🚫 Notificação ignorada pois o usuário desativou nas configurações.');
+					return;
+				}
+
+				const eventName = data.event;
+				const notification = data.payload as any;
 				
+				let type: 'info' | 'success' | 'warning' | 'error' = 'info';
+				if (eventName === 'book_request.approved') type = 'success';
+				if (eventName === 'book_request.rejected') type = 'error';
+				if (eventName === 'system.alert') type = 'info';
+
 				this.notificationService.addHistory({
 					title: notification.title || 'Sistema',
 					message: notification.message || 'Nova notificação',
-					type: (notification.type || 'info') as any,
+					type: type,
 				});
 
 				this.notificationService.show(
 					notification.message || 'Nova notificação',
-					(notification.type || 'info') as
-						| 'info'
-						| 'success'
-						| 'warning'
-						| 'error',
+					type,
 				);
 				return;
 			}
@@ -392,11 +449,32 @@ export class MqttService implements OnDestroy {
 				case BookEvents.COVER_SELECTED:
 					this.coverSelectedSubject.next(data.payload as CoverEvent);
 					break;
+				case 'book.deleted':
+					this.bookDeletedSubject.next(data.payload);
+					break;
+				case 'book.liked':
+					this.bookLikedSubject.next(data.payload);
+					break;
+				case 'book.unliked':
+					this.bookUnlikedSubject.next(data.payload);
+					break;
+				case 'chapter.deleted':
+					this.chapterDeletedSubject.next(data.payload);
+					break;
+				case 'comment.created':
+					this.commentCreatedSubject.next(data.payload);
+					break;
+				case 'comment.deleted':
+					this.commentDeletedSubject.next(data.payload);
+					break;
 				// Progresso pessoal
 				case 'progress:synced':
 					this.progressSyncedSubject.next(
 						data.payload as SyncResponse,
 					);
+					break;
+				case 'progress:deleted':
+					this.progressDeletedSubject.next(data.payload);
 					break;
 			}
 		} catch (e) {
@@ -427,13 +505,17 @@ export class MqttService implements OnDestroy {
 		this.subscribedTopics.add(topic);
 
 		if (!this.client || !this._connected()) {
-			console.warn(`[MQTT_DEBUG] ⏳ Cliente offline/conectando. Inscrição salva em fila para o tópico: ${topic}`);
+			console.warn(
+				`[MQTT_DEBUG] ⏳ Cliente offline/conectando. Inscrição salva em fila para o tópico: ${topic}`,
+			);
 			return;
 		}
-		
+
 		this.client.subscribe(topic, { qos: 1 }, (err) => {
 			if (!err) {
-				console.log(`[MQTT_DEBUG] ✅ INSCRIÇÃO CONFIRMADA no tópico: ${topic}`);
+				console.log(
+					`[MQTT_DEBUG] ✅ INSCRIÇÃO CONFIRMADA no tópico: ${topic}`,
+				);
 				logConnectionEvent(
 					this.serviceName,
 					'subscribe',
@@ -453,9 +535,9 @@ export class MqttService implements OnDestroy {
 	private unsubscribeTopic(topic: string): void {
 		// Remove do set imediatamente
 		this.subscribedTopics.delete(topic);
-		
+
 		if (!this.client || !this._connected()) return;
-		
+
 		this.client.unsubscribe(topic);
 	}
 
