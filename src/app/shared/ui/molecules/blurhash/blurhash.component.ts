@@ -25,6 +25,8 @@ export class BlurhashComponent implements AfterViewInit {
 	height = input<number>(32);
 	punch = input<number>(1);
 
+	private platformId = inject(PLATFORM_ID);
+
 	canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
 
 	constructor() {
@@ -44,6 +46,8 @@ export class BlurhashComponent implements AfterViewInit {
 	}
 
 	private render() {
+		if (!isPlatformBrowser(this.platformId)) return;
+
 		const hashValue = this.hash();
 		if (!hashValue || hashValue.length < 6) return;
 
