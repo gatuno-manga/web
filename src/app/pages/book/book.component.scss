@@ -1,5 +1,5 @@
-@use 'mixins' as *;
-@use 'dropdown-menu' as dropdown;
+@use "mixins" as *;
+@use "dropdown-menu" as dropdown;
 
 $page-size: 1200px;
 
@@ -18,8 +18,18 @@ $page-size: 1200px;
 	overflow: hidden;
 	pointer-events: none;
 	z-index: -1;
-	mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
-	-webkit-mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+	mask-image: linear-gradient(
+		to bottom,
+		black 0%,
+		black 70%,
+		transparent 100%
+	);
+	-webkit-mask-image: linear-gradient(
+		to bottom,
+		black 0%,
+		black 70%,
+		transparent 100%
+	);
 }
 
 .book-background {
@@ -144,27 +154,56 @@ $page-size: 1200px;
 .aurora-mesh {
 	position: absolute;
 	inset: 0;
-	background: 
-		radial-gradient(at 0% 0%, rgb(from var(--primary-color) r g b / 0.03) 0px, transparent 50%),
-		radial-gradient(at 100% 0%, rgb(from var(--lilac) r g b / 0.03) 0px, transparent 50%),
-		radial-gradient(at 100% 100%, rgb(from var(--primary-color) r g b / 0.03) 0px, transparent 50%);
+	background:
+		radial-gradient(
+			at 0% 0%,
+			rgb(from var(--primary-color) r g b / 0.03) 0px,
+			transparent 50%
+		),
+		radial-gradient(
+			at 100% 0%,
+			rgb(from var(--lilac) r g b / 0.03) 0px,
+			transparent 50%
+		),
+		radial-gradient(
+			at 100% 100%,
+			rgb(from var(--primary-color) r g b / 0.03) 0px,
+			transparent 50%
+		);
 	z-index: 1;
 }
 
 @keyframes orb-float-a {
-	0%, 100% { transform: translate(0, 0) scale(1); }
-	33%       { transform: translate(-30px, 40px) scale(1.06); }
-	66%       { transform: translate(20px, -20px) scale(0.96); }
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1);
+	}
+	33% {
+		transform: translate(-30px, 40px) scale(1.06);
+	}
+	66% {
+		transform: translate(20px, -20px) scale(0.96);
+	}
 }
 
 @keyframes orb-float-b {
-	0%, 100% { transform: translate(0, 0) scale(1); }
-	33%       { transform: translate(40px, -30px) scale(0.96); }
-	66%       { transform: translate(-20px, 20px) scale(1.06); }
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1);
+	}
+	33% {
+		transform: translate(40px, -30px) scale(0.96);
+	}
+	66% {
+		transform: translate(-20px, 20px) scale(1.06);
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.aurora-orb, .aurora-scene * { animation: none; }
+	.aurora-orb,
+	.aurora-scene * {
+		animation: none;
+	}
 }
 .placeholder-background {
 	width: 100%;
@@ -187,17 +226,19 @@ $page-size: 1200px;
 		width: 100%;
 		display: flex;
 		justify-content: flex-start;
-		margin-top: 20px;
 		margin-bottom: -20px;
 		z-index: 25;
 		position: relative;
-		
-		app-button {
+
+		app-icon-button {
+			display: inline-block;
+			width: 44px;
+			height: 44px;
 			font-size: 1.5rem;
 			color: var(--app-text-color);
 			opacity: 0.7;
 			transition: opacity 0.2s;
-			
+
 			&:hover {
 				opacity: 1;
 			}
@@ -260,7 +301,9 @@ $page-size: 1200px;
 				border-radius: inherit;
 				object-fit: cover;
 				opacity: 0;
-				transition: opacity 0.5s ease-in-out, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				transition:
+					opacity 0.5s ease-in-out,
+					transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 				position: relative;
 				z-index: 2;
 
@@ -468,7 +511,7 @@ $page-size: 1200px;
 									@include dropdown.dropdown-menu-label;
 								}
 							}
-							
+
 							.dropdown-divider {
 								height: 1px;
 								background-color: var(--app-text-color);
@@ -521,11 +564,14 @@ $page-size: 1200px;
 				border: 1px solid var(--border-color);
 				position: relative;
 				overflow: hidden;
-				transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.15s ease;
+				transition:
+					border-color 0.35s ease,
+					box-shadow 0.35s ease,
+					transform 0.15s ease;
 				z-index: 1;
 
 				&::before {
-					content: '';
+					content: "";
 					position: absolute;
 					inset: 0;
 					background: linear-gradient(
@@ -537,7 +583,9 @@ $page-size: 1200px;
 					background-size: 200% 100%;
 					background-position: 100% 0;
 					opacity: 0;
-					transition: opacity 0.35s ease, background-position 0.6s ease;
+					transition:
+						opacity 0.35s ease,
+						background-position 0.6s ease;
 					border-radius: inherit;
 					pointer-events: none;
 					z-index: -1;
@@ -564,7 +612,7 @@ $page-size: 1200px;
 			.sensitive {
 				color: var(--danger-color);
 				border-color: rgb(from var(--danger-color) r g b / 0.3);
-				
+
 				&::before {
 					background: linear-gradient(
 						110deg,
@@ -573,7 +621,7 @@ $page-size: 1200px;
 						rgba(255, 71, 87, 0.06) 100%
 					);
 				}
-				
+
 				&:hover {
 					border-color: rgb(from var(--danger-color) r g b / 0.5);
 				}
@@ -598,8 +646,6 @@ $page-size: 1200px;
 			}
 		}
 
-
-
 		.book-description {
 			font-size: 1rem;
 			line-height: 1.5;
@@ -610,7 +656,6 @@ $page-size: 1200px;
 			}
 		}
 	}
-
 }
 
 app-info-book {

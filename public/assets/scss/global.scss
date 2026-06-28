@@ -117,10 +117,16 @@ img {
 		content: '';
 		position: absolute;
 		top: 100%;
-		left: 50%;
+		left: var(--arrow-left, 50%);
 		transform: translateX(-50%);
 		border-width: 5px;
 		border-style: solid;
 		border-color: var(--app-text-color) transparent transparent transparent;
+	}
+
+	&.bottom::after {
+		top: auto;
+		bottom: 100%;
+		border-color: transparent transparent var(--app-text-color) transparent;
 	}
 }
