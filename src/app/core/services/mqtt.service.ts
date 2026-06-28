@@ -52,6 +52,7 @@ export interface MqttPayload {
 }
 
 interface NotificationPayload {
+	title?: string;
 	message?: string;
 	type?: string;
 }
@@ -303,6 +304,13 @@ export class MqttService implements OnDestroy {
 			// Lógica de notificação pessoal
 			if (topic.includes('/notifications')) {
 				const notification = data.payload as NotificationPayload;
+				
+				this.notificationService.addHistory({
+					title: notification.title || 'Sistema',
+					message: notification.message || 'Nova notificação',
+					type: (notification.type || 'info') as any,
+				});
+
 				this.notificationService.show(
 					notification.message || 'Nova notificação',
 					(notification.type || 'info') as

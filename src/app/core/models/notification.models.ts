@@ -34,3 +34,12 @@ export interface ToastNotification extends NotificationText {
 }
 
 export interface Notification extends NotificationText {}
+
+export interface HistoryNotification {
+	id: string;
+	title: string;
+	message: string;
+	read: boolean;
+	createdAt: Date;
+	type: NotificationType;
+}

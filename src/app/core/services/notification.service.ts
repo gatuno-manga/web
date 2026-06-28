@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, WritableSignal } from '@angular/core';
+import { Injectable, inject, signal, WritableSignal, computed } from '@angular/core';
 import { NotificationFactory } from '@core/services/notification/notification.factory';
 import {
 	NotificationComponentData,
@@ -10,6 +10,8 @@ import {
 import {
 	ModalNotification,
 	ToastNotification,
+	HistoryNotification,
+	NotificationType
 } from '@models/notification.models';
 
 /**
@@ -34,11 +36,14 @@ export class NotificationService {
 	private _toasts = signal<ToastNotification[]>([]);
 	private _modal = signal<ModalNotification | null>(null);
 	private _overlays = signal<OverlayNotification[]>([]);
+	private _history = signal<HistoryNotification[]>([]);
 
 	// Signals públicos (Read-only)
 	public readonly toasts = this._toasts.asReadonly();
 	public readonly modal = this._modal.asReadonly();
 	public readonly overlays = this._overlays.asReadonly();
+	public readonly history = this._history.asReadonly();
+	public readonly unreadCount = computed(() => this._history().filter((n) => !n.read).length);
 
 	// Timer IDs para cancelar auto-dismiss pendentes
 	private timers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -79,6 +84,30 @@ export class NotificationService {
 
 	dismissOverlay(id: string): void {
 		this.dismissItem(this._overlays, id);
+	}
+
+	// ─── Histórico ───────────────────────────────────
+
+	addHistory(data: { title: string; message: string; type: NotificationType }): void {
+		const newNotif: HistoryNotification = {
+			id: crypto.randomUUID(),
+			title: data.title,
+			message: data.message,
+			type: data.type,
+			read: false,
+			createdAt: new Date(),
+		};
+		this._history.update((h) => [newNotif, ...h]);
+	}
+
+	markAllAsRead(): void {
+		this._history.update((h) => h.map((n) => ({ ...n, read: true })));
+	}
+
+	markAsRead(id: string): void {
+		this._history.update((h) =>
+			h.map((n) => (n.id === id ? { ...n, read: true } : n)),
+		);
 	}
 
 	// ─── Métodos de conveniência ─────────────────────

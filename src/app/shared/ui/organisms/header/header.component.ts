@@ -12,7 +12,9 @@ import { ThemeService } from '@core/services/theme.service';
 import { UserService } from '@core/services/user.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { SearchMoleculeComponent } from '@ui/molecules/search/search.molecule';
+import { NotificationMenuOrganismComponent } from '@ui/organisms/notification-menu/notification-menu.organism';
 import { UserMenuOrganismComponent } from '@ui/organisms/user-menu/user-menu.organism';
 
 @Component({
@@ -21,7 +23,9 @@ import { UserMenuOrganismComponent } from '@ui/organisms/user-menu/user-menu.org
 	imports: [
 		RouterModule,
 		IconsComponent,
+		IconButtonComponent,
 		SearchMoleculeComponent,
+		NotificationMenuOrganismComponent,
 		UserMenuOrganismComponent,
 	],
 	templateUrl: './header.component.html',

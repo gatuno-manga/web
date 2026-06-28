@@ -1,0 +1,33 @@
+<div class="notification-wrapper">
+	<app-icon-button
+		name="bell"
+		size="24px"
+		(click)="toggleMenu($event)"
+		aria-label="Notificações"
+	></app-icon-button>
+	
+	@if (unreadCount() > 0) {
+		<span class="badge">{{ unreadCount() }}</span>
+	}
+
+	@if (isOpen()) {
+		<div class="dropdown-menu" (click)="$event.stopPropagation()">
+			<div class="header">
+				<h3>Notificações</h3>
+			</div>
+			<div class="list">
+				@for (notif of notifications(); track notif.id) {
+					<div class="notification-item" [class.unread]="!notif.read">
+						<div class="icon">
+							<app-icons name="bell" size="20" />
+						</div>
+						<div class="content">
+							<h4>{{ notif.title }}</h4>
+							<p>{{ notif.message }}</p>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	}
+</div>
