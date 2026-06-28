@@ -41,6 +41,7 @@
 				></app-icon-button>
 			</div>
 			<div class="glass-panel">
+				<div class="glass-panel-bg"></div>
 				<div class="book-header">
 				<div class="book-cover">
 					@if (b.cover && !coverImageError) {
@@ -267,6 +268,7 @@
 	</div>
 	<div class="book">
 		<div class="glass-panel">
+			<div class="glass-panel-bg"></div>
 			<div class="book-header">
 			<div class="book-cover placeholder" [style.background-color]="book()?.dominantColor">
 				@if (book()?.blurHash) {

@@ -2,9 +2,9 @@
 // Mixin base para dropdowns e context menus
 @mixin dropdown-menu-base {
 	min-width: 180px;
-	background-color: var(--context-menu-bg);
-	@include glass-overlay;
-	border: 1px solid var(--primary-color);
+	background-color: rgb(from var(--app-background-color) r g b / 0.75);
+	@include glass-dropdown;
+	border: 1px solid rgba(from var(--app-text-color) r g b / 0.1);
 	border-radius: 12px;
 	padding: 6px;
 	box-shadow: 0 4px 12px rgb(from var(--black) r g b / 0.5);

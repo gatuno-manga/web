@@ -56,7 +56,7 @@
 
 // Para menus suspensos, selects e popovers (intensidade média)
 @mixin glass-dropdown {
-	@include glass-backdrop(16px, 160%);
+	@include glass-backdrop(8px, 160%);
 }
 
 // Para painéis flutuantes grandes (ex: container modal)
