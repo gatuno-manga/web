@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import {
 	FormBuilder,
 	FormGroup,
@@ -64,9 +65,13 @@ export class LoginComponent implements OnInit {
 		this.setMetaData();
 	}
 
+	private platformId = inject(PLATFORM_ID);
+
 	ngOnInit(): void {
-		// Tenta iniciar a autenticação por passkey (nameless/conditional UI) assim que a página carrega
-		void this.signInWithPasskey(true);
+		if (isPlatformBrowser(this.platformId)) {
+			// Tenta iniciar a autenticação por passkey (nameless/conditional UI) assim que a página carrega
+			void this.signInWithPasskey(true);
+		}
 	}
 
 	setMetaData() {

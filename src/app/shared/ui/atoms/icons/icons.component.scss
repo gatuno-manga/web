@@ -2,6 +2,7 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	aspect-ratio: 1/1;
 	width: var(--icon-size);
 	height: var(--icon-size);
 }
@@ -28,6 +29,9 @@
 		color: var(--icon-fill);
 		stroke-width: var(--icon-stroke-width, inherit);
 		stroke: var(--icon-stroke, none);
-		transition: fill 0.3s ease, stroke 0.3s ease, color 0.3s ease;
+		transition:
+			fill 0.3s ease,
+			stroke 0.3s ease,
+			color 0.3s ease;
 	}
 }

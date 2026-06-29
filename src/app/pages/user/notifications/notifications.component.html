@@ -1,0 +1,53 @@
+@if (showPage()) {
+	<section [class.list-view]="isListView()" class="notifications-container">
+		@if (!isListView()) {
+			<h1>Notificações</h1>
+			<p class="subtitle">Controle como e quando o Gatuno fala com você</p>
+		}
+
+		<div class="settings-group">
+			<h2>Preferências Globais</h2>
+			<p class="group-description">Defina as opções gerais de notificação do sistema.</p>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<label>Notificações no Aplicativo</label>
+					<span>Receba alertas e atualizações dentro da interface enquanto navega.</span>
+				</div>
+				<div class="setting-control">
+					<app-select
+						[options]="toggleOptions"
+						[ngModel]="notificationSettings.enableAllNotifications() ? 'true' : 'false'"
+						(valueChange)="onAllNotificationsChange($event)"
+					/>
+				</div>
+			</div>
+		</div>
+
+		<div class="settings-group">
+			<h2>Notificações Push (Em 2º Plano)</h2>
+			<p class="group-description">Receba alertas nativos no sistema mesmo quando o app estiver fechado.</p>
+
+			<div class="setting-item">
+				<div class="setting-info">
+					<label>Web Push</label>
+					<span>Permitir que o navegador receba alertas em segundo plano.</span>
+				</div>
+				<div class="setting-control">
+					<app-select
+						[options]="toggleOptions"
+						[ngModel]="notificationSettings.isPushEnabled() ? 'true' : 'false'"
+						(valueChange)="onPushChange($event)"
+						[disabled]="!notificationSettings.isPushSupported()"
+					/>
+				</div>
+			</div>
+			
+			@if (!notificationSettings.isPushSupported()) {
+				<div class="setting-warning">
+					<small style="color: var(--status-error);">Seu navegador não suporta Notificações Push ou bloqueou o serviço.</small>
+				</div>
+			}
+		</div>
+	</section>
+}

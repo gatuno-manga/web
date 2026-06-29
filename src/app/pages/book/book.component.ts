@@ -42,7 +42,6 @@ import {
 	BookEditModalComponent,
 	BookEditSaveEvent,
 } from '@ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component';
-import { AsideComponent } from '@ui/organisms/aside/aside.component';
 import { MarkdownComponent } from 'ngx-markdown';
 import { firstValueFrom, Subscription } from 'rxjs';
 
@@ -52,7 +51,6 @@ import { firstValueFrom, Subscription } from 'rxjs';
 		RouterModule,
 		IconsComponent,
 		InfoBookComponent,
-		AsideComponent,
 		ButtonComponent,
 		IconButtonComponent,
 		MarkdownComponent,
@@ -171,6 +169,8 @@ export class BookComponent implements OnInit, OnDestroy {
 				}
 
 				this.book.set(book);
+				this.isFavorited.set(!!book.isFavorited);
+				this.isSubscribed.set(!!book.isSubscribed);
 				this.setMetaData();
 				this.isLoading.set(false);
 
@@ -399,6 +399,7 @@ export class BookComponent implements OnInit, OnDestroy {
 			},
 			useBackdrop: true,
 			backdropOpacity: 0.5,
+			size: 'extra-large',
 		});
 	}
 

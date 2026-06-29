@@ -11,10 +11,12 @@
 			[style.background-color]="b.dominantColor"
 		>
 			@if (b.blurHash) {
-				<div
-					class="book-background blur-placeholder"
-				>
-					<app-blurhash [hash]="b.blurHash" [width]="b.metadata?.width || 32" [height]="b.metadata?.height || 32" />
+				<div class="book-background blur-placeholder">
+					<app-blurhash
+						[hash]="b.blurHash"
+						[width]="b.metadata?.width || 32"
+						[height]="b.metadata?.height || 32"
+					/>
 				</div>
 			}
 			@if (b.cover && !coverImageError) {
@@ -38,203 +40,319 @@
 					(click)="goBack()"
 					aria-label="Voltar para a listagem"
 					appTooltip="Voltar para a listagem"
-				></app-icon-button>
+				/>
 			</div>
 			<div class="glass-panel">
+				<div class="glass-panel-bg"></div>
 				<div class="book-header">
-				<div class="book-cover">
-					@if (b.cover && !coverImageError) {
-						@if (b.blurHash) {
-							<div
-								class="blur-placeholder"
-								[class.fade-out]="isImageLoaded()"
-							>
-								<app-blurhash [hash]="b.blurHash" [width]="b.metadata?.width || 32" [height]="b.metadata?.height || 32" />
-							</div>
-						}
-						<img
-							[src]="b.cover"
-							alt="Capa do livro {{ b.title }}"
-							[class.loaded]="isImageLoaded()"
-							(load)="onImageLoad()"
-							(error)="onCoverImageError()"
-						/>
-						@if (b.originalLanguageCode) {
+					<div class="book-cover">
+						@if (b.cover && !coverImageError) {
+							@if (b.blurHash) {
+								<div
+									class="blur-placeholder"
+									[class.fade-out]="isImageLoaded()"
+								>
+									<app-blurhash
+										[hash]="b.blurHash"
+										[width]="b.metadata?.width || 32"
+										[height]="b.metadata?.height || 32"
+									/>
+								</div>
+							}
 							<img
-								[src]="b.originalLanguageCode | flag"
-								class="book-origin-flag"
-								alt="Bandeira de origem"
-								title="Origem do livro"
+								[src]="b.cover"
+								alt="Capa do livro {{ b.title }}"
+								[class.loaded]="isImageLoaded()"
+								(load)="onImageLoad()"
+								(error)="onCoverImageError()"
 							/>
-						}
-					} @else {
-						<div class="cover-placeholder">
-							<app-icons name="image" />
-						</div>
-					}
-				</div>
-				<div class="book-info">
-					<div class="top">
-						<h1
-							[class.long-title]="b.title.length > 90"
-							[class.very-long-title]="b.title.length > 140"
-						>
-							<span>{{ b.title }}</span>
-							@if (b.autoUpdate) {
-								<app-icons 
-									name="refresh-ccw" 
-									class="auto-update-icon"
-									appTooltip="Atualização Automática: Este livro recebe novos capítulos automaticamente"
+							@if (b.originalLanguageCode) {
+								<img
+									[src]="b.originalLanguageCode | flag"
+									class="book-origin-flag"
+									alt="Bandeira de origem"
+									title="Origem do livro"
 								/>
 							}
-						</h1>
-						<h6>
-							{{ getAuthorNames() }}
-						</h6>
+						} @else {
+							<div class="cover-placeholder">
+								<app-icons name="image" />
+							</div>
+						}
 					</div>
-					<div class="bottom">
-						<div class="caps">{{ b.totalChapters }} Capítulos</div>
-						<div class="release">Lançamento {{ b.publication }}</div>
-						<div class="actions">
-							<app-button
-								class="reading-btn"
-								(click)="continueReading()"
-								variant="primary"
-								rounded="small"
+					<div class="book-info">
+						<div class="top">
+							<h1
+								[class.long-title]="b.title.length > 90"
+								[class.very-long-title]="b.title.length > 140"
 							>
-								{{
-									lastReadChapterId
-										? 'Continue lendo'
-										: 'Começar a ler'
-								}}
-							</app-button>
-							@if (isLoggedIn()) {
-								<app-button
-									*appHasPermission="'interactions:manage'"
-									class="btn-actions"
-									[variant]="isFavorited() ? 'primary' : 'outline'"
-									radio="square"
-									rounded="small"
-									padding="none"
-									[aria-label]="isFavorited() ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-									[appTooltip]="isFavorited() ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-									(click)="toggleFavorite()"
-								>
-									<app-icons name="bookmark" />
-								</app-button>
-								<app-button
-									*appHasPermission="'interactions:manage'"
-									class="btn-actions"
-									[variant]="isSubscribed() ? 'primary' : 'outline'"
-									radio="square"
-									rounded="small"
-									padding="none"
-									[aria-label]="isSubscribed() ? 'Cancelar inscrição' : 'Inscrever-se para atualizações'"
-									[appTooltip]="isSubscribed() ? 'Cancelar inscrição' : 'Inscrever-se para atualizações'"
-									(click)="toggleSubscribe()"
-								>
-									<app-icons name="eye" />
-								</app-button>
-							}
-							@if (userService.hasPermission('internal:books:edit')) {
-								<app-button
-									class="btn-actions"
-									[variant]="b.autoUpdate ? 'primary' : 'outline'"
-									radio="square"
-									rounded="small"
-									padding="none"
-									[aria-label]="
-										b.autoUpdate
-											? 'Desativar atualizações automáticas'
-											: 'Ativar atualizações automáticas'
-									"
-									[appTooltip]="
-										b.autoUpdate
-											? 'Desativar atualizações automáticas'
-											: 'Ativar atualizações automáticas'
-									"
-									(click)="toggleAutoUpdate()"
-								>
+								<span>{{ b.title }}</span>
+								@if (b.autoUpdate) {
 									<app-icons
-										[name]="
-											b.autoUpdate
-												? 'refresh-ccw'
-												: 'refresh-cw-off'
-										"
+										name="refresh-ccw"
+										class="auto-update-icon"
+										appTooltip="Atualização Automática: Este livro recebe novos capítulos automaticamente"
 									/>
-								</app-button>
-							}
-							<div class="options-wrapper btn-actions">
-								<app-button
-									radio="square"
-									rounded="small"
-									padding="none"
-									class="options-btn"
-									aria-label="Mais opções"
-									appTooltip="Mais opções"
-									(click)="
-										toggleOptionsDropdown();
-										$event.stopPropagation()
-									"
-								>
-									<app-icons name="more" />
-								</app-button>
-								@if (showOptionsDropdown()) {
-									<div class="options-dropdown">
-										@if (isLoggedIn() && userService.hasPermission('collections:manage')) {
-											<button
-												type="button"
-												(click)="openAddToCollectionModal()"
-											>
-												<app-icons name="bookmark" />
-												<span>Adicionar à Coleção</span>
-											</button>
-										}
-										<button *appHasPermission="'sync:all'" type="button" (click)="saveOffline()">
-											<app-icons name="smartphone" />
-											<span>Salvar no app</span>
-										</button>
-										@if (isBookDownloaded() && userService.hasPermission('sync:all')) {
-											<button
-												type="button"
-												(click)="deleteDownloadedBook()"
-												class="danger"
-											>
-												<app-icons name="trash" />
-												<span>Excluir download</span>
-											</button>
-										}
-										<button *appHasPermission="'books:download'" type="button" (click)="downloadFiles()">
-											<app-icons name="download" />
-											<span>Baixar arquivos</span>
-										</button>
-										<button type="button" (click)="shareBook()">
-											<app-icons name="share" />
-											<span>Compartilhar</span>
-										</button>
-										@if (userService.hasPermission('internal:books:edit')) {
-											<div class="dropdown-divider"></div>
-											<button type="button" (click)="openBookEditModal()">
-												<app-icons name="edit" />
-												<span>Editar Livro</span>
-											</button>
-											<button type="button" (click)="forceCheckUpdates()">
-												<app-icons name="refresh-ccw-dot" />
-												<span>Forçar atualização</span>
-											</button>
-										}
-									</div>
 								}
+							</h1>
+							<h6>
+								{{ getAuthorNames() }}
+							</h6>
+						</div>
+						<div class="bottom">
+							<div class="caps">
+								{{ b.totalChapters }} Capítulos
+							</div>
+							<div class="release">
+								Lançamento {{ b.publication }}
+							</div>
+							<div class="actions">
+								<app-button
+									class="reading-btn"
+									(click)="continueReading()"
+									variant="primary"
+									rounded="small"
+								>
+									{{
+										lastReadChapterId
+											? "Continue lendo"
+											: "Começar a ler"
+									}}
+								</app-button>
+								@if (isLoggedIn()) {
+									<app-button
+										*appHasPermission="
+											'interactions:manage'
+										"
+										class="btn-actions"
+										[variant]="
+											isFavorited()
+												? 'primary'
+												: 'outline'
+										"
+										radio="square"
+										rounded="small"
+										padding="none"
+										[aria-label]="
+											isFavorited()
+												? 'Remover dos favoritos'
+												: 'Adicionar aos favoritos'
+										"
+										[appTooltip]="
+											isFavorited()
+												? 'Remover dos favoritos'
+												: 'Adicionar aos favoritos'
+										"
+										(click)="toggleFavorite()"
+									>
+										<app-icons name="bookmark" />
+									</app-button>
+									<app-button
+										*appHasPermission="
+											'interactions:manage'
+										"
+										class="btn-actions"
+										[variant]="
+											isSubscribed()
+												? 'primary'
+												: 'outline'
+										"
+										radio="square"
+										rounded="small"
+										padding="none"
+										[aria-label]="
+											isSubscribed()
+												? 'Cancelar inscrição'
+												: 'Inscrever-se para atualizações'
+										"
+										[appTooltip]="
+											isSubscribed()
+												? 'Cancelar inscrição'
+												: 'Inscrever-se para atualizações'
+										"
+										(click)="toggleSubscribe()"
+									>
+										<app-icons name="eye" />
+									</app-button>
+								}
+								@if (
+									userService.hasPermission(
+										"internal:books:edit"
+									)
+								) {
+									<app-button
+										class="btn-actions"
+										[variant]="
+											b.autoUpdate ? 'primary' : 'outline'
+										"
+										radio="square"
+										rounded="small"
+										padding="none"
+										[aria-label]="
+											b.autoUpdate
+												? 'Desativar atualizações automáticas'
+												: 'Ativar atualizações automáticas'
+										"
+										[appTooltip]="
+											b.autoUpdate
+												? 'Desativar atualizações automáticas'
+												: 'Ativar atualizações automáticas'
+										"
+										(click)="toggleAutoUpdate()"
+									>
+										<app-icons
+											[name]="
+												b.autoUpdate
+													? 'refresh-ccw'
+													: 'refresh-cw-off'
+											"
+										/>
+									</app-button>
+								}
+								<div class="options-wrapper btn-actions">
+									<app-button
+										radio="square"
+										rounded="small"
+										padding="none"
+										class="options-btn"
+										aria-label="Mais opções"
+										appTooltip="Mais opções"
+										(click)="
+											toggleOptionsDropdown();
+											$event.stopPropagation()
+										"
+									>
+										<app-icons name="more" />
+									</app-button>
+									@if (showOptionsDropdown()) {
+										<div class="options-dropdown">
+											@if (
+												isLoggedIn() &&
+												userService.hasPermission(
+													"collections:manage"
+												)
+											) {
+												<button
+													type="button"
+													(click)="
+														openAddToCollectionModal()
+													"
+												>
+													<app-icons
+														name="bookmark"
+													/>
+													<span
+														>Adicionar à
+														Coleção</span
+													>
+												</button>
+											}
+											<button
+												*appHasPermission="'sync:all'"
+												type="button"
+												(click)="saveOffline()"
+											>
+												<app-icons name="smartphone" />
+												<span>Salvar no app</span>
+											</button>
+											@if (
+												isBookDownloaded() &&
+												userService.hasPermission(
+													"sync:all"
+												)
+											) {
+												<button
+													type="button"
+													(click)="
+														deleteDownloadedBook()
+													"
+													class="danger"
+												>
+													<app-icons name="trash" />
+													<span
+														>Excluir download</span
+													>
+												</button>
+											}
+											<button
+												*appHasPermission="
+													'books:download'
+												"
+												type="button"
+												(click)="downloadFiles()"
+											>
+												<app-icons name="download" />
+												<span>Baixar arquivos</span>
+											</button>
+											<button
+												type="button"
+												(click)="shareBook()"
+											>
+												<app-icons name="share" />
+												<span>Compartilhar</span>
+											</button>
+											@if (
+												userService.hasPermission(
+													"internal:books:edit"
+												)
+											) {
+												<div
+													class="dropdown-divider"
+												></div>
+												<button
+													type="button"
+													(click)="
+														openBookEditModal()
+													"
+												>
+													<app-icons name="edit" />
+													<span>Editar Livro</span>
+												</button>
+												<button
+													type="button"
+													(click)="
+														forceCheckUpdates()
+													"
+												>
+													<app-icons
+														name="refresh-ccw-dot"
+													/>
+													<span
+														>Forçar
+														atualização</span
+													>
+												</button>
+												<button
+													type="button"
+													(click)="fixBook()"
+												>
+													<app-icons name="tool" />
+													<span>Corrigir Livro</span>
+												</button>
+												<button
+													type="button"
+													(click)="resetBook()"
+												>
+													<app-icons name="alert-triangle" />
+													<span>Resetar Livro</span>
+												</button>
+											}
+										</div>
+									}
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
 			</div>
 			<div class="book-info-plus">
 				<div class="tags">
 					@for (content of b.sensitiveContent || []; track content) {
-						<span class="sensitive" (click)="filterBySensitive(content.id)">{{ content.name }}</span>
+						<span
+							class="sensitive"
+							(click)="filterBySensitive(content.id)"
+							>{{ content.name }}</span
+						>
 					}
 					@for (tag of b.tags || []; track tag.id) {
 						<span class="tag" (click)="filterByTag(tag.id)">{{
@@ -267,23 +385,31 @@
 	</div>
 	<div class="book">
 		<div class="glass-panel">
+			<div class="glass-panel-bg"></div>
 			<div class="book-header">
-			<div class="book-cover placeholder" [style.background-color]="book()?.dominantColor">
-				@if (book()?.blurHash) {
-					<app-blurhash [hash]="book()?.blurHash" [width]="32" [height]="32" />
-				}
-			</div>
-			<div class="book-info">
-				<div class="top">
-					<h1 class="placeholder"></h1>
-					<h6 class="placeholder"></h6>
+				<div
+					class="book-cover placeholder"
+					[style.background-color]="book()?.dominantColor"
+				>
+					@if (book()?.blurHash) {
+						<app-blurhash
+							[hash]="book()?.blurHash"
+							[width]="32"
+							[height]="32"
+						/>
+					}
 				</div>
-				<div class="bottom">
-					<div class="caps placeholder"></div>
-					<div class="release placeholder"></div>
+				<div class="book-info">
+					<div class="top">
+						<h1 class="placeholder"></h1>
+						<h6 class="placeholder"></h6>
+					</div>
+					<div class="bottom">
+						<div class="caps placeholder"></div>
+						<div class="release placeholder"></div>
+					</div>
 				</div>
 			</div>
-		</div>
 		</div>
 		<div class="book-info-plus">
 			<div class="tags">
@@ -299,19 +425,4 @@
 			<div class="placeholder"></div>
 		}
 	</div>
-}
-@if (userService.hasPermission('internal:books:maintenance') && book()) {
-	<app-aside>
-		<h1><app-icons name="book" /> {{ book()?.title }}</h1>
-		<div class="line"></div>
-		<div class="actions">
-			<app-button (click)="openBookEditModal()" variant="text"
-				>Editar</app-button
-			>
-			<app-button (click)="resetBook()" variant="text"
-				>Resetar</app-button
-			>
-			<app-button (click)="fixBook()" variant="text">Corrigir</app-button>
-		</div>
-	</app-aside>
 }

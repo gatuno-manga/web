@@ -7,7 +7,9 @@ services:
       - "${APP_PORT:-4200}:4200"
     environment:
       - API_URL=${API_URL:-http://localhost:3000}
-      - API_URL_SERVER=${API_URL_SERVER:-http://localhost:3000}
+      - API_URL_SERVER=${API_URL_SERVER:-http://host.docker.internal:3000}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     develop:
       watch:
         - action: sync

@@ -1,4 +1,12 @@
-import { Injectable, inject, signal, WritableSignal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import {
+	computed,
+	Injectable,
+	inject,
+	PLATFORM_ID,
+	signal,
+	WritableSignal,
+} from '@angular/core';
 import { NotificationFactory } from '@core/services/notification/notification.factory';
 import {
 	NotificationComponentData,
@@ -8,9 +16,20 @@ import {
 	OverlayNotification,
 } from '@core/services/notification/notification-strategy.interface';
 import {
+	HistoryNotification,
 	ModalNotification,
+	NotificationType,
 	ToastNotification,
 } from '@models/notification.models';
+import { DBSchema, IDBPDatabase, openDB } from 'idb';
+
+interface GatunoNotificationsDB extends DBSchema {
+	notifications: {
+		key: string;
+		value: HistoryNotification;
+		indexes: { 'by-date': Date };
+	};
+}
 
 /**
  * Handle retornado ao criar uma notificação.
@@ -34,17 +53,70 @@ export class NotificationService {
 	private _toasts = signal<ToastNotification[]>([]);
 	private _modal = signal<ModalNotification | null>(null);
 	private _overlays = signal<OverlayNotification[]>([]);
+	private _history = signal<HistoryNotification[]>([]);
 
 	// Signals públicos (Read-only)
 	public readonly toasts = this._toasts.asReadonly();
 	public readonly modal = this._modal.asReadonly();
 	public readonly overlays = this._overlays.asReadonly();
+	public readonly history = this._history.asReadonly();
+	public readonly unreadCount = computed(
+		() => this._history().filter((n) => !n.read).length,
+	);
 
 	// Timer IDs para cancelar auto-dismiss pendentes
 	private timers = new Map<string, ReturnType<typeof setTimeout>>();
 
 	// Factory injetado
 	private factory = inject(NotificationFactory);
+
+	private dbPromise: Promise<IDBPDatabase<GatunoNotificationsDB>> | null =
+		null;
+	private platformId = inject(PLATFORM_ID);
+
+	constructor() {
+		if (isPlatformBrowser(this.platformId)) {
+			this.dbPromise = openDB<GatunoNotificationsDB>(
+				'GatunoNotificationsDB',
+				1,
+				{
+					upgrade(db) {
+						const store = db.createObjectStore('notifications', {
+							keyPath: 'id',
+						});
+						store.createIndex('by-date', 'createdAt');
+					},
+				},
+			);
+
+			this.loadHistory();
+		}
+	}
+
+	private async loadHistory() {
+		if (!this.dbPromise) return;
+		try {
+			const db = await this.dbPromise;
+			// Pega as últimas 50 notificações ordenadas por data
+			const tx = db.transaction('notifications', 'readonly');
+			const store = tx.objectStore('notifications');
+			const index = store.index('by-date');
+			let cursor = await index.openCursor(null, 'prev');
+
+			const loaded: HistoryNotification[] = [];
+			while (cursor && loaded.length < 50) {
+				loaded.push(cursor.value);
+				cursor = await cursor.continue();
+			}
+
+			this._history.set(loaded);
+		} catch (e) {
+			console.error(
+				'Erro ao carregar histórico de notificações do IndexedDB',
+				e,
+			);
+		}
+	}
 
 	// ─── API principal ───────────────────────────────
 
@@ -79,6 +151,73 @@ export class NotificationService {
 
 	dismissOverlay(id: string): void {
 		this.dismissItem(this._overlays, id);
+	}
+
+	// ─── Histórico ───────────────────────────────────
+
+	async addHistory(data: {
+		title: string;
+		message: string;
+		type: NotificationType;
+	}): Promise<void> {
+		const newNotif: HistoryNotification = {
+			id: crypto.randomUUID(),
+			title: data.title,
+			message: data.message,
+			type: data.type,
+			read: false,
+			createdAt: new Date(),
+		};
+		this._history.update((h) => [newNotif, ...h]);
+
+		if (!this.dbPromise) return;
+
+		try {
+			const db = await this.dbPromise;
+			await db.put('notifications', newNotif);
+		} catch (e) {
+			console.error('Erro ao salvar notificação no IndexedDB', e);
+		}
+	}
+
+	async markAllAsRead(): Promise<void> {
+		const updated = this._history().map((n) => ({ ...n, read: true }));
+		this._history.set(updated);
+
+		if (!this.dbPromise) return;
+
+		try {
+			const db = await this.dbPromise;
+			const tx = db.transaction('notifications', 'readwrite');
+			for (const notif of updated) {
+				tx.store.put(notif);
+			}
+			await tx.done;
+		} catch (e) {
+			console.error('Erro ao atualizar notificações no IndexedDB', e);
+		}
+	}
+
+	async markAsRead(id: string): Promise<void> {
+		let updatedNotif: HistoryNotification | undefined;
+		this._history.update((h) =>
+			h.map((n) => {
+				if (n.id === id) {
+					updatedNotif = { ...n, read: true };
+					return updatedNotif;
+				}
+				return n;
+			}),
+		);
+
+		if (updatedNotif && this.dbPromise) {
+			try {
+				const db = await this.dbPromise;
+				await db.put('notifications', updatedNotif);
+			} catch (e) {
+				console.error('Erro ao atualizar notificação no IndexedDB', e);
+			}
+		}
 	}
 
 	// ─── Métodos de conveniência ─────────────────────

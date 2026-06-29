@@ -50,26 +50,32 @@ export class TooltipDirective implements OnDestroy {
 		this.renderer.appendChild(document.body, this.tooltipElement);
 
 		const hostPos = this.el.nativeElement.getBoundingClientRect();
-		const tooltipPos = this.tooltipElement?.getBoundingClientRect();
-		if (!tooltipPos) return;
+		// Use layout dimensions instead of transformed dimensions
+		const tooltipWidth = this.tooltipElement!.offsetWidth;
+		const tooltipHeight = this.tooltipElement!.offsetHeight;
 
 		const margin = 10;
-		let top = hostPos.top - tooltipPos.height - margin;
-		let left = hostPos.left + (hostPos.width - tooltipPos.width) / 2;
+		let top = hostPos.top - tooltipHeight - margin;
+		let left = hostPos.left + (hostPos.width - tooltipWidth) / 2;
 
 		const viewportWidth = document.documentElement.clientWidth;
 		const viewportHeight = document.documentElement.clientHeight;
 
+		let isBottom = false;
 		// Se o tooltip for vazar por cima, coloca ele abaixo do elemento
 		if (top < margin) {
 			top = hostPos.bottom + margin;
+			isBottom = true;
 		}
 
 		// Se vazar por baixo da tela
-		if (top + tooltipPos.height > viewportHeight - margin) {
-			top = viewportHeight - tooltipPos.height - margin;
+		if (top + tooltipHeight > viewportHeight - margin) {
+			top = viewportHeight - tooltipHeight - margin;
 			// Prevenção extra caso a tela seja muito pequena
-			if (top < margin) top = margin;
+			if (top < margin) {
+				top = margin;
+				isBottom = false;
+			}
 		}
 
 		// Se vazar pela esquerda
@@ -78,8 +84,8 @@ export class TooltipDirective implements OnDestroy {
 		}
 
 		// Se vazar pela direita
-		if (left + tooltipPos.width > viewportWidth - margin) {
-			left = viewportWidth - tooltipPos.width - margin;
+		if (left + tooltipWidth > viewportWidth - margin) {
+			left = viewportWidth - tooltipWidth - margin;
 		}
 
 		this.renderer.setStyle(
@@ -93,9 +99,21 @@ export class TooltipDirective implements OnDestroy {
 			`${left + window.scrollX}px`,
 		);
 
+		const arrowLeft = hostPos.left + hostPos.width / 2 - left;
+		this.tooltipElement!.style.setProperty(
+			'--arrow-left',
+			`${arrowLeft}px`,
+		);
+
+		if (isBottom) {
+			this.renderer.addClass(this.tooltipElement, 'bottom');
+		}
+
 		// Trigger animação no próximo frame
 		requestAnimationFrame(() => {
-			this.renderer.addClass(this.tooltipElement, 'show');
+			if (this.tooltipElement) {
+				this.renderer.addClass(this.tooltipElement, 'show');
+			}
 		});
 	}
 

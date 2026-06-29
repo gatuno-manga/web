@@ -24,3 +24,47 @@
 	border-radius: $radius;
 	@include skeleton-gradient-animation;
 }
+
+// ==========================================
+// Glassmorphism / Blur effects
+// ==========================================
+
+@mixin glass-backdrop($blur, $saturate: null) {
+	@if $saturate {
+		backdrop-filter: blur($blur) saturate($saturate);
+		-webkit-backdrop-filter: blur($blur) saturate($saturate);
+	} @else {
+		backdrop-filter: blur($blur);
+		-webkit-backdrop-filter: blur($blur);
+	}
+}
+
+// Para componentes leves, fundos de itens 
+@mixin glass-light {
+	@include glass-backdrop(4px);
+}
+
+// Para o fundo de itens maiores
+@mixin glass-medium {
+	@include glass-backdrop(8px);
+}
+
+// Para o fundo (overlay) de modais e componentes fixos pequenos
+@mixin glass-overlay {
+	@include glass-backdrop(12px);
+}
+
+// Para menus suspensos, selects e popovers (intensidade média)
+@mixin glass-dropdown {
+	@include glass-backdrop(8px, 160%);
+}
+
+// Para painéis flutuantes grandes (ex: container modal)
+@mixin glass-panel {
+	@include glass-backdrop(24px, 180%);
+}
+
+// Para efeitos densos estilo macOS
+@mixin glass-heavy {
+	@include glass-backdrop(96px, 200%);
+}

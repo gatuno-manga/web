@@ -1,0 +1,53 @@
+<div class="notification-wrapper">
+	<app-icon-button
+		name="bell"
+		size="24px"
+		(click)="toggleMenu($event)"
+		aria-label="Notificações"
+	></app-icon-button>
+	
+	@if (unreadCount() > 0) {
+		<span class="badge">{{ unreadCount() }}</span>
+	}
+
+	<ng-template #menuContent>
+		<div class="menu-content-wrapper">
+			<div class="header">
+				<h3>Notificações</h3>
+			</div>
+			<div class="list">
+				@for (notif of notifications(); track notif.id) {
+					<div class="notification-item" [class.unread]="!notif.read">
+						<div class="icon">
+							<app-icons name="bell" size="20" />
+						</div>
+						<div class="content">
+							<h4>{{ notif.title }}</h4>
+							<p>{{ notif.message }}</p>
+						</div>
+					</div>
+				}
+				@if (notifications().length === 0) {
+					<div class="empty-state">
+						<app-icons name="bell" size="32" class="empty-icon" />
+						<p>Nenhuma notificação por enquanto.</p>
+					</div>
+				}
+			</div>
+		</div>
+	</ng-template>
+
+	@if (isLargeScreen()) {
+		@if (isOpen()) {
+			<div class="desktop-menu" (click)="$event.stopPropagation()">
+				<ng-container *ngTemplateOutlet="menuContent"></ng-container>
+			</div>
+		}
+	} @else {
+		<app-aside position="right" [topOffset]="0" [(isOpen)]="isOpen">
+			<div class="mobile-menu-container">
+				<ng-container *ngTemplateOutlet="menuContent"></ng-container>
+			</div>
+		</app-aside>
+	}
+</div>

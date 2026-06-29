@@ -9,10 +9,12 @@
 		"build": "ng build",
 		"lint": "biome check . && secretlint \"**/*\"",
 		"check:dead-code": "knip",
+		"check:icons": "node scripts/detect-missing-icons.js",
 		"watch": "ng build --watch --configuration development",
 		"test": "ng test",
 		"test:headless": "ng test --browsers=ChromeHeadlessCI --watch=false",
 		"api:docs": "node scripts/swagger-helper.mjs",
+		"api:graphql": "node scripts/graphql-helper.mjs",
 		"serve:ssr:front": "node dist/front/server/server.mjs"
 	},
 	"private": true,

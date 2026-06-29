@@ -1,0 +1,677 @@
+
+> front@0.8.0 test:headless
+> ng test --browsers=ChromeHeadlessCI --watch=false
+
+28 06 2026 09:26:41.457:INFO [karma-server]: Karma v6.4.4 server started at http://localhost:9876/
+28 06 2026 09:26:41.458:INFO [launcher]: Launching browsers ChromeHeadlessCI with concurrency unlimited
+28 06 2026 09:26:41.470:INFO [launcher]: Starting browser ChromeHeadless
+28 06 2026 09:26:41.664:INFO [Chrome Headless 147.0.0.0 (Linux 0.0.0)]: Connected on socket -M7_8ZHeTbjeUo8UAAAB with id 87614856
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 0 of 371[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KLOG: [36m'📡 Evento WebSocket recebido:', Object{type: 'chapters.updated'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 0 of 371[32m SUCCESS[39m (0 secs / 0 secs)
+LOG: '📡 Evento WebSocket recebido:', Object{type: 'chapters.updated'}
+[1A[2KLOG: [36m'🔄 Carregando dados do dashboard...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 0 of 371[32m SUCCESS[39m (0 secs / 0 secs)
+LOG: '🔄 Carregando dados do dashboard...'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 1 of 371[32m SUCCESS[39m (0 secs / 0.069 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 2 of 371[32m SUCCESS[39m (0 secs / 0.081 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 3 of 371[32m SUCCESS[39m (0 secs / 0.084 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 4 of 371[32m SUCCESS[39m (0 secs / 0.085 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 5 of 371[32m SUCCESS[39m (0 secs / 0.088 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 6 of 371[32m SUCCESS[39m (0 secs / 0.09 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 7 of 371[32m SUCCESS[39m (0 secs / 0.177 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 8 of 371[32m SUCCESS[39m (0 secs / 0.182 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 9 of 371[32m SUCCESS[39m (0 secs / 0.195 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 10 of 371[32m SUCCESS[39m (0 secs / 0.2 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 11 of 371[32m SUCCESS[39m (0 secs / 0.205 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 12 of 371[32m SUCCESS[39m (0 secs / 0.209 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 13 of 371[32m SUCCESS[39m (0 secs / 0.214 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 14 of 371[32m SUCCESS[39m (0 secs / 0.218 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 15 of 371[32m SUCCESS[39m (0 secs / 0.222 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 16 of 371[32m SUCCESS[39m (0 secs / 0.226 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 17 of 371[32m SUCCESS[39m (0 secs / 0.229 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 18 of 371[32m SUCCESS[39m (0 secs / 0.234 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 19 of 371[32m SUCCESS[39m (0 secs / 0.238 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 20 of 371[32m SUCCESS[39m (0 secs / 0.242 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 21 of 371[32m SUCCESS[39m (0 secs / 0.257 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 22 of 371[32m SUCCESS[39m (0 secs / 0.262 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 23 of 371[32m SUCCESS[39m (0 secs / 0.267 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 24 of 371[32m SUCCESS[39m (0 secs / 0.271 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 25 of 371[32m SUCCESS[39m (0 secs / 0.276 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 26 of 371[32m SUCCESS[39m (0 secs / 0.28 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 27 of 371[32m SUCCESS[39m (0 secs / 0.286 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 28 of 371[32m SUCCESS[39m (0 secs / 0.29 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 29 of 371[32m SUCCESS[39m (0 secs / 0.295 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 30 of 371[32m SUCCESS[39m (0 secs / 0.299 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 31 of 371[32m SUCCESS[39m (0 secs / 0.303 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 32 of 371[32m SUCCESS[39m (0 secs / 0.32 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 33 of 371[32m SUCCESS[39m (0 secs / 0.324 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 34 of 371[32m SUCCESS[39m (0 secs / 0.328 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 35 of 371[32m SUCCESS[39m (0 secs / 0.333 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 36 of 371[32m SUCCESS[39m (0 secs / 0.337 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 37 of 371[32m SUCCESS[39m (0 secs / 0.341 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 38 of 371[32m SUCCESS[39m (0 secs / 0.344 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 39 of 371[32m SUCCESS[39m (0 secs / 0.353 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 40 of 371[32m SUCCESS[39m (0 secs / 0.359 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 41 of 371[32m SUCCESS[39m (0 secs / 0.383 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 42 of 371[32m SUCCESS[39m (0 secs / 0.389 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 43 of 371[32m SUCCESS[39m (0 secs / 0.391 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 44 of 371[32m SUCCESS[39m (0 secs / 0.393 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 45 of 371[32m SUCCESS[39m (0 secs / 0.395 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 46 of 371[32m SUCCESS[39m (0 secs / 0.4 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 47 of 371[32m SUCCESS[39m (0 secs / 0.403 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 48 of 371[32m SUCCESS[39m (0 secs / 0.409 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 49 of 371[32m SUCCESS[39m (0 secs / 0.411 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KERROR: [36m'Error rendering blurhash:', ValidationError: blurhash length mismatch: length is 9 but it should be 32
+ValidationError: blurhash length mismatch: length is 9 but it should be 32
+    at C (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1073)
+    at U (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1434)
+    at BlurhashComponent.render (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:68:25)
+    at fn (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:39:10)
+    at Object.fn (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:2943:5)
+    at runEffect (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:425:10)
+    at Object.run (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:2865:16)
+    at runEffectsInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5387:16)
+    at refreshView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5487:5)
+    at detectChangesInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5607:5)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+ERROR: 'Error rendering blurhash:', ValidationError: blurhash length mismatch: length is 9 but it should be 32
+ValidationError: blurhash length mismatch: length is 9 but it should be 32
+    at C (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1073)
+    at U (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1434)
+    at BlurhashComponent.render (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:68:25)
+    at fn (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:39:10)
+    at Object.fn (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:2943:5)
+    at runEffect (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:425:10)
+    at Object.run (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:2865:16)
+    at runEffectsInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5387:16)
+    at refreshView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5487:5)
+    at detectChangesInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5607:5)
+[1A[2KERROR: [36m'Error rendering blurhash:', ValidationError: blurhash length mismatch: length is 9 but it should be 32
+ValidationError: blurhash length mismatch: length is 9 but it should be 32
+    at C (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1073)
+    at U (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1434)
+    at BlurhashComponent.render (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:68:25)
+    at BlurhashComponent.call [as ngAfterViewInit] (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:45:8)
+    at callHookInternal (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:555:10)
+    at callHook (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:570:7)
+    at callHooks (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:544:9)
+    at executeInitAndCheckHooks (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:513:5)
+    at refreshView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5524:11)
+    at detectChangesInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5607:5)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+ERROR: 'Error rendering blurhash:', ValidationError: blurhash length mismatch: length is 9 but it should be 32
+ValidationError: blurhash length mismatch: length is 9 but it should be 32
+    at C (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1073)
+    at U (http://localhost:9876/_karma_webpack_/webpack:/node_modules/blurhash/dist/esm/index.js:1:1434)
+    at BlurhashComponent.render (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:68:25)
+    at BlurhashComponent.call [as ngAfterViewInit] (http://localhost:9876/_karma_webpack_/webpack:/src/app/shared/ui/molecules/blurhash/blurhash.component.ts:45:8)
+    at callHookInternal (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:555:10)
+    at callHook (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:570:7)
+    at callHooks (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:544:9)
+    at executeInitAndCheckHooks (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:513:5)
+    at refreshView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5524:11)
+    at detectChangesInView (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5607:5)
+[1A[2KERROR: [36m'Erro ao carregar capítulo', '[chapter=test-chapter-id] reason=unknown source=unknown origin=route forceOnline=false silent=false', Object{chapterId: 'test-chapter-id', origin: 'route', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: NG0205: Injector has already been destroyed.
+Error: NG0205: Injector has already been destroyed.
+    at assertNotDestroyed (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:1395:11)
+    at runInInjectionContext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:1429:5)
+    at HttpInterceptorHandler.chain (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1288:67)
+    at HttpInterceptorHandler.handle (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1377:19)
+    at project (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1518:64)
+    at doInnerSub (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/mergeInternals.js:19:19)
+    at onNext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/mergeInternals.js:14:57)
+    at OperatorSubscriber._next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:13:21)
+    at OperatorSubscriber.next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:31:18)
+    at Observable._subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/observable/innerFrom.js:51:24)[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+ERROR: 'Erro ao carregar capítulo', '[chapter=test-chapter-id] reason=unknown source=unknown origin=route forceOnline=false silent=false', Object{chapterId: 'test-chapter-id', origin: 'route', reason: 'unknown', source: 'unknown', forceOnline: false, silent: false, statusCode: undefined}, Error: NG0205: Injector has already been destroyed.
+Error: NG0205: Injector has already been destroyed.
+    at assertNotDestroyed (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:1395:11)
+    at runInInjectionContext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/_untracked-chunk.mjs:1429:5)
+    at HttpInterceptorHandler.chain (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1288:67)
+    at HttpInterceptorHandler.handle (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1377:19)
+    at project (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/common/fesm2022/_module-chunk.mjs:1518:64)
+    at doInnerSub (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/mergeInternals.js:19:19)
+    at onNext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/mergeInternals.js:14:57)
+    at OperatorSubscriber._next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:13:21)
+    at OperatorSubscriber.next (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:31:18)
+    at Observable._subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/observable/innerFrom.js:51:24)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 50 of 371[32m SUCCESS[39m (0 secs / 0.412 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 51 of 371[32m SUCCESS[39m (0 secs / 0.414 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 52 of 371[32m SUCCESS[39m (0 secs / 0.416 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 53 of 371[32m SUCCESS[39m (0 secs / 0.418 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 54 of 371[32m SUCCESS[39m (0 secs / 0.42 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 55 of 371[32m SUCCESS[39m (0 secs / 0.432 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 56 of 371[32m SUCCESS[39m (0 secs / 0.438 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 57 of 371[32m SUCCESS[39m (0 secs / 0.443 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 58 of 371[32m SUCCESS[39m (0 secs / 0.45 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 59 of 371[32m SUCCESS[39m (0 secs / 0.456 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 60 of 371[32m SUCCESS[39m (0 secs / 0.459 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 61 of 371[32m SUCCESS[39m (0 secs / 0.461 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 62 of 371[32m SUCCESS[39m (0 secs / 0.462 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 63 of 371[32m SUCCESS[39m (0 secs / 0.493 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 64 of 371[32m SUCCESS[39m (0 secs / 0.501 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 65 of 371[32m SUCCESS[39m (0 secs / 0.507 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 66 of 371[32m SUCCESS[39m (0 secs / 0.509 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 67 of 371[32m SUCCESS[39m (0 secs / 0.514 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 68 of 371[32m SUCCESS[39m (0 secs / 0.516 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 69 of 371[32m SUCCESS[39m (0 secs / 0.517 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 70 of 371[32m SUCCESS[39m (0 secs / 0.518 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 71 of 371[32m SUCCESS[39m (0 secs / 0.519 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 72 of 371[32m SUCCESS[39m (0 secs / 0.52 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 73 of 371[32m SUCCESS[39m (0 secs / 0.521 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 74 of 371[32m SUCCESS[39m (0 secs / 0.522 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 75 of 371[32m SUCCESS[39m (0 secs / 0.531 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 76 of 371[32m SUCCESS[39m (0 secs / 0.536 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 77 of 371[32m SUCCESS[39m (0 secs / 0.538 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 78 of 371[32m SUCCESS[39m (0 secs / 0.54 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 79 of 371[32m SUCCESS[39m (0 secs / 0.543 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 80 of 371[32m SUCCESS[39m (0 secs / 0.545 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 81 of 371[32m SUCCESS[39m (0 secs / 0.547 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 82 of 371[32m SUCCESS[39m (0 secs / 0.551 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 83 of 371[32m SUCCESS[39m (0 secs / 0.562 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 84 of 371[32m SUCCESS[39m (0 secs / 0.565 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 85 of 371[32m SUCCESS[39m (0 secs / 0.568 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 86 of 371[32m SUCCESS[39m (0 secs / 0.571 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 87 of 371[32m SUCCESS[39m (0 secs / 0.573 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 88 of 371[32m SUCCESS[39m (0 secs / 0.576 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 89 of 371[32m SUCCESS[39m (0 secs / 0.578 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 90 of 371[32m SUCCESS[39m (0 secs / 0.579 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 91 of 371[32m SUCCESS[39m (0 secs / 0.581 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 92 of 371[32m SUCCESS[39m (0 secs / 0.581 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 93 of 371[32m SUCCESS[39m (0 secs / 0.581 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 94 of 371[32m SUCCESS[39m (0 secs / 0.585 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 95 of 371[32m SUCCESS[39m (0 secs / 0.588 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 96 of 371[32m SUCCESS[39m (0 secs / 0.639 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 97 of 371[32m SUCCESS[39m (0 secs / 0.649 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 98 of 371[32m SUCCESS[39m (0 secs / 0.654 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 99 of 371[32m SUCCESS[39m (0 secs / 0.658 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 100 of 371[32m SUCCESS[39m (0 secs / 0.664 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 100 of 371[32m SUCCESS[39m (0 secs / 0.664 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 100 of 371[32m SUCCESS[39m (0 secs / 0.664 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 100 of 371[32m SUCCESS[39m (0 secs / 0.664 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 100 of 371[32m SUCCESS[39m (0 secs / 0.664 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 100 of 371[32m SUCCESS[39m (0 secs / 0.664 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 100 of 371[32m SUCCESS[39m (0 secs / 0.664 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 100 of 371[32m SUCCESS[39m (0 secs / 0.664 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 101 of 371[32m SUCCESS[39m (0 secs / 0.671 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 102 of 371[32m SUCCESS[39m (0 secs / 0.676 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 103 of 371[32m SUCCESS[39m (0 secs / 0.681 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 104 of 371[32m SUCCESS[39m (0 secs / 0.685 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 105 of 371[32m SUCCESS[39m (0 secs / 0.69 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 106 of 371[32m SUCCESS[39m (0 secs / 0.697 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 107 of 371[32m SUCCESS[39m (0 secs / 0.7 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 108 of 371[32m SUCCESS[39m (0 secs / 0.703 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 109 of 371[32m SUCCESS[39m (0 secs / 0.706 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 110 of 371[32m SUCCESS[39m (0 secs / 0.709 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 111 of 371[32m SUCCESS[39m (0 secs / 0.712 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 112 of 371[32m SUCCESS[39m (0 secs / 0.715 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 113 of 371[32m SUCCESS[39m (0 secs / 0.719 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 114 of 371[32m SUCCESS[39m (0 secs / 0.722 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 115 of 371[32m SUCCESS[39m (0 secs / 0.723 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 116 of 371[32m SUCCESS[39m (0 secs / 0.732 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 117 of 371[32m SUCCESS[39m (0 secs / 0.736 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 118 of 371[32m SUCCESS[39m (0 secs / 0.74 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 119 of 371[32m SUCCESS[39m (0 secs / 0.744 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 120 of 371[32m SUCCESS[39m (0 secs / 0.749 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 121 of 371[32m SUCCESS[39m (0 secs / 0.749 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 122 of 371[32m SUCCESS[39m (0 secs / 0.749 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 123 of 371[32m SUCCESS[39m (0 secs / 0.784 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 124 of 371[32m SUCCESS[39m (0 secs / 0.791 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 125 of 371[32m SUCCESS[39m (0 secs / 0.792 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 126 of 371[32m SUCCESS[39m (0 secs / 0.793 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 127 of 371[32m SUCCESS[39m (0 secs / 0.824 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 128 of 371[32m SUCCESS[39m (0 secs / 0.833 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 129 of 371[32m SUCCESS[39m (0 secs / 0.835 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 130 of 371[32m SUCCESS[39m (0 secs / 0.835 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 131 of 371[32m SUCCESS[39m (0 secs / 0.835 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 132 of 371[32m SUCCESS[39m (0 secs / 0.836 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 133 of 371[32m SUCCESS[39m (0 secs / 0.837 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 134 of 371[32m SUCCESS[39m (0 secs / 0.838 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 135 of 371[32m SUCCESS[39m (0 secs / 0.838 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 136 of 371[32m SUCCESS[39m (0 secs / 0.839 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 137 of 371[32m SUCCESS[39m (0 secs / 0.848 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 138 of 371[32m SUCCESS[39m (0 secs / 0.849 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 139 of 371[32m SUCCESS[39m (0 secs / 0.87 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 140 of 371[32m SUCCESS[39m (0 secs / 0.874 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 141 of 371[32m SUCCESS[39m (0 secs / 0.877 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 142 of 371[32m SUCCESS[39m (0 secs / 0.888 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 143 of 371[32m SUCCESS[39m (0 secs / 0.889 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 144 of 371[32m SUCCESS[39m (0 secs / 0.89 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 145 of 371[32m SUCCESS[39m (0 secs / 0.891 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 146 of 371[32m SUCCESS[39m (0 secs / 0.892 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 147 of 371[32m SUCCESS[39m (0 secs / 0.893 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 148 of 371[32m SUCCESS[39m (0 secs / 0.894 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 149 of 371[32m SUCCESS[39m (0 secs / 0.895 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+[1A[2KDEBUG: [36m'[9:26:43 AM] 📨 [ReadingProgressSync] event: Progresso sincronizado via HTTP: c2'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+DEBUG: '[9:26:43 AM] 📨 [ReadingProgressSync] event: Progresso sincronizado via HTTP: c2'
+[1A[2KDEBUG: [36m'[9:26:43 AM] 📨 [ReadingProgressSync] event: Progresso sincronizado via HTTP: c1'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+DEBUG: '[9:26:43 AM] 📨 [ReadingProgressSync] event: Progresso sincronizado via HTTP: c1'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'
+[1A[2KERROR: [36m'[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 500 Server Error', error: null}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+ERROR: '[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 500 Server Error', error: null}
+[1A[2KWARN: [36m'[GATUNO_INTERCEPTOR] Falha temporária no refresh. Mantendo sessão.'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+WARN: '[GATUNO_INTERCEPTOR] Falha temporária no refresh. Mantendo sessão.'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Refresh concluído, repetindo requisição original...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '[GATUNO_INTERCEPTOR] Refresh concluído, repetindo requisição original...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Retentando requisição enfileirada...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '[GATUNO_INTERCEPTOR] Retentando requisição enfileirada...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'
+[1A[2KERROR: [36m'[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 401, statusText: 'Expired Refresh', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 401 Expired Refresh', error: null}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+ERROR: '[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 401, statusText: 'Expired Refresh', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 401 Expired Refresh', error: null}
+[1A[2KWARN: [36m'[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+WARN: '[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '[GATUNO_INTERCEPTOR] Requisição enfileirada aguardando refresh...'
+[1A[2KERROR: [36m'[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 401, statusText: 'Unknown Error', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 401 undefined', error: null}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+ERROR: '[GATUNO_INTERCEPTOR] Erro no refreshTokens:', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 401, statusText: 'Unknown Error', url: null, ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 401 undefined', error: null}
+[1A[2KWARN: [36m'[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+WARN: '[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...'
+[1A[2KLOG: [36m'[GATUNO_INTERCEPTOR] Refresh concluído, repetindo requisição original...'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '[GATUNO_INTERCEPTOR] Refresh concluído, repetindo requisição original...'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 150 of 371[32m SUCCESS[39m (0 secs / 0.897 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 151 of 371[32m SUCCESS[39m (0 secs / 0.898 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 152 of 371[32m SUCCESS[39m (0 secs / 0.899 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 153 of 371[32m SUCCESS[39m (0 secs / 0.906 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 154 of 371[32m SUCCESS[39m (0 secs / 0.906 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 155 of 371[32m SUCCESS[39m (0 secs / 0.907 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 156 of 371[32m SUCCESS[39m (0 secs / 0.908 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 157 of 371[32m SUCCESS[39m (0 secs / 0.909 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 158 of 371[32m SUCCESS[39m (0 secs / 0.916 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 159 of 371[32m SUCCESS[39m (0 secs / 0.93 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 160 of 371[32m SUCCESS[39m (0 secs / 0.932 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 161 of 371[32m SUCCESS[39m (0 secs / 0.937 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 162 of 371[32m SUCCESS[39m (0 secs / 0.938 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 163 of 371[32m SUCCESS[39m (0 secs / 0.94 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 164 of 371[32m SUCCESS[39m (0 secs / 0.941 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 165 of 371[32m SUCCESS[39m (0 secs / 0.943 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 166 of 371[32m SUCCESS[39m (0 secs / 0.944 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 167 of 371[32m SUCCESS[39m (0 secs / 0.946 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 168 of 371[32m SUCCESS[39m (0 secs / 0.948 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 169 of 371[32m SUCCESS[39m (0 secs / 0.949 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 170 of 371[32m SUCCESS[39m (0 secs / 0.952 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 171 of 371[32m SUCCESS[39m (0 secs / 0.953 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 172 of 371[32m SUCCESS[39m (0 secs / 0.959 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 173 of 371[32m SUCCESS[39m (0 secs / 0.961 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 174 of 371[32m SUCCESS[39m (0 secs / 0.962 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 175 of 371[32m SUCCESS[39m (0 secs / 0.964 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 176 of 371[32m SUCCESS[39m (0 secs / 0.965 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 177 of 371[32m SUCCESS[39m (0 secs / 0.966 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 178 of 371[32m SUCCESS[39m (0 secs / 0.966 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 179 of 371[32m SUCCESS[39m (0 secs / 0.966 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 180 of 371[32m SUCCESS[39m (0 secs / 0.968 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 181 of 371[32m SUCCESS[39m (0 secs / 0.969 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 182 of 371[32m SUCCESS[39m (0 secs / 0.97 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 183 of 371[32m SUCCESS[39m (0 secs / 0.99 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 184 of 371[32m SUCCESS[39m (0 secs / 0.994 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 185 of 371[32m SUCCESS[39m (0 secs / 0.998 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 186 of 371[32m SUCCESS[39m (0 secs / 1.002 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 187 of 371[32m SUCCESS[39m (0 secs / 1.006 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 188 of 371[32m SUCCESS[39m (0 secs / 1.01 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 189 of 371[32m SUCCESS[39m (0 secs / 1.016 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 190 of 371[32m SUCCESS[39m (0 secs / 1.021 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 191 of 371[32m SUCCESS[39m (0 secs / 1.025 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 192 of 371[32m SUCCESS[39m (0 secs / 1.029 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 193 of 371[32m SUCCESS[39m (0 secs / 1.033 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 194 of 371[32m SUCCESS[39m (0 secs / 1.036 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 195 of 371[32m SUCCESS[39m (0 secs / 1.046 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 196 of 371[32m SUCCESS[39m (0 secs / 1.05 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 197 of 371[32m SUCCESS[39m (0 secs / 1.057 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 198 of 371[32m SUCCESS[39m (0 secs / 1.057 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 199 of 371[32m SUCCESS[39m (0 secs / 1.058 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 200 of 371[32m SUCCESS[39m (0 secs / 1.059 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 200 of 371[32m SUCCESS[39m (0 secs / 1.059 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+28 06 2026 09:26:44.103:WARN [web-server]: 404: /_karma_webpack_/graphql
+[1A[2KERROR: [36m'Erro ao buscar biblioteca via GraphQL', HttpErrorResponse{headers: HttpHeaders{headers: undefined, normalizedNames: Map{}, lazyInit: () => { ... }, lazyUpdate: null}, status: 404, statusText: 'Not Found', url: 'http://localhost:9876/graphql', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for http://localhost:9876/graphql: 404 Not Found', error: 'NOT FOUND'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 200 of 371[32m SUCCESS[39m (0 secs / 1.059 secs)
+ERROR: 'Erro ao buscar biblioteca via GraphQL', HttpErrorResponse{headers: HttpHeaders{headers: undefined, normalizedNames: Map{}, lazyInit: () => { ... }, lazyUpdate: null}, status: 404, statusText: 'Not Found', url: 'http://localhost:9876/graphql', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for http://localhost:9876/graphql: 404 Not Found', error: 'NOT FOUND'}
+[1A[2KWARN: [36m'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 200 of 371[32m SUCCESS[39m (0 secs / 1.059 secs)
+WARN: 'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}
+[1A[2KWARN: [36m'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 200 of 371[32m SUCCESS[39m (0 secs / 1.059 secs)
+WARN: 'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}
+[1A[2KWARN: [36m'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 200 of 371[32m SUCCESS[39m (0 secs / 1.059 secs)
+WARN: 'Online tags fetch failed, falling back to offline mode', HttpErrorResponse{headers: HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'tags', ok: false, type: undefined, redirected: undefined, responseType: undefined, name: 'HttpErrorResponse', message: 'Http failure response for tags: 500 Server Error', error: 'Error'}
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 201 of 371[32m SUCCESS[39m (0 secs / 1.06 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 202 of 371[32m SUCCESS[39m (0 secs / 1.06 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 203 of 371[32m SUCCESS[39m (0 secs / 1.061 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 204 of 371[32m SUCCESS[39m (0 secs / 1.062 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 205 of 371[32m SUCCESS[39m (0 secs / 1.063 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 206 of 371[32m SUCCESS[39m (0 secs / 1.063 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 207 of 371[32m SUCCESS[39m (0 secs / 1.064 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 208 of 371[32m SUCCESS[39m (0 secs / 1.066 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 209 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 210 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 211 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 212 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 213 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 214 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 215 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 216 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 217 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 218 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 219 of 371[32m SUCCESS[39m (0 secs / 1.067 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 220 of 371[32m SUCCESS[39m (0 secs / 1.068 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 221 of 371[32m SUCCESS[39m (0 secs / 1.068 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 222 of 371[32m SUCCESS[39m (0 secs / 1.075 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 223 of 371[32m SUCCESS[39m (0 secs / 1.082 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 224 of 371[32m SUCCESS[39m (0 secs / 1.089 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 225 of 371[32m SUCCESS[39m (0 secs / 1.095 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 226 of 371[32m SUCCESS[39m (0 secs / 1.103 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 227 of 371[32m SUCCESS[39m (0 secs / 1.11 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 228 of 371[32m SUCCESS[39m (0 secs / 1.117 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 229 of 371[32m SUCCESS[39m (0 secs / 1.123 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 230 of 371[32m SUCCESS[39m (0 secs / 1.13 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 231 of 371[32m SUCCESS[39m (0 secs / 1.139 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 232 of 371[32m SUCCESS[39m (0 secs / 1.141 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 233 of 371[32m SUCCESS[39m (0 secs / 1.142 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 234 of 371[32m SUCCESS[39m (0 secs / 1.143 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 235 of 371[32m SUCCESS[39m (0 secs / 1.144 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 236 of 371[32m SUCCESS[39m (0 secs / 1.145 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 237 of 371[32m SUCCESS[39m (0 secs / 1.146 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 238 of 371[32m SUCCESS[39m (0 secs / 1.147 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 239 of 371[32m SUCCESS[39m (0 secs / 1.148 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 240 of 371[32m SUCCESS[39m (0 secs / 1.149 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 241 of 371[32m SUCCESS[39m (0 secs / 1.15 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 242 of 371[32m SUCCESS[39m (0 secs / 1.151 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 243 of 371[32m SUCCESS[39m (0 secs / 1.152 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 244 of 371[32m SUCCESS[39m (0 secs / 1.153 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 245 of 371[32m SUCCESS[39m (0 secs / 1.155 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 246 of 371[32m SUCCESS[39m (0 secs / 1.156 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 247 of 371[32m SUCCESS[39m (0 secs / 1.157 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 248 of 371[32m SUCCESS[39m (0 secs / 1.158 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 249 of 371[32m SUCCESS[39m (0 secs / 1.159 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 250 of 371[32m SUCCESS[39m (0 secs / 1.16 secs)
+[1A[2KLOG: [36m'Selected Sensitive Content IDs:', [][39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 250 of 371[32m SUCCESS[39m (0 secs / 1.16 secs)
+LOG: 'Selected Sensitive Content IDs:', []
+[1A[2KLOG: [36m'Selected Sensitive Content IDs:', [][39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 250 of 371[32m SUCCESS[39m (0 secs / 1.16 secs)
+LOG: 'Selected Sensitive Content IDs:', []
+[1A[2KLOG: [36m'Selected Sensitive Content IDs:', [][39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 250 of 371[32m SUCCESS[39m (0 secs / 1.16 secs)
+LOG: 'Selected Sensitive Content IDs:', []
+[1A[2KLOG: [36m'Selected Sensitive Content IDs:', ['new-sensitive-id'][39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 250 of 371[32m SUCCESS[39m (0 secs / 1.16 secs)
+LOG: 'Selected Sensitive Content IDs:', ['new-sensitive-id']
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 251 of 371[32m SUCCESS[39m (0 secs / 1.161 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 252 of 371[32m SUCCESS[39m (0 secs / 1.162 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 253 of 371[32m SUCCESS[39m (0 secs / 1.163 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 254 of 371[32m SUCCESS[39m (0 secs / 1.163 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 255 of 371[32m SUCCESS[39m (0 secs / 1.165 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 256 of 371[32m SUCCESS[39m (0 secs / 1.17 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 257 of 371[32m SUCCESS[39m (0 secs / 1.171 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 258 of 371[32m SUCCESS[39m (0 secs / 1.172 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 259 of 371[32m SUCCESS[39m (0 secs / 1.173 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 260 of 371[32m SUCCESS[39m (0 secs / 1.174 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 261 of 371[32m SUCCESS[39m (0 secs / 1.175 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 262 of 371[32m SUCCESS[39m (0 secs / 1.175 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 263 of 371[32m SUCCESS[39m (0 secs / 1.176 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 264 of 371[32m SUCCESS[39m (0 secs / 1.177 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 265 of 371[32m SUCCESS[39m (0 secs / 1.178 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 266 of 371[32m SUCCESS[39m (0 secs / 1.178 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 267 of 371[32m SUCCESS[39m (0 secs / 1.179 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 268 of 371[32m SUCCESS[39m (0 secs / 1.18 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 269 of 371[32m SUCCESS[39m (0 secs / 1.181 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 270 of 371[32m SUCCESS[39m (0 secs / 1.182 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 271 of 371[32m SUCCESS[39m (0 secs / 1.182 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 272 of 371[32m SUCCESS[39m (0 secs / 1.182 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 273 of 371[32m SUCCESS[39m (0 secs / 1.182 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 274 of 371[32m SUCCESS[39m (0 secs / 1.183 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 275 of 371[32m SUCCESS[39m (0 secs / 1.184 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 276 of 371[32m SUCCESS[39m (0 secs / 1.184 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 277 of 371[32m SUCCESS[39m (0 secs / 1.185 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 278 of 371[32m SUCCESS[39m (0 secs / 1.186 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 279 of 371[32m SUCCESS[39m (0 secs / 1.186 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 280 of 371[32m SUCCESS[39m (0 secs / 1.187 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 281 of 371[32m SUCCESS[39m (0 secs / 1.188 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 282 of 371[32m SUCCESS[39m (0 secs / 1.189 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 283 of 371[32m SUCCESS[39m (0 secs / 1.19 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 284 of 371[32m SUCCESS[39m (0 secs / 1.19 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 285 of 371[32m SUCCESS[39m (0 secs / 1.191 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 286 of 371[32m SUCCESS[39m (0 secs / 1.196 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 287 of 371[32m SUCCESS[39m (0 secs / 1.203 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 288 of 371[32m SUCCESS[39m (0 secs / 1.205 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 289 of 371[32m SUCCESS[39m (0 secs / 1.206 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 290 of 371[32m SUCCESS[39m (0 secs / 1.207 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 291 of 371[32m SUCCESS[39m (0 secs / 1.207 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 292 of 371[32m SUCCESS[39m (0 secs / 1.207 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 293 of 371[32m SUCCESS[39m (0 secs / 1.208 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 294 of 371[32m SUCCESS[39m (0 secs / 1.209 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 295 of 371[32m SUCCESS[39m (0 secs / 1.21 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 296 of 371[32m SUCCESS[39m (0 secs / 1.213 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 297 of 371[32m SUCCESS[39m (0 secs / 1.215 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 298 of 371[32m SUCCESS[39m (0 secs / 1.217 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 299 of 371[32m SUCCESS[39m (0 secs / 1.219 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+28 06 2026 09:26:44.295:WARN [web-server]: 404: /_karma_webpack_/test-url
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+28 06 2026 09:26:44.311:WARN [web-server]: 404: /_karma_webpack_/test-url
+[1A[2KLOG: [36m'👤 Usuário de leitura definido: guest'[39m
+Chrome Headless 147.0.0.0 (Linux 0.0.0): Executed 300 of 371[32m SUCCESS[39m (0 secs / 1.221 secs)
+LOG: '👤 Usuário de leitura definido: guest'
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 301 of 371[32m SUCCESS[39m (0 secs / 1.222 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 302 of 371[32m SUCCESS[39m (0 secs / 1.223 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 303 of 371[32m SUCCESS[39m (0 secs / 1.223 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 304 of 371[32m SUCCESS[39m (0 secs / 1.223 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 305 of 371[32m SUCCESS[39m (0 secs / 1.226 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 306 of 371[32m SUCCESS[39m (0 secs / 1.231 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 307 of 371[32m SUCCESS[39m (0 secs / 1.234 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 308 of 371[32m SUCCESS[39m (0 secs / 1.235 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 309 of 371[32m SUCCESS[39m (0 secs / 1.236 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 310 of 371[32m SUCCESS[39m (0 secs / 1.237 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 311 of 371[32m SUCCESS[39m (0 secs / 1.238 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 312 of 371[32m SUCCESS[39m (0 secs / 1.24 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 313 of 371[32m SUCCESS[39m (0 secs / 1.25 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 314 of 371[32m SUCCESS[39m (0 secs / 1.255 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 315 of 371[32m SUCCESS[39m (0 secs / 1.26 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 316 of 371[32m SUCCESS[39m (0 secs / 1.264 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 317 of 371[32m SUCCESS[39m (0 secs / 1.269 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 318 of 371[32m SUCCESS[39m (0 secs / 1.273 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 319 of 371[32m SUCCESS[39m (0 secs / 1.277 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 320 of 371[32m SUCCESS[39m (0 secs / 1.281 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 321 of 371[32m SUCCESS[39m (0 secs / 1.286 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 322 of 371[32m SUCCESS[39m (0 secs / 1.291 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 323 of 371[32m SUCCESS[39m (0 secs / 1.297 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 324 of 371[32m SUCCESS[39m (0 secs / 1.302 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 325 of 371[32m SUCCESS[39m (0 secs / 1.311 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 326 of 371[32m SUCCESS[39m (0 secs / 1.316 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 327 of 371[32m SUCCESS[39m (0 secs / 1.32 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 328 of 371[32m SUCCESS[39m (0 secs / 1.323 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 329 of 371[32m SUCCESS[39m (0 secs / 1.325 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 330 of 371[32m SUCCESS[39m (0 secs / 1.326 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 331 of 371[32m SUCCESS[39m (0 secs / 1.327 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 332 of 371[32m SUCCESS[39m (0 secs / 1.328 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 333 of 371[32m SUCCESS[39m (0 secs / 1.328 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 334 of 371[32m SUCCESS[39m (0 secs / 1.329 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 335 of 371[32m SUCCESS[39m (0 secs / 1.329 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 336 of 371[32m SUCCESS[39m (0 secs / 1.33 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 337 of 371[32m SUCCESS[39m (0 secs / 1.33 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 338 of 371[32m SUCCESS[39m (0 secs / 1.331 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 339 of 371[32m SUCCESS[39m (0 secs / 1.331 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 340 of 371[32m SUCCESS[39m (0 secs / 1.332 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 341 of 371[32m SUCCESS[39m (0 secs / 1.332 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 342 of 371[32m SUCCESS[39m (0 secs / 1.333 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 343 of 371[32m SUCCESS[39m (0 secs / 1.333 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 344 of 371[32m SUCCESS[39m (0 secs / 1.333 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 345 of 371[32m SUCCESS[39m (0 secs / 1.337 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 346 of 371[32m SUCCESS[39m (0 secs / 1.338 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 347 of 371[32m SUCCESS[39m (0 secs / 1.34 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 348 of 371[32m SUCCESS[39m (0 secs / 1.341 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 349 of 371[32m SUCCESS[39m (0 secs / 1.342 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 350 of 371[32m SUCCESS[39m (0 secs / 1.344 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 351 of 371[32m SUCCESS[39m (0 secs / 1.346 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 352 of 371[32m SUCCESS[39m (0 secs / 1.348 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 353 of 371[32m SUCCESS[39m (0 secs / 1.349 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 354 of 371[32m SUCCESS[39m (0 secs / 1.35 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 355 of 371[32m SUCCESS[39m (0 secs / 1.352 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 356 of 371[32m SUCCESS[39m (0 secs / 1.353 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 357 of 371[32m SUCCESS[39m (0 secs / 1.354 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 358 of 371[32m SUCCESS[39m (0 secs / 1.356 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 359 of 371[32m SUCCESS[39m (0 secs / 1.357 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 360 of 371[32m SUCCESS[39m (0 secs / 1.358 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 361 of 371[32m SUCCESS[39m (0 secs / 1.36 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 362 of 371[32m SUCCESS[39m (0 secs / 1.36 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 363 of 371[32m SUCCESS[39m (0 secs / 1.361 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 364 of 371[32m SUCCESS[39m (0 secs / 1.361 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 365 of 371[32m SUCCESS[39m (0 secs / 1.361 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 366 of 371[32m SUCCESS[39m (0 secs / 1.361 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 367 of 371[32m SUCCESS[39m (0 secs / 1.361 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 368 of 371[32m SUCCESS[39m (0 secs / 1.362 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 369 of 371[32m SUCCESS[39m (0 secs / 1.369 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 370 of 371[32m SUCCESS[39m (0 secs / 1.371 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 371 of 371[32m SUCCESS[39m (0 secs / 1.373 secs)
+[1A[2KChrome Headless 147.0.0.0 (Linux 0.0.0): Executed 371 of 371[32m SUCCESS[39m (1.567 secs / 1.373 secs)
+[32mTOTAL: 371 SUCCESS[39m
+TOTAL: 371 SUCCESS

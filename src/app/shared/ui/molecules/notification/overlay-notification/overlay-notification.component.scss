@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 :host {
 	position: fixed;
 	top: 0;
@@ -16,8 +17,7 @@
 	width: 100vw;
 	height: 100vh;
 	background: var(--overlay-bg);
-	backdrop-filter: blur(12px);
-	-webkit-backdrop-filter: blur(12px);
+	@include glass-overlay;
 	pointer-events: all;
 	z-index: 11000;
 	opacity: 0;
@@ -44,8 +44,7 @@
 	.modal-content {
 		pointer-events: all;
 		background: rgb(from var(--app-background-color) r g b / 0.75);
-		backdrop-filter: blur(96px) saturate(200%);
-		-webkit-backdrop-filter: blur(96px) saturate(200%);
+		@include glass-heavy;
 		border: 1px solid var(--border-color);
 		border-radius: 16px;
 		box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -58,6 +57,19 @@
 		position: relative;
 		animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		overflow: visible; // Alterado para visible para permitir dropdowns de saírem do modal
+
+		&.size-large {
+			max-width: 900px;
+		}
+		
+		&.size-extra-large {
+			max-width: 1200px;
+		}
+
+		&.size-full {
+			max-width: 95vw;
+			height: 95vh;
+		}
 
 		.close-modal-btn {
 			position: absolute;

@@ -1,9 +1,9 @@
 .book-edit-modal-content {
 	display: flex;
 	flex-direction: column;
-	width: 100%;
-	max-width: 800px;
-	max-height: 85vh;
+	width: 90vw;
+	max-width: 1200px;
+	max-height: 90vh;
 }
 
 .modal-header {
@@ -156,6 +156,18 @@
 			&:hover {
 				color: var(--danger-color);
 				background-color: rgb(from var(--danger-color) r g b / 0.1);
+			}
+		}
+
+		&.synopsis-item {
+			align-items: flex-start;
+
+			.synopsis-content {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				width: 100%;
 			}
 		}
 	}

@@ -1,9 +1,7 @@
 <header>
 	<nav>
 		@if (!hideLogo()) {
-		<button type="button" class="menu-btn" (click)="toggleMenu.emit()" aria-label="Abrir menu">
-			<app-icons name="list" size="24" />
-		</button>
+		<app-icon-button name="list" size="24px" (click)="toggleMenu.emit()" aria-label="Abrir menu" />
 		<a id="logo" [routerLink]="['/']" [class.dark-theme]="isDarkTheme()" aria-label="Logo">
 			<app-icons name="logo" size="48" />
 		</a>
@@ -13,10 +11,11 @@
 		<app-search />
 
 		<div class="user-actions">
+			@if (isLoggedIn()) {
+				<app-notification-menu />
+			}
 			@if (!isLoggedIn()) {
-				<button type="button" class="icon-btn login-btn" aria-label="Menu do Usuário" (click)="userMenu.toggle(); $event.stopPropagation()">
-					<app-icons name="user" size="32" />
-				</button>
+				<app-icon-button name="user" size="32px" (click)="userMenu.toggle(); $event.stopPropagation()" aria-label="Menu do Usuário" />
 			}
 			@else {
 				<button type="button" class="user-btn" (click)="userMenu.toggle(); $event.stopPropagation()">

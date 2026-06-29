@@ -166,6 +166,10 @@ main {
 				&.active {
 					border-bottom-color: var(--primary-color);
 				}
+
+				.bell-icon {
+					--icon-size: 24px !important; /* No mobile volta pro tamanho normal */
+				}
 			}
 
 			hr {

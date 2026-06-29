@@ -84,6 +84,7 @@ export interface NotificationConfig<
 	 * Opacidade do backdrop (0.0 a 1.0, padrão: 0.75 para componentes personalizados)
 	 */
 	backdropOpacity?: number;
+	size?: 'small' | 'medium' | 'large' | 'extra-large' | 'full';
 }
 
 /**

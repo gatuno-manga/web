@@ -343,7 +343,19 @@
 	>
 		<div class="scrollable">
 			<div class="titles">
-				<h1>Títulos alternativos</h1>
+				<div class="titles-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+					<h1 style="margin-bottom: 0;">Títulos alternativos</h1>
+					@if (userService.hasPermission('internal:books:edit')) {
+						<app-button
+							variant="text"
+							size="small"
+							(click)="openAltTitlesModal()"
+						>
+							<app-icons name="edit-2" size="16" />
+							<span>Gerenciar</span>
+						</app-button>
+					}
+				</div>
 				<div>
 					@defer (when modulesLoad[tab.extraInfo].load()) {
 						@for (

@@ -1,10 +1,13 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
 	effect,
+	inject,
 	input,
+	PLATFORM_ID,
 	viewChild,
 } from '@angular/core';
 import { decode } from 'blurhash';
@@ -21,6 +24,8 @@ export class BlurhashComponent implements AfterViewInit {
 	width = input<number>(32);
 	height = input<number>(32);
 	punch = input<number>(1);
+
+	private platformId = inject(PLATFORM_ID);
 
 	canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
 
@@ -41,6 +46,8 @@ export class BlurhashComponent implements AfterViewInit {
 	}
 
 	private render() {
+		if (!isPlatformBrowser(this.platformId)) return;
+
 		const hashValue = this.hash();
 		if (!hashValue || hashValue.length < 6) return;
 

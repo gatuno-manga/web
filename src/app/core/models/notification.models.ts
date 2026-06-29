@@ -8,6 +8,7 @@ interface NotificationBase {
 	componentData?: Record<string, unknown>;
 	useBackdrop?: boolean;
 	backdropOpacity?: number;
+	size?: 'small' | 'medium' | 'large' | 'extra-large' | 'full';
 }
 
 export interface ModalButton {
@@ -34,3 +35,12 @@ export interface ToastNotification extends NotificationText {
 }
 
 export interface Notification extends NotificationText {}
+
+export interface HistoryNotification {
+	id: string;
+	title: string;
+	message: string;
+	read: boolean;
+	createdAt: Date;
+	type: NotificationType;
+}

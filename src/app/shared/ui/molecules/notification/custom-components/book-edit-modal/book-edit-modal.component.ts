@@ -21,6 +21,7 @@ import {
 	Author,
 	BookBasic,
 	BookDetail,
+	LocalizedDescription,
 	SensitiveContentResponse,
 	TypeBook,
 	tag,
@@ -55,7 +56,6 @@ export interface BookEditSaveEvent {
 		IconsComponent,
 		DragDropModule,
 		MultiSelectTagsComponent,
-		FlagPipe,
 	],
 	templateUrl: './book-edit-modal.component.html',
 	styleUrls: ['./book-edit-modal.component.scss'],
@@ -75,11 +75,9 @@ export class BookEditModalComponent implements OnInit {
 	isSaving = signal(false);
 
 	// Multi-value fields managed with signals for easier UI binding and reordering
-	alternativeTitles = signal<AlternativeTitle[]>([]);
+	localizedDescriptions = signal<LocalizedDescription[]>([]);
 	searchTerms = signal<string[]>([]);
 	originalUrls = signal<string[]>([]);
-
-	newAltTitle = signal('');
 	newSearchTerm = signal('');
 	newUrl = signal('');
 
@@ -132,7 +130,6 @@ export class BookEditModalComponent implements OnInit {
 				this.book.title,
 				[Validators.required, Validators.maxLength(300)],
 			],
-			description: [this.book.description, [Validators.maxLength(5000)]],
 			publication: [
 				this.book.publication,
 				[Validators.min(1900), Validators.max(2100)],
@@ -141,20 +138,21 @@ export class BookEditModalComponent implements OnInit {
 			originalLanguageCode: [this.book.originalLanguageCode || ''],
 		});
 
-		this.alternativeTitles.set([...(bookDetail.alternativeTitles || [])]);
-		// Se existir o array legado e o novo estiver vazio
+		this.localizedDescriptions.set([
+			...(bookDetail.localizedDescriptions || []),
+		]);
 		if (
-			this.alternativeTitles().length === 0 &&
-			bookDetail.alternativeTitle &&
-			bookDetail.alternativeTitle.length > 0
+			this.localizedDescriptions().length === 0 &&
+			this.book.description
 		) {
-			this.alternativeTitles.set(
-				bookDetail.alternativeTitle.map((t: string) => ({
-					title: t,
-					languageCode: null,
-				})),
-			);
+			this.localizedDescriptions.set([
+				{
+					description: this.book.description,
+					languageCode: this.book.originalLanguageCode || '',
+				},
+			]);
 		}
+
 		this.searchTerms.set([...(bookDetail.searchTerms || [])]);
 		this.originalUrls.set([...(bookDetail.originalUrl || [])]);
 
@@ -211,26 +209,40 @@ export class BookEditModalComponent implements OnInit {
 		return res as T;
 	}
 
-	// --- Alternative Titles Management ---
-	addAltTitle(): void {
-		const val = this.newAltTitle().trim();
-		if (val && !this.alternativeTitles().find((t) => t.title === val)) {
-			this.alternativeTitles.update((prev) => [
-				...prev,
-				{ title: val, languageCode: null },
-			]);
-			this.newAltTitle.set('');
-		}
+	// --- Multilingual Synopses Management ---
+	addLocalizedDescription(): void {
+		this.localizedDescriptions.update((prev) => [
+			...prev,
+			{ description: '', languageCode: '', rank: prev.length },
+		]);
 	}
 
-	removeAltTitle(index: number): void {
-		this.alternativeTitles.update((prev) =>
+	removeLocalizedDescription(index: number): void {
+		this.localizedDescriptions.update((prev) =>
 			prev.filter((_, i) => i !== index),
 		);
 	}
 
-	onAltTitleDrop(event: CdkDragDrop<AlternativeTitle[]>): void {
-		this.alternativeTitles.update((prev) => {
+	updateLocalizedDescriptionText(index: number, text: string): void {
+		this.localizedDescriptions.update((prev) => {
+			const next = [...prev];
+			next[index].description = text;
+			return next;
+		});
+	}
+
+	updateLocalizedDescriptionLang(index: number, lang: string): void {
+		this.localizedDescriptions.update((prev) => {
+			const next = [...prev];
+			next[index].languageCode = lang;
+			return next;
+		});
+	}
+
+	onLocalizedDescriptionDrop(
+		event: CdkDragDrop<LocalizedDescription[]>,
+	): void {
+		this.localizedDescriptions.update((prev) => {
 			const next = [...prev];
 			moveItemInArray(next, event.previousIndex, event.currentIndex);
 			return next;
@@ -284,6 +296,28 @@ export class BookEditModalComponent implements OnInit {
 		});
 	}
 
+	// --- Dynamic Creation ---
+	onCreateTag(name: string): void {
+		const newId = 'temp-' + Date.now();
+		this.availableTags.update((prev) => [...prev, { id: newId, name }]);
+		this.selectedTagIds.update((prev) => [...prev, newId]);
+	}
+
+	onCreateAuthor(name: string): void {
+		const newId = 'temp-' + Date.now();
+		this.availableAuthors.update((prev) => [...prev, { id: newId, name }]);
+		this.selectedAuthorIds.update((prev) => [...prev, newId]);
+	}
+
+	onCreateSensitive(name: string): void {
+		const newId = 'temp-' + Date.now();
+		this.availableSensitive.update((prev) => [
+			...prev,
+			{ id: newId, name },
+		]);
+		this.selectedSensitiveIds.update((prev) => [...prev, newId]);
+	}
+
 	// --- Action Handlers ---
 	onSave(): void {
 		if (this.editForm.invalid) {
@@ -300,8 +334,6 @@ export class BookEditModalComponent implements OnInit {
 		// Basic fields delta
 		if (formValues.title !== this.book.title)
 			updatedData.title = formValues.title;
-		if (formValues.description !== this.book.description)
-			updatedData.description = formValues.description;
 		if (formValues.publication !== this.book.publication)
 			updatedData.publication = formValues.publication;
 		if (formValues.type !== this.book.type)
@@ -316,24 +348,34 @@ export class BookEditModalComponent implements OnInit {
 					: formValues.originalLanguageCode;
 
 		// Array fields delta (deep compare simplified)
-		const currentAltTitles = this.alternativeTitles();
-		const originalAltTitles = bookDetail.alternativeTitles || [];
+		const currentLocDesc = this.localizedDescriptions().map((d, index) => ({
+			...d,
+			rank: index,
+		}));
+		const originalLocDesc = bookDetail.localizedDescriptions || [];
 
-		// Map back for comparison
-		const currentAltTitlesMapped = currentAltTitles
-			.map((t) => t.title)
+		const currentLocDescMapped = currentLocDesc
+			.map(
+				(d: LocalizedDescription) =>
+					`${d.languageCode}:${d.description}`,
+			)
 			.join('|');
-		const originalAltTitlesMapped = originalAltTitles
-			.map((t) => t.title)
+		const originalLocDescMapped = originalLocDesc
+			.map(
+				(d: LocalizedDescription) =>
+					`${d.languageCode}:${d.description}`,
+			)
 			.join('|');
 
 		if (
-			currentAltTitlesMapped !== originalAltTitlesMapped ||
-			currentAltTitles.length !== originalAltTitles.length
+			currentLocDescMapped !== originalLocDescMapped ||
+			currentLocDesc.length !== originalLocDesc.length
 		) {
-			updatedData.alternativeTitles = currentAltTitles.map(
-				(t, index) => ({ ...t, rank: index }),
-			);
+			updatedData.localizedDescriptions = currentLocDesc;
+			// Atualiza a description principal se houver sinopses para manter compatibilidade
+			if (currentLocDesc.length > 0) {
+				updatedData.description = currentLocDesc[0].description;
+			}
 		}
 
 		const currentSearchTerms = this.searchTerms();
