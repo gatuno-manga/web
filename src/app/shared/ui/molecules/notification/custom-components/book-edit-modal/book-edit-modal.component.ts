@@ -138,10 +138,18 @@ export class BookEditModalComponent implements OnInit {
 			originalLanguageCode: [this.book.originalLanguageCode || ''],
 		});
 
-		this.localizedDescriptions.set([...(bookDetail.localizedDescriptions || [])]);
-		if (this.localizedDescriptions().length === 0 && this.book.description) {
+		this.localizedDescriptions.set([
+			...(bookDetail.localizedDescriptions || []),
+		]);
+		if (
+			this.localizedDescriptions().length === 0 &&
+			this.book.description
+		) {
 			this.localizedDescriptions.set([
-				{ description: this.book.description, languageCode: this.book.originalLanguageCode || '' }
+				{
+					description: this.book.description,
+					languageCode: this.book.originalLanguageCode || '',
+				},
 			]);
 		}
 
@@ -203,15 +211,20 @@ export class BookEditModalComponent implements OnInit {
 
 	// --- Multilingual Synopses Management ---
 	addLocalizedDescription(): void {
-		this.localizedDescriptions.update(prev => [...prev, { description: '', languageCode: '', rank: prev.length }]);
+		this.localizedDescriptions.update((prev) => [
+			...prev,
+			{ description: '', languageCode: '', rank: prev.length },
+		]);
 	}
 
 	removeLocalizedDescription(index: number): void {
-		this.localizedDescriptions.update(prev => prev.filter((_, i) => i !== index));
+		this.localizedDescriptions.update((prev) =>
+			prev.filter((_, i) => i !== index),
+		);
 	}
 
 	updateLocalizedDescriptionText(index: number, text: string): void {
-		this.localizedDescriptions.update(prev => {
+		this.localizedDescriptions.update((prev) => {
 			const next = [...prev];
 			next[index].description = text;
 			return next;
@@ -219,14 +232,16 @@ export class BookEditModalComponent implements OnInit {
 	}
 
 	updateLocalizedDescriptionLang(index: number, lang: string): void {
-		this.localizedDescriptions.update(prev => {
+		this.localizedDescriptions.update((prev) => {
 			const next = [...prev];
 			next[index].languageCode = lang;
 			return next;
 		});
 	}
 
-	onLocalizedDescriptionDrop(event: CdkDragDrop<LocalizedDescription[]>): void {
+	onLocalizedDescriptionDrop(
+		event: CdkDragDrop<LocalizedDescription[]>,
+	): void {
 		this.localizedDescriptions.update((prev) => {
 			const next = [...prev];
 			moveItemInArray(next, event.previousIndex, event.currentIndex);
@@ -284,20 +299,23 @@ export class BookEditModalComponent implements OnInit {
 	// --- Dynamic Creation ---
 	onCreateTag(name: string): void {
 		const newId = 'temp-' + Date.now();
-		this.availableTags.update(prev => [...prev, { id: newId, name }]);
-		this.selectedTagIds.update(prev => [...prev, newId]);
+		this.availableTags.update((prev) => [...prev, { id: newId, name }]);
+		this.selectedTagIds.update((prev) => [...prev, newId]);
 	}
 
 	onCreateAuthor(name: string): void {
 		const newId = 'temp-' + Date.now();
-		this.availableAuthors.update(prev => [...prev, { id: newId, name }]);
-		this.selectedAuthorIds.update(prev => [...prev, newId]);
+		this.availableAuthors.update((prev) => [...prev, { id: newId, name }]);
+		this.selectedAuthorIds.update((prev) => [...prev, newId]);
 	}
 
 	onCreateSensitive(name: string): void {
 		const newId = 'temp-' + Date.now();
-		this.availableSensitive.update(prev => [...prev, { id: newId, name }]);
-		this.selectedSensitiveIds.update(prev => [...prev, newId]);
+		this.availableSensitive.update((prev) => [
+			...prev,
+			{ id: newId, name },
+		]);
+		this.selectedSensitiveIds.update((prev) => [...prev, newId]);
 	}
 
 	// --- Action Handlers ---
@@ -330,13 +348,29 @@ export class BookEditModalComponent implements OnInit {
 					: formValues.originalLanguageCode;
 
 		// Array fields delta (deep compare simplified)
-		const currentLocDesc = this.localizedDescriptions().map((d, index) => ({ ...d, rank: index }));
+		const currentLocDesc = this.localizedDescriptions().map((d, index) => ({
+			...d,
+			rank: index,
+		}));
 		const originalLocDesc = bookDetail.localizedDescriptions || [];
-		
-		const currentLocDescMapped = currentLocDesc.map((d: LocalizedDescription) => `${d.languageCode}:${d.description}`).join('|');
-		const originalLocDescMapped = originalLocDesc.map((d: LocalizedDescription) => `${d.languageCode}:${d.description}`).join('|');
-		
-		if (currentLocDescMapped !== originalLocDescMapped || currentLocDesc.length !== originalLocDesc.length) {
+
+		const currentLocDescMapped = currentLocDesc
+			.map(
+				(d: LocalizedDescription) =>
+					`${d.languageCode}:${d.description}`,
+			)
+			.join('|');
+		const originalLocDescMapped = originalLocDesc
+			.map(
+				(d: LocalizedDescription) =>
+					`${d.languageCode}:${d.description}`,
+			)
+			.join('|');
+
+		if (
+			currentLocDescMapped !== originalLocDescMapped ||
+			currentLocDesc.length !== originalLocDesc.length
+		) {
 			updatedData.localizedDescriptions = currentLocDesc;
 			// Atualiza a description principal se houver sinopses para manter compatibilidade
 			if (currentLocDesc.length > 0) {

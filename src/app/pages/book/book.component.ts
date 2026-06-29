@@ -66,7 +66,6 @@ import { firstValueFrom, Subscription } from 'rxjs';
 		'(document:click)': 'onDocumentClick()',
 	},
 })
-
 export class BookComponent implements OnInit, OnDestroy {
 	book = signal<BookBasic | undefined>(undefined);
 	public userTokenService = inject(UserTokenService);
@@ -400,7 +399,7 @@ export class BookComponent implements OnInit, OnDestroy {
 			},
 			useBackdrop: true,
 			backdropOpacity: 0.5,
-			size: 'extra-large'
+			size: 'extra-large',
 		});
 	}
 

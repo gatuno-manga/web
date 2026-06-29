@@ -10,12 +10,14 @@ console.log('🔍 Iniciando verificação de ícones...');
 const availableIcons = new Set();
 if (fs.existsSync(iconsDir)) {
 	const files = fs.readdirSync(iconsDir);
-	files.forEach(file => {
+	files.forEach((file) => {
 		if (file.endsWith('.svg')) {
 			availableIcons.add(file.replace('.svg', ''));
 		}
 	});
-	console.log(`✅ Encontrados ${availableIcons.size} ícones disponíveis em ${path.relative(path.join(__dirname, '..'), iconsDir)}`);
+	console.log(
+		`✅ Encontrados ${availableIcons.size} ícones disponíveis em ${path.relative(path.join(__dirname, '..'), iconsDir)}`,
+	);
 } else {
 	console.error(`❌ Diretório de ícones não encontrado: ${iconsDir}`);
 	process.exit(1);
@@ -43,30 +45,33 @@ const regexes = [
 	// Pega usos estáticos: name="icon-name" ou name='icon-name'
 	/<app-icons[^>]*\sname=["']([^"']+)["']/g,
 	/<app-icon-button[^>]*\sname=["']([^"']+)["']/g,
-	
+
 	// Pega usos literais com property binding: [name]="'icon-name'" ou [name]='"icon-name"'
 	/<app-icons[^>]*\s\[name\]=["'](['"])([^'"]+)\1["']/g,
 	/<app-icon-button[^>]*\s\[name\]=["'](['"])([^'"]+)\1["']/g,
 ];
 
-allFiles.forEach(filePath => {
+allFiles.forEach((filePath) => {
 	const content = fs.readFileSync(filePath, 'utf8');
-	
+
 	regexes.forEach((regex, index) => {
-		let match;
-		while ((match = regex.exec(content)) !== null) {
+		let match = regex.exec(content);
+		while (match !== null) {
 			// Para os property bindings, o nome está no grupo 2. Para estáticos, no grupo 1.
 			const iconName = index > 1 ? match[2] : match[1];
-			
+
 			if (!usedIcons.has(iconName)) {
 				usedIcons.set(iconName, new Set());
 			}
 			usedIcons.get(iconName).add(filePath);
+			match = regex.exec(content);
 		}
 	});
 });
 
-console.log(`✅ Encontradas ${usedIcons.size} referências únicas a ícones nos templates.`);
+console.log(
+	`✅ Encontradas ${usedIcons.size} referências únicas a ícones nos templates.`,
+);
 
 // 4. Cruzar dados para encontrar ícones ausentes
 const missingIcons = [];
@@ -79,14 +84,22 @@ for (const [icon, files] of usedIcons.entries()) {
 // 5. Relatório final
 console.log('\n--- Relatório ---');
 if (missingIcons.length === 0) {
-	console.log('✨ Sucesso: Todos os ícones referenciados no sistema existem na pasta public/assets/icons.');
+	console.log(
+		'✨ Sucesso: Todos os ícones referenciados no sistema existem na pasta public/assets/icons.',
+	);
 	process.exit(0);
 } else {
-	console.error('❌ ATENÇÃO: Foram encontrados ícones ausentes (sendo referenciados mas não existem arquivos SVG):\n');
-	missingIcons.forEach(item => {
+	console.error(
+		'❌ ATENÇÃO: Foram encontrados ícones ausentes (sendo referenciados mas não existem arquivos SVG):\n',
+	);
+	missingIcons.forEach((item) => {
 		console.error(`Ícone: "${item.icon}"`);
 		console.error(`Usado em:`);
-		item.files.forEach(f => console.error(`  - ${path.relative(path.join(__dirname, '..'), f)}`));
+		item.files.forEach((f) => {
+			console.error(
+				`  - ${path.relative(path.join(__dirname, '..'), f)}`,
+			);
+		});
 		console.error('');
 	});
 	process.exit(1);

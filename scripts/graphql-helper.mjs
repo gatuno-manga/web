@@ -166,7 +166,10 @@ async function fetchGraphQL(url) {
 		if (!response.ok) throw new Error(`HTTP ${response.status}`);
 		const data = await response.json();
 		if (data.errors) {
-			console.error('GraphQL Errors:', JSON.stringify(data.errors, null, 2));
+			console.error(
+				'GraphQL Errors:',
+				JSON.stringify(data.errors, null, 2),
+			);
 			process.exit(1);
 		}
 		fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2));
@@ -190,7 +193,9 @@ function getTypeString(typeRef) {
 
 function printSummary(schema) {
 	const queryTypeName = schema.queryType ? schema.queryType.name : 'Query';
-	const mutationTypeName = schema.mutationType ? schema.mutationType.name : 'Mutation';
+	const mutationTypeName = schema.mutationType
+		? schema.mutationType.name
+		: 'Mutation';
 
 	const queryType = schema.types.find((t) => t.name === queryTypeName);
 	const mutationType = schema.types.find((t) => t.name === mutationTypeName);
@@ -200,9 +205,14 @@ function printSummary(schema) {
 	console.log('='.repeat(50));
 	if (queryType && queryType.fields) {
 		for (const field of queryType.fields) {
-			const args = field.args.map((a) => `${a.name}: ${getTypeString(a.type)}`).join(', ');
-			console.log(`- ${field.name}${args ? \`(\${args})\` : ''} : ${getTypeString(field.type)}`);
-			if (field.description) console.log(`    ${field.description.replace(/\n/g, ' ')}`);
+			const args = field.args
+				.map((a) => `${a.name}: ${getTypeString(a.type)}`)
+				.join(', ');
+			console.log(
+				`- ${field.name}${args ? '(' + args + ')' : ''} : ${getTypeString(field.type)}`,
+			);
+			if (field.description)
+				console.log(`    ${field.description.replace(/\n/g, ' ')}`);
 		}
 	} else {
 		console.log('No queries found.');
@@ -213,9 +223,14 @@ function printSummary(schema) {
 	console.log('='.repeat(50));
 	if (mutationType && mutationType.fields) {
 		for (const field of mutationType.fields) {
-			const args = field.args.map((a) => `${a.name}: ${getTypeString(a.type)}`).join(', ');
-			console.log(`- ${field.name}${args ? \`(\${args})\` : ''} : ${getTypeString(field.type)}`);
-			if (field.description) console.log(`    ${field.description.replace(/\n/g, ' ')}`);
+			const args = field.args
+				.map((a) => `${a.name}: ${getTypeString(a.type)}`)
+				.join(', ');
+			console.log(
+				`- ${field.name}${args ? '(' + args + ')' : ''} : ${getTypeString(field.type)}`,
+			);
+			if (field.description)
+				console.log(`    ${field.description.replace(/\n/g, ' ')}`);
 		}
 	} else {
 		console.log('No mutations found.');
@@ -224,11 +239,15 @@ function printSummary(schema) {
 
 function printOperationDetail(schema, opName) {
 	if (!opName) {
-		console.log('Please provide an operation name. Usage: --operation <name>');
+		console.log(
+			'Please provide an operation name. Usage: --operation <name>',
+		);
 		return;
 	}
 	const queryTypeName = schema.queryType ? schema.queryType.name : 'Query';
-	const mutationTypeName = schema.mutationType ? schema.mutationType.name : 'Mutation';
+	const mutationTypeName = schema.mutationType
+		? schema.mutationType.name
+		: 'Mutation';
 
 	const queryType = schema.types.find((t) => t.name === queryTypeName);
 	const mutationType = schema.types.find((t) => t.name === mutationTypeName);

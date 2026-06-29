@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
 import { firstValueFrom } from 'rxjs';
 
@@ -9,7 +9,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class NotificationSettingsService {
 	private http = inject(HttpClient);
-	private swPush = inject(SwPush);
+	private swPush = inject(SwPush, { optional: true });
 	private platformId = inject(PLATFORM_ID);
 
 	public isPushSupported = signal(false);
@@ -25,10 +25,10 @@ export class NotificationSettingsService {
 			}
 
 			// Verificar suporte ao Push
-			this.isPushSupported.set(this.swPush.isEnabled);
+			this.isPushSupported.set(this.swPush?.isEnabled ?? false);
 
 			// Inscrever para saber se o Push está ativo
-			if (this.swPush.isEnabled) {
+			if (this.swPush?.isEnabled) {
 				this.swPush.subscription.subscribe((sub) => {
 					this.isPushEnabled.set(!!sub);
 				});
@@ -39,16 +39,15 @@ export class NotificationSettingsService {
 	toggleAllNotifications(enable: boolean) {
 		this.enableAllNotifications.set(enable);
 		if (isPlatformBrowser(this.platformId)) {
-			localStorage.setItem(
-				'gatuno_enable_all_notif',
-				enable.toString(),
-			);
+			localStorage.setItem('gatuno_enable_all_notif', enable.toString());
 		}
 	}
 
 	async togglePushSubscription(enable: boolean): Promise<void> {
 		if (!this.isPushSupported()) {
-			throw new Error('Push notifications não suportadas neste navegador.');
+			throw new Error(
+				'Push notifications não suportadas neste navegador.',
+			);
 		}
 
 		if (enable) {
@@ -59,12 +58,12 @@ export class NotificationSettingsService {
 						'/notifications/push/vapid-key',
 					),
 				);
-				// A chave pode vir como res.publicKey ou apenas res (se retornar plain text ou outro formato, 
+				// A chave pode vir como res.publicKey ou apenas res (se retornar plain text ou outro formato,
 				// ajustamos conforme necessário, assumindo {publicKey: string})
 				const vapidPublicKey = res.publicKey;
 
 				// 2. Pedir permissão no browser e gerar subscription
-				const sub = await this.swPush.requestSubscription({
+				const sub = await this.swPush?.requestSubscription({
 					serverPublicKey: vapidPublicKey,
 				});
 
@@ -86,7 +85,7 @@ export class NotificationSettingsService {
 					this.http.delete('/notifications/push/unsubscribe'),
 				);
 				// 2. Desinscrever localmente no Service Worker
-				await this.swPush.unsubscribe();
+				await this.swPush?.unsubscribe();
 				this.isPushEnabled.set(false);
 			} catch (e) {
 				console.error('Erro ao cancelar push notifications:', e);

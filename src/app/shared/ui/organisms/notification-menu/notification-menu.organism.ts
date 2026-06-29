@@ -16,7 +16,12 @@ import { AsideComponent } from '@ui/organisms/aside/aside.component';
 @Component({
 	selector: 'app-notification-menu',
 	standalone: true,
-	imports: [CommonModule, IconButtonComponent, IconsComponent, AsideComponent],
+	imports: [
+		CommonModule,
+		IconButtonComponent,
+		IconsComponent,
+		AsideComponent,
+	],
 	templateUrl: './notification-menu.organism.html',
 	styleUrl: './notification-menu.organism.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,7 +33,7 @@ export class NotificationMenuOrganismComponent {
 
 	isLargeScreen = signal(false);
 	isOpen = signal(false);
-	
+
 	notifications = this.notificationService.history;
 	unreadCount = this.notificationService.unreadCount;
 

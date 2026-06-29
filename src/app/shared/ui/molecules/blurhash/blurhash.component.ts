@@ -4,10 +4,10 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
-	PLATFORM_ID,
 	effect,
 	inject,
 	input,
+	PLATFORM_ID,
 	viewChild,
 } from '@angular/core';
 import { decode } from 'blurhash';

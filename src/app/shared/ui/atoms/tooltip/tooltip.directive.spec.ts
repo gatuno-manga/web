@@ -1,5 +1,10 @@
 import { Component, DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import {
+	ComponentFixture,
+	fakeAsync,
+	TestBed,
+	tick,
+} from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { TooltipDirective } from './tooltip.directive';
 
@@ -43,7 +48,7 @@ describe('TooltipDirective', () => {
 		const tooltip = document.querySelector('.gatuno-custom-tooltip');
 		expect(tooltip).toBeTruthy();
 		expect(tooltip?.textContent?.trim()).toBe('Test Tooltip');
-		
+
 		// Flush remaining timers
 		buttonEl.triggerEventHandler('mouseleave', null);
 		tick(200);

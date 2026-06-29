@@ -56,10 +56,10 @@ import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
 	AddRelatedBookModalComponent,
-	BookEditModalComponent,
-	BookEditSaveEvent,
 	BookAltTitlesModalComponent,
 	BookAltTitlesSaveEvent,
+	BookEditModalComponent,
+	BookEditSaveEvent,
 } from '@ui/molecules/notification/custom-components';
 import {
 	CoverEditModalComponent,
@@ -910,19 +910,25 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				close: (result: BookAltTitlesSaveEvent | null) => {
 					this.modalService.close();
 					if (result) {
-						this.bookService.updateBook(result.id, result.data).subscribe({
-							next: () => {
-								this.notificationService.success('Títulos alternativos atualizados com sucesso!');
-								this.updated.emit();
-							},
-							error: (err) => {
-								this.notificationService.error('Erro ao atualizar títulos alternativos');
-								console.error(err);
-							},
-						});
+						this.bookService
+							.updateBook(result.id, result.data)
+							.subscribe({
+								next: () => {
+									this.notificationService.success(
+										'Títulos alternativos atualizados com sucesso!',
+									);
+									this.updated.emit();
+								},
+								error: (err) => {
+									this.notificationService.error(
+										'Erro ao atualizar títulos alternativos',
+									);
+									console.error(err);
+								},
+							});
 					}
 				},
-			}
+			},
 		});
 	}
 

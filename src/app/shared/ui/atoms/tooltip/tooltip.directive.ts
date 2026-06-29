@@ -99,9 +99,12 @@ export class TooltipDirective implements OnDestroy {
 			`${left + window.scrollX}px`,
 		);
 
-		const arrowLeft = (hostPos.left + hostPos.width / 2) - left;
-		this.tooltipElement!.style.setProperty('--arrow-left', `${arrowLeft}px`);
-		
+		const arrowLeft = hostPos.left + hostPos.width / 2 - left;
+		this.tooltipElement!.style.setProperty(
+			'--arrow-left',
+			`${arrowLeft}px`,
+		);
+
 		if (isBottom) {
 			this.renderer.addClass(this.tooltipElement, 'bottom');
 		}

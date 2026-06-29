@@ -1,5 +1,12 @@
-import { Injectable, inject, signal, WritableSignal, computed, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import {
+	computed,
+	Injectable,
+	inject,
+	PLATFORM_ID,
+	signal,
+	WritableSignal,
+} from '@angular/core';
 import { NotificationFactory } from '@core/services/notification/notification.factory';
 import {
 	NotificationComponentData,
@@ -9,12 +16,12 @@ import {
 	OverlayNotification,
 } from '@core/services/notification/notification-strategy.interface';
 import {
-	ModalNotification,
-	ToastNotification,
 	HistoryNotification,
-	NotificationType
+	ModalNotification,
+	NotificationType,
+	ToastNotification,
 } from '@models/notification.models';
-import { openDB, DBSchema, IDBPDatabase } from 'idb';
+import { DBSchema, IDBPDatabase, openDB } from 'idb';
 
 interface GatunoNotificationsDB extends DBSchema {
 	notifications: {
@@ -53,7 +60,9 @@ export class NotificationService {
 	public readonly modal = this._modal.asReadonly();
 	public readonly overlays = this._overlays.asReadonly();
 	public readonly history = this._history.asReadonly();
-	public readonly unreadCount = computed(() => this._history().filter((n) => !n.read).length);
+	public readonly unreadCount = computed(
+		() => this._history().filter((n) => !n.read).length,
+	);
 
 	// Timer IDs para cancelar auto-dismiss pendentes
 	private timers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -61,17 +70,24 @@ export class NotificationService {
 	// Factory injetado
 	private factory = inject(NotificationFactory);
 
-	private dbPromise: Promise<IDBPDatabase<GatunoNotificationsDB>> | null = null;
+	private dbPromise: Promise<IDBPDatabase<GatunoNotificationsDB>> | null =
+		null;
 	private platformId = inject(PLATFORM_ID);
 
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
-			this.dbPromise = openDB<GatunoNotificationsDB>('GatunoNotificationsDB', 1, {
-				upgrade(db) {
-					const store = db.createObjectStore('notifications', { keyPath: 'id' });
-					store.createIndex('by-date', 'createdAt');
+			this.dbPromise = openDB<GatunoNotificationsDB>(
+				'GatunoNotificationsDB',
+				1,
+				{
+					upgrade(db) {
+						const store = db.createObjectStore('notifications', {
+							keyPath: 'id',
+						});
+						store.createIndex('by-date', 'createdAt');
+					},
 				},
-			});
+			);
 
 			this.loadHistory();
 		}
@@ -86,16 +102,19 @@ export class NotificationService {
 			const store = tx.objectStore('notifications');
 			const index = store.index('by-date');
 			let cursor = await index.openCursor(null, 'prev');
-			
+
 			const loaded: HistoryNotification[] = [];
 			while (cursor && loaded.length < 50) {
 				loaded.push(cursor.value);
 				cursor = await cursor.continue();
 			}
-			
+
 			this._history.set(loaded);
 		} catch (e) {
-			console.error('Erro ao carregar histórico de notificações do IndexedDB', e);
+			console.error(
+				'Erro ao carregar histórico de notificações do IndexedDB',
+				e,
+			);
 		}
 	}
 
@@ -136,7 +155,11 @@ export class NotificationService {
 
 	// ─── Histórico ───────────────────────────────────
 
-	async addHistory(data: { title: string; message: string; type: NotificationType }): Promise<void> {
+	async addHistory(data: {
+		title: string;
+		message: string;
+		type: NotificationType;
+	}): Promise<void> {
 		const newNotif: HistoryNotification = {
 			id: crypto.randomUUID(),
 			title: data.title,

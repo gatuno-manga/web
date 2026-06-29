@@ -28,8 +28,8 @@ import {
 import mqtt, { MqttClient } from 'mqtt';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { NetworkStatusService } from './network-status.service';
-import { NotificationSettingsService } from './notification-settings.service';
 import { NotificationService } from './notification.service';
+import { NotificationSettingsService } from './notification-settings.service';
 import { UserTokenService } from './user-token.service';
 
 export type MqttPayloadData =
@@ -288,7 +288,9 @@ export class MqttService implements OnDestroy {
 					`[MQTT_DEBUG] Buscando tópicos dinâmicos na API...`,
 				);
 				this.http
-					.get<{ data: { topics: string[] } }>('/interactions/mqtt-topics')
+					.get<{ data: { topics: string[] } }>(
+						'/interactions/mqtt-topics',
+					)
 					.subscribe({
 						next: (response) => {
 							const topics = response.data?.topics;
@@ -360,13 +362,15 @@ export class MqttService implements OnDestroy {
 			// Lógica de notificação pessoal
 			if (topic.includes('/notifications')) {
 				if (!this.notificationSettings.enableAllNotifications()) {
-					console.log('[MQTT_DEBUG] 🚫 Notificação ignorada pois o usuário desativou nas configurações.');
+					console.log(
+						'[MQTT_DEBUG] 🚫 Notificação ignorada pois o usuário desativou nas configurações.',
+					);
 					return;
 				}
 
 				const eventName = data.event;
 				const notification = data.payload as any;
-				
+
 				let type: 'info' | 'success' | 'warning' | 'error' = 'info';
 				if (eventName === 'book_request.approved') type = 'success';
 				if (eventName === 'book_request.rejected') type = 'error';

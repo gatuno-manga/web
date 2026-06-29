@@ -1,8 +1,17 @@
-import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import {
+	CdkDragDrop,
+	DragDropModule,
+	moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AlternativeTitle, BookBasic, BookDetail, UpdateBookDto } from '@models/book.models';
+import {
+	AlternativeTitle,
+	BookBasic,
+	BookDetail,
+	UpdateBookDto,
+} from '@models/book.models';
 import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
@@ -64,7 +73,7 @@ export class BookAltTitlesModalComponent implements OnInit {
 	ngOnInit(): void {
 		const bookDetail = this.book as BookBasic & BookDetail;
 		this.alternativeTitles.set([...(bookDetail.alternativeTitles || [])]);
-		
+
 		if (
 			this.alternativeTitles().length === 0 &&
 			bookDetail.alternativeTitle &&
@@ -74,7 +83,7 @@ export class BookAltTitlesModalComponent implements OnInit {
 				bookDetail.alternativeTitle.map((t: string) => ({
 					title: t,
 					languageCode: '',
-					rank: 0
+					rank: 0,
 				})),
 			);
 		}
@@ -85,16 +94,22 @@ export class BookAltTitlesModalComponent implements OnInit {
 		if (val && !this.alternativeTitles().find((t) => t.title === val)) {
 			this.alternativeTitles.update((prev) => [
 				...prev,
-				{ title: val, languageCode: this.newLanguageCode(), rank: prev.length },
+				{
+					title: val,
+					languageCode: this.newLanguageCode(),
+					rank: prev.length,
+				},
 			]);
 			this.newAltTitle.set('');
 		}
 	}
 
 	removeAltTitle(index: number): void {
-		this.alternativeTitles.update((prev) => prev.filter((_, i) => i !== index));
+		this.alternativeTitles.update((prev) =>
+			prev.filter((_, i) => i !== index),
+		);
 	}
-	
+
 	updateAltTitleLang(index: number, lang: string): void {
 		this.alternativeTitles.update((prev) => {
 			const next = [...prev];
@@ -118,15 +133,22 @@ export class BookAltTitlesModalComponent implements OnInit {
 		const currentAltTitles = this.alternativeTitles();
 		const originalAltTitles = bookDetail.alternativeTitles || [];
 
-		const currentAltTitlesMapped = currentAltTitles.map((t) => `${t.languageCode || ''}:${t.title}`).join('|');
-		const originalAltTitlesMapped = originalAltTitles.map((t) => `${t.languageCode || ''}:${t.title}`).join('|');
+		const currentAltTitlesMapped = currentAltTitles
+			.map((t) => `${t.languageCode || ''}:${t.title}`)
+			.join('|');
+		const originalAltTitlesMapped = originalAltTitles
+			.map((t) => `${t.languageCode || ''}:${t.title}`)
+			.join('|');
 
-		if (currentAltTitlesMapped !== originalAltTitlesMapped || currentAltTitles.length !== originalAltTitles.length) {
+		if (
+			currentAltTitlesMapped !== originalAltTitlesMapped ||
+			currentAltTitles.length !== originalAltTitles.length
+		) {
 			const updatedData: UpdateBookDto = {
-				alternativeTitles: currentAltTitles.map((t, index) => ({ 
-					...t, 
+				alternativeTitles: currentAltTitles.map((t, index) => ({
+					...t,
 					languageCode: t.languageCode === '' ? null : t.languageCode,
-					rank: index 
+					rank: index,
 				})),
 			};
 			if (this.close) {
