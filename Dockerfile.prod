@@ -14,8 +14,10 @@ COPY . .
 
 ARG API_URL
 ARG API_URL_SERVER
+ARG MQTT_BROKER_URL
 ENV API_URL=$API_URL
 ENV API_URL_SERVER=$API_URL_SERVER
+ENV MQTT_BROKER_URL=$MQTT_BROKER_URL
 
 RUN npm run build \
 	&& if grep -R --line-number --fixed-strings "localhost:3001" dist/front/browser; then \
