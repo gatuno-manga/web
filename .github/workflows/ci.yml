@@ -16,17 +16,48 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    pre_job:
-        runs-on: ubuntu-latest
-        outputs:
-            should_skip: ${{ steps.skip_check.outputs.should_skip }}
-        steps:
-            - id: skip_check
-              uses: fkirc/skip-duplicate-actions@v5
-              with:
-                  concurrent_skipping: "never"
-                  skip_after_successful_duplicate: "true"
-                  do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+  pre_job:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          concurrent_skipping: 'never'
+          skip_after_successful_duplicate: 'true'
+          do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+
+  ci:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+    uses: gatuno-manga/workflows/.github/workflows/node-ci.yml@main
+    with:
+      node_version: '24.11.1'
+      setup_chrome: true
+      lint_command: "npm run lint"
+      test_command: "npm run test:headless"
+
+  build-and-publish:
+    needs: [pre_job, ci]
+    if: |
+      always() &&
+      !cancelled() &&
+      (needs.ci.result == 'success' || needs.ci.result == 'skipped') &&
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/developer')
+    uses: gatuno-manga/workflows/.github/workflows/registry.yml@main
+    with:
+      image_name: gatuno-web
+      image_tag: ${{ github.ref == 'refs/heads/main' && 'latest' || 'staging' }}
+      build_context: .
+      dockerfile_path: Dockerfile.prod
+      runner_labels_json: '["self-hosted","linux","x64"]'
+      build_args: |
+        --build-arg API_URL=${{ vars.API_URL }}
+        --build-arg API_URL_SERVER=${{ vars.API_URL_SERVER }}
+        --build-arg MQTT_BROKER_URL=${{ vars.MQTT_BROKER_URL }}
+    secrets: inherit
 
     ci:
         needs: pre_job
