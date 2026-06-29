@@ -56,6 +56,7 @@ jobs:
       build_args: |
         --build-arg API_URL=${{ vars.API_URL }}
         --build-arg API_URL_SERVER=${{ vars.API_URL_SERVER }}
+        --build-arg MQTT_BROKER_URL=${{ vars.MQTT_BROKER_URL }}
     secrets: inherit
 
   release:
