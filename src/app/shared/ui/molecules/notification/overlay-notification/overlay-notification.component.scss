@@ -58,6 +58,19 @@
 		animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		overflow: visible; // Alterado para visible para permitir dropdowns de saírem do modal
 
+		&.size-large {
+			max-width: 900px;
+		}
+		
+		&.size-extra-large {
+			max-width: 1200px;
+		}
+
+		&.size-full {
+			max-width: 95vw;
+			height: 95vh;
+		}
+
 		.close-modal-btn {
 			position: absolute;
 			top: 16px;

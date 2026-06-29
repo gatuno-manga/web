@@ -58,6 +58,8 @@ import {
 	AddRelatedBookModalComponent,
 	BookEditModalComponent,
 	BookEditSaveEvent,
+	BookAltTitlesModalComponent,
+	BookAltTitlesSaveEvent,
 } from '@ui/molecules/notification/custom-components';
 import {
 	CoverEditModalComponent,
@@ -891,6 +893,36 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			error: (error) => {
 				console.error('Error loading extra info:', error);
 			},
+		});
+	}
+
+	openAltTitlesModal() {
+		const book = this.bookBasic();
+		if (!book) return;
+
+		this.notificationService.notify({
+			message: '',
+			level: 'custom',
+			severity: NotificationSeverity.CRITICAL,
+			component: BookAltTitlesModalComponent,
+			componentData: {
+				book: book,
+				close: (result: BookAltTitlesSaveEvent | null) => {
+					this.modalService.close();
+					if (result) {
+						this.bookService.updateBook(result.id, result.data).subscribe({
+							next: () => {
+								this.notificationService.success('Títulos alternativos atualizados com sucesso!');
+								this.updated.emit();
+							},
+							error: (err) => {
+								this.notificationService.error('Erro ao atualizar títulos alternativos');
+								console.error(err);
+							},
+						});
+					}
+				},
+			}
 		});
 	}
 

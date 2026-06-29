@@ -117,6 +117,7 @@ export class NotificationFactory {
 			componentData: config.componentData as NotificationComponentData,
 			useBackdrop: config.useBackdrop ?? true,
 			backdropOpacity: config.backdropOpacity,
+			size: config.size,
 		};
 		return { kind: 'modal', data: modal };
 	}

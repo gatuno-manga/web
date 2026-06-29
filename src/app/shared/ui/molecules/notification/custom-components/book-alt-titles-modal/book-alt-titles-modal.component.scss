@@ -1,0 +1,124 @@
+.alt-titles-modal-content {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-width: 600px;
+	max-height: 80vh;
+}
+
+.modal-header {
+	padding: 16px 24px;
+	border-bottom: 1px solid rgb(from var(--app-text-color) r g b / 0.1);
+
+	h2 {
+		margin: 0;
+		font-size: 1.25rem;
+		color: var(--primary-color);
+	}
+}
+
+.modal-body {
+	padding: 24px;
+	overflow-y: auto;
+	flex: 1;
+
+	&::-webkit-scrollbar {
+		width: 8px;
+	}
+	&::-webkit-scrollbar-thumb {
+		background-color: var(--primary-color);
+		border-radius: 10px;
+	}
+}
+
+.modal-footer {
+	padding: 16px 24px;
+	border-top: 1px solid rgb(from var(--app-text-color) r g b / 0.1);
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
+.list-manager {
+	background-color: rgb(from var(--app-text-color) r g b / 0.03);
+	border-radius: 12px;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+
+	.scrollable-list {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		max-height: 400px;
+		overflow-y: auto;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 24px;
+		color: var(--app-text-color-secondary);
+		font-size: 0.9rem;
+	}
+
+	.list-item {
+		display: flex;
+		align-items: center;
+		padding: 10px 14px;
+		background-color: var(--secondary-color);
+		border-radius: 8px;
+		gap: 12px;
+		border: 1px solid rgb(from var(--app-text-color) r g b / 0.1);
+		cursor: grab;
+
+		&:active { cursor: grabbing; }
+
+		.title-with-flag {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			flex: 1;
+
+			.flag-icon {
+				width: 24px;
+				height: 18px;
+				border-radius: 2px;
+				object-fit: cover;
+			}
+			.item-text {
+				font-size: 0.9rem;
+			}
+		}
+
+		.lang-select {
+			min-width: 140px;
+		}
+
+		.remove-btn {
+			background: transparent;
+			border: none;
+			color: var(--app-text-color-secondary);
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			padding: 4px;
+			border-radius: 4px;
+
+			&:hover {
+				color: var(--danger-color);
+				background-color: rgb(from var(--danger-color) r g b / 0.1);
+			}
+		}
+	}
+
+	.add-row {
+		display: flex;
+		gap: 8px;
+		align-items: flex-start;
+
+		app-input { flex: 2; }
+		.lang-select { flex: 1; min-width: 140px; }
+		app-button { height: 42px; }
+	}
+}

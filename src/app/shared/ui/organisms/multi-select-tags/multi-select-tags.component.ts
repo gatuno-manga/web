@@ -5,6 +5,7 @@ import {
 	computed,
 	input,
 	model,
+	output,
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -41,6 +42,9 @@ export class MultiSelectTagsComponent {
 	placeholderSearch = input<string>('Filtrar...');
 	limitDisplay = input<number>(15);
 	groupSelectedAtTop = input<boolean>(false);
+	allowCreate = input<boolean>(false);
+
+	createOption = output<string>();
 
 	searchQuery = signal('');
 
@@ -67,6 +71,12 @@ export class MultiSelectTagsComponent {
 		return filtered.slice(0, this.limitDisplay());
 	});
 
+	hasExactMatch = computed(() => {
+		const query = this.searchQuery().toLowerCase().trim();
+		if (!query) return true;
+		return this.options().some((opt) => opt.name.toLowerCase() === query);
+	});
+
 	// Items that are selected/excluded but NOT in the current filtered list
 	activeItemsNotInFilter = computed(() => {
 		if (this.groupSelectedAtTop()) return []; // Already handled in filteredOptions
@@ -81,6 +91,14 @@ export class MultiSelectTagsComponent {
 			(opt) => activeSet.has(opt.id) && !filteredSet.has(opt.id),
 		);
 	});
+
+	onCreateClick() {
+		const term = this.searchQuery().trim();
+		if (term) {
+			this.createOption.emit(term);
+			this.searchQuery.set('');
+		}
+	}
 
 	toggleTag(id: string) {
 		const selected = this.selectedIds();

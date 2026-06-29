@@ -48,49 +48,44 @@
 							placeholder="Idioma Original"
 						/>
 					</div>
-					<div class="full-width">
-						<app-text-area
-							id="description"
-							formControlName="description"
-							placeholder="Sinopse do livro..."
-							[rows]="5"
-							[errors]="editForm.get('description')?.errors"
-							[touched]="editForm.get('description')?.touched || false"
-						/>
-					</div>
 				</section>
 
-				<!-- Alternative Titles Section -->
+				<!-- Multilingual Synopses Section -->
 				<section class="form-section">
-					<h3>Títulos Alternativos</h3>
+					<h3>Sinopses (Multilíngues)</h3>
 					<div class="list-manager">
-						<div class="scrollable-list" cdkDropList (cdkDropListDropped)="onAltTitleDrop($event)">
-							@for (title of alternativeTitles(); track title; let i = $index) {
-								<div class="list-item" cdkDrag>
+						<div class="scrollable-list" cdkDropList (cdkDropListDropped)="onLocalizedDescriptionDrop($event)">
+							@for (desc of localizedDescriptions(); track $index; let i = $index) {
+								<div class="list-item synopsis-item" cdkDrag>
 									<div class="drag-handle" cdkDragHandle>
 										<app-icons name="list" size="20" />
 									</div>
-									<div class="title-with-flag">
-										<img [src]="title.languageCode | flag" alt="Flag" class="flag-icon" />
-										<span class="item-text">{{ title.title }}</span>
+									<div class="synopsis-content">
+										<app-select
+											[ngModel]="desc.languageCode"
+											(ngModelChange)="updateLocalizedDescriptionLang(i, $event)"
+											[ngModelOptions]="{standalone: true}"
+											[options]="languageCodes"
+											placeholder="Idioma"
+										/>
+										<app-text-area
+											[ngModel]="desc.description"
+											(ngModelChange)="updateLocalizedDescriptionText(i, $event)"
+											[ngModelOptions]="{standalone: true}"
+											placeholder="Sinopse neste idioma..."
+											[rows]="4"
+										/>
 									</div>
-									<button type="button" class="remove-btn" (click)="removeAltTitle(i)">
+									<button type="button" class="remove-btn" (click)="removeLocalizedDescription(i)">
 										<app-icons name="trash" size="18" />
 									</button>
 								</div>
 							}
 						</div>
 						<div class="add-row">
-							<app-input
-								type="text"
-								[ngModel]="newAltTitle()"
-								(ngModelChange)="newAltTitle.set($event)"
-								[ngModelOptions]="{standalone: true}"
-								placeholder="Novo título alternativo"
-								(keyup.enter)="addAltTitle()"
-							/>
-							<app-button variant="primary" (click)="addAltTitle()" [disabled]="!newAltTitle().trim()">
+							<app-button variant="outline" (click)="addLocalizedDescription()">
 								<app-icons name="plus" size="20" />
+								Adicionar Sinopse
 							</app-button>
 						</div>
 					</div>
@@ -176,6 +171,8 @@
 							[(selectedIds)]="selectedTagIds"
 							placeholderSearch="Filtrar tags..."
 							[groupSelectedAtTop]="true"
+							[allowCreate]="true"
+							(createOption)="onCreateTag($event)"
 						/>
 					</div>
 
@@ -186,6 +183,8 @@
 							[(selectedIds)]="selectedAuthorIds"
 							placeholderSearch="Filtrar autores..."
 							[groupSelectedAtTop]="true"
+							[allowCreate]="true"
+							(createOption)="onCreateAuthor($event)"
 						/>
 					</div>
 
@@ -196,6 +195,8 @@
 							[(selectedIds)]="selectedSensitiveIds"
 							placeholderSearch="Filtrar conteúdos..."
 							[groupSelectedAtTop]="true"
+							[allowCreate]="true"
+							(createOption)="onCreateSensitive($event)"
 						/>
 					</div>
 				</section>

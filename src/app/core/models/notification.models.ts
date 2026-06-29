@@ -8,6 +8,7 @@ interface NotificationBase {
 	componentData?: Record<string, unknown>;
 	useBackdrop?: boolean;
 	backdropOpacity?: number;
+	size?: 'small' | 'medium' | 'large' | 'extra-large' | 'full';
 }
 
 export interface ModalButton {

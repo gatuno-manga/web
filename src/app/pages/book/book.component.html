@@ -322,6 +322,20 @@
 														atualização</span
 													>
 												</button>
+												<button
+													type="button"
+													(click)="fixBook()"
+												>
+													<app-icons name="tool" />
+													<span>Corrigir Livro</span>
+												</button>
+												<button
+													type="button"
+													(click)="resetBook()"
+												>
+													<app-icons name="alert-triangle" />
+													<span>Resetar Livro</span>
+												</button>
 											}
 										</div>
 									}
@@ -411,19 +425,4 @@
 			<div class="placeholder"></div>
 		}
 	</div>
-}
-@if (userService.hasPermission("internal:books:maintenance") && book()) {
-	<app-aside>
-		<h1><app-icons name="book" /> {{ book()?.title }}</h1>
-		<div class="line"></div>
-		<div class="actions">
-			<app-button (click)="openBookEditModal()" variant="text"
-				>Editar</app-button
-			>
-			<app-button (click)="resetBook()" variant="text"
-				>Resetar</app-button
-			>
-			<app-button (click)="fixBook()" variant="text">Corrigir</app-button>
-		</div>
-	</app-aside>
 }

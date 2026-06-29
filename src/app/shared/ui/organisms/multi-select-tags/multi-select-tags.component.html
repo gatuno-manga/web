@@ -50,6 +50,18 @@
 		@if (filteredOptions().length === 0 && searchQuery()) {
 			<div class="no-tags">Nenhuma opção encontrada.</div>
 		}
+
+		@if (allowCreate() && searchQuery() && !hasExactMatch()) {
+			<app-button
+				class="create-btn"
+				variant="outline"
+				rounded="small"
+				(click)="onCreateClick()"
+			>
+				<app-icons name="plus" size="14" />
+				Criar "{{ searchQuery() }}"
+			</app-button>
+		}
 	</div>
 
 	@if (maxSelection()) {

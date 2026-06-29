@@ -55,6 +55,8 @@ export interface BookBasic {
 	dominantColor?: string;
 	metadata?: ImageMetadata;
 	originalLanguageCode?: string;
+	isFavorited?: boolean;
+	isSubscribed?: boolean;
 }
 
 export interface AlternativeTitle {
