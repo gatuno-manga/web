@@ -39,6 +39,14 @@
           [size]="iconSize()"
           class="left-icon selected-icon"
         />
+      } @else if (selectedOption()?.imageUrl) {
+        <img
+          [src]="selectedOption()!.imageUrl"
+          class="left-icon selected-image"
+          [style.width]="iconSize()"
+          [style.height]="iconSize()"
+          alt=""
+        />
       }
 
       <span class="selected-value" [class.placeholder]="!hasValue()">
@@ -87,6 +95,14 @@
                   [name]="option.icon"
                   [size]="iconSize()"
                   class="option-icon"
+                />
+              } @else if (option.imageUrl) {
+                <img
+                  [src]="option.imageUrl"
+                  class="option-image"
+                  [style.width]="iconSize()"
+                  [style.height]="iconSize()"
+                  alt=""
                 />
               }
               <div class="option-text">

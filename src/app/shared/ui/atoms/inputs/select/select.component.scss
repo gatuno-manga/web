@@ -135,6 +135,13 @@
 	transition: color 0.2s ease;
 }
 
+.selected-image,
+.option-image {
+	flex-shrink: 0;
+	border-radius: 2px;
+	object-fit: cover;
+}
+
 .selected-value {
 	flex: 1;
 	font-size: var(--select-font);

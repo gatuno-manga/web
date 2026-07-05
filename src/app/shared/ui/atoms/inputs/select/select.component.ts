@@ -19,8 +19,10 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 export type SelectOption = {
 	value: string | number | boolean;
 	label: string;
-	/** Ícone opcional exibido ao lado do label */
+	/** Ícone opcional exibido ao lado do label (usando app-icons) */
 	icon?: string;
+	/** Imagem (URL) exibida ao lado do label (ex: bandeiras) */
+	imageUrl?: string;
 	/** Texto secundário exibido abaixo do label */
 	description?: string;
 	/** Desabilita a opção individualmente */

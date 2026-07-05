@@ -381,7 +381,7 @@ export class BookService {
 	}
 
 	getChapters(bookId: string, options?: ChapterCursorOptions) {
-		const params: { cursor?: string; limit?: number; order?: string } = {};
+		const params: { cursor?: string; limit?: number; order?: string; languageCode?: string } = {};
 
 		if (options?.cursor) {
 			params.cursor = options.cursor;
@@ -393,6 +393,10 @@ export class BookService {
 
 		if (options?.order) {
 			params.order = options.order;
+		}
+
+		if (options?.languageCode) {
+			params.languageCode = options.languageCode;
 		}
 
 		return this.http.get<ChapterCursorPage>(`books/${bookId}/chapters`, {
