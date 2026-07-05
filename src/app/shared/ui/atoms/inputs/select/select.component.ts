@@ -1,5 +1,6 @@
 import {
 	ChangeDetectionStrategy,
+	ChangeDetectorRef,
 	Component,
 	computed,
 	ElementRef,
@@ -85,12 +86,14 @@ export class SelectComponent implements ControlValueAccessor {
 	hasValue = computed(() => !!this.value());
 
 	private host = inject(ElementRef<HTMLElement>);
+	private cdr = inject(ChangeDetectorRef);
 
 	private onChange: (value: string) => void = () => {};
 	private onTouched: () => void = () => {};
 
 	writeValue(value: string): void {
 		this.value.set(value || '');
+		this.cdr.markForCheck();
 	}
 
 	registerOnChange(fn: (value: string) => void): void {

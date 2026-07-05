@@ -230,6 +230,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		return Array.from(map.values());
 	});
 
+	useChapterGroup = computed(() => {
+		return this.availableLanguages().length > 1 && !this.selectedLanguage();
+	});
+
 	covers = signal<Cover[]>([]);
 	originalCovers = signal<Cover[]>([]);
 	isReorderingCovers = signal(false);

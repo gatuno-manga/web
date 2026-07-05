@@ -84,7 +84,7 @@
 							size="sm"
 							[options]="languageOptions()"
 							[ngModel]="selectedLanguage() || 'all'"
-							(ngModelChange)="onLanguageChange($event)"
+							(valueChange)="onLanguageChange($event)"
 						/>
 					</div>
 				}
@@ -102,7 +102,7 @@
 				</app-button>
 			</div>
 			<div class="scrollable">
-				<ng-template #chapterTemplate let-chapter>
+				<ng-template #chapterTemplate let-chapter let-showIndex="showIndex">
 					<a
 						[routerLink]="[chapter.id]"
 						class="chapter"
@@ -123,9 +123,17 @@
 									size="16"
 									class="content-type-icon"
 								/>
-								@if (chapter.title) {
-									<span class="chapter-name">{{ chapter.title }}</span>
-								}
+								<span class="chapter-name">
+									@if (showIndex) {
+										Capítulo {{ chapter.index | chapterIndex }}
+										@if (chapter.title) {
+											- 
+										}
+									}
+									@if (chapter.title) {
+										{{ chapter.title }}
+									}
+								</span>
 							</div>
 						</div>
 						<div class="metadata">
@@ -232,11 +240,17 @@
 					}
 				} @else {
 					@for (group of groupedChapters(); track group.index) {
-						<app-chapter-group [group]="group">
+						@if (useChapterGroup()) {
+							<app-chapter-group [group]="group">
+								@for (chapter of group.chapters; track chapter.id) {
+									<ng-container *ngTemplateOutlet="chapterTemplate; context: { $implicit: chapter, showIndex: false }"></ng-container>
+								}
+							</app-chapter-group>
+						} @else {
 							@for (chapter of group.chapters; track chapter.id) {
-								<ng-container *ngTemplateOutlet="chapterTemplate; context: { $implicit: chapter }"></ng-container>
+								<ng-container *ngTemplateOutlet="chapterTemplate; context: { $implicit: chapter, showIndex: true }"></ng-container>
 							}
-						</app-chapter-group>
+						}
 					}
 
 					@if (isAppendingChapters()) {
