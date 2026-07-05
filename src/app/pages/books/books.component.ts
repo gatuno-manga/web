@@ -44,7 +44,7 @@ import {
 } from '@models/settings.models';
 import { SelectCycleComponent } from '@ui/atoms/select/select-cycle.component';
 import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
-import { Subscription } from 'rxjs';
+import { distinctUntilChanged, Subscription } from 'rxjs';
 
 interface BookQueryParams {
 	page?: string;
@@ -111,16 +111,28 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private routerEventsSub?: Subscription;
 
 	constructor() {
-		// Re-load books when global filters change
+		// Re-load books when global filters change (sensitive content / excluded tags).
+		//
+		// WHY effectRunCount instead of an `initialized` class field:
+		// The Angular effect() ALWAYS executes once on init to register signal
+		// dependencies. route.queryParams emits SYNCHRONOUSLY on subscribe (inside
+		// ngOnInit), so by the time the effect() runs its first tick (next CD cycle),
+		// any class-level `initialized` flag would already be `true` — causing a
+		// duplicate load. A closure-local counter is deterministic: run 1 is always
+		// the dependency-registration run, run 2+ are genuine signal changes.
+		let effectRunCount = 0;
 		effect(() => {
 			this.sensitiveContentService.allowContentSignal();
 			this.tagsService.excludedTagsSignal();
+
+			if (effectRunCount++ === 0) return; // skip first (dependency-tracking) run
 
 			this.ngZone.run(() => {
 				this.loadBooks();
 			});
 		});
 	}
+
 
 	books: BookList[] = [];
 	currentPage = 1;
@@ -202,7 +214,9 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			}
 		});
 
-		this.route.queryParams.subscribe((rawParams) => {
+		this.route.queryParams
+			.pipe(distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)))
+			.subscribe((rawParams) => {
 			const params = rawParams as BookQueryParams;
 			const pageFromUrl = params.page
 				? Number.parseInt(params.page, 10)
