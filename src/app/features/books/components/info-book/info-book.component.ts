@@ -3,7 +3,12 @@ import {
 	DragDropModule,
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { DecimalPipe, isPlatformBrowser, Location, NgTemplateOutlet } from '@angular/common';
+import {
+	DecimalPipe,
+	isPlatformBrowser,
+	Location,
+	NgTemplateOutlet,
+} from '@angular/common';
 import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
@@ -76,8 +81,8 @@ import { ImageViewerComponent } from '@ui/organisms/image-viewer/image-viewer.co
 import { firstValueFrom, fromEvent, Subscription, throttleTime } from 'rxjs';
 import { BookReviewFormComponent } from '../book-review-form/book-review-form.component';
 import { BookReviewsListComponent } from '../book-reviews-list/book-reviews-list.component';
-import { ItemBookComponent } from '../item-book/item-book.component';
 import { ChapterGroupComponent } from '../chapter-group/chapter-group.component';
+import { ItemBookComponent } from '../item-book/item-book.component';
 
 enum tab {
 	chapters = 0,
@@ -114,7 +119,7 @@ interface ModulesLoad {
 		BookReviewsListComponent,
 		RouterLink,
 		HasPermissionDirective,
-		FormsModule
+		FormsModule,
 	],
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
@@ -200,20 +205,32 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	readonly chaptersPageLimit = 200;
 	availableLanguages = signal<string[]>([]);
 	selectedLanguage = signal<string | undefined>(undefined);
-	
+
 	languageOptions = computed(() => {
 		const flagPipe = new FlagPipe();
-		const options: import('@ui/atoms/inputs/select/select.component').SelectOption[] = [
-			{ value: 'all', label: 'Todos os Idiomas', imageUrl: flagPipe.transform('un') }
-		];
+		const options: import('@ui/atoms/inputs/select/select.component').SelectOption[] =
+			[
+				{
+					value: 'all',
+					label: 'Todos os Idiomas',
+					imageUrl: flagPipe.transform('un'),
+				},
+			];
 		for (const lang of this.availableLanguages()) {
-			options.push({ value: lang, label: lang.toUpperCase(), imageUrl: flagPipe.transform(lang) });
+			options.push({
+				value: lang,
+				label: lang.toUpperCase(),
+				imageUrl: flagPipe.transform(lang),
+			});
 		}
 		return options;
 	});
-	
+
 	groupedChapters = computed(() => {
-		const map = new Map<number, import('../chapter-group/chapter-group.component').ChapterGroupData>();
+		const map = new Map<
+			number,
+			import('../chapter-group/chapter-group.component').ChapterGroupData
+		>();
 		const chapters = this.chapters();
 
 		for (const chapter of chapters) {
@@ -221,7 +238,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				map.set(chapter.index, {
 					index: chapter.index,
 					title: chapter.title,
-					chapters: []
+					chapters: [],
 				});
 			}
 			map.get(chapter.index)!.chapters.push(chapter);
@@ -680,7 +697,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 					this.chapters.set(updatedChapters);
 					if (!this.selectedLanguage()) {
-						this.availableLanguages.set(chapters.availableLanguages || []);
+						this.availableLanguages.set(
+							chapters.availableLanguages || [],
+						);
 					}
 					this.nextChaptersCursor.set(chapters.nextCursor);
 					this.hasMoreChapters.set(chapters.hasNextPage);

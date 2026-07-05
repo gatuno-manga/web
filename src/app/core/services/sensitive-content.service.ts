@@ -17,8 +17,9 @@ export class SensitiveContentService {
 	allowContentSignal = signal<string[]>(this.getInitialContentAllow());
 
 	/** Cached observable — shared across all subscribers to avoid duplicate GETs. */
-	private sensitiveContentCache$: Observable<SensitiveContentResponse[]> | null =
-		null;
+	private sensitiveContentCache$: Observable<
+		SensitiveContentResponse[]
+	> | null = null;
 
 	private getInitialContentAllow(): string[] {
 		const content = this.cookieService.get(this.KEY);
