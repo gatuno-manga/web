@@ -33,7 +33,7 @@ export const appConfig: ApplicationConfig = {
 		),
 		provideClientHydration(
 			withEventReplay(),
-			withHttpTransferCacheOptions({ includePostRequests: true }),
+			withHttpTransferCacheOptions({ includePostRequests: false }),
 		),
 		provideAnimationsAsync(),
 		provideHttpClient(
