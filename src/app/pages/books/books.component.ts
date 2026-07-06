@@ -44,7 +44,7 @@ import {
 } from '@models/settings.models';
 import { SelectCycleComponent } from '@ui/atoms/select/select-cycle.component';
 import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
-import { Subscription } from 'rxjs';
+import { distinctUntilChanged, Subscription } from 'rxjs';
 
 interface BookQueryParams {
 	page?: string;
@@ -111,10 +111,21 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private routerEventsSub?: Subscription;
 
 	constructor() {
-		// Re-load books when global filters change
+		// Re-load books when global filters change (sensitive content / excluded tags).
+		//
+		// WHY effectRunCount instead of an `initialized` class field:
+		// The Angular effect() ALWAYS executes once on init to register signal
+		// dependencies. route.queryParams emits SYNCHRONOUSLY on subscribe (inside
+		// ngOnInit), so by the time the effect() runs its first tick (next CD cycle),
+		// any class-level `initialized` flag would already be `true` — causing a
+		// duplicate load. A closure-local counter is deterministic: run 1 is always
+		// the dependency-registration run, run 2+ are genuine signal changes.
+		let effectRunCount = 0;
 		effect(() => {
 			this.sensitiveContentService.allowContentSignal();
 			this.tagsService.excludedTagsSignal();
+
+			if (effectRunCount++ === 0) return; // skip first (dependency-tracking) run
 
 			this.ngZone.run(() => {
 				this.loadBooks();
@@ -202,85 +213,92 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			}
 		});
 
-		this.route.queryParams.subscribe((rawParams) => {
-			const params = rawParams as BookQueryParams;
-			const pageFromUrl = params.page
-				? Number.parseInt(params.page, 10)
-				: 1;
+		this.route.queryParams
+			.pipe(
+				distinctUntilChanged(
+					(a, b) => JSON.stringify(a) === JSON.stringify(b),
+				),
+			)
+			.subscribe((rawParams) => {
+				const params = rawParams as BookQueryParams;
+				const pageFromUrl = params.page
+					? Number.parseInt(params.page, 10)
+					: 1;
 
-			if (
-				this.listSettings.listMode === 'infinite-scroll' &&
-				(!params.page || pageFromUrl === 1)
-			) {
-				this.books = [];
-			}
+				if (
+					this.listSettings.listMode === 'infinite-scroll' &&
+					(!params.page || pageFromUrl === 1)
+				) {
+					this.books = [];
+				}
 
-			this.currentPage = pageFromUrl > 0 ? pageFromUrl : 1;
+				this.currentPage = pageFromUrl > 0 ? pageFromUrl : 1;
 
-			this.isOfflineMode = this.networkStatus.isOffline();
+				this.isOfflineMode = this.networkStatus.isOffline();
 
-			if (this.isOfflineMode) {
-				this.viewMode = 'offline';
-			} else {
-				if (params.mode === 'offline') {
+				if (this.isOfflineMode) {
 					this.viewMode = 'offline';
 				} else {
-					this.viewMode = 'online';
+					if (params.mode === 'offline') {
+						this.viewMode = 'offline';
+					} else {
+						this.viewMode = 'online';
+					}
 				}
-			}
 
-			const filters: BookPageOptions = {
-				page: this.currentPage,
-				limit: this.listSettings.limit,
-			};
+				const filters: BookPageOptions = {
+					page: this.currentPage,
+					limit: this.listSettings.limit,
+				};
 
-			// Only apply these filters in online mode
-			if (this.viewMode === 'online') {
-				if (params.type)
-					filters.type = Array.isArray(params.type)
-						? params.type
-						: [params.type];
-				if (params.tags)
-					filters.tags = Array.isArray(params.tags)
-						? params.tags
-						: [params.tags];
-				if (params.tagsLogic) filters.tagsLogic = params.tagsLogic;
-				if (params.excludeTags)
-					filters.excludeTags = Array.isArray(params.excludeTags)
-						? params.excludeTags
-						: [params.excludeTags];
-				if (params.excludeTagsLogic)
-					filters.excludeTagsLogic = params.excludeTagsLogic;
-				if (params.authors)
-					filters.authors = Array.isArray(params.authors)
-						? params.authors
-						: [params.authors];
-				if (params.authorsLogic)
-					filters.authorsLogic = params.authorsLogic;
-				if (params.publication)
-					filters.publication = Number.parseInt(
-						params.publication,
-						10,
-					);
-				if (params.publicationOperator)
-					filters.publicationOperator = params.publicationOperator;
-				if (params.orderBy) filters.orderBy = params.orderBy;
-				if (params.order) filters.order = params.order;
-			}
+				// Only apply these filters in online mode
+				if (this.viewMode === 'online') {
+					if (params.type)
+						filters.type = Array.isArray(params.type)
+							? params.type
+							: [params.type];
+					if (params.tags)
+						filters.tags = Array.isArray(params.tags)
+							? params.tags
+							: [params.tags];
+					if (params.tagsLogic) filters.tagsLogic = params.tagsLogic;
+					if (params.excludeTags)
+						filters.excludeTags = Array.isArray(params.excludeTags)
+							? params.excludeTags
+							: [params.excludeTags];
+					if (params.excludeTagsLogic)
+						filters.excludeTagsLogic = params.excludeTagsLogic;
+					if (params.authors)
+						filters.authors = Array.isArray(params.authors)
+							? params.authors
+							: [params.authors];
+					if (params.authorsLogic)
+						filters.authorsLogic = params.authorsLogic;
+					if (params.publication)
+						filters.publication = Number.parseInt(
+							params.publication,
+							10,
+						);
+					if (params.publicationOperator)
+						filters.publicationOperator =
+							params.publicationOperator;
+					if (params.orderBy) filters.orderBy = params.orderBy;
+					if (params.order) filters.order = params.order;
+				}
 
-			// These filters work in both modes
-			if (params.search) filters.search = params.search;
-			if (params.sensitiveContent)
-				filters.sensitiveContent = Array.isArray(
-					params.sensitiveContent,
-				)
-					? params.sensitiveContent
-					: [params.sensitiveContent];
+				// These filters work in both modes
+				if (params.search) filters.search = params.search;
+				if (params.sensitiveContent)
+					filters.sensitiveContent = Array.isArray(
+						params.sensitiveContent,
+					)
+						? params.sensitiveContent
+						: [params.sensitiveContent];
 
-			this.filterOptions = filters;
+				this.filterOptions = filters;
 
-			this.loadBooks();
-		});
+				this.loadBooks();
+			});
 		this.setMetaData();
 	}
 

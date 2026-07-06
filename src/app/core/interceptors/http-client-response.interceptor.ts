@@ -48,6 +48,10 @@ const handle401Error = (
 		console.log(
 			'[GATUNO_INTERCEPTOR] Iniciando processo de refresh devido a 401...',
 		);
+		// Reseta estado de falha anterior antes de iniciar novo ciclo de refresh
+		if (authQueue.hasFailed) {
+			authQueue.reset();
+		}
 		authQueue.startRefreshing();
 
 		return tokenService.refreshTokens().pipe(

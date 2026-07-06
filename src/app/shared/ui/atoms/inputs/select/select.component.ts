@@ -1,5 +1,6 @@
 import {
 	ChangeDetectionStrategy,
+	ChangeDetectorRef,
 	Component,
 	computed,
 	ElementRef,
@@ -19,8 +20,10 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 export type SelectOption = {
 	value: string | number | boolean;
 	label: string;
-	/** Ícone opcional exibido ao lado do label */
+	/** Ícone opcional exibido ao lado do label (usando app-icons) */
 	icon?: string;
+	/** Imagem (URL) exibida ao lado do label (ex: bandeiras) */
+	imageUrl?: string;
 	/** Texto secundário exibido abaixo do label */
 	description?: string;
 	/** Desabilita a opção individualmente */
@@ -83,12 +86,14 @@ export class SelectComponent implements ControlValueAccessor {
 	hasValue = computed(() => !!this.value());
 
 	private host = inject(ElementRef<HTMLElement>);
+	private cdr = inject(ChangeDetectorRef);
 
 	private onChange: (value: string) => void = () => {};
 	private onTouched: () => void = () => {};
 
 	writeValue(value: string): void {
 		this.value.set(value || '');
+		this.cdr.markForCheck();
 	}
 
 	registerOnChange(fn: (value: string) => void): void {

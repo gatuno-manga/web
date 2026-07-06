@@ -322,7 +322,10 @@ export class UserTokenService {
 			);
 		}
 
-		const obs = this.http
+		// O fonte HTTP inclui tap e finalize antes do shareReplay.
+		// Assim, refreshObservable só é limpo quando a request HTTP completa
+		// (não quando um subscriber individual cancela a subscription).
+		const source = this.http
 			.post<{
 				accessToken: string;
 				refreshToken?: string;
@@ -337,12 +340,15 @@ export class UserTokenService {
 						this.setTokens(body.accessToken, body.csrfToken);
 					}
 				}),
+				catchError((err) => throwError(() => err)),
 				finalize(() => {
 					this.refreshObservable = null;
 				}),
-				shareReplay(1),
-				catchError((err) => throwError(() => err)),
 			);
+
+		const obs = source.pipe(
+			shareReplay({ bufferSize: 1, refCount: false }),
+		);
 
 		this.refreshObservable = obs;
 		return obs;

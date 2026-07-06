@@ -163,6 +163,7 @@ describe('InfoBookComponent', () => {
 			cursor: undefined,
 			limit: 200,
 			order: 'ASC',
+			languageCode: undefined,
 		});
 		expect(component.chapters().length).toBeGreaterThan(0);
 		expect(component.chapters()[0].title).toBe('Chapter 1');
@@ -248,6 +249,7 @@ describe('InfoBookComponent', () => {
 			cursor: undefined,
 			limit: 200,
 			order: 'DESC',
+			languageCode: undefined,
 		});
 	});
 

@@ -147,18 +147,21 @@ export interface Chapterlist {
 	index: number;
 	read?: boolean;
 	contentType?: ContentType;
+	languageCode?: string;
 }
 
 export interface ChapterCursorPage {
 	data: Chapterlist[];
 	nextCursor: string | null;
 	hasNextPage: boolean;
+	availableLanguages: string[];
 }
 
 export interface ChapterCursorOptions {
 	cursor?: string;
 	limit?: number;
 	order?: 'ASC' | 'DESC';
+	languageCode?: string;
 }
 
 export interface Chapter {

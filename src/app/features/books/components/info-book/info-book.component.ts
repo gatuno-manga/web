@@ -3,7 +3,12 @@ import {
 	DragDropModule,
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { DecimalPipe, isPlatformBrowser, Location } from '@angular/common';
+import {
+	DecimalPipe,
+	isPlatformBrowser,
+	Location,
+	NgTemplateOutlet,
+} from '@angular/common';
 import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
@@ -21,6 +26,7 @@ import {
 	ViewChild,
 	ViewChildren,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
@@ -53,6 +59,7 @@ import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { ScrapingStatusPipe } from '@shared/utils/pipes/scraping-status.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
 	AddRelatedBookModalComponent,
@@ -74,6 +81,7 @@ import { ImageViewerComponent } from '@ui/organisms/image-viewer/image-viewer.co
 import { firstValueFrom, fromEvent, Subscription, throttleTime } from 'rxjs';
 import { BookReviewFormComponent } from '../book-review-form/book-review-form.component';
 import { BookReviewsListComponent } from '../book-reviews-list/book-reviews-list.component';
+import { ChapterGroupComponent } from '../chapter-group/chapter-group.component';
 import { ItemBookComponent } from '../item-book/item-book.component';
 
 enum tab {
@@ -95,11 +103,14 @@ interface ModulesLoad {
 	imports: [
 		RouterModule,
 		DecimalPipe,
+		NgTemplateOutlet,
 		ChapterIndexPipe,
 		FlagPipe,
 		ScrapingStatusPipe,
 		IconsComponent,
 		ButtonComponent,
+		SelectComponent,
+		ChapterGroupComponent,
 		ImageViewerComponent,
 		BlurhashComponent,
 		ItemBookComponent,
@@ -108,6 +119,7 @@ interface ModulesLoad {
 		BookReviewsListComponent,
 		RouterLink,
 		HasPermissionDirective,
+		FormsModule,
 	],
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
@@ -191,6 +203,54 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	hasMoreChapters = signal(false);
 	isLoadingMoreChapters = signal(false);
 	readonly chaptersPageLimit = 200;
+	availableLanguages = signal<string[]>([]);
+	selectedLanguage = signal<string | undefined>(undefined);
+
+	languageOptions = computed(() => {
+		const flagPipe = new FlagPipe();
+		const options: import('@ui/atoms/inputs/select/select.component').SelectOption[] =
+			[
+				{
+					value: 'all',
+					label: 'Todos os Idiomas',
+					imageUrl: flagPipe.transform('un'),
+				},
+			];
+		for (const lang of this.availableLanguages()) {
+			options.push({
+				value: lang,
+				label: lang.toUpperCase(),
+				imageUrl: flagPipe.transform(lang),
+			});
+		}
+		return options;
+	});
+
+	groupedChapters = computed(() => {
+		const map = new Map<
+			number,
+			import('../chapter-group/chapter-group.component').ChapterGroupData
+		>();
+		const chapters = this.chapters();
+
+		for (const chapter of chapters) {
+			if (!map.has(chapter.index)) {
+				map.set(chapter.index, {
+					index: chapter.index,
+					title: chapter.title,
+					chapters: [],
+				});
+			}
+			map.get(chapter.index)!.chapters.push(chapter);
+		}
+
+		return Array.from(map.values());
+	});
+
+	useChapterGroup = computed(() => {
+		return this.availableLanguages().length > 1 && !this.selectedLanguage();
+	});
+
 	covers = signal<Cover[]>([]);
 	originalCovers = signal<Cover[]>([]);
 	isReorderingCovers = signal(false);
@@ -605,6 +665,16 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 	}
 
+	onLanguageChange(langValue: string) {
+		if (typeof langValue !== 'string') return;
+		const newLang = langValue === 'all' ? undefined : langValue;
+		if (this.selectedLanguage() !== newLang) {
+			this.selectedLanguage.set(newLang);
+			this.chapters.set([]);
+			this.loadChapters();
+		}
+	}
+
 	private loadChaptersPage(cursor?: string, append = false) {
 		if (this.isLoadingMoreChapters()) {
 			return;
@@ -617,6 +687,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				cursor,
 				limit: this.chaptersPageLimit,
 				order: this.sortAscending() ? 'ASC' : 'DESC',
+				languageCode: this.selectedLanguage(),
 			})
 			.subscribe({
 				next: (chapters) => {
@@ -625,6 +696,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 						: chapters.data;
 
 					this.chapters.set(updatedChapters);
+					if (!this.selectedLanguage()) {
+						this.availableLanguages.set(
+							chapters.availableLanguages || [],
+						);
+					}
 					this.nextChaptersCursor.set(chapters.nextCursor);
 					this.hasMoreChapters.set(chapters.hasNextPage);
 					this.sortChapters();
