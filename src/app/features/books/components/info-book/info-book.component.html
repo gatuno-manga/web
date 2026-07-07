@@ -21,7 +21,7 @@
 	>
 		@defer (when modulesLoad[tab.chapters].load()) {
 			<div class="controls">
-				@if (selectedChapters().size > 0) {
+				@if (selectedChapters().size > 0 || isChaptersSelectionMode()) {
 					<div class="selection-controls">
 						<div class="selection-header">
 							<span class="selection-count"
@@ -31,6 +31,15 @@
 								selecionado(s)</span
 							>
 							<app-button
+								(click)="toggleChaptersSelectionMode()"
+								variant="text"
+								size="small"
+								[class.active]="isChaptersSelectionMode()"
+							>
+								<app-icons [name]="isChaptersSelectionMode() ? 'x-circle' : 'check-circle'" size="16" />
+								<span>{{ isChaptersSelectionMode() ? 'Sair da Seleção' : 'Modo Seleção' }}</span>
+							</app-button>
+							<app-button
 								(click)="clearSelection()"
 								variant="text"
 								size="small"
@@ -39,43 +48,19 @@
 								<span>Limpar</span>
 							</app-button>
 						</div>
-						<div class="selection-actions">
-							<app-button
-								*appHasPermission="'books:download'"
-								(click)="downloadSelectedChapters()"
-								variant="text"
-								size="small"
-							>
-								<app-icons name="download" size="16" />
-								<span>Baixar</span>
-							</app-button>
-							@if (hasDownloadedInSelection() && userService.hasPermission('books:download')) {
-								<app-button
-									(click)="deleteSelectedChaptersDownloads()"
-									variant="text"
-									size="small"
-								>
-									<app-icons name="trash" size="16" />
-									<span>Excluir Downloads</span>
-								</app-button>
-							}
-							<app-button
-								(click)="toggleSelectedReadStatus()"
-								variant="text"
-								size="small"
-							>
-								<app-icons name="eye" size="16" />
-								<span>Alternar Leitura</span>
-							</app-button>
+						<div class="selection-actions hint-box" title="Pressione e segure ou clique direito em um item para ver as opções">
+							<app-icons name="alert-circle" size="16" />
+							<span class="hint-text">Dica: Use o menu de contexto para ver as ações.</span>
 						</div>
 					</div>
 				} @else {
 					<app-button
-						(click)="selectAllChapters()"
+						(click)="toggleChaptersSelectionMode()"
 						variant="text"
 						size="small"
 					>
-						<span>Selecionar Todos</span>
+						<app-icons name="x-circle" size="16" />
+						<span>Selecionar</span>
 					</app-button>
 				}
 				@if (availableLanguages().length > 1) {
@@ -110,6 +95,7 @@
 						(click)="onChapterClick($event, chapter)"
 						(contextmenu)="onChapterContextMenu($event, chapter)"
 					>
+						<app-icons name="check" class="selection-indicator" />
 						<div class="title">
 							<div class="title-with-icon">
 								<img
@@ -284,31 +270,29 @@
 		@defer (when modulesLoad[tab.covers].load()) {
 			@if (userService.hasPermission('internal:books:edit')) {
 				<div class="covers-toolbar">
-					<div class="toolbar-info"></div>
+					<div class="toolbar-info">
+						@if (selectedCovers().size > 0 || isCoversSelectionMode()) {
+							<span class="selection-count"
+								>{{
+									selectedCovers().size
+								}}
+								selecionado(s)</span
+							>
+							<div class="selection-actions hint-box" title="Pressione e segure ou clique direito na área ou itens para opções">
+								<app-icons name="alert-circle" size="16" />
+								<span class="hint-text">Dica: Use o menu de contexto para opções administrativas.</span>
+							</div>
+						}
+					</div>
 					<div class="toolbar-actions">
 						<app-button
-							(click)="redefineCover()"
+							(click)="toggleCoversSelectionMode()"
 							variant="text"
 							size="small"
+							[class.active]="isCoversSelectionMode()"
 						>
-							<app-icons name="upload" size="16" />
-							<span>Upload</span>
-						</app-button>
-						<app-button
-							(click)="correctCover()"
-							variant="text"
-							size="small"
-						>
-							<app-icons name="globe" size="16" />
-							<span>URL</span>
-						</app-button>
-						<app-button
-							(click)="fixCovers()"
-							variant="text"
-							size="small"
-						>
-							<app-icons name="refresh-ccw" size="16" />
-							<span>Corrigir</span>
+							<app-icons [name]="isCoversSelectionMode() ? 'x-circle' : 'check-circle'" size="16" />
+							<span>{{ isCoversSelectionMode() ? 'Sair da Seleção' : 'Selecionar' }}</span>
 						</app-button>
 
 						@if (hasCoversChanged()) {
@@ -337,17 +321,20 @@
 				cdkDropList
 				cdkDropListOrientation="mixed"
 				(cdkDropListDropped)="onCoverDrop($event)"
-				[cdkDropListDisabled]="!userService.hasPermission('internal:books:edit')"
+				[cdkDropListDisabled]="!userService.hasPermission('internal:books:edit') || isCoversSelectionMode()"
+				(contextmenu)="onCoversContainerContextMenu($event)"
 			>
 				@for (cover of covers(); track cover.id) {
 					<div
 						class="cover"
-						[class.selected]="cover.selected"
-						(click)="onCoverClick(cover)"
+						[class.main-cover]="cover.selected"
+						[class.multi-selected]="isCoverSelected(cover.id)"
+						(click)="onCoverClick($event, cover)"
 						(contextmenu)="onCoverContextMenu($event, cover)"
 						cdkDrag
-						[cdkDragDisabled]="!userService.hasPermission('internal:books:edit')"
+						[cdkDragDisabled]="!userService.hasPermission('internal:books:edit') || isCoversSelectionMode()"
 					>
+						<app-icons name="check" class="selection-indicator" />
 						<div class="drag-placeholder" *cdkDragPlaceholder></div>
 						@if (cover.url && !coverImageErrors().has(cover.id)) {
 							<img
