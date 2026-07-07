@@ -23,6 +23,14 @@ export class ChapterService {
 		return this.http.patch(`chapters/${idChapter}/reset`, {});
 	}
 
+	fixChapter(idChapter: string) {
+		return this.http.patch(`chapters/${idChapter}/fix`, {});
+	}
+
+	deleteChapter(idChapter: string) {
+		return this.http.delete(`chapters/${idChapter}`);
+	}
+
 	resetChapters(idChapters: string[]) {
 		return this.http.patch('chapters/reset', idChapters);
 	}
