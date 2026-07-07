@@ -168,7 +168,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	private websocketSubscription?: Subscription;
 	private downloadSubscription?: Subscription;
-	private scrollSubscription?: Subscription;
+	private intersectionObserver?: IntersectionObserver;
 
 	modulesLoad: ModulesLoad[] = [
 		{
@@ -307,6 +307,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	@ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
 	@ViewChildren('tabEl') tabEls!: QueryList<ElementRef<HTMLSpanElement>>;
 	@ViewChild('container') containerElement!: ElementRef<HTMLDivElement>;
+	@ViewChild('scrollSentinel') scrollSentinel?: ElementRef<HTMLDivElement>;
 
 	containerHeight = signal('auto');
 
@@ -321,7 +322,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 		if (isPlatformBrowser(this.platformId)) {
 			this.setupResizeObserver();
-			this.setupScrollListener();
+			this.setupIntersectionObserver();
 			window.addEventListener('resize', this.onWindowResize.bind(this));
 		}
 
@@ -362,8 +363,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		if (this.downloadSubscription) {
 			this.downloadSubscription.unsubscribe();
 		}
-		if (this.scrollSubscription) {
-			this.scrollSubscription.unsubscribe();
+		if (this.intersectionObserver) {
+			this.intersectionObserver.disconnect();
 		}
 		if (isPlatformBrowser(this.platformId)) {
 			window.removeEventListener(
@@ -493,17 +494,34 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		});
 	}
 
-	private setupScrollListener() {
-		this.scrollSubscription = fromEvent(window, 'scroll', {
-			capture: true,
-		})
-			.pipe(
-				throttleTime(100, undefined, {
-					leading: true,
-					trailing: true,
-				}),
-			)
-			.subscribe(() => this.onWindowScroll());
+	private setupIntersectionObserver() {
+		this.intersectionObserver = new IntersectionObserver(
+			(entries) => {
+				const entry = entries[0];
+				if (entry.isIntersecting) {
+					this.ngZone.run(() => {
+						if (
+							this.selectedTab() === tab.chapters &&
+							this.hasMoreChapters() &&
+							!this.isLoadingMoreChapters()
+						) {
+							this.loadMoreChapters();
+						}
+					});
+				}
+			},
+			{
+				rootMargin: '1000px',
+				threshold: 0,
+			}
+		);
+	}
+
+	private observeScrollSentinel() {
+		if (this.intersectionObserver && this.scrollSentinel?.nativeElement) {
+			this.intersectionObserver.disconnect();
+			this.intersectionObserver.observe(this.scrollSentinel.nativeElement);
+		}
 	}
 
 	private observeActiveTab() {
@@ -567,7 +585,11 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		// Aguarda o Angular renderizar o conteúdo e depois atualiza a altura
 		requestAnimationFrame(() => {
 			this.updateContainerHeight();
-			setTimeout(() => this.updateContainerHeight(), 50);
+			this.observeScrollSentinel();
+			setTimeout(() => {
+				this.updateContainerHeight();
+				this.observeScrollSentinel();
+			}, 50);
 			setTimeout(() => this.updateContainerHeight(), 150);
 			setTimeout(() => this.updateContainerHeight(), 500);
 		});
@@ -575,9 +597,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	private scheduleLoadMoreCheck() {
 		requestAnimationFrame(() => {
-			this.onWindowScroll();
-			setTimeout(() => this.onWindowScroll(), 50);
-			setTimeout(() => this.onWindowScroll(), 150);
+			// No-op for compatibility, IntersectionObserver handles it
 		});
 	}
 
@@ -638,31 +658,15 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	onWindowScroll() {
+		// Legacy method kept for compatibility with tests, use IntersectionObserver instead
 		if (
 			this.selectedTab() !== tab.chapters ||
 			!this.hasMoreChapters() ||
-			this.isLoadingMoreChapters() ||
-			!this.containerElement?.nativeElement
+			this.isLoadingMoreChapters()
 		) {
 			return;
 		}
-
-		// Usar o bounding rect do container ATIVO (o que tem o conteúdo)
-		const container = this.containerElement.nativeElement;
-		const tabs = container.querySelectorAll('.container');
-		const activeTab = tabs[this.selectedTab()] as HTMLElement;
-
-		if (!activeTab) {
-			return;
-		}
-
-		const rect = activeTab.getBoundingClientRect();
-		const viewportHeight = window.innerHeight;
-		const thresholdPx = 1000;
-
-		if (rect.bottom <= viewportHeight + thresholdPx) {
-			this.loadMoreChapters();
-		}
+		this.loadMoreChapters();
 	}
 
 	onLanguageChange(langValue: string) {
