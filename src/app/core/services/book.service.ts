@@ -485,6 +485,13 @@ export class BookService {
 		return this.http.delete<void>(`books/${bookId}/covers/${coverId}`);
 	}
 
+	resetCover(bookId: string, coverId: string) {
+		return this.http.patch<void>(
+			`books/${bookId}/covers/${coverId}/reset`,
+			{},
+		);
+	}
+
 	scrapeCover(bookId: string, url: string, title?: string) {
 		return this.http.post<void>(`books/${bookId}/covers/scrape`, {
 			url,

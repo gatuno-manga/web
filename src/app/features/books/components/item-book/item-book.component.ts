@@ -191,7 +191,7 @@ export class ItemBookComponent {
 		const items: ContextMenuItem[] = [
 			{
 				label: 'Abrir em nova aba',
-				icon: 'external-link',
+				icon: 'link',
 				action: () => {
 					const urlTree = this.router.createUrlTree([
 						'/books',

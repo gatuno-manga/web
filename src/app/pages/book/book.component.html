@@ -119,6 +119,7 @@
 											: "Começar a ler"
 									}}
 								</app-button>
+								<div class="small-actions-group">
 								@if (isLoggedIn()) {
 									<app-button
 										*appHasPermission="
@@ -291,14 +292,31 @@
 												<app-icons name="share" />
 												<span>Compartilhar</span>
 											</button>
-											@if (
-												userService.hasPermission(
-													"internal:books:edit"
-												)
-											) {
-												<div
-													class="dropdown-divider"
-												></div>
+										</div>
+									}
+								</div>
+								@if (
+									userService.hasPermission(
+										"internal:books:edit"
+									)
+								) {
+									<div class="options-wrapper btn-actions">
+										<app-button
+											radio="square"
+											rounded="small"
+											padding="none"
+											class="options-btn"
+											aria-label="Ferramentas de Administrador"
+											appTooltip="Ferramentas de Administrador"
+											(click)="
+												toggleAdminDropdown();
+												$event.stopPropagation()
+											"
+										>
+											<app-icons name="settings" />
+										</app-button>
+										@if (showAdminDropdown()) {
+											<div class="options-dropdown">
 												<button
 													type="button"
 													(click)="
@@ -326,7 +344,7 @@
 													type="button"
 													(click)="fixBook()"
 												>
-													<app-icons name="tool" />
+													<app-icons name="settings" />
 													<span>Corrigir Livro</span>
 												</button>
 												<button
@@ -336,9 +354,10 @@
 													<app-icons name="alert-triangle" />
 													<span>Resetar Livro</span>
 												</button>
-											}
-										</div>
-									}
+											</div>
+										}
+									</div>
+								}
 								</div>
 							</div>
 						</div>

@@ -417,3 +417,22 @@
 		}
 	}
 }
+
+// ─── Firefox Mobile Performance Overrides ─────────────────────────────────────
+@supports (-moz-appearance: none) {
+	@media (pointer: coarse), (max-width: 768px) {
+		.book-card {
+			&::before {
+				display: none !important;
+			}
+			.card-blur-background {
+				display: none !important;
+			}
+		}
+
+		.cover-image-container .blur-placeholder {
+			filter: none !important;
+			opacity: 0.4 !important;
+		}
+	}
+}

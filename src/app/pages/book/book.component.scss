@@ -459,14 +459,29 @@ $page-size: 1200px;
 					margin-top: 1rem;
 
 					.reading-btn {
+						height: 44px;
 						@media (max-width: 768px) {
-							flex: 1 1 100%;
-							max-width: 350px;
+							width: 100%;
+							flex: none;
 						}
 					}
 
 					@media (max-width: 768px) {
-						justify-content: center;
+						flex-direction: column;
+						align-items: stretch;
+						width: max-content;
+						margin-left: auto;
+						margin-right: auto;
+					}
+
+					.small-actions-group {
+						display: flex;
+						gap: 0.75rem;
+						align-items: center;
+						
+						@media (max-width: 768px) {
+							justify-content: space-between;
+						}
 					}
 
 					app-button {
@@ -701,5 +716,36 @@ app-aside {
 	to {
 		opacity: 1;
 		transform: translateY(0);
+	}
+}
+
+// ─── Firefox Mobile Performance Overrides ─────────────────────────────────────
+@supports (-moz-appearance: none) {
+	@media (pointer: coarse), (max-width: 768px) {
+		// Disable heavy aurora animations and blurs
+		.aurora-scene {
+			display: none !important;
+		}
+		
+		// Remove heavy background blurring and blending
+		.book-background {
+			filter: none !important;
+			opacity: 0.15 !important;
+			background-blend-mode: normal !important;
+		}
+		
+		// Simplify background masking
+		.background-container {
+			mask-image: none !important;
+			-webkit-mask-image: none !important;
+			background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, var(--app-background-color) 70%, var(--app-background-color) 100%);
+		}
+		
+		// Glass panels fallback to solid color on Firefox Mobile
+		.glass-panel .glass-panel-bg {
+			backdrop-filter: none !important;
+			-webkit-backdrop-filter: none !important;
+			background: rgb(from var(--app-background-color) r g b / 0.95) !important;
+		}
 	}
 }

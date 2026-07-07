@@ -93,6 +93,7 @@ export class BookComponent implements OnInit, OnDestroy {
 
 	// Estado para dropdown de opções
 	showOptionsDropdown = signal(false);
+	showAdminDropdown = signal(false);
 
 	// Estado para verificar se o livro está baixado
 	isBookDownloaded = signal(false);
@@ -122,6 +123,7 @@ export class BookComponent implements OnInit, OnDestroy {
 
 	onDocumentClick() {
 		this.closeOptionsDropdown();
+		this.closeAdminDropdown();
 	}
 
 	onCoverImageError() {
@@ -729,10 +731,20 @@ export class BookComponent implements OnInit, OnDestroy {
 
 	toggleOptionsDropdown() {
 		this.showOptionsDropdown.update((v) => !v);
+		this.closeAdminDropdown();
 	}
 
 	closeOptionsDropdown() {
 		this.showOptionsDropdown.set(false);
+	}
+
+	toggleAdminDropdown() {
+		this.showAdminDropdown.update((v) => !v);
+		this.closeOptionsDropdown();
+	}
+
+	closeAdminDropdown() {
+		this.showAdminDropdown.set(false);
 	}
 
 	async checkBookDownloaded() {
