@@ -98,15 +98,22 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private pendingRestoreState: ScrollRestorationState | null = null;
 	/** Debounce timer for scroll position saving */
 	private scrollSaveTimer: ReturnType<typeof setTimeout> | null = null;
+	/** Flag to throttle scroll events via requestAnimationFrame */
+	private isScrollScheduled = false;
 	/** Bound scroll handler so it can be removed on destroy */
 	private lastScrollY = 0;
 	private readonly onScroll = (event: Event) => {
-		const target = event.target as HTMLElement | Document;
-		this.lastScrollY =
-			target instanceof Document
-				? window.scrollY
-				: (target as HTMLElement).scrollTop;
-		this.scheduleScrollSave();
+		if (this.isScrollScheduled) return;
+		this.isScrollScheduled = true;
+		requestAnimationFrame(() => {
+			const target = event.target as HTMLElement | Document;
+			this.lastScrollY =
+				target instanceof Document
+					? window.scrollY
+					: (target as HTMLElement).scrollTop;
+			this.scheduleScrollSave();
+			this.isScrollScheduled = false;
+		});
 	};
 	private routerEventsSub?: Subscription;
 
