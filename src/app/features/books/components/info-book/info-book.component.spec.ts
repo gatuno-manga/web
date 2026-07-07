@@ -253,6 +253,24 @@ describe('InfoBookComponent', () => {
 		});
 	});
 
+	it('should sort chapters by languageCode when index is the same', () => {
+		component.chapters.set([
+			{ id: '1', index: 1, languageCode: 'pt-br' } as any,
+			{ id: '2', index: 1, languageCode: 'en' } as any,
+			{ id: '3', index: 1, languageCode: 'es' } as any,
+			{ id: '4', index: 2, languageCode: 'en' } as any,
+		]);
+		component.sortAscending.set(true);
+		
+		component.sortChapters();
+		
+		const chapters = component.chapters();
+		expect(chapters[0].id).toBe('2'); // en
+		expect(chapters[1].id).toBe('3'); // es
+		expect(chapters[2].id).toBe('1'); // pt-br
+		expect(chapters[3].id).toBe('4'); // index 2
+	});
+
 	it('loadMoreChapters should request next page when cursor exists', () => {
 		const loadChaptersPageSpy = spyOn<any>(component, 'loadChaptersPage');
 		component.nextChaptersCursor.set('cursor-123');

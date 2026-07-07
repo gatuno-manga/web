@@ -628,9 +628,16 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	sortChapters() {
 		const asc = this.sortAscending();
 		this.chapters.update((currentChapters) => {
-			return [...currentChapters].sort((a, b) =>
-				asc ? a.index - b.index : b.index - a.index,
-			);
+			return [...currentChapters].sort((a, b) => {
+				const indexDiff = asc ? a.index - b.index : b.index - a.index;
+				if (indexDiff !== 0) {
+					return indexDiff;
+				}
+				
+				const langA = a.languageCode || '';
+				const langB = b.languageCode || '';
+				return langA.localeCompare(langB);
+			});
 		});
 	}
 
