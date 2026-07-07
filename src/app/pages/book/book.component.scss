@@ -459,14 +459,29 @@ $page-size: 1200px;
 					margin-top: 1rem;
 
 					.reading-btn {
+						height: 44px;
 						@media (max-width: 768px) {
-							flex: 1 1 100%;
-							max-width: 350px;
+							width: 100%;
+							flex: none;
 						}
 					}
 
 					@media (max-width: 768px) {
-						justify-content: center;
+						flex-direction: column;
+						align-items: stretch;
+						width: max-content;
+						margin-left: auto;
+						margin-right: auto;
+					}
+
+					.small-actions-group {
+						display: flex;
+						gap: 0.75rem;
+						align-items: center;
+						
+						@media (max-width: 768px) {
+							justify-content: space-between;
+						}
 					}
 
 					app-button {
