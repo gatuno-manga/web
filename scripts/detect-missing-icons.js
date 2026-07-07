@@ -43,28 +43,36 @@ const allFiles = getAllFiles(srcDir);
 const usedIcons = new Map(); // iconName -> Set of filePaths
 const regexes = [
 	// Pega usos estáticos: name="icon-name" ou name='icon-name'
-	/<app-icons[^>]*\sname=["']([^"']+)["']/g,
-	/<app-icon-button[^>]*\sname=["']([^"']+)["']/g,
+	{ pattern: /<app-icons[^>]*\sname=["']([^"']+)["']/g, group: 1 },
+	{ pattern: /<app-icon-button[^>]*\sname=["']([^"']+)["']/g, group: 1 },
 
 	// Pega usos literais com property binding: [name]="'icon-name'" ou [name]='"icon-name"'
-	/<app-icons[^>]*\s\[name\]=["'](['"])([^'"]+)\1["']/g,
-	/<app-icon-button[^>]*\s\[name\]=["'](['"])([^'"]+)\1["']/g,
+	{ pattern: /<app-icons[^>]*\s\[name\]=["'](['"])([^'"]+)\1["']/g, group: 2 },
+	{ pattern: /<app-icon-button[^>]*\s\[name\]=["'](['"])([^'"]+)\1["']/g, group: 2 },
+
+	// Pega usos estáticos do atributo icon em botões, inputs, etc: icon="icon-name"
+	{ pattern: /\sicon=["']([^"']+)["']/g, group: 1 },
+
+	// Pega usos literais do atributo icon: [icon]="'icon-name'" ou [icon]='"icon-name"'
+	{ pattern: /\s\[icon\]=["'](['"])([^'"]+)\1["']/g, group: 2 },
+
+	// Pega usos em objetos TS como ContextMenuItem: icon: 'icon-name'
+	{ pattern: /icon:\s*['"]([^'"]+)['"]/g, group: 1 },
 ];
 
 allFiles.forEach((filePath) => {
 	const content = fs.readFileSync(filePath, 'utf8');
 
-	regexes.forEach((regex, index) => {
-		let match = regex.exec(content);
+	regexes.forEach(({ pattern, group }) => {
+		let match = pattern.exec(content);
 		while (match !== null) {
-			// Para os property bindings, o nome está no grupo 2. Para estáticos, no grupo 1.
-			const iconName = index > 1 ? match[2] : match[1];
+			const iconName = match[group];
 
 			if (!usedIcons.has(iconName)) {
 				usedIcons.set(iconName, new Set());
 			}
 			usedIcons.get(iconName).add(filePath);
-			match = regex.exec(content);
+			match = pattern.exec(content);
 		}
 	});
 });
