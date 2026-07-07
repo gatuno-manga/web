@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { SelectComponent, SelectOption } from './select.component';
 
 const MOCK_OPTIONS: SelectOption[] = [
-	{ value: 'a', label: 'Option A', icon: 'star' },
+	{ value: 'a', label: 'Option A', icon: 'heart' },
 	{ value: 'b', label: 'Option B', description: 'Secondary text' },
 	{ value: 'c', label: 'Option C', disabled: true },
 ];
