@@ -516,14 +516,16 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			{
 				rootMargin: '1000px',
 				threshold: 0,
-			}
+			},
 		);
 	}
 
 	private observeScrollSentinel() {
 		if (this.intersectionObserver && this.scrollSentinel?.nativeElement) {
 			this.intersectionObserver.disconnect();
-			this.intersectionObserver.observe(this.scrollSentinel.nativeElement);
+			this.intersectionObserver.observe(
+				this.scrollSentinel.nativeElement,
+			);
 		}
 	}
 
@@ -636,7 +638,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				if (indexDiff !== 0) {
 					return indexDiff;
 				}
-				
+
 				const langA = a.languageCode || '';
 				const langB = b.languageCode || '';
 				return langA.localeCompare(langB);
@@ -1521,7 +1523,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 						icon: 'trash',
 						danger: true,
 						action: () => this.confirmBulkDeleteChapters(),
-					}
+					},
 				);
 			}
 
@@ -1604,7 +1606,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					label: 'Corrigir Capítulo',
 					icon: 'settings',
 					action: () => this.confirmFixChapter(chapter),
-				}
+				},
 			);
 			if (chapter.originalUrl) {
 				items.push({
@@ -1620,7 +1622,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					icon: 'trash',
 					danger: true,
 					action: () => this.confirmDeleteChapter(chapter),
-				}
+				},
 			);
 		}
 
@@ -1692,15 +1694,22 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					label: 'Resetar',
 					type: 'danger',
 					callback: async () => {
-						this.notificationService.info('Resetando capítulos...', 'Aguarde');
+						this.notificationService.info(
+							'Resetando capítulos...',
+							'Aguarde',
+						);
 						for (const id of selectedIds) {
 							try {
-								await firstValueFrom(this.chapterService.resetChapter(id));
+								await firstValueFrom(
+									this.chapterService.resetChapter(id),
+								);
 							} catch (e) {
 								console.error('Error resetting chapter', id, e);
 							}
 						}
-						this.notificationService.success('Capítulos resetados!');
+						this.notificationService.success(
+							'Capítulos resetados!',
+						);
 						this.clearSelection();
 					},
 				},
@@ -1720,15 +1729,22 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					label: 'Corrigir',
 					type: 'danger',
 					callback: async () => {
-						this.notificationService.info('Corrigindo capítulos...', 'Aguarde');
+						this.notificationService.info(
+							'Corrigindo capítulos...',
+							'Aguarde',
+						);
 						for (const id of selectedIds) {
 							try {
-								await firstValueFrom(this.chapterService.fixChapter(id));
+								await firstValueFrom(
+									this.chapterService.fixChapter(id),
+								);
 							} catch (e) {
 								console.error('Error fixing chapter', id, e);
 							}
 						}
-						this.notificationService.success('Capítulos corrigidos!');
+						this.notificationService.success(
+							'Capítulos corrigidos!',
+						);
 						this.clearSelection();
 						if (this.selectedTab() === tab.chapters) {
 							this.loadChapters();
@@ -1751,10 +1767,15 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					label: 'Apagar',
 					type: 'danger',
 					callback: async () => {
-						this.notificationService.info('Apagando capítulos...', 'Aguarde');
+						this.notificationService.info(
+							'Apagando capítulos...',
+							'Aguarde',
+						);
 						for (const id of selectedIds) {
 							try {
-								await firstValueFrom(this.chapterService.deleteChapter(id));
+								await firstValueFrom(
+									this.chapterService.deleteChapter(id),
+								);
 							} catch (e) {
 								console.error('Error deleting chapter', id, e);
 							}
@@ -1782,15 +1803,22 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					label: 'Resetar',
 					type: 'danger',
 					callback: async () => {
-						this.notificationService.info('Resetando capas...', 'Aguarde');
+						this.notificationService.info(
+							'Resetando capas...',
+							'Aguarde',
+						);
 						for (const id of selectedIds) {
 							try {
-								await firstValueFrom(this.bookService.resetCover(this.id(), id));
+								await firstValueFrom(
+									this.bookService.resetCover(this.id(), id),
+								);
 							} catch (e) {
 								console.error('Error resetting cover', id, e);
 							}
 						}
-						this.notificationService.success('Capas resetadas com sucesso!');
+						this.notificationService.success(
+							'Capas resetadas com sucesso!',
+						);
 						this.clearCoverSelection();
 					},
 				},
@@ -1810,15 +1838,22 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					label: 'Corrigir',
 					type: 'danger',
 					callback: async () => {
-						this.notificationService.info('Corrigindo capas...', 'Aguarde');
+						this.notificationService.info(
+							'Corrigindo capas...',
+							'Aguarde',
+						);
 						for (const id of selectedIds) {
 							try {
-								await firstValueFrom(this.bookService.fixCover(this.id(), id));
+								await firstValueFrom(
+									this.bookService.fixCover(this.id(), id),
+								);
 							} catch (e) {
 								console.error('Error fixing cover', id, e);
 							}
 						}
-						this.notificationService.success('Capas corrigidas com sucesso!');
+						this.notificationService.success(
+							'Capas corrigidas com sucesso!',
+						);
 						this.clearCoverSelection();
 					},
 				},
@@ -1838,15 +1873,22 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					label: 'Apagar',
 					type: 'danger',
 					callback: async () => {
-						this.notificationService.info('Apagando capas...', 'Aguarde');
+						this.notificationService.info(
+							'Apagando capas...',
+							'Aguarde',
+						);
 						for (const id of selectedIds) {
 							try {
-								await firstValueFrom(this.bookService.deleteCover(this.id(), id));
+								await firstValueFrom(
+									this.bookService.deleteCover(this.id(), id),
+								);
 							} catch (e) {
 								console.error('Error deleting cover', id, e);
 							}
 						}
-						this.notificationService.success('Capas apagadas com sucesso!');
+						this.notificationService.success(
+							'Capas apagadas com sucesso!',
+						);
 						this.clearCoverSelection();
 					},
 				},
@@ -1891,7 +1933,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	onCoversContainerContextMenu(event: MouseEvent) {
 		event.preventDefault();
 		event.stopPropagation();
-		
+
 		if (!this.userService.hasPermission('internal:books:edit')) return;
 
 		const items: ContextMenuItem[] = [
@@ -1910,9 +1952,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				label: 'Corrigir Todas as Capas',
 				icon: 'refresh-ccw',
 				action: () => this.fixCovers(),
-			}
+			},
 		];
-		
+
 		this.contextMenuService.open(event, items);
 	}
 
@@ -1971,7 +2013,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 						label: 'Limpar Seleção',
 						icon: 'close',
 						action: () => this.clearCoverSelection(),
-					}
+					},
 				);
 			} else {
 				if (cover.url) {
@@ -2034,7 +2076,10 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 									this.modalService.close();
 								},
 								error: (err) => {
-									console.error('Error resetting cover:', err);
+									console.error(
+										'Error resetting cover:',
+										err,
+									);
 									this.notificationService.error(
 										'Erro ao agendar reset da capa.',
 									);

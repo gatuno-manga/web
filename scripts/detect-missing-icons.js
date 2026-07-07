@@ -47,8 +47,14 @@ const regexes = [
 	{ pattern: /<app-icon-button[^>]*\sname=["']([^"']+)["']/g, group: 1 },
 
 	// Pega usos literais com property binding: [name]="'icon-name'" ou [name]='"icon-name"'
-	{ pattern: /<app-icons[^>]*\s\[name\]=["'](['"])([^'"]+)\1["']/g, group: 2 },
-	{ pattern: /<app-icon-button[^>]*\s\[name\]=["'](['"])([^'"]+)\1["']/g, group: 2 },
+	{
+		pattern: /<app-icons[^>]*\s\[name\]=["'](['"])([^'"]+)\1["']/g,
+		group: 2,
+	},
+	{
+		pattern: /<app-icon-button[^>]*\s\[name\]=["'](['"])([^'"]+)\1["']/g,
+		group: 2,
+	},
 
 	// Pega usos estáticos do atributo icon em botões, inputs, etc: icon="icon-name"
 	{ pattern: /\sicon=["']([^"']+)["']/g, group: 1 },

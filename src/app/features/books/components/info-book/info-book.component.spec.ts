@@ -261,9 +261,9 @@ describe('InfoBookComponent', () => {
 			{ id: '4', index: 2, languageCode: 'en' } as any,
 		]);
 		component.sortAscending.set(true);
-		
+
 		component.sortChapters();
-		
+
 		const chapters = component.chapters();
 		expect(chapters[0].id).toBe('2'); // en
 		expect(chapters[1].id).toBe('3'); // es
@@ -335,15 +335,17 @@ describe('InfoBookComponent', () => {
 		component.onCoverContextMenu(event, cover);
 
 		const args = mockContextMenuService.open.calls.mostRecent().args;
-		// Admin sees 8 items: Copy Image, Download Image, Separator, Select, Edit, Correct, Separator, Remove
-		expect(args[1].length).toBe(8);
+		// Admin sees 10 items: Copy Image, Download Image, Separator, Select, Edit, Separator, Reset, Correct, Separator, Remove
+		expect(args[1].length).toBe(10);
 		expect(args[1][0].label).toBe('Copiar Imagem');
 		expect(args[1][1].label).toBe('Baixar Imagem');
 		expect(args[1][2].type).toBe('separator');
-		expect(args[1][3].label).toBe('Selecionar Capa');
+		expect(args[1][3].label).toBe('Selecionar como Capa Principal');
 		expect(args[1][4].label).toBe('Editar');
-		expect(args[1][5].label).toBe('Corrigir Capa');
-		expect(args[1][6].type).toBe('separator');
-		expect(args[1][7].label).toBe('Remover');
+		expect(args[1][5].type).toBe('separator');
+		expect(args[1][6].label).toBe('Resetar Capa');
+		expect(args[1][7].label).toBe('Corrigir Capa');
+		expect(args[1][8].type).toBe('separator');
+		expect(args[1][9].label).toBe('Apagar');
 	});
 });
