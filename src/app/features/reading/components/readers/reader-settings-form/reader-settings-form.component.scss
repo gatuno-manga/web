@@ -8,6 +8,11 @@
 	padding: 16px 24px;
 	max-height: 60vh;
 	overflow-y: auto;
+
+	&.flat-mode {
+		max-height: none;
+		overflow-y: visible;
+	}
 }
 
 .view-selector {
