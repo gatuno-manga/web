@@ -4,7 +4,7 @@
 	--app-background-color: var(--black);
 	--app-text-color: var(--beige);
 	--primary-color: var(--orange);
-	--secondary-color: var(--dark-purple);
+	--secondary-color: var(--dark-surface);
 	--scrollbar-color: var(--dark-gray);
 	--scrollbar-thumb-color: var(--orange);
 	--erro-message-color: var(--orange);
@@ -15,7 +15,7 @@
 	--degrader: linear-gradient(
 		88deg,
 		var(--black) 55%,
-		var(--dark-purple) 194%
+		var(--dark-surface) 194%
 	);
 
 	// Overlays & Shadows
@@ -67,7 +67,7 @@
 	--app-background-color: var(--true-black);
 	--app-text-color: var(--beige);
 	--primary-color: var(--orange);
-	--secondary-color: var(--dark-purple);
+	--secondary-color: var(--dark-surface);
 	--scrollbar-color: var(--dark-gray);
 	--scrollbar-thumb-color: var(--orange);
 	--erro-message-color: var(--orange);
@@ -78,7 +78,7 @@
 	--degrader: linear-gradient(
 		88deg,
 		var(--true-black) 55%,
-		var(--dark-purple) 194%
+		var(--dark-surface) 194%
 	);
 
 	// Overlays & Shadows
@@ -127,22 +127,22 @@
 }
 
 @mixin light-definitions() {
-	--app-background-color: var(--white);
-	--app-text-color: var(--dark-purple);
-	--primary-color: var(--lilac);
-	--secondary-color: var(--beige);
-	--scrollbar-color: var(--beige);
-	--scrollbar-thumb-color: var(--dark-purple);
+	--app-background-color: var(--gray-100);
+	--app-text-color: #2b2d31;
+	--primary-color: var(--orange-dark);
+	--secondary-color: var(--gray-300);
+	--scrollbar-color: var(--gray-300);
+	--scrollbar-thumb-color: #a0a0a0;
 	--erro-message-color: var(--orange);
 	--scraping-status-ready-color: var(--green);
 	--scraping-status-processing-color: var(--orange);
 	--scraping-status-error-color: var(--red);
-	--context-menu-bg: rgba(253, 253, 253, 0.9);
+	--context-menu-bg: rgba(255, 255, 255, 0.9);
 	--degrader: linear-gradient(
 		88deg,
-		var(--white) 0%,
-		var(--white) 50%,
-		var(--beige) 100%
+		var(--gray-100) 0%,
+		var(--gray-100) 50%,
+		var(--gray-300) 100%
 	);
 
 	// Overlays & Shadows
@@ -151,10 +151,10 @@
 
 	// Extended Semantic Tokens
 	--app-bg-color: var(--app-background-color);
-	--app-text-color-secondary: rgba(32, 20, 42, 0.55); // --dark-purple com 55% opacidade
-	--white-muted: rgba(32, 20, 42, 0.45); // no light é escuro, não branco
-	--border-color: rgba(32, 20, 42, 0.12);
-	--hover-color: rgba(32, 20, 42, 0.06);
+	--app-text-color-secondary: rgba(43, 45, 49, 0.65);
+	--white-muted: rgba(43, 45, 49, 0.45);
+	--border-color: rgba(43, 45, 49, 0.12);
+	--hover-color: rgba(43, 45, 49, 0.06);
 	--danger-color: var(--red);
 	--warning-color: var(--yellow);
 	--success-color: var(--success);
