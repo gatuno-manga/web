@@ -58,6 +58,8 @@ export class AppearanceComponent implements OnInit {
 		{ value: 'light', label: 'Claro' },
 		{ value: 'dark', label: 'Escuro' },
 		{ value: 'true-dark', label: 'True Dark (OLED)' },
+		{ value: 'dracula', label: 'Dracula' },
+		{ value: 'slate', label: 'Slate' },
 	];
 
 	languageOptions = computed(() =>
