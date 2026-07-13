@@ -9,9 +9,9 @@ import {
 } from '@models/user.models';
 import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { tap } from 'rxjs/operators';
+import { SensitiveContentService } from './sensitive-content.service';
 import { UnifiedReadingProgressService } from './unified-reading-progress.service';
 import { UserTokenService } from './user-token.service';
-import { SensitiveContentService } from './sensitive-content.service';
 
 @Injectable({
 	providedIn: 'root',

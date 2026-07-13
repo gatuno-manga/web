@@ -78,7 +78,7 @@ import {
 	SourceAddSaveEvent,
 } from '@ui/molecules/notification/custom-components/source-add-modal/source-add-modal.component';
 import { ImageViewerComponent } from '@ui/organisms/image-viewer/image-viewer.component';
-import { firstValueFrom, fromEvent, Subscription, throttleTime } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { BookReviewFormComponent } from '../book-review-form/book-review-form.component';
 import { BookReviewsListComponent } from '../book-reviews-list/book-reviews-list.component';
 import { ChapterGroupComponent } from '../chapter-group/chapter-group.component';
@@ -241,7 +241,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					chapters: [],
 				});
 			}
-			map.get(chapter.index)!.chapters.push(chapter);
+			map.get(chapter.index)?.chapters.push(chapter);
 		}
 
 		return Array.from(map.values());

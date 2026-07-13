@@ -51,8 +51,8 @@ export class TooltipDirective implements OnDestroy {
 
 		const hostPos = this.el.nativeElement.getBoundingClientRect();
 		// Use layout dimensions instead of transformed dimensions
-		const tooltipWidth = this.tooltipElement!.offsetWidth;
-		const tooltipHeight = this.tooltipElement!.offsetHeight;
+		const tooltipWidth = this.tooltipElement?.offsetWidth;
+		const tooltipHeight = this.tooltipElement?.offsetHeight;
 
 		const margin = 10;
 		let top = hostPos.top - tooltipHeight - margin;
@@ -100,7 +100,7 @@ export class TooltipDirective implements OnDestroy {
 		);
 
 		const arrowLeft = hostPos.left + hostPos.width / 2 - left;
-		this.tooltipElement!.style.setProperty(
+		this.tooltipElement?.style.setProperty(
 			'--arrow-left',
 			`${arrowLeft}px`,
 		);

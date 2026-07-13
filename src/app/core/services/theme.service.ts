@@ -69,12 +69,19 @@ export class ThemeService {
 
 				for (const key of previousColors) {
 					if (!colors[key]) {
-						this.renderer.removeStyle(document.documentElement, key);
+						this.renderer.removeStyle(
+							document.documentElement,
+							key,
+						);
 					}
 				}
 
 				for (const [key, value] of Object.entries(colors)) {
-					this.renderer.setStyle(document.documentElement, key, value);
+					this.renderer.setStyle(
+						document.documentElement,
+						key,
+						value,
+					);
 				}
 
 				previousColors = Object.keys(colors);
@@ -139,7 +146,11 @@ export class ThemeService {
 			const text = await file.text();
 			const parsed = JSON.parse(text);
 
-			if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+			if (
+				typeof parsed !== 'object' ||
+				parsed === null ||
+				Array.isArray(parsed)
+			) {
 				throw new Error('Formato de arquivo inválido.');
 			}
 

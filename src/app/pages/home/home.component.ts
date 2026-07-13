@@ -19,7 +19,7 @@ import { BookList } from '@models/book.models';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
-import { firstValueFrom, forkJoin } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
 	selector: 'app-home',
@@ -109,21 +109,24 @@ export class HomeComponent {
 		try {
 			// 1. Obter IDs do histórico de leitura local
 			const progress = await this.readingProgressService.getAllProgress();
-			const bookIds = progress.length === 0 ? [] : [
-				...new Set(
-					[...progress]
-						.sort(
-							(a, b) =>
-								new Date(b.updatedAt).getTime() -
-								new Date(a.updatedAt).getTime(),
-						)
-						.map((p) => p.bookId),
-				),
-			].slice(0, 10);
+			const bookIds =
+				progress.length === 0
+					? []
+					: [
+							...new Set(
+								[...progress]
+									.sort(
+										(a, b) =>
+											new Date(b.updatedAt).getTime() -
+											new Date(a.updatedAt).getTime(),
+									)
+									.map((p) => p.bookId),
+							),
+						].slice(0, 10);
 
 			// 2. Fazer uma única chamada GraphQL com tudo
 			const res = await firstValueFrom(
-				this.bookService.getHomeBooksData(bookIds)
+				this.bookService.getHomeBooksData(bookIds),
 			);
 
 			this.featuredBooks.set(res.latestUpdated.slice(0, 5));

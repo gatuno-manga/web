@@ -40,13 +40,15 @@ export class ThemeSetupModalComponent {
 			id: 'dracula',
 			label: 'Dracula',
 			icon: 'dracula',
-			description: 'Tema popular vibrante e focado em tons escuros arroxeados.',
+			description:
+				'Tema popular vibrante e focado em tons escuros arroxeados.',
 		},
 		{
 			id: 'slate',
 			label: 'Slate',
 			icon: 'slate',
-			description: 'Tons de azul e ardósia elegantes, perfeitos para leitura noturna.',
+			description:
+				'Tons de azul e ardósia elegantes, perfeitos para leitura noturna.',
 		},
 	];
 
