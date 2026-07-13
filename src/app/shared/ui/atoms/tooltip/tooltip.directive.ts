@@ -51,8 +51,8 @@ export class TooltipDirective implements OnDestroy {
 
 		const hostPos = this.el.nativeElement.getBoundingClientRect();
 		// Use layout dimensions instead of transformed dimensions
-		const tooltipWidth = this.tooltipElement?.offsetWidth;
-		const tooltipHeight = this.tooltipElement?.offsetHeight;
+		const tooltipWidth = this.tooltipElement?.offsetWidth ?? 0;
+		const tooltipHeight = this.tooltipElement?.offsetHeight ?? 0;
 
 		const margin = 10;
 		let top = hostPos.top - tooltipHeight - margin;
