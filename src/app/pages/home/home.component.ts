@@ -19,7 +19,7 @@ import { BookList } from '@models/book.models';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
-import { firstValueFrom, forkJoin } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
 	selector: 'app-home',
@@ -73,15 +73,13 @@ export class HomeComponent {
 
 	constructor() {
 		this.setMetaData();
-		this.loadContinueReading();
 
 		// Re-carrega livros quando filtros globais mudam
 		effect(() => {
 			this.sensitiveContentService.allowContentSignal();
 			this.tagsService.excludedTagsSignal();
 
-			this.loadBooksData();
-			this.loadRecentlyAdded();
+			this.loadAllData();
 		});
 
 		// Inicia o carousel apenas no browser (SSR safe) com cleanup automático
@@ -99,91 +97,48 @@ export class HomeComponent {
 		});
 	}
 
-	/** Busca os livros mais recentemente atualizados.
-	 * Usa os primeiros 5 para o carousel featured e todos os 12 para o grid,
-	 * economizando uma request HTTP.
+	/** Busca todos os livros necessários para a home em uma única requisição GraphQL.
+	 * Isso substitui as chamadas individuais, eliminando até 12 requisições separadas.
 	 */
-	async loadBooksData() {
+	async loadAllData() {
 		this.isLoadingFeatured.set(true);
 		this.isLoadingGrid.set(true);
+		this.isLoadingContinueReading.set(true);
+		this.isLoadingRecentlyAdded.set(true);
+
 		try {
+			// 1. Obter IDs do histórico de leitura local
+			const progress = await this.readingProgressService.getAllProgress();
+			const bookIds =
+				progress.length === 0
+					? []
+					: [
+							...new Set(
+								[...progress]
+									.sort(
+										(a, b) =>
+											new Date(b.updatedAt).getTime() -
+											new Date(a.updatedAt).getTime(),
+									)
+									.map((p) => p.bookId),
+							),
+						].slice(0, 10);
+
+			// 2. Fazer uma única chamada GraphQL com tudo
 			const res = await firstValueFrom(
-				this.bookService.getBooks({
-					limit: 12,
-					orderBy: 'updatedAt',
-					order: 'DESC',
-				}),
+				this.bookService.getHomeBooksData(bookIds),
 			);
-			this.featuredBooks.set(res.data.slice(0, 5));
-			this.latestUpdatedBooks.set(res.data);
+
+			this.featuredBooks.set(res.latestUpdated.slice(0, 5));
+			this.latestUpdatedBooks.set(res.latestUpdated);
+			this.recentlyAddedBooks.set(res.recentlyAdded);
+			this.continueReadingBooks.set(res.continueReading);
 		} catch (e) {
-			console.error('Error loading books data', e);
+			console.error('Error loading all home data', e);
 		} finally {
 			this.isLoadingFeatured.set(false);
 			this.isLoadingGrid.set(false);
-		}
-	}
-
-	async loadContinueReading() {
-		this.isLoadingContinueReading.set(true);
-		try {
-			const progress = await this.readingProgressService.getAllProgress();
-			if (progress.length === 0) return;
-
-			// Ordena por updatedAt DESC e pega IDs únicos
-			const bookIds = [
-				...new Set(
-					[...progress]
-						.sort(
-							(a, b) =>
-								new Date(b.updatedAt).getTime() -
-								new Date(a.updatedAt).getTime(),
-						)
-						.map((p) => p.bookId),
-				),
-			].slice(0, 10);
-
-			// forkJoin: todas as requests em paralelo (elimina N+1)
-			const bookResponses = await firstValueFrom(
-				forkJoin(bookIds.map((id) => this.bookService.getBook(id))),
-			);
-
-			const books: BookList[] = bookResponses
-				.filter(Boolean)
-				.map((book) => ({
-					id: book?.id,
-					title: book?.title,
-					cover: book?.cover,
-					description: book?.description,
-					tags: book?.tags,
-					scrapingStatus: book?.scrapingStatus,
-					blurHash: book?.blurHash,
-					dominantColor: book?.dominantColor,
-					metadata: book?.metadata,
-				}));
-
-			this.continueReadingBooks.set(books);
-		} catch (e) {
-			console.error('Error loading continue reading', e);
-		} finally {
 			this.isLoadingContinueReading.set(false);
-		}
-	}
-
-	async loadRecentlyAdded() {
-		this.isLoadingRecentlyAdded.set(true);
-		try {
-			const res = await firstValueFrom(
-				this.bookService.getBooks({
-					limit: 12,
-					orderBy: 'createdAt',
-					order: 'DESC',
-				}),
-			);
-			this.recentlyAddedBooks.set(res.data);
-		} catch (e) {
-			console.error('Error loading recently added books', e);
-		} finally {
 			this.isLoadingRecentlyAdded.set(false);
 		}
 	}

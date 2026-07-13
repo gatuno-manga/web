@@ -1,15 +1,16 @@
 @mixin colors() {
 	// Typography
-	--font-display: 'Inknut Antiqua', serif;
-	--font-body: 'Manrope', sans-serif;
-	--font-ui: 'Plus Jakarta Sans', sans-serif;
-	--font-secondary: 'Epilogue', sans-serif;
+	--font-display: "Inknut Antiqua", serif;
+	--font-body: "Manrope", sans-serif;
+	--font-ui: "Plus Jakarta Sans", sans-serif;
+	--font-secondary: "Epilogue", sans-serif;
 
 	--true-black: #000000;
 	--black: #000212;
-	--dark-purple: #20142a;
+	--dark-surface: #181a1f;
 	--dark-gray: #191a1c;
 	--orange: #f18522;
+	--orange-dark: #cc5e00;
 	--beige: #e9e1d1;
 	--white: #fdfdfd;
 	--lilac: #a972ff;
@@ -21,6 +22,7 @@
 
 	// Gray Scale
 	--gray-100: #f8f9fa;
+	--gray-200: #eeeeee;
 	--gray-300: #e0e0e0;
 	--gray-400: #ccc;
 	--gray-600: #888;
@@ -60,4 +62,30 @@
 
 	// Overlay & Shadow
 	--shadow-base: 0, 0, 0;
+
+	// Theme Colors (Dracula)
+	--dracula-bg: #282a36;
+	--dracula-text: #f8f8f2;
+	--dracula-surface: #44475a;
+	--dracula-purple: #bd93f9;
+	--dracula-red: #ff5555;
+	--dracula-green: #50fa7b;
+	--dracula-yellow: #f1fa8c;
+	--dracula-orange: #ffb86c;
+	--dracula-pink: #ff79c6;
+	--dracula-cyan: #8be9fd;
+	--dracula-text-sec: #6272a4;
+
+	// Theme Colors (Slate)
+	--slate-bg: #15161a;
+	--slate-text: #f8fafc;
+	--slate-surface: #212329;
+	--slate-red: #ef4444;
+	--slate-green: #10b981;
+	--slate-orange: #f59e0b;
+	--slate-blue: #38bdf8;
+	--slate-purple: #a855f7;
+	--slate-yellow: #eab308;
+	--slate-teal: #14b8a6;
+	--slate-text-sec: #94a3b8;
 }

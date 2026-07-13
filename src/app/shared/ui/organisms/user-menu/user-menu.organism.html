@@ -93,6 +93,20 @@
 						</div>
 						@if (currentTheme() === 'true-dark') { <app-icons name="check" size="18" class="active-icon" /> }
 					</button>
+					<button type="button" class="menu-item option-item" [class.active]="currentTheme() === 'dracula'" (click)="setTheme('dracula')">
+						<div class="item-left">
+							<app-icons name="dracula" size="20" />
+							<span>Dracula</span>
+						</div>
+						@if (currentTheme() === 'dracula') { <app-icons name="check" size="18" class="active-icon" /> }
+					</button>
+					<button type="button" class="menu-item option-item" [class.active]="currentTheme() === 'slate'" (click)="setTheme('slate')">
+						<div class="item-left">
+							<app-icons name="slate" size="20" />
+							<span>Slate</span>
+						</div>
+						@if (currentTheme() === 'slate') { <app-icons name="check" size="18" class="active-icon" /> }
+					</button>
 				</div>
 			}
 

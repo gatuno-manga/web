@@ -17,7 +17,6 @@ import { NotificationService } from '@core/services/notification.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { TagsService } from '@core/services/tags.service';
 import {
-	AlternativeTitle,
 	Author,
 	BookBasic,
 	BookDetail,
@@ -27,7 +26,6 @@ import {
 	tag,
 	UpdateBookDto,
 } from '@models/book.models';
-import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
@@ -298,19 +296,19 @@ export class BookEditModalComponent implements OnInit {
 
 	// --- Dynamic Creation ---
 	onCreateTag(name: string): void {
-		const newId = 'temp-' + Date.now();
+		const newId = `temp-${Date.now()}`;
 		this.availableTags.update((prev) => [...prev, { id: newId, name }]);
 		this.selectedTagIds.update((prev) => [...prev, newId]);
 	}
 
 	onCreateAuthor(name: string): void {
-		const newId = 'temp-' + Date.now();
+		const newId = `temp-${Date.now()}`;
 		this.availableAuthors.update((prev) => [...prev, { id: newId, name }]);
 		this.selectedAuthorIds.update((prev) => [...prev, newId]);
 	}
 
 	onCreateSensitive(name: string): void {
-		const newId = 'temp-' + Date.now();
+		const newId = `temp-${Date.now()}`;
 		this.availableSensitive.update((prev) => [
 			...prev,
 			{ id: newId, name },

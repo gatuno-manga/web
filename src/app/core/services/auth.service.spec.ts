@@ -11,6 +11,7 @@ import {
 } from '@models/user.models';
 import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { AuthService } from './auth.service';
+import { SensitiveContentService } from './sensitive-content.service';
 import { UnifiedReadingProgressService } from './unified-reading-progress.service';
 import { UserTokenService } from './user-token.service';
 
@@ -19,6 +20,7 @@ describe('AuthService', () => {
 	let httpMock: HttpTestingController;
 	let userTokenServiceSpy: jasmine.SpyObj<UserTokenService>;
 	let readingProgressServiceSpy: jasmine.SpyObj<UnifiedReadingProgressService>;
+	let sensitiveContentServiceSpy: jasmine.SpyObj<SensitiveContentService>;
 
 	const mockAssertion: AuthenticationResponseJSON = {
 		id: 'cred',
@@ -45,6 +47,10 @@ describe('AuthService', () => {
 			'UnifiedReadingProgressService',
 			['onUserLogin', 'onUserLogout'],
 		);
+		const sensitiveContentSpy = jasmine.createSpyObj(
+			'SensitiveContentService',
+			['invalidateCache'],
+		);
 
 		TestBed.configureTestingModule({
 			imports: [HttpClientTestingModule],
@@ -54,6 +60,10 @@ describe('AuthService', () => {
 				{
 					provide: UnifiedReadingProgressService,
 					useValue: readingProgressSpy,
+				},
+				{
+					provide: SensitiveContentService,
+					useValue: sensitiveContentSpy,
 				},
 			],
 		});
@@ -66,6 +76,9 @@ describe('AuthService', () => {
 		readingProgressServiceSpy = TestBed.inject(
 			UnifiedReadingProgressService,
 		) as jasmine.SpyObj<UnifiedReadingProgressService>;
+		sensitiveContentServiceSpy = TestBed.inject(
+			SensitiveContentService,
+		) as jasmine.SpyObj<SensitiveContentService>;
 	});
 
 	afterEach(() => {
@@ -96,6 +109,9 @@ describe('AuthService', () => {
 				expect(
 					readingProgressServiceSpy.onUserLogin,
 				).toHaveBeenCalled();
+				expect(
+					sensitiveContentServiceSpy.invalidateCache,
+				).toHaveBeenCalled();
 			});
 
 			const req = httpMock.expectOne('/auth/signin');
@@ -122,6 +138,9 @@ describe('AuthService', () => {
 					expect(
 						readingProgressServiceSpy.onUserLogin,
 					).toHaveBeenCalled();
+					expect(
+						sensitiveContentServiceSpy.invalidateCache,
+					).toHaveBeenCalled();
 				});
 
 			const req = httpMock.expectOne('/auth/mfa/verify-login');
@@ -140,6 +159,9 @@ describe('AuthService', () => {
 				expect(userTokenServiceSpy.removeTokens).toHaveBeenCalled();
 				expect(
 					readingProgressServiceSpy.onUserLogout,
+				).toHaveBeenCalled();
+				expect(
+					sensitiveContentServiceSpy.invalidateCache,
 				).toHaveBeenCalled();
 			});
 
@@ -168,6 +190,9 @@ describe('AuthService', () => {
 				);
 				expect(
 					readingProgressServiceSpy.onUserLogin,
+				).toHaveBeenCalled();
+				expect(
+					sensitiveContentServiceSpy.invalidateCache,
 				).toHaveBeenCalled();
 			});
 
@@ -213,6 +238,9 @@ describe('AuthService', () => {
 					);
 					expect(
 						readingProgressServiceSpy.onUserLogin,
+					).toHaveBeenCalled();
+					expect(
+						sensitiveContentServiceSpy.invalidateCache,
 					).toHaveBeenCalled();
 				});
 

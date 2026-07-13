@@ -36,6 +36,20 @@ export class ThemeSetupModalComponent {
 			icon: 'contrast',
 			description: 'Preto puro para economizar bateria em telas OLED.',
 		},
+		{
+			id: 'dracula',
+			label: 'Dracula',
+			icon: 'dracula',
+			description:
+				'Tema popular vibrante e focado em tons escuros arroxeados.',
+		},
+		{
+			id: 'slate',
+			label: 'Slate',
+			icon: 'slate',
+			description:
+				'Tons de azul e ardósia elegantes, perfeitos para leitura noturna.',
+		},
 	];
 
 	selectTheme(theme: AppTheme) {

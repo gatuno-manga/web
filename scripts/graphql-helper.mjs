@@ -183,10 +183,10 @@ async function fetchGraphQL(url) {
 function getTypeString(typeRef) {
 	if (!typeRef) return '';
 	if (typeRef.kind === 'NON_NULL') {
-		return getTypeString(typeRef.ofType) + '!';
+		return `${getTypeString(typeRef.ofType)}!`;
 	}
 	if (typeRef.kind === 'LIST') {
-		return '[' + getTypeString(typeRef.ofType) + ']';
+		return `[${getTypeString(typeRef.ofType)}]`;
 	}
 	return typeRef.name;
 }
@@ -203,13 +203,13 @@ function printSummary(schema) {
 	console.log('='.repeat(50));
 	console.log(' QUERIES');
 	console.log('='.repeat(50));
-	if (queryType && queryType.fields) {
+	if (queryType?.fields) {
 		for (const field of queryType.fields) {
 			const args = field.args
 				.map((a) => `${a.name}: ${getTypeString(a.type)}`)
 				.join(', ');
 			console.log(
-				`- ${field.name}${args ? '(' + args + ')' : ''} : ${getTypeString(field.type)}`,
+				`- ${field.name}${args ? `(${args})` : ''} : ${getTypeString(field.type)}`,
 			);
 			if (field.description)
 				console.log(`    ${field.description.replace(/\n/g, ' ')}`);
@@ -218,16 +218,16 @@ function printSummary(schema) {
 		console.log('No queries found.');
 	}
 
-	console.log('\n' + '='.repeat(50));
+	console.log(`\n${'='.repeat(50)}`);
 	console.log(' MUTATIONS');
 	console.log('='.repeat(50));
-	if (mutationType && mutationType.fields) {
+	if (mutationType?.fields) {
 		for (const field of mutationType.fields) {
 			const args = field.args
 				.map((a) => `${a.name}: ${getTypeString(a.type)}`)
 				.join(', ');
 			console.log(
-				`- ${field.name}${args ? '(' + args + ')' : ''} : ${getTypeString(field.type)}`,
+				`- ${field.name}${args ? `(${args})` : ''} : ${getTypeString(field.type)}`,
 			);
 			if (field.description)
 				console.log(`    ${field.description.replace(/\n/g, ' ')}`);
