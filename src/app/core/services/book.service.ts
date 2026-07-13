@@ -95,6 +95,104 @@ export class BookService {
 			);
 	}
 
+	getHomeBooksData(
+		bookIds: string[],
+	): Observable<{
+		latestUpdated: BookList[];
+		recentlyAdded: BookList[];
+		continueReading: BookList[];
+	}> {
+		const allowed = this.sensitiveContentService.getContentAllow();
+		const sensitiveContent =
+			allowed.length > 0 ? ['safe', ...allowed] : ['safe'];
+		const excludeTags = this.tagsService.excludedTagsSignal();
+
+		const baseFilter = {
+			limit: 12,
+			order: 'DESC',
+			sensitiveContent,
+			excludeTags,
+		};
+
+		const filterUpdated = { ...baseFilter, orderBy: 'UPDATED_AT' };
+		const filterAdded = { ...baseFilter, orderBy: 'CREATED_AT' };
+
+		let bookAliases = '';
+		bookIds.forEach((id, index) => {
+			bookAliases += `
+				book${index}: book(id: "${id}") {
+					id title description cover tags { id name } scrapingStatus covers { url isMain metadata { blurHash dominantColor } }
+				}
+			`;
+		});
+
+		const query = `
+			query GetHomeBooks($filterUpdated: BookFilterInput, $filterAdded: BookFilterInput) {
+				latestUpdated: books(filter: $filterUpdated) {
+					data {
+						id title description cover tags { id name } scrapingStatus covers { url isMain metadata { blurHash dominantColor } }
+					}
+				}
+				recentlyAdded: books(filter: $filterAdded) {
+					data {
+						id title description cover tags { id name } scrapingStatus covers { url isMain metadata { blurHash dominantColor } }
+					}
+				}
+				${bookAliases}
+			}
+		`;
+
+		return this.http
+			.post<{ data: any }>('graphql', {
+				query,
+				variables: { filterUpdated, filterAdded },
+			})
+			.pipe(
+				map((response) => {
+					const data = response.data;
+					const mapBookList = (b: any): BookList => {
+						const book = { ...b } as any;
+						if (book.covers && book.covers.length > 0) {
+							const mainCover =
+								book.covers.find((c: any) => c.isMain) ||
+								book.covers[0];
+							book.cover = mainCover.url;
+							if (mainCover.metadata) {
+								book.blurHash = mainCover.metadata.blurHash;
+								book.dominantColor =
+									mainCover.metadata.dominantColor;
+							}
+						}
+						delete book.covers;
+						return book as BookList;
+					};
+
+					const latestUpdated =
+						data.latestUpdated?.data?.map(mapBookList) || [];
+					const recentlyAdded =
+						data.recentlyAdded?.data?.map(mapBookList) || [];
+					const continueReading: BookList[] = [];
+
+					for (let i = 0; i < bookIds.length; i++) {
+						const b = data[`book${i}`];
+						if (b) {
+							continueReading.push(mapBookList(b));
+						}
+					}
+
+					return { latestUpdated, recentlyAdded, continueReading };
+				}),
+				catchError((err) => {
+					console.warn('Online home fetch failed', err);
+					return of({
+						latestUpdated: [],
+						recentlyAdded: [],
+						continueReading: [],
+					});
+				}),
+			);
+	}
+
 	getBooksGraphQL(
 		filter: BookFilterInput,
 		fields: string[] = ['id', 'title', 'cover'],
