@@ -61,7 +61,7 @@ export class SensitiveContentService {
 	}
 
 	/** Invalidates the in-memory cache so the next call triggers a fresh GET. */
-	private invalidateCache(): void {
+	invalidateCache(): void {
 		this.sensitiveContentCache$ = null;
 	}
 

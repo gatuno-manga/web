@@ -11,6 +11,7 @@ import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { tap } from 'rxjs/operators';
 import { UnifiedReadingProgressService } from './unified-reading-progress.service';
 import { UserTokenService } from './user-token.service';
+import { SensitiveContentService } from './sensitive-content.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -21,6 +22,7 @@ export class AuthService {
 	private readonly readingProgressService = inject(
 		UnifiedReadingProgressService,
 	);
+	private readonly sensitiveContentService = inject(SensitiveContentService);
 
 	login(payload: loginRequest) {
 		return this.http
@@ -37,6 +39,7 @@ export class AuthService {
 						);
 						// Sincroniza o histórico de leitura após o login
 						this.readingProgressService.onUserLogin();
+						this.sensitiveContentService.invalidateCache();
 					}
 				}),
 			);
@@ -59,6 +62,7 @@ export class AuthService {
 						);
 						// Sincroniza o histórico de leitura após o login
 						this.readingProgressService.onUserLogin();
+						this.sensitiveContentService.invalidateCache();
 					}
 				}),
 			);
@@ -69,6 +73,7 @@ export class AuthService {
 			tap(() => {
 				this.userTokenService.removeTokens();
 				this.readingProgressService.onUserLogout();
+				this.sensitiveContentService.invalidateCache();
 			}),
 		);
 	}
@@ -88,6 +93,7 @@ export class AuthService {
 						);
 						// Sincroniza o histórico de leitura após o registro
 						this.readingProgressService.onUserLogin();
+						this.sensitiveContentService.invalidateCache();
 					}
 				}),
 			);
@@ -122,6 +128,7 @@ export class AuthService {
 						);
 						// Sincroniza o histórico de leitura após o login
 						this.readingProgressService.onUserLogin();
+						this.sensitiveContentService.invalidateCache();
 					}
 				}),
 			);
