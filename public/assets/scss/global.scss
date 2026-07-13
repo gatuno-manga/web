@@ -31,6 +31,12 @@
 [data-theme='true-dark'] {
 	@include color-definitions.true-dark-definitions();
 }
+[data-theme='dracula'] {
+	@include color-definitions.dracula-definitions();
+}
+[data-theme='slate'] {
+	@include color-definitions.slate-definitions();
+}
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme]) {
 		@include color-definitions.dark-definitions();

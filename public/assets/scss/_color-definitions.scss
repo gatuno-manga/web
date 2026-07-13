@@ -196,3 +196,101 @@
 	--badge-author-border: rgba(26, 188, 156, 0.35);
 	--badge-author-text: #138d75;
 }
+
+@mixin dracula-definitions() {
+	--app-background-color: var(--dracula-bg);
+	--app-text-color: var(--dracula-text);
+	--primary-color: var(--dracula-purple);
+	--secondary-color: var(--dracula-surface);
+	--scrollbar-color: var(--dracula-surface);
+	--scrollbar-thumb-color: var(--dracula-purple);
+	--erro-message-color: var(--dracula-red);
+	--scraping-status-ready-color: var(--dracula-green);
+	--scraping-status-processing-color: var(--dracula-yellow);
+	--scraping-status-error-color: var(--dracula-red);
+	--context-menu-bg: color-mix(in srgb, var(--dracula-bg) 90%, transparent);
+	--degrader: linear-gradient(88deg, var(--dracula-bg) 55%, var(--dracula-surface) 194%);
+
+	--overlay-bg: rgba(0, 0, 0, 0.75);
+	--shadow-color: rgba(0, 0, 0, 0.5);
+
+	--app-bg-color: var(--app-background-color);
+	--app-text-color-secondary: var(--dracula-text-sec);
+	--white-muted: color-mix(in srgb, var(--dracula-text) 45%, transparent);
+	--border-color: color-mix(in srgb, var(--dracula-text) 15%, transparent);
+	--hover-color: color-mix(in srgb, var(--dracula-text) 8%, transparent);
+	--danger-color: var(--dracula-red);
+	--warning-color: var(--dracula-orange);
+	--success-color: var(--dracula-green);
+
+	--badge-default-bg: color-mix(in srgb, var(--dracula-cyan) 20%, transparent);
+	--badge-default-border: color-mix(in srgb, var(--dracula-cyan) 40%, transparent);
+	--badge-default-text: var(--dracula-cyan);
+	--badge-search-bg: color-mix(in srgb, var(--dracula-green) 20%, transparent);
+	--badge-search-border: color-mix(in srgb, var(--dracula-green) 40%, transparent);
+	--badge-search-text: var(--dracula-green);
+	--badge-type-bg: color-mix(in srgb, var(--dracula-orange) 20%, transparent);
+	--badge-type-border: color-mix(in srgb, var(--dracula-orange) 40%, transparent);
+	--badge-type-text: var(--dracula-orange);
+	--badge-excluded-bg: color-mix(in srgb, var(--dracula-red) 20%, transparent);
+	--badge-excluded-border: color-mix(in srgb, var(--dracula-red) 40%, transparent);
+	--badge-excluded-text: var(--dracula-red);
+	--badge-sensitive-bg: color-mix(in srgb, var(--dracula-pink) 20%, transparent);
+	--badge-sensitive-border: color-mix(in srgb, var(--dracula-pink) 40%, transparent);
+	--badge-sensitive-text: var(--dracula-pink);
+	--badge-publication-bg: color-mix(in srgb, var(--dracula-yellow) 20%, transparent);
+	--badge-publication-border: color-mix(in srgb, var(--dracula-yellow) 40%, transparent);
+	--badge-publication-text: var(--dracula-yellow);
+	--badge-author-bg: color-mix(in srgb, var(--dracula-purple) 20%, transparent);
+	--badge-author-border: color-mix(in srgb, var(--dracula-purple) 40%, transparent);
+	--badge-author-text: var(--dracula-purple);
+}
+
+@mixin slate-definitions() {
+	--app-background-color: var(--slate-bg);
+	--app-text-color: var(--slate-text);
+	--primary-color: var(--orange);
+	--secondary-color: var(--slate-surface);
+	--scrollbar-color: var(--slate-surface);
+	--scrollbar-thumb-color: var(--orange);
+	--erro-message-color: var(--slate-red);
+	--scraping-status-ready-color: var(--slate-green);
+	--scraping-status-processing-color: var(--slate-orange);
+	--scraping-status-error-color: var(--slate-red);
+	--context-menu-bg: color-mix(in srgb, var(--slate-bg) 90%, transparent);
+	--degrader: linear-gradient(88deg, var(--slate-bg) 55%, var(--slate-surface) 194%);
+
+	--overlay-bg: rgba(0, 0, 0, 0.7);
+	--shadow-color: rgba(0, 0, 0, 0.4);
+
+	--app-bg-color: var(--app-background-color);
+	--app-text-color-secondary: var(--slate-text-sec);
+	--white-muted: color-mix(in srgb, var(--slate-text) 45%, transparent);
+	--border-color: color-mix(in srgb, var(--slate-text) 15%, transparent);
+	--hover-color: color-mix(in srgb, var(--slate-text) 8%, transparent);
+	--danger-color: var(--slate-red);
+	--warning-color: var(--slate-orange);
+	--success-color: var(--slate-green);
+
+	--badge-default-bg: color-mix(in srgb, var(--slate-blue) 20%, transparent);
+	--badge-default-border: color-mix(in srgb, var(--slate-blue) 40%, transparent);
+	--badge-default-text: var(--slate-blue);
+	--badge-search-bg: color-mix(in srgb, var(--slate-green) 20%, transparent);
+	--badge-search-border: color-mix(in srgb, var(--slate-green) 40%, transparent);
+	--badge-search-text: var(--slate-green);
+	--badge-type-bg: color-mix(in srgb, var(--slate-orange) 20%, transparent);
+	--badge-type-border: color-mix(in srgb, var(--slate-orange) 40%, transparent);
+	--badge-type-text: var(--slate-orange);
+	--badge-excluded-bg: color-mix(in srgb, var(--slate-red) 20%, transparent);
+	--badge-excluded-border: color-mix(in srgb, var(--slate-red) 40%, transparent);
+	--badge-excluded-text: var(--slate-red);
+	--badge-sensitive-bg: color-mix(in srgb, var(--slate-purple) 20%, transparent);
+	--badge-sensitive-border: color-mix(in srgb, var(--slate-purple) 40%, transparent);
+	--badge-sensitive-text: var(--slate-purple);
+	--badge-publication-bg: color-mix(in srgb, var(--slate-yellow) 20%, transparent);
+	--badge-publication-border: color-mix(in srgb, var(--slate-yellow) 40%, transparent);
+	--badge-publication-text: var(--slate-yellow);
+	--badge-author-bg: color-mix(in srgb, var(--slate-teal) 20%, transparent);
+	--badge-author-border: color-mix(in srgb, var(--slate-teal) 40%, transparent);
+	--badge-author-text: var(--slate-teal);
+}
