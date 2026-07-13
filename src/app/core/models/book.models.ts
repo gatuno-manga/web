@@ -12,6 +12,7 @@ export interface BookList {
 	blurHash?: string;
 	dominantColor?: string;
 	metadata?: ImageMetadata;
+	sensitiveContent?: SensitiveContentResponse[];
 }
 
 export interface ImageMetadata {

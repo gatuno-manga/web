@@ -19,7 +19,7 @@ import {
 } from '@models/book.models';
 import { BookTitleCheckResult } from '@models/book-admin.models';
 import { Paginated } from '@models/miscellaneous.models';
-import { firstValueFrom, from, Observable, of } from 'rxjs';
+import { firstValueFrom, forkJoin, from, Observable, of, Subject } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { DownloadService } from './download.service';
 import { MqttService } from './mqtt.service';
@@ -116,18 +116,12 @@ export class BookService {
 
 		const filterUpdated = { ...baseFilter, orderBy: 'UPDATED_AT' };
 		const filterAdded = { ...baseFilter, orderBy: 'CREATED_AT' };
-
-		let bookAliases = '';
-		bookIds.forEach((id, index) => {
-			bookAliases += `
-				book${index}: book(id: "${id}") {
-					id title description cover tags { id name } scrapingStatus covers { url isMain metadata { blurHash dominantColor } }
-				}
-			`;
-		});
+		
+		const hasContinueReading = bookIds.length > 0;
+		const filterContinue = hasContinueReading ? { ...baseFilter, ids: bookIds } : undefined;
 
 		const query = `
-			query GetHomeBooks($filterUpdated: BookFilterInput, $filterAdded: BookFilterInput) {
+			query GetHomeBooks($filterUpdated: BookFilterInput, $filterAdded: BookFilterInput, $hasContinueReading: Boolean!, $filterContinue: BookFilterInput) {
 				latestUpdated: books(filter: $filterUpdated) {
 					data {
 						id title description cover tags { id name } scrapingStatus covers { url isMain metadata { blurHash dominantColor } }
@@ -138,59 +132,64 @@ export class BookService {
 						id title description cover tags { id name } scrapingStatus covers { url isMain metadata { blurHash dominantColor } }
 					}
 				}
-				${bookAliases}
+				continueReading: books(filter: $filterContinue) @include(if: $hasContinueReading) {
+					data {
+						id title description cover tags { id name } scrapingStatus covers { url isMain metadata { blurHash dominantColor } }
+					}
+				}
 			}
 		`;
 
-		return this.http
-			.post<{ data: any }>('graphql', {
-				query,
-				variables: { filterUpdated, filterAdded },
-			})
-			.pipe(
-				map((response) => {
-					const data = response.data;
-					const mapBookList = (b: any): BookList => {
-						const book = { ...b } as any;
-						if (book.covers && book.covers.length > 0) {
-							const mainCover =
-								book.covers.find((c: any) => c.isMain) ||
-								book.covers[0];
-							book.cover = mainCover.url;
-							if (mainCover.metadata) {
-								book.blurHash = mainCover.metadata.blurHash;
-								book.dominantColor =
-									mainCover.metadata.dominantColor;
-							}
-						}
-						delete book.covers;
-						return book as BookList;
-					};
-
-					const latestUpdated =
-						data.latestUpdated?.data?.map(mapBookList) || [];
-					const recentlyAdded =
-						data.recentlyAdded?.data?.map(mapBookList) || [];
-					const continueReading: BookList[] = [];
-
-					for (let i = 0; i < bookIds.length; i++) {
-						const b = data[`book${i}`];
-						if (b) {
-							continueReading.push(mapBookList(b));
+		return this.http.post<{ data: any }>('graphql', {
+			query,
+			variables: { 
+				filterUpdated, 
+				filterAdded, 
+				hasContinueReading,
+				filterContinue
+			},
+		}).pipe(
+			map((response) => {
+				const data = response.data;
+				const mapBookList = (b: any): BookList => {
+					const book = { ...b } as any;
+					if (book.covers && book.covers.length > 0) {
+						const mainCover =
+							book.covers.find((c: any) => c.isMain) ||
+							book.covers[0];
+						book.cover = mainCover.url;
+						if (mainCover.metadata) {
+							book.blurHash = mainCover.metadata.blurHash;
+							book.dominantColor =
+								mainCover.metadata.dominantColor;
 						}
 					}
+					delete book.covers;
+					return book as BookList;
+				};
 
-					return { latestUpdated, recentlyAdded, continueReading };
-				}),
-				catchError((err) => {
-					console.warn('Online home fetch failed', err);
-					return of({
-						latestUpdated: [],
-						recentlyAdded: [],
-						continueReading: [],
-					});
-				}),
-			);
+				const latestUpdated =
+					data.latestUpdated?.data?.map(mapBookList) || [];
+				const recentlyAdded =
+					data.recentlyAdded?.data?.map(mapBookList) || [];
+				const continueReading = 
+					data.continueReading?.data?.map(mapBookList) || [];
+
+				return {
+					latestUpdated,
+					recentlyAdded,
+					continueReading,
+				};
+			}),
+			catchError((err) => {
+				console.warn('Online home fetch failed', err);
+				return of({
+					latestUpdated: [],
+					recentlyAdded: [],
+					continueReading: [],
+				});
+			}),
+		);
 	}
 
 	getBooksGraphQL(
@@ -379,7 +378,7 @@ export class BookService {
 
 		return from(this.downloadService.getAllBooks()).pipe(
 			map((books) => {
-				let filteredBooks = books;
+				let filteredBooks = books as any[];
 
 				// 1. Filtrar por Conteúdo Sensível
 				// Recarrega as preferências se estiver offline, ignorando estado do token
@@ -398,7 +397,7 @@ export class BookService {
 
 					// Verifica se TODOS os conteúdos sensíveis do livro estão na lista permitida
 					const isAllowed = book.sensitiveContent.every(
-						(sc) =>
+						(sc: any) =>
 							allowedContent.includes(sc.name) ||
 							allowedContent.includes(sc.id),
 					);
@@ -409,7 +408,7 @@ export class BookService {
 				// 1.1 Filtrar por Tags Excluídas Globalmente
 				if (globalExcludedTags.length > 0) {
 					filteredBooks = filteredBooks.filter((book) => {
-						const bookTagIds = (book.tags || []).map((t) => t.id);
+						const bookTagIds = (book.tags || []).map((t: any) => t.id);
 						return !globalExcludedTags.some((id) =>
 							bookTagIds.includes(id),
 						);
@@ -428,8 +427,8 @@ export class BookService {
 				if (opts.tags && opts.tags.length > 0) {
 					filteredBooks = filteredBooks.filter((book) => {
 						const tags = book.tags || [];
-						const bookTagIds = tags.map((t) => t.id);
-						const bookTagNames = tags.map((t) => t.name);
+						const bookTagIds = tags.map((t: any) => t.id);
+						const bookTagNames = tags.map((t: any) => t.name);
 
 						const checkTag = (tag: string) =>
 							bookTagIds.includes(tag) ||
@@ -443,7 +442,7 @@ export class BookService {
 				}
 
 				// Mapear para BookList
-				const data: BookList[] = filteredBooks.map((book) => ({
+				const data: BookList[] = filteredBooks.map((book: any) => ({
 					id: book.id,
 					title: book.title,
 					tags: book.tags || [],
