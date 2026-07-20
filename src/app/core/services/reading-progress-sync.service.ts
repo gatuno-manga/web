@@ -16,7 +16,7 @@ import {
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
-import { LocalStorageService } from './local-storage.service';
+import { openDB, IDBPDatabase } from 'idb';
 import { MqttService } from './mqtt.service';
 import { NetworkStatusService } from './network-status.service';
 import {
@@ -42,6 +42,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private networkSubscription: Subscription | null = null;
 	private readonly serviceName = 'ReadingProgressSync';
 	private readonly baseUrl = 'users/me/reading-progress';
+	private dbPromise?: Promise<IDBPDatabase<any>>;
 
 	private mqttService = inject(MqttService);
 
@@ -70,24 +71,38 @@ export class ReadingProgressSyncService implements OnDestroy {
 		private localProgressService: ReadingProgressService,
 		private networkStatusService: NetworkStatusService,
 		private backgroundSyncService: BackgroundSyncRegistrationService,
-		private localStorageService: LocalStorageService,
 		@Inject(ENVIRONMENT) _env: Environment,
 		@Inject(WINDOW) private window: Window,
 	) {
 		this.isBrowser = typeof this.window.location !== 'undefined';
 
 		if (this.isBrowser) {
+			this.dbPromise = openDB('GatunoSyncDB', 1, {
+				upgrade(db) {
+					db.createObjectStore('keyval');
+				},
+			});
+
 			this.setupNetworkListener();
 			this.setupMqttListeners();
 
-			const savedSync =
-				this.localStorageService.get<string>('last_sync_at');
+			this.initLastSyncAt();
+		}
+	}
+
+	private async initLastSyncAt(): Promise<void> {
+		if (!this.dbPromise) return;
+		try {
+			const db = await this.dbPromise;
+			const savedSync = await db.get('keyval', 'last_sync_at');
 			if (savedSync) {
 				this._syncStatus.update((state) => ({
 					...state,
 					lastSyncAt: new Date(savedSync),
 				}));
 			}
+		} catch (e) {
+			console.error('Failed to load last_sync_at from IDB', e);
 		}
 	}
 
@@ -383,11 +398,12 @@ export class ReadingProgressSyncService implements OnDestroy {
 
 	private updateSyncStatus(partial: Partial<SyncStatus>): void {
 		this._syncStatus.update((state) => {
-			if (partial.lastSyncAt) {
-				this.localStorageService.set(
-					'last_sync_at',
-					partial.lastSyncAt.toISOString(),
-				);
+			if (partial.lastSyncAt && this.dbPromise) {
+				this.dbPromise.then(db => {
+					db.put('keyval', partial.lastSyncAt!.toISOString(), 'last_sync_at').catch(e => {
+						console.error('Failed to save last_sync_at to IDB', e);
+					});
+				});
 			}
 			return {
 				...state,

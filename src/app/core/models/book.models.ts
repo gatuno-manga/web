@@ -12,6 +12,7 @@ export interface BookList {
 	blurHash?: string;
 	dominantColor?: string;
 	metadata?: ImageMetadata;
+	coverMetadata?: ImageMetadata;
 	sensitiveContent?: SensitiveContentResponse[];
 }
 
@@ -55,6 +56,7 @@ export interface BookBasic {
 	blurHash?: string;
 	dominantColor?: string;
 	metadata?: ImageMetadata;
+	coverMetadata?: ImageMetadata;
 	originalLanguageCode?: string;
 	isFavorited?: boolean;
 	isSubscribed?: boolean;
@@ -117,6 +119,7 @@ export interface Book {
 	blurHash?: string;
 	dominantColor?: string;
 	metadata?: ImageMetadata;
+	coverMetadata?: ImageMetadata;
 	originalLanguageCode?: string;
 }
 
