@@ -239,9 +239,9 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 						this.bookService.getBook(bookId).subscribe({
 							next: (book) => {
 								if (book) {
-									this.bookBlurHash.set(book.blurHash);
+									this.bookBlurHash.set(book.blurHash ?? book.coverMetadata?.blurHash);
 									this.bookDominantColor.set(
-										book.dominantColor,
+										book.dominantColor ?? book.coverMetadata?.dominantColor,
 									);
 									this.bookMetadata.set(book.coverMetadata);
 								}
