@@ -13,10 +13,10 @@ import {
 	logConnectionEvent,
 	logWebSocketError,
 } from '@shared/utils/websocket-logger.utils';
+import { IDBPDatabase, openDB } from 'idb';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
-import { openDB, IDBPDatabase } from 'idb';
 import { MqttService } from './mqtt.service';
 import { NetworkStatusService } from './network-status.service';
 import {
@@ -399,8 +399,12 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private updateSyncStatus(partial: Partial<SyncStatus>): void {
 		this._syncStatus.update((state) => {
 			if (partial.lastSyncAt && this.dbPromise) {
-				this.dbPromise.then(db => {
-					db.put('keyval', partial.lastSyncAt!.toISOString(), 'last_sync_at').catch(e => {
+				this.dbPromise.then((db) => {
+					db.put(
+						'keyval',
+						partial.lastSyncAt!.toISOString(),
+						'last_sync_at',
+					).catch((e) => {
 						console.error('Failed to save last_sync_at to IDB', e);
 					});
 				});
