@@ -13,6 +13,7 @@ import {
 	ChapterCursorPage,
 	Chapterlist,
 	Cover,
+	ImageMetadata,
 	PaginatedBookResponse,
 	ScrapingStatus,
 	UpdateBookDto,
@@ -141,7 +142,7 @@ export class BookService {
 		`;
 
 		return this.http
-			.post<{ data: any }>('graphql', {
+			.post<{ data: Record<string, unknown> }>('graphql', {
 				query,
 				variables: {
 					filterUpdated,
@@ -153,11 +154,19 @@ export class BookService {
 			.pipe(
 				map((response) => {
 					const data = response.data;
-					const mapBookList = (b: any): BookList => {
-						const book = { ...b } as any;
+					const mapBookList = (
+						b: Record<string, unknown>,
+					): BookList => {
+						const book = { ...b } as Partial<BookList> & {
+							covers?: {
+								isMain: boolean;
+								url: string;
+								metadata?: ImageMetadata;
+							}[];
+						};
 						if (book.covers && book.covers.length > 0) {
 							const mainCover =
-								book.covers.find((c: any) => c.isMain) ||
+								book.covers.find((c) => c.isMain) ||
 								book.covers[0];
 							book.cover = mainCover.url;
 							if (mainCover.metadata) {
@@ -171,11 +180,23 @@ export class BookService {
 					};
 
 					const latestUpdated =
-						data.latestUpdated?.data?.map(mapBookList) || [];
+						(
+							data['latestUpdated'] as {
+								data?: Record<string, unknown>[];
+							}
+						)?.data?.map(mapBookList) || [];
 					const recentlyAdded =
-						data.recentlyAdded?.data?.map(mapBookList) || [];
+						(
+							data['recentlyAdded'] as {
+								data?: Record<string, unknown>[];
+							}
+						)?.data?.map(mapBookList) || [];
 					const continueReading =
-						data.continueReading?.data?.map(mapBookList) || [];
+						(
+							data['continueReading'] as {
+								data?: Record<string, unknown>[];
+							}
+						)?.data?.map(mapBookList) || [];
 
 					return {
 						latestUpdated,
@@ -325,7 +346,7 @@ export class BookService {
 		`;
 
 		return this.http
-			.post<{ data: Record<string, any> }>('graphql', { query })
+			.post<{ data: Record<string, unknown> }>('graphql', { query })
 			.pipe(
 				map((response) => {
 					const data = response.data;
@@ -336,20 +357,30 @@ export class BookService {
 							let cover = '';
 							let blurHash = '';
 							let dominantColor = '';
+							const covers = (
+								b as {
+									covers?: {
+										isMain: boolean;
+										url: string;
+										metadata?: ImageMetadata;
+									}[];
+								}
+							).covers;
 							const mainCover =
-								b.covers?.find((c: any) => c.isMain) ||
-								b.covers?.[0];
+								covers?.find((c) => c.isMain) || covers?.[0];
 							if (mainCover) {
 								cover = mainCover.url;
 								if (mainCover.metadata) {
-									blurHash = mainCover.metadata.blurHash;
+									blurHash =
+										mainCover.metadata.blurHash || '';
 									dominantColor =
-										mainCover.metadata.dominantColor;
+										mainCover.metadata.dominantColor || '';
 								}
 							}
+							const bObj = b as Record<string, unknown>;
 							books.push({
-								id: b.id,
-								title: b.title,
+								id: bObj['id'] as string,
+								title: bObj['title'] as string,
 								cover: cover,
 								blurHash: blurHash,
 								dominantColor: dominantColor,
@@ -380,7 +411,7 @@ export class BookService {
 
 		return from(this.downloadService.getAllBooks()).pipe(
 			map((books) => {
-				let filteredBooks = books as any[];
+				let filteredBooks = books as unknown as BookBasic[];
 
 				// 1. Filtrar por Conteúdo Sensível
 				// Recarrega as preferências se estiver offline, ignorando estado do token
@@ -399,7 +430,7 @@ export class BookService {
 
 					// Verifica se TODOS os conteúdos sensíveis do livro estão na lista permitida
 					const isAllowed = book.sensitiveContent.every(
-						(sc: any) =>
+						(sc) =>
 							allowedContent.includes(sc.name) ||
 							allowedContent.includes(sc.id),
 					);
@@ -410,9 +441,7 @@ export class BookService {
 				// 1.1 Filtrar por Tags Excluídas Globalmente
 				if (globalExcludedTags.length > 0) {
 					filteredBooks = filteredBooks.filter((book) => {
-						const bookTagIds = (book.tags || []).map(
-							(t: any) => t.id,
-						);
+						const bookTagIds = (book.tags || []).map((t) => t.id);
 						return !globalExcludedTags.some((id) =>
 							bookTagIds.includes(id),
 						);
@@ -431,8 +460,8 @@ export class BookService {
 				if (opts.tags && opts.tags.length > 0) {
 					filteredBooks = filteredBooks.filter((book) => {
 						const tags = book.tags || [];
-						const bookTagIds = tags.map((t: any) => t.id);
-						const bookTagNames = tags.map((t: any) => t.name);
+						const bookTagIds = tags.map((t) => t.id);
+						const bookTagNames = tags.map((t) => t.name);
 
 						const checkTag = (tag: string) =>
 							bookTagIds.includes(tag) ||
@@ -446,14 +475,32 @@ export class BookService {
 				}
 
 				// Mapear para BookList
-				const data: BookList[] = filteredBooks.map((book: any) => ({
+				const data: BookList[] = filteredBooks.map((book) => ({
 					id: book.id,
 					title: book.title,
 					tags: book.tags || [],
 					cover:
-						book.cover instanceof Blob
-							? URL.createObjectURL(book.cover)
-							: '',
+						(book as unknown as Record<string, unknown>)[
+							'cover'
+						] instanceof Blob
+							? URL.createObjectURL(
+									(
+										book as unknown as Record<
+											string,
+											unknown
+										>
+									)['cover'] as Blob,
+								)
+							: typeof (
+										book as unknown as Record<
+											string,
+											unknown
+										>
+									)['cover'] === 'string'
+								? ((book as unknown as Record<string, unknown>)[
+										'cover'
+									] as string)
+								: '',
 					description: book.description,
 					scrapingStatus: ScrapingStatus.READY, // Livros offline estão sempre "prontos"
 				}));

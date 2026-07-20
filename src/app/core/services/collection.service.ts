@@ -46,8 +46,9 @@ export class CollectionService {
 		return this.http
 			.post<Collection | { data: Collection }>('collections', data)
 			.pipe(
-				map((response: any) => {
-					const resData = response?.data ? response.data : response;
+				map((response: Collection | { data: Collection }) => {
+					const resData =
+						'data' in response ? response.data : response;
 					return resData?.id
 						? resData
 						: ({
@@ -126,8 +127,8 @@ export class CollectionService {
 				data,
 			)
 			.pipe(
-				map((response: any) => {
-					return response?.data ? response.data : response;
+				map((response: Collection | { data: Collection }) => {
+					return 'data' in response ? response.data : response;
 				}),
 				tap((updatedCollection: Collection) => {
 					this.myCollectionsSignal.update((current) =>

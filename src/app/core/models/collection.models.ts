@@ -21,7 +21,9 @@ export interface Collection {
 export interface CreateCollectionDto {
 	id?: string;
 	title: string;
-	description?: string;
+	description?: string | null;
+	isPublic?: boolean;
+	coverUrl?: string | null;
 }
 
 export interface ShareCollectionDto {

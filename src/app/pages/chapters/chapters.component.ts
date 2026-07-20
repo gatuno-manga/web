@@ -54,7 +54,6 @@ import { ContextMenuItem } from '@models/context-menu.models';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
-import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { ReaderSettingsNotificationComponent } from '@ui/molecules/notification/custom-components';
 import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
@@ -99,7 +98,6 @@ type ChapterLoadFailureDiagnostic = {
 		DecimalPipe,
 		ChapterIndexPipe,
 		ButtonComponent,
-		IconButtonComponent,
 		AsideComponent,
 		ImageReaderComponent,
 		TextReaderComponent,
@@ -239,9 +237,13 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 						this.bookService.getBook(bookId).subscribe({
 							next: (book) => {
 								if (book) {
-									this.bookBlurHash.set(book.blurHash ?? book.coverMetadata?.blurHash);
+									this.bookBlurHash.set(
+										book.blurHash ??
+											book.coverMetadata?.blurHash,
+									);
 									this.bookDominantColor.set(
-										book.dominantColor ?? book.coverMetadata?.dominantColor,
+										book.dominantColor ??
+											book.coverMetadata?.dominantColor,
 									);
 									this.bookMetadata.set(book.coverMetadata);
 								}

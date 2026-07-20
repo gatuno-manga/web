@@ -42,7 +42,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private networkSubscription: Subscription | null = null;
 	private readonly serviceName = 'ReadingProgressSync';
 	private readonly baseUrl = 'users/me/reading-progress';
-	private dbPromise?: Promise<IDBPDatabase<any>>;
+	private dbPromise?: Promise<IDBPDatabase<unknown>>;
 
 	private mqttService = inject(MqttService);
 
@@ -283,12 +283,15 @@ export class ReadingProgressSyncService implements OnDestroy {
 		progress: SaveProgressDto[],
 	): Promise<SyncResponse> {
 		const sanitizedProgress = progress.map((p) => {
-			const { timestamp, ...rest } = p as any;
+			const { timestamp, ...rest } = p as unknown as Record<
+				string,
+				unknown
+			>;
 			return rest;
 		});
 
 		const dto: SyncReadingProgressDto = {
-			progress: sanitizedProgress as SaveProgressDto[],
+			progress: sanitizedProgress as unknown as SaveProgressDto[],
 			lastSyncAt: this._syncStatus().lastSyncAt || undefined,
 		};
 
@@ -402,7 +405,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 				this.dbPromise.then((db) => {
 					db.put(
 						'keyval',
-						partial.lastSyncAt!.toISOString(),
+						partial.lastSyncAt?.toISOString(),
 						'last_sync_at',
 					).catch((e) => {
 						console.error('Failed to save last_sync_at to IDB', e);

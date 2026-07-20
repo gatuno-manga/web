@@ -313,7 +313,7 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 		if (this.isBrowser) {
 			window.removeEventListener('scroll', this.onScroll, {
 				capture: true,
-			} as any);
+			} as EventListenerOptions);
 		}
 		if (this.scrollSaveTimer !== null) {
 			clearTimeout(this.scrollSaveTimer);

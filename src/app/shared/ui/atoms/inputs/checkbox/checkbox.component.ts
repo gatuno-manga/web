@@ -19,8 +19,8 @@ export class CheckboxComponent implements ControlValueAccessor {
 	disabled = model<boolean>(false);
 	indeterminate = input<boolean>(false);
 
-	onChange: any = () => {};
-	onTouched: any = () => {};
+	onChange: (value: boolean) => void = () => {};
+	onTouched: () => void = () => {};
 
 	onCheckboxChange(event: Event): void {
 		const input = event.target as HTMLInputElement;
@@ -30,15 +30,15 @@ export class CheckboxComponent implements ControlValueAccessor {
 		this.onTouched();
 	}
 
-	writeValue(value: any): void {
+	writeValue(value: boolean | null | undefined): void {
 		this.value.set(!!value);
 	}
 
-	registerOnChange(fn: any): void {
+	registerOnChange(fn: (value: boolean) => void): void {
 		this.onChange = fn;
 	}
 
-	registerOnTouched(fn: any): void {
+	registerOnTouched(fn: () => void): void {
 		this.onTouched = fn;
 	}
 
