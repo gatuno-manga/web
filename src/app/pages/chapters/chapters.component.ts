@@ -54,6 +54,7 @@ import { ContextMenuItem } from '@models/context-menu.models';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { ReaderSettingsNotificationComponent } from '@ui/molecules/notification/custom-components';
 import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
@@ -98,6 +99,7 @@ type ChapterLoadFailureDiagnostic = {
 		DecimalPipe,
 		ChapterIndexPipe,
 		ButtonComponent,
+		IconButtonComponent,
 		AsideComponent,
 		ImageReaderComponent,
 		TextReaderComponent,
