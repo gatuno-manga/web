@@ -179,6 +179,8 @@
 	background-color: var(--secondary-color);
 	border: 1px solid var(--border-color);
 	border-radius: 12px;
+	content-visibility: auto;
+	contain-intrinsic-size: auto 250px;
 	overflow: hidden;
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 	user-select: none;

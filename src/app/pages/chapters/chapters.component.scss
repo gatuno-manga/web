@@ -238,8 +238,10 @@
 		.reading-progress-fill {
 			position: absolute;
 			height: 100%;
+			width: 100%;
 			background: var(--primary-color);
-			transition: width 0.1s ease-out;
+			transition: transform 0.1s ease-out;
+			transform-origin: left;
 			box-shadow: 0 0 10px
 				rgb(from var(--app-background-color) r g b / 0.5);
 			border-radius: inherit;

@@ -98,6 +98,12 @@
 	overflow: hidden;
 	transition: height 0.3s ease;
 	min-height: 50vh;
+
+	@supports (-moz-appearance: none) {
+		@media (pointer: coarse) {
+			transition: none;
+		}
+	}
 }
 .container {
 	width: 100%;
@@ -287,6 +293,8 @@
 		padding: 0.6rem 1rem;
 		border-radius: 12px;
 		width: 100%;
+		content-visibility: auto;
+		contain-intrinsic-size: auto 60px;
 		transition:
 			background-color 0.3s,
 			border-color 0.3s,

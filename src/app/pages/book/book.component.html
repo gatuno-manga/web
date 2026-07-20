@@ -8,24 +8,18 @@
 		</div>
 		<div
 			class="background-container"
-			[style.background-color]="b.dominantColor"
+			[style.background-color]="b.dominantColor || (b.metadata || b.coverMetadata)?.dominantColor"
 		>
-			@if (b.blurHash) {
-				<div class="book-background blur-placeholder">
-					<app-blurhash
-						[hash]="b.blurHash"
-						[width]="b.metadata?.width || 32"
-						[height]="b.metadata?.height || 32"
-					/>
-				</div>
-			}
-			@if (b.cover && !coverImageError) {
-				<div
-					[style.background-image]="'url(' + b.cover + ')'"
-					[style.background-color]="b.dominantColor"
-					class="book-background detailed-background"
-					[class.loaded]="isImageLoaded()"
+			@if (b.blurHash || (b.metadata || b.coverMetadata)?.blurHash) {
+				<div 
+					class="book-background blur-placeholder"
+					[style.background-color]="b.dominantColor || (b.metadata || b.coverMetadata)?.dominantColor"
 				>
+					<app-blurhash
+						[hash]="b.blurHash || (b.metadata || b.coverMetadata)?.blurHash || ''"
+						[width]="(b.metadata || b.coverMetadata)?.width || 32"
+						[height]="(b.metadata || b.coverMetadata)?.height || 32"
+					/>
 					<div class="gradient"></div>
 				</div>
 			} @else {
@@ -47,15 +41,15 @@
 				<div class="book-header">
 					<div class="book-cover">
 						@if (b.cover && !coverImageError) {
-							@if (b.blurHash) {
+							@if (b.blurHash || (b.metadata || b.coverMetadata)?.blurHash) {
 								<div
 									class="blur-placeholder"
 									[class.fade-out]="isImageLoaded()"
 								>
 									<app-blurhash
-										[hash]="b.blurHash"
-										[width]="b.metadata?.width || 32"
-										[height]="b.metadata?.height || 32"
+										[hash]="b.blurHash || (b.metadata || b.coverMetadata)?.blurHash || ''"
+										[width]="(b.metadata || b.coverMetadata)?.width || 32"
+										[height]="(b.metadata || b.coverMetadata)?.height || 32"
 									/>
 								</div>
 							}

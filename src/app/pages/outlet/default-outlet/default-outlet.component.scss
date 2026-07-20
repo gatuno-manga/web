@@ -58,6 +58,12 @@ $aside: 300px;
 		flex-shrink: 0;
 		overflow: hidden;
 		transition: width 0.3s ease-in-out;
+
+		@supports (-moz-appearance: none) {
+			@media (pointer: coarse) {
+				transition: none;
+			}
+		}
 	}
 
 	.sidebar-content {

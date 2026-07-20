@@ -46,7 +46,7 @@
 		>
 			<div
 				class="reading-progress-fill"
-				[style.width.%]="readingProgress()"
+				[style.transform]="'scaleX(' + (readingProgress() / 100) + ')'"
 			></div>
 			@if (
 				currentChapter.contentType === 'image' ||
