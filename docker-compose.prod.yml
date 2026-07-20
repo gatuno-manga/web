@@ -8,4 +8,4 @@ services:
         - API_URL_SERVER=http://api:3000
     ports:
       - "${APP_PORT:-4000}:4000"
-    restart: always
+    restart: on-failure:3

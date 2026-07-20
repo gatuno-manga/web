@@ -8,6 +8,11 @@ services:
       - API_URL=${API_URL:-http://localhost:3000}
     networks:
       - gatuno-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 4G
 
 networks:
   gatuno-net:

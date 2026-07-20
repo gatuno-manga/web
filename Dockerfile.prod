@@ -1,6 +1,7 @@
+# syntax=docker/dockerfile:1.4
 ARG NODE_VERSION=24.11.1
 
-FROM node:${NODE_VERSION}-alpine AS builder
+FROM node:${NODE_VERSION}-bookworm-slim AS builder
 
 WORKDIR /usr/src/app
 
@@ -8,7 +9,8 @@ ENV NG_CLI_ANALYTICS=false
 
 COPY package*.json ./
 
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 COPY . .
 
@@ -25,7 +27,8 @@ RUN npm run build \
 		exit 1; \
 	fi
 
-FROM node:${NODE_VERSION}-alpine AS runtime
+# Using node slim instead of distroless here because distroless doesn't explicitly support Node 24 tags yet.
+FROM node:${NODE_VERSION}-bookworm-slim AS runtime
 
 WORKDIR /usr/src/app
 
