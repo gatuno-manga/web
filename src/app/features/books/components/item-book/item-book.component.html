@@ -4,11 +4,11 @@
 	[ngStyle]="cardCoverStyle()"
 	(contextmenu)="onContextMenu($event)"
 	>
-	@if (book().blurHash || (book().metadata || book().coverMetadata)?.blurHash) {
+	@if (book().blurHash || book().coverMetadata?.blurHash) {
 		<div
 			class="card-blur-background"
 		>
-			<app-blurhash [hash]="book().blurHash || (book().metadata || book().coverMetadata)?.blurHash || ''" [width]="(book().metadata || book().coverMetadata)?.width || 32" [height]="(book().metadata || book().coverMetadata)?.height || 32" />
+			<app-blurhash [hash]="book().blurHash || book().coverMetadata?.blurHash || ''" [width]="book().coverMetadata?.width || 32" [height]="book().coverMetadata?.height || 32" />
 		</div>
 	}
 	
@@ -69,9 +69,9 @@
 		>
 			<ng-container *ngTemplateOutlet="badgesAndRemove"></ng-container>
 
-			@if (book().blurHash || (book().metadata || book().coverMetadata)?.blurHash) {
+			@if (book().blurHash || book().coverMetadata?.blurHash) {
 				<div class="blur-placeholder" [class.fade-out]="isImageLoaded()" aria-hidden="true">
-					<app-blurhash [hash]="book().blurHash || (book().metadata || book().coverMetadata)?.blurHash || ''" [width]="(book().metadata || book().coverMetadata)?.width || 32" [height]="(book().metadata || book().coverMetadata)?.height || 32" />
+					<app-blurhash [hash]="book().blurHash || book().coverMetadata?.blurHash || ''" [width]="book().coverMetadata?.width || 32" [height]="book().coverMetadata?.height || 32" />
 				</div>
 			}
 

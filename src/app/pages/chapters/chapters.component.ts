@@ -241,7 +241,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 									this.bookDominantColor.set(
 										book.dominantColor,
 									);
-									this.bookMetadata.set(book.metadata);
+									this.bookMetadata.set(book.coverMetadata);
 								}
 							},
 						});

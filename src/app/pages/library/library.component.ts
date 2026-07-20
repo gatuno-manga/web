@@ -142,7 +142,7 @@ export class LibraryComponent implements OnInit {
 								.map((b) => [
 									{
 										url: b.cover,
-										metadata: b.metadata,
+										metadata: b.coverMetadata,
 										isMain: true,
 									},
 								])
