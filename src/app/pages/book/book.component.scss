@@ -275,9 +275,9 @@ $page-size: 1200px;
 
 		.book-cover {
 			position: relative;
-			flex: 0 0 200px;
+			flex: 0 0 auto;
 			width: 200px;
-			aspect-ratio: 200 / 350;
+			aspect-ratio: var(--book-aspect-ratio, 2 / 3);
 			overflow: hidden;
 			border-radius: 12px;
 			border: 1px solid var(--border-color);
@@ -459,6 +459,16 @@ $page-size: 1200px;
 						width: max-content;
 						margin-left: auto;
 						margin-right: auto;
+
+						&.single-action {
+							flex-direction: row;
+							width: 100%;
+
+							.reading-btn {
+								flex: 1 1 auto;
+								width: auto;
+							}
+						}
 					}
 
 					.small-actions-group {

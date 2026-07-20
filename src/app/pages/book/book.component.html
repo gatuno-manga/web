@@ -39,7 +39,7 @@
 			<div class="glass-panel">
 				<div class="glass-panel-bg"></div>
 				<div class="book-header">
-					<div class="book-cover">
+				<div class="book-cover" [style.--book-aspect-ratio]="(b.coverMetadata?.width && b.coverMetadata?.height) ? (b.coverMetadata!.width + ' / ' + b.coverMetadata!.height) : '2 / 3'">
 						@if (b.cover && !coverImageError) {
 							@if (b.blurHash || b.coverMetadata?.blurHash) {
 								<div
@@ -100,7 +100,7 @@
 							<div class="release">
 								Lançamento {{ b.publication }}
 							</div>
-							<div class="actions">
+							<div class="actions" [class.single-action]="!isLoggedIn()">
 								<app-button
 									class="reading-btn"
 									(click)="continueReading()"
@@ -403,6 +403,7 @@
 				<div
 					class="book-cover placeholder"
 					[style.background-color]="book()?.dominantColor"
+					[style.--book-aspect-ratio]="'2 / 3'"
 				>
 					@if (book()?.blurHash) {
 						<app-blurhash
