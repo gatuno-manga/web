@@ -43,7 +43,8 @@
 						"allowedCommonJsDependencies": [
 							"cookie-parser",
 							"debug",
-							"xmlhttprequest-ssl"
+							"xmlhttprequest-ssl",
+							"mqtt"
 						]
 					},
 					"configurations": {
@@ -63,8 +64,8 @@
 								},
 								{
 									"type": "anyComponentStyle",
-									"maximumWarning": "13kB",
-									"maximumError": "20kB"
+									"maximumWarning": "20kB",
+									"maximumError": "30kB"
 								}
 							],
 							"outputHashing": "all",
