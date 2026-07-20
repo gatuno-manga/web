@@ -49,6 +49,12 @@ textarea {
 	overflow-y: auto;
 	transition: height 0.2s ease;
 
+	@supports (-moz-appearance: none) {
+		@media (pointer: coarse) {
+			transition: none;
+		}
+	}
+
 	&::-webkit-scrollbar {
 		width: 4px;
 	}

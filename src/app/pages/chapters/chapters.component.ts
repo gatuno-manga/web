@@ -237,11 +237,15 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 						this.bookService.getBook(bookId).subscribe({
 							next: (book) => {
 								if (book) {
-									this.bookBlurHash.set(book.blurHash);
-									this.bookDominantColor.set(
-										book.dominantColor,
+									this.bookBlurHash.set(
+										book.blurHash ??
+											book.coverMetadata?.blurHash,
 									);
-									this.bookMetadata.set(book.metadata);
+									this.bookDominantColor.set(
+										book.dominantColor ??
+											book.coverMetadata?.dominantColor,
+									);
+									this.bookMetadata.set(book.coverMetadata);
 								}
 							},
 						});
@@ -720,7 +724,6 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		};
 
 		const onMove = (moveEvent: MouseEvent | TouchEvent) => {
-			moveEvent.preventDefault();
 			const clientX =
 				'touches' in moveEvent
 					? moveEvent.touches[0].clientX
@@ -736,10 +739,10 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			document.removeEventListener('touchend', onUp);
 		};
 
-		document.addEventListener('mousemove', onMove);
-		document.addEventListener('mouseup', onUp);
-		document.addEventListener('touchmove', onMove, { passive: false });
-		document.addEventListener('touchend', onUp);
+		document.addEventListener('mousemove', onMove, { passive: true });
+		document.addEventListener('mouseup', onUp, { passive: true });
+		document.addEventListener('touchmove', onMove, { passive: true });
+		document.addEventListener('touchend', onUp, { passive: true });
 
 		const clientX =
 			'touches' in event

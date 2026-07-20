@@ -8,7 +8,7 @@
 	text-align: center;
 	text-transform: capitalize;
 
-	a {
+	.index {
 		background-color: var(--primary-color);
 		height: 100%;
 		display: flex;
@@ -16,44 +16,14 @@
 		justify-content: center;
 		border-radius: 10px;
 		cursor: pointer;
-	}
-	.index {
 		width: 100%;
 		font-size: 2.2rem;
 	}
-	.arrow {
-		flex: none;
-		width: 3rem;
-		height: 3rem;
-
-		border-radius: 15px;
-	}
-
+	.arrow,
 	.settings-btn {
 		flex: none;
 		width: 3rem;
 		height: 3rem;
-		background-color: var(--primary-color);
-		border: none;
-		border-radius: 15px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.2s;
-
-		&:hover {
-			opacity: 0.9;
-			transform: scale(1.05);
-		}
-
-		&:active {
-			transform: scale(0.95);
-		}
-
-		app-icons {
-			color: var(--app-text-color);
-		}
 	}
 }
 
@@ -238,8 +208,10 @@
 		.reading-progress-fill {
 			position: absolute;
 			height: 100%;
+			width: 100%;
 			background: var(--primary-color);
-			transition: width 0.1s ease-out;
+			transition: transform 0.1s ease-out;
+			transform-origin: left;
 			box-shadow: 0 0 10px
 				rgb(from var(--app-background-color) r g b / 0.5);
 			border-radius: inherit;

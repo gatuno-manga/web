@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { BookList } from '@core/models/book.models';
+import { BookList, ImageMetadata } from '@core/models/book.models';
 import { ContextMenuItem } from '@core/models/context-menu.models';
 import { BookService } from '@core/services/book.service';
 import { CollectionService } from '@core/services/collection.service';
@@ -23,10 +23,49 @@ export interface LibraryCollection {
 	visibility?: string;
 	isSpecial?: boolean;
 	books: string[] | BookList[];
-	bookCovers?: any[];
+	bookCovers?: {
+		url: string;
+		isMain?: boolean;
+		metadata?: ImageMetadata;
+	}[][];
 	coverUrl?: string | null;
 	bookCount: number;
 	isPublic?: boolean;
+}
+
+interface GraphQlLibraryResponse {
+	data: {
+		myFavorites?: {
+			data: {
+				book: Partial<BookList> & {
+					cover?: string;
+					covers?: {
+						url: string;
+						isMain?: boolean;
+						metadata?: {
+							blurHash?: string;
+							dominantColor?: string;
+						};
+					}[];
+				};
+			}[];
+		};
+		myCollections?: {
+			data: {
+				id: string;
+				title: string;
+				description?: string;
+				visibility?: string;
+				coverUrl?: string;
+				books?: string[] | BookList[];
+				bookCovers?: {
+					url: string;
+					isMain?: boolean;
+					metadata?: ImageMetadata;
+				}[][];
+			}[];
+		};
+	};
 }
 
 const LIBRARY_QUERY = `
@@ -105,7 +144,7 @@ export class LibraryComponent implements OnInit {
 		this.error.set(null);
 
 		this.http
-			.post<any>('graphql', { query: LIBRARY_QUERY })
+			.post<GraphQlLibraryResponse>('graphql', { query: LIBRARY_QUERY })
 			.pipe(finalize(() => this.isLoading.set(false)))
 			.subscribe({
 				next: (res) => {
@@ -115,11 +154,12 @@ export class LibraryComponent implements OnInit {
 					// 1. Map Favorites
 					if (data?.myFavorites?.data) {
 						const favoriteBooks: BookList[] =
-							data.myFavorites.data.map((fav: any) => {
+							data.myFavorites.data.map((fav) => {
 								const b = fav.book;
+								const covers = b.covers;
 								const mainCover =
-									b.covers?.find((c: any) => c.isMain) ||
-									b.covers?.[0];
+									covers?.find((c) => c.isMain) ||
+									covers?.[0];
 								return {
 									...b,
 									cover: mainCover?.url || b.cover,
@@ -142,7 +182,7 @@ export class LibraryComponent implements OnInit {
 								.map((b) => [
 									{
 										url: b.cover,
-										metadata: b.metadata,
+										metadata: b.coverMetadata,
 										isMain: true,
 									},
 								])
@@ -153,7 +193,7 @@ export class LibraryComponent implements OnInit {
 					// 2. Map Collections
 					if (data?.myCollections?.data) {
 						const collections = data.myCollections.data.map(
-							(c: any) => ({
+							(c) => ({
 								id: c.id,
 								title: c.title,
 								description: c.description,
@@ -216,11 +256,17 @@ export class LibraryComponent implements OnInit {
 		this.selectedBooks.set([]);
 	}
 
-	getCovers(bookCovers: any[][]) {
+	getCovers(
+		bookCovers: {
+			url: string;
+			isMain?: boolean;
+			metadata?: ImageMetadata;
+		}[][],
+	) {
 		if (!bookCovers || bookCovers.length === 0) return [];
 		return bookCovers
 			.filter((book) => book && book.length > 0)
-			.map((book) => book.find((c: any) => c.isMain) || book[0])
+			.map((book) => book.find((c) => c.isMain) || book[0])
 			.slice(0, 4);
 	}
 
@@ -306,16 +352,22 @@ export class LibraryComponent implements OnInit {
 							return;
 						}
 
-						const payload: any = {
+						const payload: {
+							title: string;
+							isPublic?: boolean;
+							description?: string | null;
+							coverUrl?: string | null;
+						} = {
 							title: newData.title,
 							isPublic: newData.isPublic,
 						};
 
-						if (newData.description !== collection.description) {
-							payload.description =
-								newData.description.trim() === ''
-									? null
-									: newData.description;
+						if (newData.description !== undefined) {
+							payload.description = newData.description;
+						}
+
+						if (newData.coverUrl !== undefined) {
+							payload.coverUrl = newData.coverUrl;
 						}
 
 						if (

@@ -19,8 +19,8 @@ export class SwitchComponent implements ControlValueAccessor {
 	value = model<boolean>(false);
 	disabled = model<boolean>(false);
 
-	onChange: any = () => {};
-	onTouched: any = () => {};
+	onChange: (value: boolean) => void = () => {};
+	onTouched: () => void = () => {};
 
 	onSwitchChange(event: Event): void {
 		const input = event.target as HTMLInputElement;
@@ -30,15 +30,15 @@ export class SwitchComponent implements ControlValueAccessor {
 		this.onTouched();
 	}
 
-	writeValue(value: any): void {
+	writeValue(value: boolean | null | undefined): void {
 		this.value.set(!!value);
 	}
 
-	registerOnChange(fn: any): void {
+	registerOnChange(fn: (value: boolean) => void): void {
 		this.onChange = fn;
 	}
 
-	registerOnTouched(fn: any): void {
+	registerOnTouched(fn: () => void): void {
 		this.onTouched = fn;
 	}
 

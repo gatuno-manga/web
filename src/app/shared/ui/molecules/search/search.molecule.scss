@@ -37,6 +37,12 @@
 		border-radius: 0.75rem;
 		transition: width 0.3s ease, padding 0.3s ease, opacity 0.25s ease;
 		outline: none;
+
+		@supports (-moz-appearance: none) {
+			@media (pointer: coarse) {
+				transition: opacity 0.25s ease;
+			}
+		}
 		font-family: inherit;
 		font-size: 0.9rem;
 		opacity: 0;

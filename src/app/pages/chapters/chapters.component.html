@@ -8,9 +8,9 @@
 		</div>
 		<div class="controls">
 			@if (currentChapter.previous) {
-				<a class="arrow" (click)="previousPage()" aria-label="Capítulo anterior">
-					<app-icons name="arrow-left" size="42" />
-				</a>
+				<app-button class="arrow" radio="square" rounded="medium" (click)="previousPage()" aria-label="Capítulo anterior">
+					<app-icons name="arrow-left" size="32" />
+				</app-button>
 			}
 			<a class="index" (click)="backPage()" aria-label="Ir para a página do livro">
 				{{ currentChapter.index | chapterIndex }}/{{
@@ -18,13 +18,13 @@
 				}}
 			</a>
 			@if (currentChapter.next) {
-				<a class="arrow" (click)="nextPage()" aria-label="Próximo capítulo">
-					<app-icons name="arrow-right" size="42" />
-				</a>
+				<app-button class="arrow" radio="square" rounded="medium" (click)="nextPage()" aria-label="Próximo capítulo">
+					<app-icons name="arrow-right" size="32" />
+				</app-button>
 			}
-			<button type="button" class="settings-btn" (click)="openSettings()" aria-label="Configurações">
-				<app-icons name="settings" size="42" />
-			</button>
+			<app-button class="settings-btn" radio="square" rounded="medium" (click)="openSettings()" aria-label="Configurações">
+				<app-icons name="settings" size="24" />
+			</app-button>
 		</div>
 	</div>
 
@@ -46,7 +46,7 @@
 		>
 			<div
 				class="reading-progress-fill"
-				[style.width.%]="readingProgress()"
+				[style.transform]="'scaleX(' + (readingProgress() / 100) + ')'"
 			></div>
 			@if (
 				currentChapter.contentType === 'image' ||

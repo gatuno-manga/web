@@ -8,24 +8,18 @@
 		</div>
 		<div
 			class="background-container"
-			[style.background-color]="b.dominantColor"
+			[style.background-color]="b.dominantColor || b.coverMetadata?.dominantColor"
 		>
-			@if (b.blurHash) {
-				<div class="book-background blur-placeholder">
-					<app-blurhash
-						[hash]="b.blurHash"
-						[width]="b.metadata?.width || 32"
-						[height]="b.metadata?.height || 32"
-					/>
-				</div>
-			}
-			@if (b.cover && !coverImageError) {
-				<div
-					[style.background-image]="'url(' + b.cover + ')'"
-					[style.background-color]="b.dominantColor"
-					class="book-background detailed-background"
-					[class.loaded]="isImageLoaded()"
+			@if (b.blurHash || b.coverMetadata?.blurHash) {
+				<div 
+					class="book-background blur-placeholder"
+					[style.background-color]="b.dominantColor || b.coverMetadata?.dominantColor"
 				>
+					<app-blurhash
+						[hash]="b.blurHash || b.coverMetadata?.blurHash || ''"
+						[width]="b.coverMetadata?.width || 32"
+						[height]="b.coverMetadata?.height || 32"
+					/>
 					<div class="gradient"></div>
 				</div>
 			} @else {
@@ -45,17 +39,17 @@
 			<div class="glass-panel">
 				<div class="glass-panel-bg"></div>
 				<div class="book-header">
-					<div class="book-cover">
+				<div class="book-cover" [style.--book-aspect-ratio]="(b.coverMetadata?.width && b.coverMetadata?.height) ? (b.coverMetadata!.width + ' / ' + b.coverMetadata!.height) : '2 / 3'">
 						@if (b.cover && !coverImageError) {
-							@if (b.blurHash) {
+							@if (b.blurHash || b.coverMetadata?.blurHash) {
 								<div
 									class="blur-placeholder"
 									[class.fade-out]="isImageLoaded()"
 								>
 									<app-blurhash
-										[hash]="b.blurHash"
-										[width]="b.metadata?.width || 32"
-										[height]="b.metadata?.height || 32"
+										[hash]="b.blurHash || b.coverMetadata?.blurHash || ''"
+										[width]="b.coverMetadata?.width || 32"
+										[height]="b.coverMetadata?.height || 32"
 									/>
 								</div>
 							}
@@ -106,7 +100,7 @@
 							<div class="release">
 								Lançamento {{ b.publication }}
 							</div>
-							<div class="actions">
+							<div class="actions" [class.single-action]="!isLoggedIn()">
 								<app-button
 									class="reading-btn"
 									(click)="continueReading()"
@@ -409,6 +403,7 @@
 				<div
 					class="book-cover placeholder"
 					[style.background-color]="book()?.dominantColor"
+					[style.--book-aspect-ratio]="'2 / 3'"
 				>
 					@if (book()?.blurHash) {
 						<app-blurhash

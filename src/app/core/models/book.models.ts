@@ -11,7 +11,8 @@ export interface BookList {
 	totalChapters?: number;
 	blurHash?: string;
 	dominantColor?: string;
-	metadata?: ImageMetadata;
+
+	coverMetadata?: ImageMetadata;
 	sensitiveContent?: SensitiveContentResponse[];
 }
 
@@ -54,7 +55,8 @@ export interface BookBasic {
 	type?: TypeBook;
 	blurHash?: string;
 	dominantColor?: string;
-	metadata?: ImageMetadata;
+
+	coverMetadata?: ImageMetadata;
 	originalLanguageCode?: string;
 	isFavorited?: boolean;
 	isSubscribed?: boolean;
@@ -116,7 +118,8 @@ export interface Book {
 	type?: TypeBook;
 	blurHash?: string;
 	dominantColor?: string;
-	metadata?: ImageMetadata;
+
+	coverMetadata?: ImageMetadata;
 	originalLanguageCode?: string;
 }
 

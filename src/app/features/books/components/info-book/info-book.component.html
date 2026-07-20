@@ -208,9 +208,9 @@
 				@if (isInitialChaptersLoading()) {
 					@for (i of [0,1,2,3,4,5,6,7]; track $index) {
 						<div class="chapter-skeleton" [style.background-color]="bookBasic()?.dominantColor">
-							@if (bookBasic()?.blurHash) {
+							@if (bookBasic()?.blurHash || bookBasic()?.coverMetadata?.blurHash) {
 								<div class="skeleton-blur">
-									<app-blurhash [hash]="bookBasic()?.blurHash" [width]="bookBasic()?.metadata?.width || 32" [height]="bookBasic()?.metadata?.height || 32" />
+									<app-blurhash [hash]="bookBasic()?.blurHash || bookBasic()?.coverMetadata?.blurHash || ''" [width]="bookBasic()?.coverMetadata?.width || 32" [height]="bookBasic()?.coverMetadata?.height || 32" />
 								</div>
 							}
 							<div class="chapter-skeleton-left">

@@ -34,12 +34,12 @@ describe('ProgressNotificationComponent', () => {
 		);
 	});
 
-	it('should update progress bar width', () => {
+	it('should update progress bar transform', () => {
 		fixture.componentRef.setInput('progress', 75);
 		fixture.detectChanges();
 		const progressFill =
 			fixture.nativeElement.querySelector('.progress-fill');
-		expect(progressFill?.style.width).toBe('75%');
+		expect(progressFill?.style.transform).toBe('scaleX(0.75)');
 	});
 
 	it('should display status message', () => {

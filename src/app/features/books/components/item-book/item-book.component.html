@@ -4,11 +4,11 @@
 	[ngStyle]="cardCoverStyle()"
 	(contextmenu)="onContextMenu($event)"
 	>
-	@if (book().blurHash) {
+	@if (book().blurHash || book().coverMetadata?.blurHash) {
 		<div
 			class="card-blur-background"
 		>
-			<app-blurhash [hash]="book().blurHash" [width]="book().metadata?.width || 32" [height]="book().metadata?.height || 32" />
+			<app-blurhash [hash]="book().blurHash || book().coverMetadata?.blurHash || ''" [width]="book().coverMetadata?.width || 32" [height]="book().coverMetadata?.height || 32" />
 		</div>
 	}
 	
@@ -69,12 +69,9 @@
 		>
 			<ng-container *ngTemplateOutlet="badgesAndRemove"></ng-container>
 
-			@if (book().blurHash) {
-				<div
-					class="blur-placeholder"
-					[class.fade-out]="isImageLoaded()"
-				>
-					<app-blurhash [hash]="book().blurHash" [width]="book().metadata?.width || 32" [height]="book().metadata?.height || 32" />
+			@if (book().blurHash || book().coverMetadata?.blurHash) {
+				<div class="blur-placeholder" [class.fade-out]="isImageLoaded()" aria-hidden="true">
+					<app-blurhash [hash]="book().blurHash || book().coverMetadata?.blurHash || ''" [width]="book().coverMetadata?.width || 32" [height]="book().coverMetadata?.height || 32" />
 				</div>
 			}
 
@@ -101,7 +98,7 @@
 	} @else {
 		<div class="cover-placeholder">
 			<ng-container *ngTemplateOutlet="badgesAndRemove"></ng-container>
-			<img src="assets/icons/image-placeholder-14824e.svg" alt="Placeholder" class="placeholder-icon" />
+			<app-icons name="image" [size]="type() === 'list' ? '32' : '64'" class="placeholder-icon" color="var(--app-text-color)" />
 		</div>
 	}
 	@if (type() === 'list') {

@@ -37,7 +37,7 @@ describe('ScrollRestorationService', () => {
 
 			const raw = sessionStorage.getItem(`${storagePrefix}/test-key`);
 			expect(raw).not.toBeNull();
-			const parsed = JSON.parse(raw!);
+			const parsed = JSON.parse(raw as string);
 			expect(parsed.scrollY).toBe(500);
 		});
 
@@ -47,7 +47,7 @@ describe('ScrollRestorationService', () => {
 			service.save('test-key', { infiniteScrollPage: 3 });
 
 			const raw = sessionStorage.getItem(`${storagePrefix}/test-key`);
-			const parsed = JSON.parse(raw!);
+			const parsed = JSON.parse(raw as string);
 			expect(parsed.infiniteScrollPage).toBe(3);
 		});
 	});

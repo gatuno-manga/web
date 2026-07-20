@@ -100,13 +100,13 @@ export class MqttService implements OnDestroy {
 	private chapterScrapingCompletedSubject = new Subject<ScrapingEvent>();
 	private chapterScrapingFailedSubject = new Subject<ScrapingEvent>();
 	private progressSyncedSubject = new Subject<SyncResponse>();
-	private progressDeletedSubject = new Subject<any>();
-	private bookLikedSubject = new Subject<any>();
-	private bookUnlikedSubject = new Subject<any>();
-	private bookDeletedSubject = new Subject<any>();
-	private chapterDeletedSubject = new Subject<any>();
-	private commentCreatedSubject = new Subject<any>();
-	private commentDeletedSubject = new Subject<any>();
+	private progressDeletedSubject = new Subject<unknown>();
+	private bookLikedSubject = new Subject<unknown>();
+	private bookUnlikedSubject = new Subject<unknown>();
+	private bookDeletedSubject = new Subject<unknown>();
+	private chapterDeletedSubject = new Subject<unknown>();
+	private commentCreatedSubject = new Subject<unknown>();
+	private commentDeletedSubject = new Subject<unknown>();
 	private errorSubject = new Subject<{ message: string }>();
 
 	// Observables públicos
@@ -369,7 +369,7 @@ export class MqttService implements OnDestroy {
 				}
 
 				const eventName = data.event;
-				const notification = data.payload as any;
+				const notification = data.payload as NotificationPayload;
 
 				let type: 'info' | 'success' | 'warning' | 'error' = 'info';
 				if (eventName === 'book_request.approved') type = 'success';

@@ -150,7 +150,11 @@ export class ItemBookComponent {
 	}
 
 	cardCoverStyle = computed(() => {
-		if (this.book().cover && !this.imageError && !this.book().blurHash) {
+		if (
+			this.book().cover &&
+			!this.imageError &&
+			!(this.book().blurHash || this.book().coverMetadata?.blurHash)
+		) {
 			return { '--card-cover': `url(${this.book().cover})` };
 		}
 		return {};
