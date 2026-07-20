@@ -98,7 +98,7 @@
 	} @else {
 		<div class="cover-placeholder">
 			<ng-container *ngTemplateOutlet="badgesAndRemove"></ng-container>
-			<img src="assets/icons/image-placeholder-14824e.svg" alt="Placeholder" class="placeholder-icon" />
+			<app-icons name="image" [size]="type() === 'list' ? '32' : '64'" class="placeholder-icon" color="var(--app-text-color)" />
 		</div>
 	}
 	@if (type() === 'list') {

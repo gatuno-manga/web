@@ -238,10 +238,7 @@
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
-			width: 32px;
-			height: 32px;
 			opacity: 0.15;
-			filter: grayscale(1);
 		}
 	}
 }
@@ -334,8 +331,6 @@
 		border-radius: 12px;
 
 		.placeholder-icon {
-			width: 64px;
-			height: 64px;
 		}
 	}
 }
