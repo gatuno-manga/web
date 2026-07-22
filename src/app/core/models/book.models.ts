@@ -220,6 +220,7 @@ export interface Cover {
 export interface SensitiveContentResponse {
 	id: string;
 	name: string;
+	weight?: number;
 }
 export interface TagResponse {
 	id: string;

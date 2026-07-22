@@ -21,4 +21,8 @@ export const dashboardRoutes: Routes = [
 		path: 'monitoring',
 		component: MonitoringComponent,
 	},
+	{
+		path: 'sensitive-content',
+		loadComponent: () => import('./sensitive-content/sensitive-content.component').then(m => m.SensitiveContentComponent),
+	}
 ];
