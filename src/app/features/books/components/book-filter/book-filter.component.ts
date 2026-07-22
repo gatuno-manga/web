@@ -301,8 +301,6 @@ export class BookFilterComponent implements OnInit {
 		const selectedIds = this.selectedSensitiveContent();
 		let sensitiveContent: string[];
 
-		console.log('Selected Sensitive Content IDs:', selectedIds);
-
 		if (selectedIds.length > 0) {
 			// Map selected IDs to their names for the API call
 			sensitiveContent = this.availableSensitiveContent()
@@ -611,7 +609,6 @@ export class BookFilterComponent implements OnInit {
 	}
 
 	openRandomFiltersModal() {
-		console.log('Opening Random Filters Modal');
 		this.notificationService.notify({
 			message: '',
 			level: 'critical',

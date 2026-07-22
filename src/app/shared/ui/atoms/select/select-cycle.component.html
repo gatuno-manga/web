@@ -1,6 +1,10 @@
-<div class="container" (click)="onSelect()" [class.disabled]="disabled()">
+<div class="container" [class.disabled]="disabled()" (click)="onContainerClick()"
+     [style.--selected-index]="select()" [style.--total-items]="items().length">
+	
+	<div class="slider"></div>
+
 	@for (item of items(); track $index) {
-	<div class="icon" [ngClass]="{ select: $index == select() }">
+	<div class="icon" [ngClass]="{ select: $index == select() }" (click)="onIconClick($event, $index)">
 		<app-icons [name]="item.icon" />
 	</div>
 	}

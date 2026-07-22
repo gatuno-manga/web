@@ -69,7 +69,7 @@
 				font-weight: 700;
 				font-size: 14px;
 				padding: 0 16px;
-				border-radius: 5px;
+				border-radius: 8px;
 				height: 40px;
 
 				&:hover {
@@ -169,6 +169,8 @@
 		var(--secondary-color) 20%,
 		transparent
 	);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
 	display: flex;
 	flex-direction: column;
 	gap: 30px;

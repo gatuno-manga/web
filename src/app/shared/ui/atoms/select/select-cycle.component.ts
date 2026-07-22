@@ -14,20 +14,24 @@ export class SelectCycleComponent {
 	items = input.required<SelectItem[]>();
 	select = input<number>(0);
 	disabled = input<boolean>(false);
+	isCyclic = input<boolean>(true); // Flag para definir o comportamento
 
-	// Local state for cycling if needed, but the original used @Input and mutated it.
-	// In OnPush/Signals, we should ideally not mutate inputs.
-	// However, I'll use a local signal to track the current index if I want to cycle it.
-
-	onSelect() {
-		if (this.disabled()) {
+	onContainerClick() {
+		if (this.disabled() || !this.isCyclic()) {
 			return;
 		}
-		// Note: Since 'select' is an input signal, we cannot mutate it directly.
-		// The parent should probably handle the change or we use a model().
-		// But for a simple cycle that triggers a callback:
 		const currentIndex = this.select();
 		const nextIndex = (currentIndex + 1) % this.items().length;
 		this.items()[nextIndex].checked();
+	}
+
+	onIconClick(event: Event, index: number) {
+		if (this.disabled()) {
+			return;
+		}
+		if (!this.isCyclic()) {
+			event.stopPropagation();
+			this.items()[index].checked();
+		}
 	}
 }
