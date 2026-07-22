@@ -6,7 +6,7 @@
 		/>
 	</div>
 } @placeholder {
-	<div class="filter" style="height: 100px;"></div>
+	<div class="filter" style="height: 100px"></div>
 }
 
 <div class="controller">
@@ -17,7 +17,7 @@
 			[disabled]="isOfflineMode"
 		/>
 	</div>
-	@if (listSettings.listMode === 'pagination') {
+	@if (listSettings.listMode === "pagination") {
 		<div class="pages">
 			@if (isLoading() && books.length === 0) {
 				@for (i of [].constructor(5); track $index) {
@@ -37,16 +37,16 @@
 		</div>
 	}
 	<div class="view-options">
-		<app-select-cycle [items]="selectList" [select]="selectListItem()" />
+		<app-select-cycle
+			[items]="selectList"
+			[select]="selectListItem()"
+			[isCyclic]="false"
+		/>
 	</div>
 </div>
-<app-book-grid
-	[books]="books"
-	[isLoading]="isLoading()"
-	[type]="bookOptions"
-/>
+<app-book-grid [books]="books" [isLoading]="isLoading()" [type]="bookOptions" />
 
-@if (listSettings.listMode === 'infinite-scroll') {
+@if (listSettings.listMode === "infinite-scroll") {
 	<div #scrollAnchor class="scroll-anchor">
 		@if (isLoading() && books.length > 0) {
 			<div class="infinite-loader">
@@ -61,7 +61,7 @@
 	</div>
 }
 
-@if (listSettings.listMode === 'pagination') {
+@if (listSettings.listMode === "pagination") {
 	@defer (on idle) {
 		<div class="controller">
 			<div class="mode-switch"></div>
@@ -79,6 +79,6 @@
 			<div class="view-options"></div>
 		</div>
 	} @placeholder {
-		<div class="controller" style="height: 100px;"></div>
+		<div class="controller" style="height: 100px"></div>
 	}
 }
