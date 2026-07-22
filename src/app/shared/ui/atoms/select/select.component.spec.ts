@@ -26,8 +26,8 @@ describe('SelectCycleComponent', () => {
 		expect(component).toBeTruthy();
 	});
 
-	it('onSelect calls checked of next item', () => {
-		component.onSelect();
+	it('onContainerClick calls checked of next item', () => {
+		component.onContainerClick();
 		expect(component.items()[1].checked).toHaveBeenCalled();
 	});
 });

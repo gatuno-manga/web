@@ -9,11 +9,11 @@
 		class="search-input"
 		[attr.aria-hidden]="!isSearchExpanded()"
 		[tabIndex]="isSearchExpanded() ? 0 : -1"
-			role="combobox" aria-expanded="false"
+			role="combobox"
 		
 		aria-autocomplete="list"
 		aria-haspopup="listbox"
-		[attr.aria-expanded]="searchResults().length > 0"
+		[attr.aria-expanded]="isSearchExpanded() && searchResults().length > 0"
 		[attr.aria-activedescendant]="focusedIndex() >= 0 ? 'search-result-' + focusedIndex() : null"
 	/>
 
@@ -32,6 +32,7 @@
 					class="search-result-item"
 					[class.focused]="focusedIndex() === i"
 					role="option"
+					tabindex="-1"
 					[attr.aria-selected]="focusedIndex() === i"
 					(click)="clearSearch()"
 					(keydown)="onKeydown($event)"

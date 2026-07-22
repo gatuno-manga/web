@@ -19,6 +19,7 @@ import {
 	switchMap,
 	tap,
 } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
 	selector: 'app-search',
@@ -62,6 +63,7 @@ export class SearchMoleculeComponent {
 					this.bookService.getBooks({ search: term, limit: 5 }),
 				),
 				tap(() => this.isSearching.set(false)),
+				takeUntilDestroyed()
 			)
 			.subscribe((response) => {
 				this.searchResults.set(response.data);
@@ -184,6 +186,6 @@ export class SearchMoleculeComponent {
 
 	private focusResult(index: number) {
 		const items = this.resultItems();
-		items[index]?.nativeElement.focus();
+		items[index]?.nativeElement.scrollIntoView({ block: 'nearest' });
 	}
 }
