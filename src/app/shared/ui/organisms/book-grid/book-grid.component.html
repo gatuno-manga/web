@@ -1,6 +1,6 @@
 <div class="books-container" [class]="type()">
 	@if (isLoading() && books().length === 0) {
-		@for (i of [].constructor(skeletonCount()); track $index) {
+		@for (skeleton of skeletons(); track $index) {
 			<div class="book-card-skeleton" [class]="type()">
 				<div class="cover-skeleton placeholder"></div>
 				<div class="info-skeleton">
@@ -18,6 +18,7 @@
 			/>
 		} @empty {
 			<div class="no-books">
+				<app-icons name="book-open" size="48" color="var(--white-muted)" />
 				<p>Nenhum livro disponível.</p>
 			</div>
 		}
