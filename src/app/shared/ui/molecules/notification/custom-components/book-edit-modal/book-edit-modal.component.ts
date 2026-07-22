@@ -4,7 +4,15 @@ import {
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, model, OnInit, signal } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	inject,
+	input,
+	model,
+	OnInit,
+	signal,
+} from '@angular/core';
 import {
 	FormBuilder,
 	FormGroup,
@@ -57,13 +65,15 @@ export interface BookEditSaveEvent {
 	],
 	templateUrl: './book-edit-modal.component.html',
 	styleUrls: ['./book-edit-modal.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookEditModalComponent implements OnInit {
 	book = input.required<BookBasic>();
 	close = input.required<(result: BookEditSaveEvent | null) => void>();
 
-	activeTab = signal<'Básico' | 'Sinopses' | 'Categorias' | 'Links'>('Básico');
+	activeTab = signal<'Básico' | 'Sinopses' | 'Categorias' | 'Links'>(
+		'Básico',
+	);
 
 	private fb = inject(FormBuilder);
 	private tagsService = inject(TagsService);
@@ -98,24 +108,72 @@ export class BookEditModalComponent implements OnInit {
 	}));
 
 	languageCodes = [
-		{ value: '', label: 'Desconhecido', imageUrl: '/assets/flags/unknown.svg' },
+		{
+			value: '',
+			label: 'Desconhecido',
+			imageUrl: '/assets/flags/unknown.svg',
+		},
 		{ value: 'ja-JP', label: 'Japonês', imageUrl: '/assets/flags/jp.svg' },
 		{ value: 'ko-KR', label: 'Coreano', imageUrl: '/assets/flags/kr.svg' },
-		{ value: 'zh-CN', label: 'Chinês (Simplificado)', imageUrl: '/assets/flags/cn.svg' },
-		{ value: 'zh-TW', label: 'Chinês (Tradicional)', imageUrl: '/assets/flags/tw.svg' },
-		{ value: 'en-US', label: 'Inglês (EUA)', imageUrl: '/assets/flags/us.svg' },
-		{ value: 'en-GB', label: 'Inglês (Reino Unido)', imageUrl: '/assets/flags/gb.svg' },
-		{ value: 'pt-BR', label: 'Português (Brasil)', imageUrl: '/assets/flags/br.svg' },
-		{ value: 'pt-PT', label: 'Português (Portugal)', imageUrl: '/assets/flags/pt.svg' },
-		{ value: 'es-ES', label: 'Espanhol (Espanha)', imageUrl: '/assets/flags/es.svg' },
-		{ value: 'es-419', label: 'Espanhol (América Latina)', imageUrl: '/assets/flags/es.svg' },
+		{
+			value: 'zh-CN',
+			label: 'Chinês (Simplificado)',
+			imageUrl: '/assets/flags/cn.svg',
+		},
+		{
+			value: 'zh-TW',
+			label: 'Chinês (Tradicional)',
+			imageUrl: '/assets/flags/tw.svg',
+		},
+		{
+			value: 'en-US',
+			label: 'Inglês (EUA)',
+			imageUrl: '/assets/flags/us.svg',
+		},
+		{
+			value: 'en-GB',
+			label: 'Inglês (Reino Unido)',
+			imageUrl: '/assets/flags/gb.svg',
+		},
+		{
+			value: 'pt-BR',
+			label: 'Português (Brasil)',
+			imageUrl: '/assets/flags/br.svg',
+		},
+		{
+			value: 'pt-PT',
+			label: 'Português (Portugal)',
+			imageUrl: '/assets/flags/pt.svg',
+		},
+		{
+			value: 'es-ES',
+			label: 'Espanhol (Espanha)',
+			imageUrl: '/assets/flags/es.svg',
+		},
+		{
+			value: 'es-419',
+			label: 'Espanhol (América Latina)',
+			imageUrl: '/assets/flags/es.svg',
+		},
 		{ value: 'fr-FR', label: 'Francês', imageUrl: '/assets/flags/fr.svg' },
 		{ value: 'it-IT', label: 'Italiano', imageUrl: '/assets/flags/it.svg' },
 		{ value: 'de-DE', label: 'Alemão', imageUrl: '/assets/flags/de.svg' },
 		{ value: 'ru-RU', label: 'Russo', imageUrl: '/assets/flags/ru.svg' },
-		{ value: 'id-ID', label: 'Indonésio', imageUrl: '/assets/flags/id.svg' },
-		{ value: 'th-TH', label: 'Tailandês', imageUrl: '/assets/flags/th.svg' },
-		{ value: 'vi-VN', label: 'Vietnamita', imageUrl: '/assets/flags/vn.svg' },
+		{
+			value: 'id-ID',
+			label: 'Indonésio',
+			imageUrl: '/assets/flags/id.svg',
+		},
+		{
+			value: 'th-TH',
+			label: 'Tailandês',
+			imageUrl: '/assets/flags/th.svg',
+		},
+		{
+			value: 'vi-VN',
+			label: 'Vietnamita',
+			imageUrl: '/assets/flags/vn.svg',
+		},
 	];
 
 	ngOnInit(): void {
@@ -128,10 +186,7 @@ export class BookEditModalComponent implements OnInit {
 		const b = this.book();
 
 		this.editForm = this.fb.group({
-			title: [
-				b.title,
-				[Validators.required, Validators.maxLength(300)],
-			],
+			title: [b.title, [Validators.required, Validators.maxLength(300)]],
 			publication: [
 				b.publication,
 				[Validators.min(1900), Validators.max(2100)],
@@ -143,10 +198,7 @@ export class BookEditModalComponent implements OnInit {
 		this.localizedDescriptions.set([
 			...(bookDetail.localizedDescriptions || []),
 		]);
-		if (
-			this.localizedDescriptions().length === 0 &&
-			b.description
-		) {
+		if (this.localizedDescriptions().length === 0 && b.description) {
 			this.localizedDescriptions.set([
 				{
 					description: b.description,
@@ -160,9 +212,7 @@ export class BookEditModalComponent implements OnInit {
 
 		this.selectedTagIds.set(b.tags.map((t) => t.id));
 		this.selectedAuthorIds.set(b.authors.map((a) => a.id));
-		this.selectedSensitiveIds.set(
-			b.sensitiveContent.map((s) => s.id),
-		);
+		this.selectedSensitiveIds.set(b.sensitiveContent.map((s) => s.id));
 	}
 
 	private loadMasterData(): void {
@@ -335,16 +385,11 @@ export class BookEditModalComponent implements OnInit {
 		const b = this.book();
 
 		// Basic fields delta
-		if (formValues.title !== b.title)
-			updatedData.title = formValues.title;
+		if (formValues.title !== b.title) updatedData.title = formValues.title;
 		if (formValues.publication !== b.publication)
 			updatedData.publication = formValues.publication;
-		if (formValues.type !== b.type)
-			updatedData.type = formValues.type;
-		if (
-			formValues.originalLanguageCode !==
-			(b.originalLanguageCode || '')
-		)
+		if (formValues.type !== b.type) updatedData.type = formValues.type;
+		if (formValues.originalLanguageCode !== (b.originalLanguageCode || ''))
 			updatedData.originalLanguageCode =
 				formValues.originalLanguageCode === ''
 					? null
@@ -431,9 +476,7 @@ export class BookEditModalComponent implements OnInit {
 		}
 
 		const currentSensitiveIds = Array.from(this.selectedSensitiveIds());
-		const originalSensitiveIds = b.sensitiveContent.map(
-			(s) => s.id,
-		);
+		const originalSensitiveIds = b.sensitiveContent.map((s) => s.id);
 		if (
 			JSON.stringify(currentSensitiveIds.sort()) !==
 			JSON.stringify(originalSensitiveIds.sort())

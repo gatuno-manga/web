@@ -37,7 +37,10 @@ describe('SuccessDetailsNotificationComponent', () => {
 	});
 
 	it('should display message', () => {
-		fixture.componentRef.setInput('message', 'Operação realizada com sucesso');
+		fixture.componentRef.setInput(
+			'message',
+			'Operação realizada com sucesso',
+		);
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(compiled.querySelector('.main-message')?.textContent).toBe(
@@ -123,7 +126,7 @@ describe('SuccessDetailsNotificationComponent', () => {
 		await fixture.whenStable();
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
-		const checks = compiled.querySelectorAll('app-icons[name="check"]');
+		const checks = compiled.querySelectorAll('app-icons[name="check-circle"]');
 		expect(checks.length).toBe(2);
 	});
 });

@@ -8,6 +8,8 @@ import {
 	PLATFORM_ID,
 	signal,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { TagsService } from '@core/services/tags.service';
 import { Tag } from '@models/tags.models';
@@ -16,23 +18,26 @@ import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { ListCheckboxComponent } from '@ui/atoms/inputs/list-checkbox/list-checkbox.component';
 import { ListCheckboxItem } from '@ui/atoms/inputs/list-checkbox/list-checkbox.type';
 
-import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-
 @Component({
 	selector: 'app-tags',
-	imports: [ButtonComponent, ListCheckboxComponent, IconsComponent, FormsModule, RouterLink],
+	imports: [
+		ButtonComponent,
+		ListCheckboxComponent,
+		IconsComponent,
+		FormsModule,
+		RouterLink,
+	],
 	templateUrl: './tags.component.html',
 	styleUrl: './tags.component.scss',
 })
 export class TagsComponent {
 	tags: Tag[] = [];
-	
+
 	searchQuery = signal('');
 	filteredTags = computed(() => {
 		const search = this.searchQuery().toLowerCase();
 		if (!search) return this.tags;
-		return this.tags.filter(t => t.name.toLowerCase().includes(search));
+		return this.tags.filter((t) => t.name.toLowerCase().includes(search));
 	});
 
 	isLoading = signal(true);
@@ -43,7 +48,9 @@ export class TagsComponent {
 	filteredMergingTags = computed(() => {
 		const search = this.mergeSearchQuery().toLowerCase();
 		if (!search) return this.mergingTags;
-		return this.mergingTags.filter(t => t.label.toLowerCase().includes(search));
+		return this.mergingTags.filter((t) =>
+			t.label.toLowerCase().includes(search),
+		);
 	});
 
 	private platformId = inject(PLATFORM_ID);

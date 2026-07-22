@@ -7,6 +7,7 @@ import {
 	viewChild,
 	viewChildren,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
@@ -19,7 +20,6 @@ import {
 	switchMap,
 	tap,
 } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
 	selector: 'app-search',
@@ -63,7 +63,7 @@ export class SearchMoleculeComponent {
 					this.bookService.getBooks({ search: term, limit: 5 }),
 				),
 				tap(() => this.isSearching.set(false)),
-				takeUntilDestroyed()
+				takeUntilDestroyed(),
 			)
 			.subscribe((response) => {
 				this.searchResults.set(response.data);

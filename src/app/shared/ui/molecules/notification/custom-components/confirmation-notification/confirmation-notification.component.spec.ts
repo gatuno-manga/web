@@ -66,7 +66,11 @@ describe('ConfirmationNotificationComponent', () => {
 	});
 
 	it('should display details when provided', () => {
-		fixture.componentRef.setInput('details', ['Detalhe 1', 'Detalhe 2', 'Detalhe 3']);
+		fixture.componentRef.setInput('details', [
+			'Detalhe 1',
+			'Detalhe 2',
+			'Detalhe 3',
+		]);
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		const detailsDiv = compiled.querySelector('.details');

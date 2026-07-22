@@ -4,7 +4,13 @@ import {
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, OnInit, signal } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	input,
+	OnInit,
+	signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
 	AlternativeTitle,
@@ -38,7 +44,7 @@ export interface BookAltTitlesSaveEvent {
 	],
 	templateUrl: './book-alt-titles-modal.component.html',
 	styleUrls: ['./book-alt-titles-modal.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookAltTitlesModalComponent implements OnInit {
 	book = input.required<BookBasic>();
@@ -51,24 +57,72 @@ export class BookAltTitlesModalComponent implements OnInit {
 	newLanguageCode = signal<string>('');
 
 	languageCodes = [
-		{ value: '', label: 'Desconhecido', imageUrl: '/assets/flags/unknown.svg' },
+		{
+			value: '',
+			label: 'Desconhecido',
+			imageUrl: '/assets/flags/unknown.svg',
+		},
 		{ value: 'ja-JP', label: 'Japonês', imageUrl: '/assets/flags/jp.svg' },
 		{ value: 'ko-KR', label: 'Coreano', imageUrl: '/assets/flags/kr.svg' },
-		{ value: 'zh-CN', label: 'Chinês (Simplificado)', imageUrl: '/assets/flags/cn.svg' },
-		{ value: 'zh-TW', label: 'Chinês (Tradicional)', imageUrl: '/assets/flags/tw.svg' },
-		{ value: 'en-US', label: 'Inglês (EUA)', imageUrl: '/assets/flags/us.svg' },
-		{ value: 'en-GB', label: 'Inglês (Reino Unido)', imageUrl: '/assets/flags/gb.svg' },
-		{ value: 'pt-BR', label: 'Português (Brasil)', imageUrl: '/assets/flags/br.svg' },
-		{ value: 'pt-PT', label: 'Português (Portugal)', imageUrl: '/assets/flags/pt.svg' },
-		{ value: 'es-ES', label: 'Espanhol (Espanha)', imageUrl: '/assets/flags/es.svg' },
-		{ value: 'es-419', label: 'Espanhol (América Latina)', imageUrl: '/assets/flags/es.svg' },
+		{
+			value: 'zh-CN',
+			label: 'Chinês (Simplificado)',
+			imageUrl: '/assets/flags/cn.svg',
+		},
+		{
+			value: 'zh-TW',
+			label: 'Chinês (Tradicional)',
+			imageUrl: '/assets/flags/tw.svg',
+		},
+		{
+			value: 'en-US',
+			label: 'Inglês (EUA)',
+			imageUrl: '/assets/flags/us.svg',
+		},
+		{
+			value: 'en-GB',
+			label: 'Inglês (Reino Unido)',
+			imageUrl: '/assets/flags/gb.svg',
+		},
+		{
+			value: 'pt-BR',
+			label: 'Português (Brasil)',
+			imageUrl: '/assets/flags/br.svg',
+		},
+		{
+			value: 'pt-PT',
+			label: 'Português (Portugal)',
+			imageUrl: '/assets/flags/pt.svg',
+		},
+		{
+			value: 'es-ES',
+			label: 'Espanhol (Espanha)',
+			imageUrl: '/assets/flags/es.svg',
+		},
+		{
+			value: 'es-419',
+			label: 'Espanhol (América Latina)',
+			imageUrl: '/assets/flags/es.svg',
+		},
 		{ value: 'fr-FR', label: 'Francês', imageUrl: '/assets/flags/fr.svg' },
 		{ value: 'it-IT', label: 'Italiano', imageUrl: '/assets/flags/it.svg' },
 		{ value: 'de-DE', label: 'Alemão', imageUrl: '/assets/flags/de.svg' },
 		{ value: 'ru-RU', label: 'Russo', imageUrl: '/assets/flags/ru.svg' },
-		{ value: 'id-ID', label: 'Indonésio', imageUrl: '/assets/flags/id.svg' },
-		{ value: 'th-TH', label: 'Tailandês', imageUrl: '/assets/flags/th.svg' },
-		{ value: 'vi-VN', label: 'Vietnamita', imageUrl: '/assets/flags/vn.svg' },
+		{
+			value: 'id-ID',
+			label: 'Indonésio',
+			imageUrl: '/assets/flags/id.svg',
+		},
+		{
+			value: 'th-TH',
+			label: 'Tailandês',
+			imageUrl: '/assets/flags/th.svg',
+		},
+		{
+			value: 'vi-VN',
+			label: 'Vietnamita',
+			imageUrl: '/assets/flags/vn.svg',
+		},
 	];
 
 	ngOnInit(): void {

@@ -10,8 +10,8 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
-import { DashboardService } from '@core/services/dashboard.service';
 import { BookService } from '@core/services/book.service';
+import { DashboardService } from '@core/services/dashboard.service';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { MqttService } from '@core/services/mqtt.service';
 import { UserTokenService } from '@core/services/user-token.service';
@@ -76,11 +76,15 @@ export class HomeComponent implements OnInit {
 	queueStats = signal<QueueStats>({ queues: [] });
 
 	allActiveJobs = computed(() => {
-		return this.queueStats().queues?.flatMap((q) => q.activeJobs ?? []) ?? [];
+		return (
+			this.queueStats().queues?.flatMap((q) => q.activeJobs ?? []) ?? []
+		);
 	});
 
 	allPendingJobs = computed(() => {
-		return this.queueStats().queues?.flatMap((q) => q.pendingJobs ?? []) ?? [];
+		return (
+			this.queueStats().queues?.flatMap((q) => q.pendingJobs ?? []) ?? []
+		);
 	});
 
 	// Charts Options as computed signals
@@ -104,9 +108,19 @@ export class HomeComponent implements OnInit {
 					type: 'pie',
 					radius: ['40%', '70%'],
 					avoidLabelOverlap: false,
-					itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+					itemStyle: {
+						borderRadius: 10,
+						borderColor: '#fff',
+						borderWidth: 2,
+					},
 					label: { show: false, position: 'center' },
-					emphasis: { label: { show: true, fontSize: '20', fontWeight: 'bold' } },
+					emphasis: {
+						label: {
+							show: true,
+							fontSize: '20',
+							fontWeight: 'bold',
+						},
+					},
 					labelLine: { show: false },
 					data: data,
 				},
@@ -132,9 +146,19 @@ export class HomeComponent implements OnInit {
 					type: 'pie',
 					radius: ['40%', '70%'],
 					avoidLabelOverlap: false,
-					itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+					itemStyle: {
+						borderRadius: 10,
+						borderColor: '#fff',
+						borderWidth: 2,
+					},
 					label: { show: false, position: 'center' },
-					emphasis: { label: { show: true, fontSize: '20', fontWeight: 'bold' } },
+					emphasis: {
+						label: {
+							show: true,
+							fontSize: '20',
+							fontWeight: 'bold',
+						},
+					},
 					labelLine: { show: false },
 					data: data,
 				},
@@ -178,8 +202,12 @@ export class HomeComponent implements OnInit {
 
 	tagsChartOption = computed<EChartsOption>(() => {
 		const overview = this.overview();
-		const names = overview.tags ? overview.tags.map((item) => item.name) : [];
-		const counts = overview.tags ? overview.tags.map((item) => item.count) : [];
+		const names = overview.tags
+			? overview.tags.map((item) => item.name)
+			: [];
+		const counts = overview.tags
+			? overview.tags.map((item) => item.count)
+			: [];
 
 		return {
 			title: {
@@ -212,19 +240,27 @@ export class HomeComponent implements OnInit {
 
 	constructor() {
 		this.setMetaData();
-		
+
 		if (this.isBrowser && this.userTokenService.isAdmin) {
-			this.wsService.bookCreated$.pipe(takeUntilDestroyed()).subscribe(() => this.loadDashboardData());
-			this.wsService.chaptersUpdated$.pipe(takeUntilDestroyed()).subscribe(() => this.loadDashboardData());
-			this.wsService.chapterScrapingCompleted$.pipe(takeUntilDestroyed()).subscribe(() => this.loadDashboardData());
-			this.wsService.chaptersFix$.pipe(takeUntilDestroyed()).subscribe(() => {});
+			this.wsService.bookCreated$
+				.pipe(takeUntilDestroyed())
+				.subscribe(() => this.loadDashboardData());
+			this.wsService.chaptersUpdated$
+				.pipe(takeUntilDestroyed())
+				.subscribe(() => this.loadDashboardData());
+			this.wsService.chapterScrapingCompleted$
+				.pipe(takeUntilDestroyed())
+				.subscribe(() => this.loadDashboardData());
+			this.wsService.chaptersFix$
+				.pipe(takeUntilDestroyed())
+				.subscribe(() => {});
 		}
 	}
 
 	ngOnInit() {
 		if (this.isBrowser) {
 			this.loadDashboardData();
-			
+
 			if (this.userTokenService.isAdmin) {
 				if (!this.wsService.isConnected()) {
 					this.wsService.connect();
@@ -236,28 +272,47 @@ export class HomeComponent implements OnInit {
 	private loadDashboardData(): void {
 		this.dashboardService.getOverview().subscribe({
 			next: (overview) => this.overview.set(overview),
-			error: (error) => console.error('Erro ao carregar overview do dashboard:', error),
+			error: (error) =>
+				console.error('Erro ao carregar overview do dashboard:', error),
 		});
 
 		this.dashboardService.getProgressBooks().subscribe({
 			next: (progressBooks) => {
 				const bookIds = progressBooks.books.map((b) => b.id);
 				if (bookIds.length > 0) {
-					this.bookService.getBooksBatchGraphQL(bookIds).subscribe((graphqlBooks) => {
-						const updatedBooks = progressBooks.books.map((pb) => {
-							const gb = graphqlBooks.find((b) => b.id === pb.id);
-							if (gb) {
-								return { ...pb, cover: gb.cover, blurHash: gb.blurHash, dominantColor: gb.dominantColor };
-							}
-							return pb;
+					this.bookService
+						.getBooksBatchGraphQL(bookIds)
+						.subscribe((graphqlBooks) => {
+							const updatedBooks = progressBooks.books.map(
+								(pb) => {
+									const gb = graphqlBooks.find(
+										(b) => b.id === pb.id,
+									);
+									if (gb) {
+										return {
+											...pb,
+											cover: gb.cover,
+											blurHash: gb.blurHash,
+											dominantColor: gb.dominantColor,
+										};
+									}
+									return pb;
+								},
+							);
+							this.progressBooks.set({
+								...progressBooks,
+								books: updatedBooks,
+							});
 						});
-						this.progressBooks.set({ ...progressBooks, books: updatedBooks });
-					});
 				} else {
 					this.progressBooks.set(progressBooks);
 				}
 			},
-			error: (error) => console.error('❌ Erro ao carregar livros em processamento:', error),
+			error: (error) =>
+				console.error(
+					'❌ Erro ao carregar livros em processamento:',
+					error,
+				),
 		});
 
 		this.dashboardService.getQueueStats().subscribe({
@@ -269,7 +324,8 @@ export class HomeComponent implements OnInit {
 	private setMetaData() {
 		this.metaService.setMetaData({
 			title: 'Dashboard',
-			description: 'Visão geral do seu painel. Acompanhe estatísticas, progresso e atividades recentes.',
+			description:
+				'Visão geral do seu painel. Acompanhe estatísticas, progresso e atividades recentes.',
 		});
 	}
 }

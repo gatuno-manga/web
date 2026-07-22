@@ -1,3 +1,4 @@
+import { ConnectionPositionPair, OverlayModule } from '@angular/cdk/overlay';
 import {
 	ChangeDetectionStrategy,
 	ChangeDetectorRef,
@@ -16,7 +17,6 @@ import {
 	NG_VALUE_ACCESSOR,
 } from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
-import { OverlayModule, ConnectionPositionPair } from '@angular/cdk/overlay';
 
 export type SelectOption = {
 	value: string | number | boolean;
@@ -76,13 +76,15 @@ export class SelectComponent implements ControlValueAccessor {
 		new ConnectionPositionPair(
 			{ originX: 'start', originY: 'bottom' },
 			{ overlayX: 'start', overlayY: 'top' },
-			0, 4 // offset Y
+			0,
+			4, // offset Y
 		),
 		new ConnectionPositionPair(
 			{ originX: 'start', originY: 'top' },
 			{ overlayX: 'start', overlayY: 'bottom' },
-			0, -4
-		)
+			0,
+			-4,
+		),
 	];
 
 	filteredOptions = computed(() => {

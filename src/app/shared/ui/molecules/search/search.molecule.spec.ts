@@ -1,10 +1,14 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { SearchMoleculeComponent } from './search.molecule';
-import { BookService } from '@core/services/book.service';
+import {
+	ComponentFixture,
+	fakeAsync,
+	TestBed,
+	tick,
+} from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BookService } from '@core/services/book.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { of } from 'rxjs';
-import { signal } from '@angular/core';
+import { SearchMoleculeComponent } from './search.molecule';
 
 describe('SearchMoleculeComponent', () => {
 	let component: SearchMoleculeComponent;
@@ -17,7 +21,7 @@ describe('SearchMoleculeComponent', () => {
 		mockBookService = jasmine.createSpyObj('BookService', ['getBooks']);
 		mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 		mockRoute = {
-			snapshot: { queryParams: { type: 'manga' } }
+			snapshot: { queryParams: { type: 'manga' } },
 		};
 
 		await TestBed.configureTestingModule({
@@ -25,8 +29,8 @@ describe('SearchMoleculeComponent', () => {
 			providers: [
 				{ provide: BookService, useValue: mockBookService },
 				{ provide: Router, useValue: mockRouter },
-				{ provide: ActivatedRoute, useValue: mockRoute }
-			]
+				{ provide: ActivatedRoute, useValue: mockRoute },
+			],
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(SearchMoleculeComponent);
@@ -61,12 +65,17 @@ describe('SearchMoleculeComponent', () => {
 	});
 
 	it('should fetch books on search input', fakeAsync(() => {
-		mockBookService.getBooks.and.returnValue(of({ data: [{ id: '1', title: 'Test Book' } as any] } as any));
-		
+		mockBookService.getBooks.and.returnValue(
+			of({ data: [{ id: '1', title: 'Test Book' } as any] } as any),
+		);
+
 		component.searchControl.setValue('test');
 		tick(300); // debounce time
 
-		expect(mockBookService.getBooks).toHaveBeenCalledWith({ search: 'test', limit: 5 });
+		expect(mockBookService.getBooks).toHaveBeenCalledWith({
+			search: 'test',
+			limit: 5,
+		});
 		expect(component.searchResults().length).toBe(1);
 		expect(component.searchResults()[0].id).toBe('1');
 	}));

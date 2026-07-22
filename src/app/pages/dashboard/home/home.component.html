@@ -101,7 +101,7 @@
 						<div class="book-item-core">
 							<div class="book-image" [style.background-color]="item.dominantColor || 'var(--secondary-color)'">
 								@if (item.cover && !imageErrors().has(item.id)) {
-									<img [src]="item.cover" [alt]="item.title" (error)="onImageError(item.id)" />
+									<img [src]="item.cover" alt="{{ item.title }}" (error)="onImageError(item.id)" />
 								} @else {
 									<div class="cover-placeholder">
 										<app-icons name="image" size="32" class="placeholder-icon" color="var(--app-text-color)" />

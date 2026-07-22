@@ -68,9 +68,15 @@ export class SensitiveContentService {
 	/**
 	 * Cria uma nova tag de conteúdo sensível.
 	 */
-	createSensitiveContent(name: string, weight?: number): Observable<SensitiveContentResponse> {
+	createSensitiveContent(
+		name: string,
+		weight?: number,
+	): Observable<SensitiveContentResponse> {
 		return this.http
-			.post<SensitiveContentResponse>('sensitive-content', { name, weight })
+			.post<SensitiveContentResponse>('sensitive-content', {
+				name,
+				weight,
+			})
 			.pipe(tap(() => this.invalidateCache()));
 	}
 
@@ -83,7 +89,10 @@ export class SensitiveContentService {
 		weight?: number,
 	): Observable<SensitiveContentResponse> {
 		return this.http
-			.put<SensitiveContentResponse>(`sensitive-content/${id}`, { name, weight })
+			.put<SensitiveContentResponse>(`sensitive-content/${id}`, {
+				name,
+				weight,
+			})
 			.pipe(tap(() => this.invalidateCache()));
 	}
 
@@ -111,7 +120,9 @@ export class SensitiveContentService {
 	/**
 	 * Atualiza múltiplas tags de conteúdo sensível em lote (ex: reordenação).
 	 */
-	updateSensitiveContentBatch(items: Partial<SensitiveContentResponse>[]): Observable<void> {
+	updateSensitiveContentBatch(
+		items: Partial<SensitiveContentResponse>[],
+	): Observable<void> {
 		return this.http
 			.patch<void>('sensitive-content/batch', { items })
 			.pipe(tap(() => this.invalidateCache()));

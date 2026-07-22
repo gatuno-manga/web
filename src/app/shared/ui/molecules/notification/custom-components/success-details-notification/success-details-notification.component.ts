@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	input,
+} from '@angular/core';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 
@@ -8,7 +13,7 @@ import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 	imports: [IconsComponent, ButtonComponent],
 	templateUrl: './success-details-notification.component.html',
 	styleUrls: ['./success-details-notification.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SuccessDetailsNotificationComponent {
 	title = input<string>('Sucesso!');

@@ -13,7 +13,7 @@
 		
 		aria-autocomplete="list"
 		aria-haspopup="listbox"
-		[attr.aria-expanded]="isSearchExpanded() && searchResults().length > 0"
+		aria-expanded="{{ isSearchExpanded() && searchResults().length > 0 }}"
 		[attr.aria-activedescendant]="focusedIndex() >= 0 ? 'search-result-' + focusedIndex() : null"
 	/>
 

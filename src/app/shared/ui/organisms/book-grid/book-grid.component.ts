@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, input, computed } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	input,
+} from '@angular/core';
 import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
 import { BookList } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
