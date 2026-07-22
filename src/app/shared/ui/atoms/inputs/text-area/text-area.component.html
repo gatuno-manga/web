@@ -17,6 +17,7 @@
         [id]="id()"
         [value]="value()"
         [rows]="rows()"
+        [placeholder]="(isFocused || value()) ? placeholder() : ''"
 				[attr.maxlength]="maxLength()"
         (input)="onInput($event)"
         (blur)="onBlur(value()); isFocused = false"
@@ -28,7 +29,7 @@
         [for]="id()"
         [ngClass]="{ ative: touched() || value(), icons: leftIcon() }"
         >
-        {{ placeholder() }}
+        {{ label() || placeholder() }}
       </label>
 
 			@if (clearable() && value()) {

@@ -25,7 +25,7 @@
 
 .left-icon {
 	margin-top: 8px;
-	color: var(--white-muted);
+	color: var(--app-text-color-secondary);
 }
 
 .input-wrapper {
@@ -73,7 +73,7 @@ label {
 	top: 16px;
 	left: 0;
 	pointer-events: none;
-	color: var(--white-muted);
+	color: var(--app-text-color-secondary);
 }
 
 label.ative,
@@ -81,7 +81,7 @@ textarea:focus + label {
 	top: -2.5rem;
 	left: 0;
 	transform: translateY(0);
-	color: var(--white);
+	color: var(--app-text-color);
 
 	&.icons {
 		left: -40px;
@@ -98,11 +98,11 @@ textarea:focus + label {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: rgba(255, 255, 255, 0.1);
+	background-color: rgb(from var(--app-text-color) r g b / 0.08);
 	transition: background-color 0.2s;
 
 	&:hover {
-		background-color: rgba(255, 255, 255, 0.2);
+		background-color: rgb(from var(--app-text-color) r g b / 0.15);
 	}
 }
 
@@ -111,7 +111,7 @@ textarea:focus + label {
 	bottom: 8px;
 	right: 12px;
 	font-size: 0.7rem;
-	color: var(--white-muted);
+	color: var(--app-text-color-secondary);
 	pointer-events: none;
 	background-color: var(--secondary-color);
 	padding: 2px 4px;
@@ -136,6 +136,6 @@ textarea:focus + label {
 		line-height: $line-height;
 		font-size: 0.9rem;
 		margin-left: 0.5rem;
-		color: var(--dark-red);
+		color: var(--danger-color);
 	}
 }

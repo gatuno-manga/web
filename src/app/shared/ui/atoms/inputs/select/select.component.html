@@ -3,12 +3,10 @@
   [class.disabled]="isDisabled()"
   [class.is-open]="isOpen()"
   >
-  @if (isOpen()) {
-    <div class="overlay" (click)="closeDropdown()"></div>
-  }
-
   <div
     class="select-trigger"
+    cdkOverlayOrigin
+    #trigger="cdkOverlayOrigin"
     (click)="toggleDropdown()"
     [class.open]="isOpen()"
     [class.has-value]="hasValue()"
@@ -62,8 +60,15 @@
     />
   </div>
 
-  @if (isOpen()) {
-    <div class="select-dropdown" [class.drop-top]="dropdownPosition() === 'top'" role="listbox">
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="isOpen()"
+    [cdkConnectedOverlayMinWidth]="trigger.elementRef.nativeElement.offsetWidth"
+    [cdkConnectedOverlayPositions]="positions"
+    (overlayOutsideClick)="closeDropdown()"
+  >
+    <div class="select-dropdown app-theme-aware" [attr.data-size]="size()" role="listbox">
       @if (searchable()) {
         <div class="search-bar" (click)="$event.stopPropagation()">
           <app-icons name="search" size="14px" class="search-icon" />
@@ -125,5 +130,5 @@
         }
       </div>
     </div>
-  }
+  </ng-template>
 </div>

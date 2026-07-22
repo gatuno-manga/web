@@ -173,22 +173,39 @@
 
 // ─── Dropdown ─────────────────────────────────────────────────────────────────
 .select-dropdown {
-	position: absolute;
-	top: 100%;
-	left: 0;
-	right: 0;
-	max-height: 320px;
-	overflow: hidden;
 	display: flex;
 	flex-direction: column;
+	max-height: 320px;
+	min-width: 100%;
+	width: max-content;
+	max-width: 90vw;
+	overflow: hidden;
 	z-index: 99;
-	border-radius: 0 0 var(--select-radius) var(--select-radius);
+	border-radius: 0 0 var(--select-radius, 10px) var(--select-radius, 10px);
 	border: 1px solid var(--border-color);
 	border-top: none;
 	background: color-mix(in srgb, var(--secondary-color) 60%, transparent);
 	@include glass-dropdown;
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
 	animation: selectSlideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+
+	&[data-size='sm'] {
+		--select-font: 13px;
+		--select-radius: 8px;
+		--option-padding: 8px 12px;
+	}
+
+	&[data-size='md'] {
+		--select-font: 14px;
+		--select-radius: 10px;
+		--option-padding: 10px 16px;
+	}
+
+	&[data-size='lg'] {
+		--select-font: 15px;
+		--select-radius: 12px;
+		--option-padding: 12px 18px;
+	}
 
 	&::-webkit-scrollbar {
 		width: 4px;
@@ -359,14 +376,7 @@
 	}
 }
 
-// ─── Overlay ──────────────────────────────────────────────────────────────────
-.overlay {
-	position: fixed;
-	inset: 0;
-	z-index: 88;
-	background: transparent;
-	cursor: default;
-}
+// Removed manual overlay
 
 // ─── Animations ───────────────────────────────────────────────────────────────
 @keyframes selectSlideDown {
@@ -402,6 +412,12 @@
 		--select-height: 44px;
 		--select-font: 14px;
 		--select-padding: 10px 14px;
+		--option-padding: 10px 14px;
+	}
+
+	.select-dropdown[data-size='md'],
+	.select-dropdown[data-size='lg'] {
+		--select-font: 14px;
 		--option-padding: 10px 14px;
 	}
 }

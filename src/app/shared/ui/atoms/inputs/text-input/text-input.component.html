@@ -19,7 +19,7 @@
         [id]="id()"
         [type]="type() === 'password' ? passwordInputType : type()"
         [value]="value()"
-        [placeholder]="!showLabel() ? placeholder() : ''"
+        [placeholder]="(!showLabel() || isFocused || value()) ? placeholder() : ''"
         [autocomplete]="autocomplete()"
         [disabled]="isDisabled()"
         (input)="onInput($event)"
@@ -31,7 +31,7 @@
           [for]="id()"
           [ngClass]="{ ative: touched() || value(), icons: leftIconInput() }"
           >
-          {{ placeholder() }}
+          {{ label() || placeholder() }}
         </label>
       }
     </div>

@@ -40,6 +40,7 @@ export class TextInputComponent implements ControlValueAccessor {
 	inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
 	id = input<string>();
+	label = input<string>('');
 	type = input<string>('text');
 	placeholder = input<string>('');
 	autocomplete = input<string>('');
