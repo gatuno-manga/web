@@ -3,26 +3,27 @@
 		<app-icons name="circle-check" size="64" />
 	</div>
 
-	<h2 id="success-title">{{ title }}</h2>
-	<p class="main-message">{{ message }}</p>
+	<h2 id="success-title">{{ title() }}</h2>
+	<p class="main-message">{{ message() }}</p>
 
-	@if (items && items.length > 0) {
-		<div class="items-list" role="list" aria-label="{{ itemsTitle }}">
-			<strong>{{ itemsTitle }}:</strong>
+	@if (hasItems()) {
+		<div class="items-list">
+			<strong>{{ itemsTitle() }}</strong>
 			<ul>
-				@for (item of items; track $index) {
-					<li role="listitem">
-						<app-icons name="check" size="16" />
-						<span>{{ item }}</span>
+				@for (item of items(); track $index) {
+					<li>
+						<app-icons name="check-circle" size="16" />
+						{{ item }}
 					</li>
 				}
 			</ul>
 		</div>
 	}
-	@if (actionLabel && actionCallback) {
+
+	@if (hasAction()) {
 		<div class="settings-footer">
-			<app-button variant="primary" (click)="actionCallback()">
-				{{ actionLabel }}
+			<app-button variant="outline" (click)="actionCallback()!()">
+				{{ actionLabel() }}
 			</app-button>
 		</div>
 	}

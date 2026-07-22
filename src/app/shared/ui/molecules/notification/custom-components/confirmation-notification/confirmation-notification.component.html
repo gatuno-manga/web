@@ -8,20 +8,20 @@
 		<app-icons name="alert-triangle" size="48" />
 	</div>
 
-	<h2 id="confirm-title">{{ title }}</h2>
-	<p id="confirm-message" class="message">{{ message }}</p>
+	<h2 id="confirm-title">{{ title() }}</h2>
+	<p id="confirm-message" class="message">{{ message() }}</p>
 
-	@if (details && details.length > 0) {
+	@if (hasDetails()) {
 		<div class="details" role="list" aria-label="Detalhes">
 			<strong>Detalhes:</strong>
 			<ul>
-				@for (detail of details; track $index) {
+				@for (detail of details(); track $index) {
 					<li role="listitem">{{ detail }}</li>
 				}
 			</ul>
 		</div>
 	}
-	@if (showWarning) {
+	@if (showWarning()) {
 		<div class="warning-box" role="alert">
 			<app-icons name="alert-circle" size="16" />
 			<span

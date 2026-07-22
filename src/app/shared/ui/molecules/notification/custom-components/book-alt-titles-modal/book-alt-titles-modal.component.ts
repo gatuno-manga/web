@@ -4,7 +4,7 @@ import {
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
 	AlternativeTitle,
@@ -38,10 +38,11 @@ export interface BookAltTitlesSaveEvent {
 	],
 	templateUrl: './book-alt-titles-modal.component.html',
 	styleUrls: ['./book-alt-titles-modal.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BookAltTitlesModalComponent implements OnInit {
-	@Input() book!: BookBasic;
-	@Input() close!: (result: BookAltTitlesSaveEvent | null) => void;
+	book = input.required<BookBasic>();
+	close = input.required<(result: BookAltTitlesSaveEvent | null) => void>();
 
 	isSaving = signal(false);
 	alternativeTitles = signal<AlternativeTitle[]>([]);
@@ -50,28 +51,28 @@ export class BookAltTitlesModalComponent implements OnInit {
 	newLanguageCode = signal<string>('');
 
 	languageCodes = [
-		{ value: '', label: 'Desconhecido' },
-		{ value: 'ja-JP', label: 'Japonês' },
-		{ value: 'ko-KR', label: 'Coreano' },
-		{ value: 'zh-CN', label: 'Chinês (Simplificado)' },
-		{ value: 'zh-TW', label: 'Chinês (Tradicional)' },
-		{ value: 'en-US', label: 'Inglês (EUA)' },
-		{ value: 'en-GB', label: 'Inglês (Reino Unido)' },
-		{ value: 'pt-BR', label: 'Português (Brasil)' },
-		{ value: 'pt-PT', label: 'Português (Portugal)' },
-		{ value: 'es-ES', label: 'Espanhol (Espanha)' },
-		{ value: 'es-419', label: 'Espanhol (América Latina)' },
-		{ value: 'fr-FR', label: 'Francês' },
-		{ value: 'it-IT', label: 'Italiano' },
-		{ value: 'de-DE', label: 'Alemão' },
-		{ value: 'ru-RU', label: 'Russo' },
-		{ value: 'id-ID', label: 'Indonésio' },
-		{ value: 'th-TH', label: 'Tailandês' },
-		{ value: 'vi-VN', label: 'Vietnamita' },
+		{ value: '', label: 'Desconhecido', imageUrl: '/assets/flags/unknown.svg' },
+		{ value: 'ja-JP', label: 'Japonês', imageUrl: '/assets/flags/jp.svg' },
+		{ value: 'ko-KR', label: 'Coreano', imageUrl: '/assets/flags/kr.svg' },
+		{ value: 'zh-CN', label: 'Chinês (Simplificado)', imageUrl: '/assets/flags/cn.svg' },
+		{ value: 'zh-TW', label: 'Chinês (Tradicional)', imageUrl: '/assets/flags/tw.svg' },
+		{ value: 'en-US', label: 'Inglês (EUA)', imageUrl: '/assets/flags/us.svg' },
+		{ value: 'en-GB', label: 'Inglês (Reino Unido)', imageUrl: '/assets/flags/gb.svg' },
+		{ value: 'pt-BR', label: 'Português (Brasil)', imageUrl: '/assets/flags/br.svg' },
+		{ value: 'pt-PT', label: 'Português (Portugal)', imageUrl: '/assets/flags/pt.svg' },
+		{ value: 'es-ES', label: 'Espanhol (Espanha)', imageUrl: '/assets/flags/es.svg' },
+		{ value: 'es-419', label: 'Espanhol (América Latina)', imageUrl: '/assets/flags/es.svg' },
+		{ value: 'fr-FR', label: 'Francês', imageUrl: '/assets/flags/fr.svg' },
+		{ value: 'it-IT', label: 'Italiano', imageUrl: '/assets/flags/it.svg' },
+		{ value: 'de-DE', label: 'Alemão', imageUrl: '/assets/flags/de.svg' },
+		{ value: 'ru-RU', label: 'Russo', imageUrl: '/assets/flags/ru.svg' },
+		{ value: 'id-ID', label: 'Indonésio', imageUrl: '/assets/flags/id.svg' },
+		{ value: 'th-TH', label: 'Tailandês', imageUrl: '/assets/flags/th.svg' },
+		{ value: 'vi-VN', label: 'Vietnamita', imageUrl: '/assets/flags/vn.svg' },
 	];
 
 	ngOnInit(): void {
-		const bookDetail = this.book as BookBasic & BookDetail;
+		const bookDetail = this.book() as BookBasic & BookDetail;
 		this.alternativeTitles.set([...(bookDetail.alternativeTitles || [])]);
 
 		if (
@@ -129,7 +130,7 @@ export class BookAltTitlesModalComponent implements OnInit {
 	onSave(): void {
 		this.isSaving.set(true);
 
-		const bookDetail = this.book as BookBasic & BookDetail;
+		const bookDetail = this.book() as BookBasic & BookDetail;
 		const currentAltTitles = this.alternativeTitles();
 		const originalAltTitles = bookDetail.alternativeTitles || [];
 
@@ -151,8 +152,8 @@ export class BookAltTitlesModalComponent implements OnInit {
 					rank: index,
 				})),
 			};
-			if (this.close) {
-				this.close({ id: this.book.id, data: updatedData });
+			if (this.close()) {
+				this.close()({ id: this.book().id, data: updatedData });
 			}
 		} else {
 			this.onCancel();
@@ -160,8 +161,8 @@ export class BookAltTitlesModalComponent implements OnInit {
 	}
 
 	onCancel(): void {
-		if (this.close) {
-			this.close(null);
+		if (this.close()) {
+			this.close()(null);
 		}
 	}
 }

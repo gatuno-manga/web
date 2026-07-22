@@ -22,7 +22,8 @@
       <form [formGroup]="form" (ngSubmit)="nextStep()" class="auth-form" novalidate>
         <app-input
           formControlName="email"
-          placeholder="seu@email.com"
+          label="E-mail"
+          placeholder="exemplo@email.com"
           id="email"
           type="email"
           leftIcon="email"
@@ -100,7 +101,8 @@
       <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
         <app-input
           formControlName="password"
-          placeholder="Sua senha"
+          label="Senha"
+          placeholder="Sua senha secreta"
           id="password"
           type="password"
           leftIcon="lock"

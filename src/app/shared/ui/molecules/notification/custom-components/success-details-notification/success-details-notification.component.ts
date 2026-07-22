@@ -1,4 +1,4 @@
-import { Component, computed, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 
@@ -8,15 +8,19 @@ import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 	imports: [IconsComponent, ButtonComponent],
 	templateUrl: './success-details-notification.component.html',
 	styleUrls: ['./success-details-notification.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SuccessDetailsNotificationComponent {
-	@Input() title: string = 'Sucesso!';
-	@Input() message: string = '';
-	@Input() items?: string[];
-	@Input() itemsTitle: string = 'Itens processados';
-	@Input() actionLabel?: string;
-	@Input() actionCallback?: () => void;
+	title = input<string>('Sucesso!');
+	message = input<string>('');
+	items = input<string[]>();
+	itemsTitle = input<string>('Itens processados');
+	actionLabel = input<string>();
+	actionCallback = input<() => void>();
 
-	hasItems = computed(() => !!this.items && this.items.length > 0);
-	hasAction = computed(() => !!this.actionLabel && !!this.actionCallback);
+	hasItems = computed(() => {
+		const items = this.items();
+		return !!items && items.length > 0;
+	});
+	hasAction = computed(() => !!this.actionLabel() && !!this.actionCallback());
 }

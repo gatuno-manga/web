@@ -4,7 +4,7 @@ import {
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, Input, inject, model, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, model, OnInit, signal } from '@angular/core';
 import {
 	FormBuilder,
 	FormGroup,
@@ -57,10 +57,13 @@ export interface BookEditSaveEvent {
 	],
 	templateUrl: './book-edit-modal.component.html',
 	styleUrls: ['./book-edit-modal.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BookEditModalComponent implements OnInit {
-	@Input() book!: BookBasic;
-	@Input() close!: (result: BookEditSaveEvent | null) => void;
+	book = input.required<BookBasic>();
+	close = input.required<(result: BookEditSaveEvent | null) => void>();
+
+	activeTab = signal<'Básico' | 'Sinopses' | 'Categorias' | 'Links'>('Básico');
 
 	private fb = inject(FormBuilder);
 	private tagsService = inject(TagsService);
@@ -95,24 +98,24 @@ export class BookEditModalComponent implements OnInit {
 	}));
 
 	languageCodes = [
-		{ value: '', label: 'Desconhecido' },
-		{ value: 'ja-JP', label: 'Japonês' },
-		{ value: 'ko-KR', label: 'Coreano' },
-		{ value: 'zh-CN', label: 'Chinês (Simplificado)' },
-		{ value: 'zh-TW', label: 'Chinês (Tradicional)' },
-		{ value: 'en-US', label: 'Inglês (EUA)' },
-		{ value: 'en-GB', label: 'Inglês (Reino Unido)' },
-		{ value: 'pt-BR', label: 'Português (Brasil)' },
-		{ value: 'pt-PT', label: 'Português (Portugal)' },
-		{ value: 'es-ES', label: 'Espanhol (Espanha)' },
-		{ value: 'es-419', label: 'Espanhol (América Latina)' },
-		{ value: 'fr-FR', label: 'Francês' },
-		{ value: 'it-IT', label: 'Italiano' },
-		{ value: 'de-DE', label: 'Alemão' },
-		{ value: 'ru-RU', label: 'Russo' },
-		{ value: 'id-ID', label: 'Indonésio' },
-		{ value: 'th-TH', label: 'Tailandês' },
-		{ value: 'vi-VN', label: 'Vietnamita' },
+		{ value: '', label: 'Desconhecido', imageUrl: '/assets/flags/unknown.svg' },
+		{ value: 'ja-JP', label: 'Japonês', imageUrl: '/assets/flags/jp.svg' },
+		{ value: 'ko-KR', label: 'Coreano', imageUrl: '/assets/flags/kr.svg' },
+		{ value: 'zh-CN', label: 'Chinês (Simplificado)', imageUrl: '/assets/flags/cn.svg' },
+		{ value: 'zh-TW', label: 'Chinês (Tradicional)', imageUrl: '/assets/flags/tw.svg' },
+		{ value: 'en-US', label: 'Inglês (EUA)', imageUrl: '/assets/flags/us.svg' },
+		{ value: 'en-GB', label: 'Inglês (Reino Unido)', imageUrl: '/assets/flags/gb.svg' },
+		{ value: 'pt-BR', label: 'Português (Brasil)', imageUrl: '/assets/flags/br.svg' },
+		{ value: 'pt-PT', label: 'Português (Portugal)', imageUrl: '/assets/flags/pt.svg' },
+		{ value: 'es-ES', label: 'Espanhol (Espanha)', imageUrl: '/assets/flags/es.svg' },
+		{ value: 'es-419', label: 'Espanhol (América Latina)', imageUrl: '/assets/flags/es.svg' },
+		{ value: 'fr-FR', label: 'Francês', imageUrl: '/assets/flags/fr.svg' },
+		{ value: 'it-IT', label: 'Italiano', imageUrl: '/assets/flags/it.svg' },
+		{ value: 'de-DE', label: 'Alemão', imageUrl: '/assets/flags/de.svg' },
+		{ value: 'ru-RU', label: 'Russo', imageUrl: '/assets/flags/ru.svg' },
+		{ value: 'id-ID', label: 'Indonésio', imageUrl: '/assets/flags/id.svg' },
+		{ value: 'th-TH', label: 'Tailandês', imageUrl: '/assets/flags/th.svg' },
+		{ value: 'vi-VN', label: 'Vietnamita', imageUrl: '/assets/flags/vn.svg' },
 	];
 
 	ngOnInit(): void {
@@ -121,19 +124,20 @@ export class BookEditModalComponent implements OnInit {
 	}
 
 	private initForm(): void {
-		const bookDetail = this.book as BookBasic & BookDetail;
+		const bookDetail = this.book() as BookBasic & BookDetail;
+		const b = this.book();
 
 		this.editForm = this.fb.group({
 			title: [
-				this.book.title,
+				b.title,
 				[Validators.required, Validators.maxLength(300)],
 			],
 			publication: [
-				this.book.publication,
+				b.publication,
 				[Validators.min(1900), Validators.max(2100)],
 			],
-			type: [this.book.type || TypeBook.OTHER],
-			originalLanguageCode: [this.book.originalLanguageCode || ''],
+			type: [b.type || TypeBook.OTHER],
+			originalLanguageCode: [b.originalLanguageCode || ''],
 		});
 
 		this.localizedDescriptions.set([
@@ -141,12 +145,12 @@ export class BookEditModalComponent implements OnInit {
 		]);
 		if (
 			this.localizedDescriptions().length === 0 &&
-			this.book.description
+			b.description
 		) {
 			this.localizedDescriptions.set([
 				{
-					description: this.book.description,
-					languageCode: this.book.originalLanguageCode || '',
+					description: b.description,
+					languageCode: b.originalLanguageCode || '',
 				},
 			]);
 		}
@@ -154,10 +158,10 @@ export class BookEditModalComponent implements OnInit {
 		this.searchTerms.set([...(bookDetail.searchTerms || [])]);
 		this.originalUrls.set([...(bookDetail.originalUrl || [])]);
 
-		this.selectedTagIds.set(this.book.tags.map((t) => t.id));
-		this.selectedAuthorIds.set(this.book.authors.map((a) => a.id));
+		this.selectedTagIds.set(b.tags.map((t) => t.id));
+		this.selectedAuthorIds.set(b.authors.map((a) => a.id));
 		this.selectedSensitiveIds.set(
-			this.book.sensitiveContent.map((s) => s.id),
+			b.sensitiveContent.map((s) => s.id),
 		);
 	}
 
@@ -327,18 +331,19 @@ export class BookEditModalComponent implements OnInit {
 
 		const formValues = this.editForm.value;
 		const updatedData: UpdateBookDto = {};
-		const bookDetail = this.book as BookBasic & BookDetail;
+		const bookDetail = this.book() as BookBasic & BookDetail;
+		const b = this.book();
 
 		// Basic fields delta
-		if (formValues.title !== this.book.title)
+		if (formValues.title !== b.title)
 			updatedData.title = formValues.title;
-		if (formValues.publication !== this.book.publication)
+		if (formValues.publication !== b.publication)
 			updatedData.publication = formValues.publication;
-		if (formValues.type !== this.book.type)
+		if (formValues.type !== b.type)
 			updatedData.type = formValues.type;
 		if (
 			formValues.originalLanguageCode !==
-			(this.book.originalLanguageCode || '')
+			(b.originalLanguageCode || '')
 		)
 			updatedData.originalLanguageCode =
 				formValues.originalLanguageCode === ''
@@ -393,7 +398,7 @@ export class BookEditModalComponent implements OnInit {
 
 		// Categorization delta (compare sets of IDs)
 		const currentTagIds = Array.from(this.selectedTagIds());
-		const originalTagIds = this.book.tags.map((t) => t.id);
+		const originalTagIds = b.tags.map((t) => t.id);
 		if (
 			JSON.stringify(currentTagIds.sort()) !==
 			JSON.stringify(originalTagIds.sort())
@@ -409,7 +414,7 @@ export class BookEditModalComponent implements OnInit {
 		}
 
 		const currentAuthorIds = Array.from(this.selectedAuthorIds());
-		const originalAuthorIds = this.book.authors.map((a) => a.id);
+		const originalAuthorIds = b.authors.map((a) => a.id);
 		if (
 			JSON.stringify(currentAuthorIds.sort()) !==
 			JSON.stringify(originalAuthorIds.sort())
@@ -426,7 +431,7 @@ export class BookEditModalComponent implements OnInit {
 		}
 
 		const currentSensitiveIds = Array.from(this.selectedSensitiveIds());
-		const originalSensitiveIds = this.book.sensitiveContent.map(
+		const originalSensitiveIds = b.sensitiveContent.map(
 			(s) => s.id,
 		);
 		if (
@@ -450,14 +455,14 @@ export class BookEditModalComponent implements OnInit {
 			return;
 		}
 
-		if (this.close) {
-			this.close({ id: this.book.id, data: updatedData });
+		if (this.close()) {
+			this.close()({ id: b.id, data: updatedData });
 		}
 	}
 
 	onCancel(): void {
-		if (this.close) {
-			this.close(null);
+		if (this.close()) {
+			this.close()(null);
 		}
 	}
 

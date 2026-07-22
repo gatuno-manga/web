@@ -11,7 +11,8 @@
   <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
     <app-input
       formControlName="email"
-      placeholder="seu@email.com"
+      label="E-mail"
+      placeholder="exemplo@email.com"
       id="email"
       type="email"
       leftIcon="email"
@@ -20,7 +21,8 @@
     />
     <app-input
       formControlName="password"
-      placeholder="Crie uma senha forte"
+      label="Senha"
+      placeholder="Mínimo 8 caracteres"
       id="password"
       type="password"
       leftIcon="lock"
@@ -31,7 +33,8 @@
     />
     <app-input
       formControlName="confirmPassword"
-      placeholder="Confirme sua senha"
+      label="Confirmar Senha"
+      placeholder="Repita a senha acima"
       id="confirmPassword"
       type="password"
       leftIcon="lock"
