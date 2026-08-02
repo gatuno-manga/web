@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
+	DestroyRef,
 	ElementRef,
 	HostListener,
 	inject,
 	signal,
-	DestroyRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NotificationService } from '@core/services/notification.service';

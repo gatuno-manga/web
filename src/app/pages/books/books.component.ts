@@ -1,7 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
 	AfterViewInit,
+	ChangeDetectionStrategy,
 	Component,
+	DestroyRef,
 	ElementRef,
 	effect,
 	inject,
@@ -11,8 +13,6 @@ import {
 	PLATFORM_ID,
 	signal,
 	ViewChild,
-	DestroyRef,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {

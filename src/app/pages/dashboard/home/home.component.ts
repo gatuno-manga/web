@@ -21,14 +21,20 @@ import {
 	QueueStats,
 } from '@models/dashboard.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { EChartsOption } from 'echarts';
 import { NgxEchartsDirective } from 'ngx-echarts';
-import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 
 @Component({
 	selector: 'app-home',
 	standalone: true,
-	imports: [CommonModule, IconsComponent, RouterModule, NgxEchartsDirective, ImageFallbackDirective],
+	imports: [
+		CommonModule,
+		IconsComponent,
+		RouterModule,
+		NgxEchartsDirective,
+		ImageFallbackDirective,
+	],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	Input,
 	inject,
 	OnInit,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FullscreenService } from '@core/services/fullscreen.service';

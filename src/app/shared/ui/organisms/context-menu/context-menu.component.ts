@@ -1,5 +1,6 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
 	effect,
@@ -7,7 +8,6 @@ import {
 	inject,
 	PLATFORM_ID,
 	ViewChild,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { ContextMenuService } from '@core/services/context-menu.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';

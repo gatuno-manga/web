@@ -1,7 +1,6 @@
-import { TimeAgoPipe } from '@shared/utils/pipes/time-ago-pipe';
-import { QueueLabelPipe } from '@shared/utils/pipes/queue-label-pipe';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	computed,
 	inject,
@@ -9,7 +8,6 @@ import {
 	OnInit,
 	PLATFORM_ID,
 	signal,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { DashboardService } from '@core/services/dashboard.service';
@@ -24,6 +22,8 @@ import {
 	QueueStats,
 	RecentQueueEvent,
 } from '@models/dashboard.models';
+import { QueueLabelPipe } from '@shared/utils/pipes/queue-label-pipe';
+import { TimeAgoPipe } from '@shared/utils/pipes/time-ago-pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { interval, Subscription } from 'rxjs';

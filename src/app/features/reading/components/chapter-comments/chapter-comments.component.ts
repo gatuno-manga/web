@@ -1,4 +1,3 @@
-import { CommentInitialsPipe } from '@shared/utils/pipes/comment-initials-pipe';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
@@ -19,6 +18,7 @@ import { UserService } from '@core/services/user.service';
 import { UserTokenService } from '@core/services/user-token.service';
 import { ChapterCommentNode } from '@models/book.models';
 import { Paginated as PaginatedResponse } from '@models/miscellaneous.models';
+import { CommentInitialsPipe } from '@shared/utils/pipes/comment-initials-pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { MarkdownComponent } from 'ngx-markdown';
 import { filter, switchMap } from 'rxjs/operators';

@@ -1,5 +1,6 @@
 import { CommonModule, Location, NgOptimizedImage } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	ChangeDetectorRef,
 	Component,
 	computed,
@@ -8,7 +9,6 @@ import {
 	input,
 	output,
 	signal,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
@@ -21,9 +21,9 @@ import { UserTokenService } from '@core/services/user-token.service';
 import { BookList } from '@models/book.models';
 import { ContextMenuItem } from '@models/context-menu.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { firstValueFrom } from 'rxjs';
-import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 
 @Component({
 	selector: 'app-item-book',

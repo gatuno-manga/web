@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import {
+	DestroyRef,
 	Inject,
 	Injectable,
 	inject,
 	OnDestroy,
 	signal,
-	DestroyRef,
 } from '@angular/core';
-import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { BookEvents } from '@constants/book-events.constants';
 import { ENVIRONMENT, Environment } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';

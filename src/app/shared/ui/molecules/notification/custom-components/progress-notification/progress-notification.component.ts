@@ -1,8 +1,8 @@
 import {
+	ChangeDetectionStrategy,
 	Component,
 	computed,
 	input,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 

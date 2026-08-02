@@ -1,4 +1,3 @@
-import { UrlTransformPipe } from '@shared/utils/pipes/url-transform-pipe';
 import {
 	CdkDragDrop,
 	DragDropModule,
@@ -35,6 +34,7 @@ import {
 	tag,
 	UpdateBookDto,
 } from '@models/book.models';
+import { UrlTransformPipe } from '@shared/utils/pipes/url-transform-pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { SelectComponent } from '@ui/atoms/inputs/select/select.component';

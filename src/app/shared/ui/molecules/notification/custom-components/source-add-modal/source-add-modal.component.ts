@@ -1,18 +1,18 @@
-import { UrlTransformPipe } from '@shared/utils/pipes/url-transform-pipe';
 import {
 	CdkDragDrop,
 	DragDropModule,
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	computed,
 	Input,
 	OnInit,
 	signal,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { UrlTransformPipe } from '@shared/utils/pipes/url-transform-pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';

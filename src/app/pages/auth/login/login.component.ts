@@ -1,10 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	inject,
 	OnInit,
 	PLATFORM_ID,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import {
 	FormBuilder,

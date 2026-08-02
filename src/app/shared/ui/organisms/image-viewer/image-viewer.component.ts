@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	EventEmitter,
 	HostListener,
 	Input,
 	Output,
 	signal,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { ImageMetadata } from '@models/book.models';
 import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';

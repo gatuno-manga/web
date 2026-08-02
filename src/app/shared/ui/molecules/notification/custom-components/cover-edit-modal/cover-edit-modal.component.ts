@@ -1,4 +1,5 @@
 import {
+	ChangeDetectionStrategy,
 	Component,
 	computed,
 	Input,
@@ -6,7 +7,6 @@ import {
 	OnInit,
 	SimpleChanges,
 	signal,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Cover } from '@models/book.models';
@@ -24,7 +24,13 @@ export interface CoverEditSaveEvent {
 @Component({
 	selector: 'app-cover-edit-modal',
 	standalone: true,
-	imports: [FormsModule, ButtonComponent, TextInputComponent, IconsComponent, ImageFallbackDirective],
+	imports: [
+		FormsModule,
+		ButtonComponent,
+		TextInputComponent,
+		IconsComponent,
+		ImageFallbackDirective,
+	],
 	templateUrl: './cover-edit-modal.component.html',
 	styleUrls: ['./cover-edit-modal.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,

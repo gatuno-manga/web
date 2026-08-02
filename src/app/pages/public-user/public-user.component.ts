@@ -1,10 +1,10 @@
 import { DatePipe } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	inject,
 	OnInit,
 	signal,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { MetaDataService } from '@core/services/meta-data.service';

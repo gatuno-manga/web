@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 

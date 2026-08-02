@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
+	DestroyRef,
 	ElementRef,
 	HostListener,
 	inject,
 	OnInit,
 	signal,
 	viewChild,
-	DestroyRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';

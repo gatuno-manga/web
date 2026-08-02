@@ -1,11 +1,11 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import {
+	DestroyRef,
 	Injectable,
 	inject,
 	PLATFORM_ID,
 	signal,
-	DestroyRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SwPush } from '@angular/service-worker';

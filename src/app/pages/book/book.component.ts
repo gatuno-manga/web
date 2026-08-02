@@ -32,6 +32,7 @@ import { FlagPipe } from '@shared/utils/pipes/flag.pipe';
 import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
 	AddToCollectionModalComponent,
@@ -42,7 +43,6 @@ import {
 	BookEditModalComponent,
 	BookEditSaveEvent,
 } from '@ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component';
-import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { MarkdownComponent } from 'ngx-markdown';
 import { firstValueFrom, Subscription } from 'rxjs';
 

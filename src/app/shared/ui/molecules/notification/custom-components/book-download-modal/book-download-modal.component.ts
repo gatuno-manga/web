@@ -1,13 +1,13 @@
-import { ChapterLabelPipe } from '@shared/utils/pipes/chapter-label-pipe';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	computed,
 	Input,
 	OnInit,
 	signal,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ChapterLabelPipe } from '@shared/utils/pipes/chapter-label-pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 

@@ -1,5 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	computed,
 	HostListener,
@@ -11,7 +12,6 @@ import {
 	output,
 	PLATFORM_ID,
 	signal,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 

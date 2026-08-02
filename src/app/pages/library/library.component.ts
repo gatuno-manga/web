@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	inject,
 	OnInit,
 	signal,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { BookList, ImageMetadata } from '@core/models/book.models';
 import { ContextMenuItem } from '@core/models/context-menu.models';

@@ -28,7 +28,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterModule } from '@angular/router';
-import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BookService } from '@core/services/book.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
@@ -61,6 +60,7 @@ import { ScrapingStatusPipe } from '@shared/utils/pipes/scraping-status.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
 	AddRelatedBookModalComponent,

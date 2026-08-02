@@ -1,8 +1,8 @@
 import {
+	ChangeDetectionStrategy,
 	Component,
 	input,
 	output,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { SwitchComponent } from '../switch/switch.component';
 

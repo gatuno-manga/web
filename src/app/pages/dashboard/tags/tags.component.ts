@@ -1,5 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	ChangeDetectorRef,
 	Component,
 	computed,
@@ -7,7 +8,6 @@ import {
 	NgZone,
 	PLATFORM_ID,
 	signal,
-	ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';

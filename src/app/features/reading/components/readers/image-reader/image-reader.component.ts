@@ -19,10 +19,10 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { SettingsService } from '@core/services/settings.service';
 import { ImageMetadata, Page } from '@models/book.models';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { fromEvent } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
-import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 
 export interface ReadingProgressEvent {
 	pageIndex: number;
