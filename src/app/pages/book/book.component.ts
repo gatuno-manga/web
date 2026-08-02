@@ -364,13 +364,13 @@ export class BookComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	getAuthorNames(): string {
+	authorNames = computed(() => {
 		return (
 			this.book()
 				?.authors?.map((author) => author.name)
 				.join(', ') || ''
 		);
-	}
+	});
 	filterByTag(tagId: string) {
 		this.router.navigate(['/books'], { queryParams: { tags: tagId } });
 	}

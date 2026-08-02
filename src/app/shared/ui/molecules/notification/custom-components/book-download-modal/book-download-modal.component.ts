@@ -1,3 +1,4 @@
+import { ChapterLabelPipe } from '@shared/utils/pipes/chapter-label-pipe';
 import {
 	Component,
 	computed,
@@ -26,7 +27,13 @@ import { CheckboxComponent } from '@ui/atoms/inputs/checkbox/checkbox.component'
 @Component({
 	selector: 'app-book-download-modal',
 	standalone: true,
-	imports: [FormsModule, ButtonComponent, IconsComponent, CheckboxComponent],
+	imports: [
+		FormsModule,
+		ButtonComponent,
+		IconsComponent,
+		CheckboxComponent,
+		ChapterLabelPipe,
+	],
 	templateUrl: './book-download-modal.component.html',
 	styleUrls: ['./book-download-modal.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,

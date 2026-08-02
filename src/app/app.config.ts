@@ -8,7 +8,7 @@ import {
 	importProvidersFrom,
 	isDevMode,
 	LOCALE_ID,
-	provideZoneChangeDetection,
+	provideZonelessChangeDetection,
 } from '@angular/core';
 import {
 	provideClientHydration,
@@ -26,7 +26,7 @@ import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
 	providers: [
-		provideZoneChangeDetection({ eventCoalescing: true }),
+		provideZonelessChangeDetection(),
 		provideRouter(
 			routes,
 			withRouterConfig({ onSameUrlNavigation: 'reload' }),

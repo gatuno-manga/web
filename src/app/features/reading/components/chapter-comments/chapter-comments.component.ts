@@ -1,3 +1,4 @@
+import { CommentInitialsPipe } from '@shared/utils/pipes/comment-initials-pipe';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
@@ -37,6 +38,7 @@ type FlattenedComment = {
 		DatePipe,
 		IconsComponent,
 		MarkdownComponent,
+		CommentInitialsPipe,
 	],
 	templateUrl: './chapter-comments.component.html',
 	styleUrl: './chapter-comments.component.scss',
@@ -305,15 +307,6 @@ export class ChapterCommentsComponent implements OnInit {
 	canEditComment(comment: ChapterCommentNode): boolean {
 		const userId = this.userTokenService.userIdSignal();
 		return this.admin() || userId === comment.userId;
-	}
-
-	getCommentInitials(userName: string): string {
-		const normalized = (userName || '').trim();
-		if (!normalized) return '?';
-
-		const parts = normalized.split(/\s+/).filter(Boolean);
-		if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-		return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
 	}
 
 	wasCommentEdited(comment: ChapterCommentNode): boolean {

@@ -147,9 +147,9 @@ export class SelectComponent implements ControlValueAccessor {
 		this.isOpen.set(false);
 	}
 
-	getSelectedLabel(): string {
-		return this.selectedOption()?.label ?? this.placeholder();
-	}
+	selectedLabel = computed(
+		() => this.selectedOption()?.label ?? this.placeholder(),
+	);
 
 	closeDropdown(): void {
 		this.isOpen.set(false);

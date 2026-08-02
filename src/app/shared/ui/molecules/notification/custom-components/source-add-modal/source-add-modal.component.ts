@@ -1,3 +1,4 @@
+import { UrlTransformPipe } from '@shared/utils/pipes/url-transform-pipe';
 import {
 	CdkDragDrop,
 	DragDropModule,
@@ -29,6 +30,7 @@ export interface SourceAddSaveEvent {
 		TextInputComponent,
 		IconsComponent,
 		DragDropModule,
+		UrlTransformPipe,
 	],
 	templateUrl: './source-add-modal.component.html',
 	styleUrls: ['./source-add-modal.component.scss'],
@@ -128,14 +130,6 @@ export class SourceAddModalComponent implements OnInit {
 	onCancel(): void {
 		if (this.close) {
 			this.close(null);
-		}
-	}
-
-	urlTransform(url: string): string {
-		try {
-			return new URL(url).hostname;
-		} catch (_e) {
-			return url;
 		}
 	}
 }

@@ -11,7 +11,7 @@
 			@if (userProfile()?.profileImageUrl; as avatar) {
 				<img [src]="avatar" alt="Avatar" />
 			} @else {
-				<span>{{ getCommentInitials(userProfile()?.name || userProfile()?.userName || userEmail() || '?') }}</span>
+				<span>{{ (userProfile()?.name || userProfile()?.userName || userEmail() || '?') | commentInitials }}</span>
 			}
 		</div>
 		<div class="chapter-comments__new-content">
@@ -129,7 +129,7 @@
 							/>
 						} @else {
 							<span>
-								{{ getCommentInitials(item.comment.userName) }}
+								{{ (item.comment.userName) | commentInitials }}
 							</span>
 						}
 					</div>

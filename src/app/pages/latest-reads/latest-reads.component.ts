@@ -261,11 +261,4 @@ export class LatestReadsComponent implements OnInit {
 		};
 		return target.toLocaleDateString('pt-BR', options);
 	}
-
-	formatTime(d: Date): string {
-		return d.toLocaleTimeString('pt-BR', {
-			hour: '2-digit',
-			minute: '2-digit',
-		});
-	}
 }

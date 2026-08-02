@@ -1,3 +1,4 @@
+import { UrlTransformPipe } from '@shared/utils/pipes/url-transform-pipe';
 import {
 	CdkDragDrop,
 	DragDropModule,
@@ -62,6 +63,7 @@ export interface BookEditSaveEvent {
 		IconsComponent,
 		DragDropModule,
 		MultiSelectTagsComponent,
+		UrlTransformPipe,
 	],
 	templateUrl: './book-edit-modal.component.html',
 	styleUrls: ['./book-edit-modal.component.scss'],
@@ -506,14 +508,6 @@ export class BookEditModalComponent implements OnInit {
 	onCancel(): void {
 		if (this.close()) {
 			this.close()(null);
-		}
-	}
-
-	urlTransform(url: string): string {
-		try {
-			return new URL(url).hostname;
-		} catch (_e) {
-			return url;
 		}
 	}
 }
