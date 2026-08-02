@@ -11,7 +11,10 @@ import {
 	PLATFORM_ID,
 	signal,
 	ViewChild,
+	DestroyRef,
+	ChangeDetectionStrategy,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
 	ActivatedRoute,
 	NavigationStart,
@@ -75,6 +78,7 @@ interface BookQueryParams {
 	],
 	templateUrl: './books.component.html',
 	styleUrl: './books.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private localStorage = inject(LocalStorageService);
@@ -91,6 +95,7 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 	private scrollRestoration = inject(ScrollRestorationService);
 	private readonly platformId = inject(PLATFORM_ID);
 	private readonly isBrowser = isPlatformBrowser(this.platformId);
+	private destroyRef = inject(DestroyRef);
 
 	/** Key used to store/retrieve scroll position in sessionStorage */
 	private readonly scrollKey = 'books-list';
@@ -225,6 +230,7 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 				distinctUntilChanged(
 					(a, b) => JSON.stringify(a) === JSON.stringify(b),
 				),
+				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((rawParams) => {
 				const params = rawParams as BookQueryParams;

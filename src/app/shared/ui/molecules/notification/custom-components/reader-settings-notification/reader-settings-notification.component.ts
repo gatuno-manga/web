@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ReaderSettingsFormComponent } from '@features/reading/components/readers';
 
 @Component({
@@ -8,6 +8,7 @@ import { ReaderSettingsFormComponent } from '@features/reading/components/reader
 	imports: [CommonModule, ReaderSettingsFormComponent],
 	templateUrl: './reader-settings-notification.component.html',
 	styleUrls: ['./reader-settings-notification.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReaderSettingsNotificationComponent {
 	@Input() title = 'Configurações do Leitor';

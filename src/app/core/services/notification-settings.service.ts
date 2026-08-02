@@ -1,6 +1,13 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
+import {
+	Injectable,
+	inject,
+	PLATFORM_ID,
+	signal,
+	DestroyRef,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SwPush } from '@angular/service-worker';
 import { firstValueFrom } from 'rxjs';
 
@@ -11,6 +18,7 @@ export class NotificationSettingsService {
 	private http = inject(HttpClient);
 	private swPush = inject(SwPush, { optional: true });
 	private platformId = inject(PLATFORM_ID);
+	private destroyRef = inject(DestroyRef);
 
 	public isPushSupported = signal(false);
 	public isPushEnabled = signal(false);
@@ -29,9 +37,11 @@ export class NotificationSettingsService {
 
 			// Inscrever para saber se o Push está ativo
 			if (this.swPush?.isEnabled) {
-				this.swPush.subscription.subscribe((sub) => {
-					this.isPushEnabled.set(!!sub);
-				});
+				this.swPush.subscription
+					.pipe(takeUntilDestroyed(this.destroyRef))
+					.subscribe((sub) => {
+						this.isPushEnabled.set(!!sub);
+					});
 			}
 		}
 	}

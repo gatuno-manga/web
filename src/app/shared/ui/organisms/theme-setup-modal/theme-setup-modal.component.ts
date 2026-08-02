@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { AppTheme, ThemeService } from '@core/services/theme.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
@@ -8,6 +8,7 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 	imports: [IconsComponent],
 	templateUrl: './theme-setup-modal.component.html',
 	styleUrl: './theme-setup-modal.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeSetupModalComponent {
 	public themeService = inject(ThemeService);

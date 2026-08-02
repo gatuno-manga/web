@@ -6,6 +6,7 @@ import {
 	OnInit,
 	SimpleChanges,
 	signal,
+	ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Cover } from '@models/book.models';
@@ -25,6 +26,7 @@ export interface CoverEditSaveEvent {
 	imports: [FormsModule, ButtonComponent, TextInputComponent, IconsComponent],
 	templateUrl: './cover-edit-modal.component.html',
 	styleUrls: ['./cover-edit-modal.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CoverEditModalComponent implements OnInit, OnChanges {
 	@Input() cover!: Cover;

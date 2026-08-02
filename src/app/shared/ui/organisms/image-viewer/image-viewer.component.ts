@@ -6,6 +6,7 @@ import {
 	Input,
 	Output,
 	signal,
+	ChangeDetectionStrategy,
 } from '@angular/core';
 import { ImageMetadata } from '@models/book.models';
 import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
@@ -17,6 +18,7 @@ import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 	imports: [CommonModule, IconButtonComponent, BlurhashComponent],
 	templateUrl: './image-viewer.component.html',
 	styleUrl: './image-viewer.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageViewerComponent {
 	@Input() imageUrl: string = '';

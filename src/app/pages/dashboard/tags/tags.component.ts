@@ -7,6 +7,7 @@ import {
 	NgZone,
 	PLATFORM_ID,
 	signal,
+	ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -29,6 +30,7 @@ import { ListCheckboxItem } from '@ui/atoms/inputs/list-checkbox/list-checkbox.t
 	],
 	templateUrl: './tags.component.html',
 	styleUrl: './tags.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagsComponent {
 	tags: Tag[] = [];

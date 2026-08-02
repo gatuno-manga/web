@@ -3,7 +3,14 @@ import {
 	DragDropModule,
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { Component, computed, Input, OnInit, signal } from '@angular/core';
+import {
+	Component,
+	computed,
+	Input,
+	OnInit,
+	signal,
+	ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
@@ -25,6 +32,7 @@ export interface SourceAddSaveEvent {
 	],
 	templateUrl: './source-add-modal.component.html',
 	styleUrls: ['./source-add-modal.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SourceAddModalComponent implements OnInit {
 	@Input() existingUrls: string[] = [];

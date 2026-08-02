@@ -1,4 +1,9 @@
-import { Component, Input, signal } from '@angular/core';
+import {
+	Component,
+	Input,
+	signal,
+	ChangeDetectionStrategy,
+} from '@angular/core';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { SwitchComponent } from '@ui/atoms/inputs/switch/switch.component';
@@ -15,6 +20,7 @@ export interface RandomFilterResult {
 	imports: [ButtonComponent, SwitchComponent, IconsComponent],
 	templateUrl: './random-filter-modal.component.html',
 	styleUrls: ['./random-filter-modal.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RandomFilterModalComponent {
 	@Input() close!: (result: RandomFilterResult | null) => void;

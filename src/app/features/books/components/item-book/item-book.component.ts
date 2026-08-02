@@ -8,6 +8,7 @@ import {
 	input,
 	output,
 	signal,
+	ChangeDetectionStrategy,
 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
@@ -35,6 +36,7 @@ import { firstValueFrom } from 'rxjs';
 	],
 	templateUrl: './item-book.component.html',
 	styleUrl: './item-book.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemBookComponent {
 	book = input.required<BookList>();

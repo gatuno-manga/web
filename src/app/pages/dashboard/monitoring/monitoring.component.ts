@@ -7,6 +7,7 @@ import {
 	OnInit,
 	PLATFORM_ID,
 	signal,
+	ChangeDetectionStrategy,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { DashboardService } from '@core/services/dashboard.service';
@@ -47,6 +48,7 @@ const QUEUE_LABELS: Record<string, string> = {
 	imports: [CommonModule, IconsComponent, RouterModule, ButtonComponent],
 	templateUrl: './monitoring.component.html',
 	styleUrl: './monitoring.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonitoringComponent implements OnInit, OnDestroy {
 	private dashboardService = inject(DashboardService);

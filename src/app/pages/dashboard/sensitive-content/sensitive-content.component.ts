@@ -12,6 +12,7 @@ import {
 	NgZone,
 	PLATFORM_ID,
 	signal,
+	ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -38,6 +39,7 @@ import { TooltipDirective } from '@ui/atoms/tooltip/tooltip.directive';
 	],
 	templateUrl: './sensitive-content.component.html',
 	styleUrl: './sensitive-content.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SensitiveContentComponent {
 	sensitiveContents = signal<SensitiveContentResponse[]>([]);

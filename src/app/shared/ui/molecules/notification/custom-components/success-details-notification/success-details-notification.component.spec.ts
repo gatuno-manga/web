@@ -126,7 +126,9 @@ describe('SuccessDetailsNotificationComponent', () => {
 		await fixture.whenStable();
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
-		const checks = compiled.querySelectorAll('app-icons[name="check-circle"]');
+		const checks = compiled.querySelectorAll(
+			'app-icons[name="check-circle"]',
+		);
 		expect(checks.length).toBe(2);
 	});
 });

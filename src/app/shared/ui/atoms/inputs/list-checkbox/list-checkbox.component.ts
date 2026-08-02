@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ListCheckboxItem } from './list-checkbox.type';
 
 @Component({
@@ -6,6 +6,7 @@ import { ListCheckboxItem } from './list-checkbox.type';
 	imports: [],
 	templateUrl: './list-checkbox.component.html',
 	styleUrl: './list-checkbox.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListCheckboxComponent {
 	@Input() items: ListCheckboxItem[] = [];

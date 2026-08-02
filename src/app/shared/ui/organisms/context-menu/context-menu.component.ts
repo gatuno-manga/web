@@ -7,6 +7,7 @@ import {
 	inject,
 	PLATFORM_ID,
 	ViewChild,
+	ChangeDetectionStrategy,
 } from '@angular/core';
 import { ContextMenuService } from '@core/services/context-menu.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
@@ -17,6 +18,7 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 	imports: [CommonModule, IconsComponent],
 	templateUrl: './context-menu.component.html',
 	styleUrl: './context-menu.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContextMenuComponent {
 	private contextMenuService = inject(ContextMenuService);

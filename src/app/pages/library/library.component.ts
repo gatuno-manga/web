@@ -1,6 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+	Component,
+	inject,
+	OnInit,
+	signal,
+	ChangeDetectionStrategy,
+} from '@angular/core';
 import { BookList, ImageMetadata } from '@core/models/book.models';
 import { ContextMenuItem } from '@core/models/context-menu.models';
 import { BookService } from '@core/services/book.service';
@@ -119,6 +125,7 @@ const LIBRARY_QUERY = `
 	],
 	templateUrl: './library.component.html',
 	styleUrl: './library.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LibraryComponent implements OnInit {
 	private http = inject(HttpClient);

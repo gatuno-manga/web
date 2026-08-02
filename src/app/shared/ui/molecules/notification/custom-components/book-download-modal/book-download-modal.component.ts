@@ -1,4 +1,11 @@
-import { Component, computed, Input, OnInit, signal } from '@angular/core';
+import {
+	Component,
+	computed,
+	Input,
+	OnInit,
+	signal,
+	ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
@@ -22,6 +29,7 @@ import { CheckboxComponent } from '@ui/atoms/inputs/checkbox/checkbox.component'
 	imports: [FormsModule, ButtonComponent, IconsComponent, CheckboxComponent],
 	templateUrl: './book-download-modal.component.html',
 	styleUrls: ['./book-download-modal.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookDownloadModalComponent implements OnInit {
 	@Input() chapters: BookDownloadChapter[] = [];
