@@ -42,6 +42,7 @@ import {
 	BookEditModalComponent,
 	BookEditSaveEvent,
 } from '@ui/molecules/notification/custom-components/book-edit-modal/book-edit-modal.component';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { MarkdownComponent } from 'ngx-markdown';
 import { firstValueFrom, Subscription } from 'rxjs';
 

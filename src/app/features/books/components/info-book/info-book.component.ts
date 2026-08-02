@@ -28,6 +28,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterModule } from '@angular/router';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BookService } from '@core/services/book.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
@@ -1955,8 +1956,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	onCoverContextMenu(event: MouseEvent, cover: Cover) {
 		const items: ContextMenuItem[] = [];
 
-		// Only show image-related options if cover has a URL and no error
-		if (cover.url && !this.coverImageErrors().has(cover.id)) {
+		// Only show image-related options if cover has a URL
+		if (cover.url) {
 			items.push(
 				{
 					label: 'Copiar Imagem',
@@ -2098,7 +2099,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			return;
 		}
 
-		if (cover.url && !this.coverImageErrors().has(cover.id)) {
+		if (cover.url) {
 			this.openImageViewer(cover.url, cover.title, '', cover.metadata);
 		} else {
 			// Open edit modal for covers without image or with loading error
@@ -2372,11 +2373,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 								}
 								next[coverIndex] = updatedCover;
 							}
-							return next;
-						});
-						this.coverImageErrors.update((set) => {
-							const next = new Set(set);
-							next.delete(data.id);
 							return next;
 						});
 						this.closeCoverEditModal();
