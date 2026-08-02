@@ -9,13 +9,17 @@
 
 	<div class="settings-body">
 		<div class="cover-preview" (click)="triggerFileInput(fileInput)">
-			@if (hasImage() && !imageError()) {
+			@if (hasImage()) {
+				<div class="placeholder-icon" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 0;">
+					<app-icons name="image" />
+				</div>
 				<img
 					[src]="previewUrl()"
 					alt="{{ cover.title }}"
-					(error)="onImageError()"
+					appImageFallback
+					style="position: relative; z-index: 1;"
 				/>
-				<div class="upload-overlay">
+				<div class="upload-overlay" style="z-index: 2;">
 					<app-icons name="upload" />
 					<span>Trocar imagem</span>
 				</div>

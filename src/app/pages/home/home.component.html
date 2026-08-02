@@ -32,8 +32,8 @@
               @if (book.blurHash) {
                 <app-blurhash [hash]="book.blurHash" class="bg-blur" />
               }
-              @if (book.cover && !hasImageError(book.id)) {
-                <img [ngSrc]="book.cover" fill priority alt="" class="bg-image" (error)="onImageError(book.id)" />
+              @if (book.cover) {
+                <img [ngSrc]="book.cover" fill priority alt="" class="bg-image" appImageFallback />
               }
               <div class="gradient-overlay"></div>
             </div>
@@ -42,12 +42,11 @@
               <div class="glass-panel">
                 <div class="cover-container" [style.background-color]="book.dominantColor || 'var(--secondary-color)'">
                   <!-- Capa é decorativa aqui pois o título já está logo abaixo como h2 -->
-                  @if (book.cover && !hasImageError(book.id)) {
-                    <img [ngSrc]="book.cover" alt="" width="298" height="453" priority (error)="onImageError(book.id)" />
-                  } @else {
-                    <div class="cover-placeholder">
-                      <img src="assets/icons/image-placeholder-14824e.svg" alt="Sem capa" class="placeholder-icon" />
-                    </div>
+                  <div class="cover-placeholder" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 0;">
+                    <img src="assets/icons/image-placeholder-14824e.svg" alt="Sem capa" class="placeholder-icon" />
+                  </div>
+                  @if (book.cover) {
+                    <img [ngSrc]="book.cover" alt="" width="298" height="453" priority appImageFallback style="position: relative; z-index: 1;" />
                   }
                 </div>
                 <div class="info-container">

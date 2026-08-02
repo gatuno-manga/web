@@ -116,12 +116,11 @@
 					<a [routerLink]="['/books', item.id]" class="book-item-shell interactive-card">
 						<div class="book-item-core">
 							<div class="book-image" [style.background-color]="item.dominantColor || 'var(--secondary-color)'">
-								@if (item.cover && !imageErrors().has(item.id)) {
-									<img [src]="item.cover" alt="{{ item.title }}" (error)="onImageError(item.id)" />
-								} @else {
-									<div class="cover-placeholder">
-										<app-icons name="image" size="32" class="placeholder-icon" color="var(--app-text-color)" />
-									</div>
+								<div class="cover-placeholder" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 0;">
+									<app-icons name="image" size="32" class="placeholder-icon" color="var(--app-text-color)" style="opacity: 0.15;" />
+								</div>
+								@if (item.cover) {
+									<img [src]="item.cover" alt="{{ item.title }}" appImageFallback style="position: relative; z-index: 1;" />
 								}
 							</div>
 							<div class="book-title">{{ item.title }}</div>

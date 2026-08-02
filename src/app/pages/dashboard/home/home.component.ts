@@ -23,11 +23,12 @@ import {
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { EChartsOption } from 'echarts';
 import { NgxEchartsDirective } from 'ngx-echarts';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 
 @Component({
 	selector: 'app-home',
 	standalone: true,
-	imports: [CommonModule, IconsComponent, RouterModule, NgxEchartsDirective],
+	imports: [CommonModule, IconsComponent, RouterModule, NgxEchartsDirective, ImageFallbackDirective],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,16 +63,6 @@ export class HomeComponent implements OnInit {
 		processingChapters: 0,
 		books: [],
 	});
-
-	imageErrors = signal<Set<string>>(new Set());
-
-	onImageError(bookId: string) {
-		this.imageErrors.update((set) => {
-			const newSet = new Set(set);
-			newSet.add(bookId);
-			return newSet;
-		});
-	}
 
 	queueStats = signal<QueueStats>({ queues: [] });
 

@@ -58,6 +58,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 		FlagPipe,
 		TooltipDirective,
 		HasPermissionDirective,
+		ImageFallbackDirective,
 	],
 	templateUrl: './book.component.html',
 	styleUrl: './book.component.scss',
@@ -95,11 +96,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	showOptionsDropdown = signal(false);
 	showAdminDropdown = signal(false);
 
-	// Estado para verificar se o livro está baixado
 	isBookDownloaded = signal(false);
-
-	// Estado para erro de imagem de capa
-	coverImageError = false;
 
 	public userService = inject(UserService);
 	private metaService = inject(MetaDataService);
@@ -126,10 +123,6 @@ export class BookComponent implements OnInit, OnDestroy {
 		this.closeAdminDropdown();
 	}
 
-	onCoverImageError() {
-		this.coverImageError = true;
-	}
-
 	private routeSub?: Subscription;
 
 	ngOnInit() {
@@ -146,7 +139,6 @@ export class BookComponent implements OnInit, OnDestroy {
 	private loadBook(id: string) {
 		this.isLoading.set(true);
 		this.book.set(undefined); // Reseta o livro para forçar a recriação do app-info-book
-		this.coverImageError = false;
 		this.wsSubscription?.unsubscribe();
 
 		this.bookService.getBook(id).subscribe({

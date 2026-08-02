@@ -23,6 +23,7 @@ import { ContextMenuItem } from '@models/context-menu.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { firstValueFrom } from 'rxjs';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 
 @Component({
 	selector: 'app-item-book',
@@ -33,6 +34,7 @@ import { firstValueFrom } from 'rxjs';
 		BlurhashComponent,
 		CommonModule,
 		IconsComponent,
+		ImageFallbackDirective,
 	],
 	templateUrl: './item-book.component.html',
 	styleUrl: './item-book.component.scss',
@@ -62,7 +64,6 @@ export class ItemBookComponent {
 	private router = inject(Router);
 	private location = inject(Location);
 
-	imageError = false;
 	isImageLoaded = signal(false);
 	isDownloaded = signal(false);
 
@@ -154,7 +155,6 @@ export class ItemBookComponent {
 	cardCoverStyle = computed(() => {
 		if (
 			this.book().cover &&
-			!this.imageError &&
 			!(this.book().blurHash || this.book().coverMetadata?.blurHash)
 		) {
 			return { '--card-cover': `url(${this.book().cover})` };
@@ -184,10 +184,6 @@ export class ItemBookComponent {
 
 	isBlobUrl(url: string | undefined | null): boolean {
 		return typeof url === 'string' && url.startsWith('blob:');
-	}
-
-	onImageError() {
-		this.imageError = true;
 	}
 
 	onContextMenu(event: MouseEvent) {

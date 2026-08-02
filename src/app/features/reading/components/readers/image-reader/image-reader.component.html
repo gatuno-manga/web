@@ -36,7 +36,7 @@
 			[attr.fetchpriority]="$index < 2 ? 'high' : 'auto'"
 			[attr.loading]="$index < 2 ? 'eager' : 'lazy'"
 			(load)="onImageLoad($index)"
-			(error)="onImageError()"
+			appImageFallback
 			[class.loaded]="loadedPages.has($index) && !isBlurred"
 			[class.hidden]="isBlurred"
 		/>

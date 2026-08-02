@@ -120,6 +120,7 @@ interface ModulesLoad {
 		RouterLink,
 		HasPermissionDirective,
 		FormsModule,
+		ImageFallbackDirective,
 	],
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
@@ -303,9 +304,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	// Cover edit modal state
 	editingCover = signal<Cover | null>(null);
-
-	// Track cover image loading errors
-	coverImageErrors = signal<Set<string>>(new Set());
 
 	@ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
 	@ViewChildren('tabEl') tabEls!: QueryList<ElementRef<HTMLSpanElement>>;
@@ -1111,13 +1109,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 	}
 
-	onCoverImageError(coverId: string) {
-		this.coverImageErrors.update((set) => {
-			const newSet = new Set(set);
-			newSet.add(coverId);
-			return newSet;
-		});
-	}
+	hasCoversToSave = computed(() => {
+		return this.hasCoversChanged();
+	});
 
 	onSavedPageClick(savedPage: SavedPage) {
 		if (savedPage.page?.path) {

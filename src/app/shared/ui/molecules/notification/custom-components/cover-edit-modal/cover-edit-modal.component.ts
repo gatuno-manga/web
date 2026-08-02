@@ -13,6 +13,7 @@ import { Cover } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 
 export interface CoverEditSaveEvent {
 	id: string;
@@ -23,7 +24,7 @@ export interface CoverEditSaveEvent {
 @Component({
 	selector: 'app-cover-edit-modal',
 	standalone: true,
-	imports: [FormsModule, ButtonComponent, TextInputComponent, IconsComponent],
+	imports: [FormsModule, ButtonComponent, TextInputComponent, IconsComponent, ImageFallbackDirective],
 	templateUrl: './cover-edit-modal.component.html',
 	styleUrls: ['./cover-edit-modal.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,14 +36,12 @@ export class CoverEditModalComponent implements OnInit, OnChanges {
 	editedTitle = signal<string>('');
 	selectedFile = signal<File | null>(null);
 	previewUrl = signal<string | null>(null);
-	imageError = signal<boolean>(false);
 
 	hasImage = computed(() => !!this.previewUrl());
 
 	ngOnInit(): void {
 		this.editedTitle.set(this.cover?.title || '');
 		this.previewUrl.set(this.cover?.url || null);
-		this.imageError.set(false);
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
@@ -50,7 +49,6 @@ export class CoverEditModalComponent implements OnInit, OnChanges {
 			this.editedTitle.set(this.cover.title || '');
 			this.previewUrl.set(this.cover.url || null);
 			this.selectedFile.set(null);
-			this.imageError.set(false);
 		}
 	}
 
@@ -59,12 +57,7 @@ export class CoverEditModalComponent implements OnInit, OnChanges {
 		if (input.files && input.files.length > 0) {
 			this.selectedFile.set(input.files[0]);
 			this.previewUrl.set(URL.createObjectURL(input.files[0]));
-			this.imageError.set(false);
 		}
-	}
-
-	onImageError(): void {
-		this.imageError.set(true);
 	}
 
 	triggerFileInput(fileInput: HTMLInputElement): void {

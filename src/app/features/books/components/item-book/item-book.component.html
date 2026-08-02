@@ -62,13 +62,17 @@
 		</div>
 	</ng-template>
 
-	@if (book().cover && !imageError) {
-		<div
-			class="cover-image-container"
-			[style.background-color]="book().dominantColor || 'var(--secondary-color)'"
-		>
-			<ng-container *ngTemplateOutlet="badgesAndRemove"></ng-container>
+	<div
+		class="cover-image-container"
+		[style.background-color]="book().dominantColor || 'var(--secondary-color)'"
+	>
+		<ng-container *ngTemplateOutlet="badgesAndRemove"></ng-container>
 
+		<div class="cover-placeholder-inner">
+			<app-icons name="image" [size]="type() === 'list' ? '32' : '64'" class="placeholder-icon" color="var(--app-text-color)" />
+		</div>
+
+		@if (book().cover) {
 			@if (book().blurHash || book().coverMetadata?.blurHash) {
 				<div class="blur-placeholder" [class.fade-out]="isImageLoaded()" aria-hidden="true">
 					<app-blurhash [hash]="book().blurHash || book().coverMetadata?.blurHash || ''" [width]="book().coverMetadata?.width || 32" [height]="book().coverMetadata?.height || 32" />
@@ -81,7 +85,7 @@
 					alt="Capa do livro {{ book().title }}"
 					[class.loaded]="isImageLoaded()"
 					(load)="onImageLoad()"
-					(error)="onImageError()"
+					appImageFallback
 				/>
 			} @else {
 				<img
@@ -91,16 +95,11 @@
 					[priority]="priority()"
 					[class.loaded]="isImageLoaded()"
 					(load)="onImageLoad()"
-					(error)="onImageError()"
+					appImageFallback
 				/>
 			}
-		</div>
-	} @else {
-		<div class="cover-placeholder">
-			<ng-container *ngTemplateOutlet="badgesAndRemove"></ng-container>
-			<app-icons name="image" [size]="type() === 'list' ? '32' : '64'" class="placeholder-icon" color="var(--app-text-color)" />
-		</div>
-	}
+		}
+	</div>
 	@if (type() === 'list') {
 		<div class="info">
 			<span class="title">{{ truncatedTitle() }}</span>
