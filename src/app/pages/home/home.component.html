@@ -84,55 +84,76 @@
 
   <!-- Continue Reading Section -->
   @if (isLoadingContinueReading() || continueReadingBooks().length > 0) {
-    <section class="home-section continue-reading">
-      <h2 class="section-title">Continue a sua leitura</h2>
-      @if (isLoadingContinueReading()) {
-        <div class="horizontal-scroll" aria-busy="true" aria-label="Carregando livros...">
+    @defer (on viewport) {
+      <section class="home-section continue-reading">
+        <h2 class="section-title">Continue a sua leitura</h2>
+        @if (isLoadingContinueReading()) {
+          <div class="horizontal-scroll" aria-busy="true" aria-label="Carregando livros...">
+            @for (i of [1,2,3,4,5]; track i) {
+              <div class="book-item-wrapper" aria-hidden="true">
+                <div class="placeholder" style="width: 200px; height: 300px; border-radius: 0.75rem;"></div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="horizontal-scroll" tabindex="0" aria-label="Lista de livros para continuar lendo">
+            @for (book of continueReadingBooks(); track book.id) {
+              <div class="book-item-wrapper">
+                <app-item-book [book]="book" type="grid" />
+              </div>
+            }
+          </div>
+        }
+      </section>
+    } @placeholder {
+      <section class="home-section continue-reading" style="min-height: 400px;">
+        <h2 class="section-title">Continue a sua leitura</h2>
+        <div class="horizontal-scroll" aria-busy="true">
           @for (i of [1,2,3,4,5]; track i) {
             <div class="book-item-wrapper" aria-hidden="true">
               <div class="placeholder" style="width: 200px; height: 300px; border-radius: 0.75rem;"></div>
             </div>
           }
         </div>
-      } @else {
-        <div class="horizontal-scroll" tabindex="0" aria-label="Lista de livros para continuar lendo">
-          @for (book of continueReadingBooks(); track book.id) {
-            <div class="book-item-wrapper">
-              <app-item-book [book]="book" type="grid" />
-            </div>
-          }
-        </div>
-      }
-    </section>
+      </section>
+    }
   }
 
   <!-- Latest Updated Section -->
-  <section class="home-section latest-updates">
+  <section class="home-section latest-updates content-visibility-auto">
     <div class="section-header">
       <h2 class="section-title">Atualizações Recentes</h2>
       <a routerLink="/books" [queryParams]="{ orderBy: 'updatedAt', order: 'DESC' }" class="view-more" aria-label="Ver todas as atualizações recentes">Ver tudo</a>
     </div>
 
-		<app-book-grid
-			[books]="latestUpdatedBooks()"
-			[isLoading]="isLoadingGrid()"
-			type="grid"
-			[skeletonCount]="6"
-		/>
+    @defer (on viewport) {
+      <app-book-grid
+        [books]="latestUpdatedBooks()"
+        [isLoading]="isLoadingGrid()"
+        type="grid"
+        [skeletonCount]="6"
+      />
+    } @placeholder {
+      <div style="min-height: 400px;"></div>
+    }
   </section>
 
   <!-- Recently Added Section -->
-  <section class="home-section recently-added">
+  <section class="home-section recently-added content-visibility-auto">
     <div class="section-header">
       <h2 class="section-title">Novidades no Gatuno</h2>
       <a routerLink="/books" [queryParams]="{ orderBy: 'createdAt', order: 'DESC' }" class="view-more" aria-label="Ver todas as novidades no Gatuno">Ver tudo</a>
     </div>
 
-		<app-book-grid
-			[books]="recentlyAddedBooks()"
-			[isLoading]="isLoadingRecentlyAdded()"
-			type="grid"
-			[skeletonCount]="6"
-		/>
+    @defer (on viewport) {
+      <app-book-grid
+        [books]="recentlyAddedBooks()"
+        [isLoading]="isLoadingRecentlyAdded()"
+        type="grid"
+        [skeletonCount]="6"
+      />
+    } @placeholder {
+      <div style="min-height: 400px;"></div>
+    }
   </section>
 </div>

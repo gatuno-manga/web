@@ -205,3 +205,9 @@ img {
 .scrollable-list.cdk-drop-list-dragging .list-item:not(.cdk-drag-placeholder) {
 	transition: transform 250ms cubic-bezier(0.32, 0.72, 0, 1);
 }
+
+// --- Performance Utilities ---
+.content-visibility-auto {
+	content-visibility: auto;
+	contain-intrinsic-size: auto 500px;
+}

@@ -67,36 +67,42 @@
 			<!-- Content switching based on type -->
 			@switch (currentChapter.contentType) {
 				@case ('text') {
-					<app-text-reader
-						[content]="currentChapter.content || ''"
-						[format]="currentChapter.contentFormat || 'markdown'"
-						[initialScrollPercentage]="
-							savedPageIndex() > 0 ? (savedPageIndex() / 10) * 100 : 0
-						"
-						(progressChange)="onTextProgress($event)"
-					/>
+					@defer (on immediate) {
+						<app-text-reader
+							[content]="currentChapter.content || ''"
+							[format]="currentChapter.contentFormat || 'markdown'"
+							[initialScrollPercentage]="
+								savedPageIndex() > 0 ? (savedPageIndex() / 10) * 100 : 0
+							"
+							(progressChange)="onTextProgress($event)"
+						/>
+					}
 				}
 				@case ('document') {
-					<app-document-reader
-						[src]="currentChapter.documentPath || ''"
-						[format]="currentChapter.documentFormat || 'pdf'"
-						[initialPage]="savedPageIndex() + 1"
-						(pageChange)="onDocumentProgress($event)"
-					/>
+					@defer (on immediate) {
+						<app-document-reader
+							[src]="currentChapter.documentPath || ''"
+							[format]="currentChapter.documentFormat || 'pdf'"
+							[initialPage]="savedPageIndex() + 1"
+							(pageChange)="onDocumentProgress($event)"
+						/>
+					}
 				}
 				@default {
-					<app-image-reader
-						[pages]="currentChapter.pages"
-						[showPageNumbers]="settings().showPageNumbers"
-						[bookBlurHash]="bookBlurHash()"
-						[bookDominantColor]="bookDominantColor()"
-						[bookMetadata]="bookMetadata()"
-						[isBlurred]="privacyService.isBlurred()"
-						(progressChange)="onImageProgress($event)"
-						(contextMenu)="
-							onContextMenu($event.event, $event.page, $event.index)
-						"
-					/>
+					@defer (on immediate) {
+						<app-image-reader
+							[pages]="currentChapter.pages"
+							[showPageNumbers]="settings().showPageNumbers"
+							[bookBlurHash]="bookBlurHash()"
+							[bookDominantColor]="bookDominantColor()"
+							[bookMetadata]="bookMetadata()"
+							[isBlurred]="privacyService.isBlurred()"
+							(progressChange)="onImageProgress($event)"
+							(contextMenu)="
+								onContextMenu($event.event, $event.page, $event.index)
+							"
+						/>
+					}
 				}
 
 			}
@@ -128,7 +134,11 @@
 		}
 	</div>
 
-	<app-chapter-comments [chapterId]="currentChapter.id" />
+	@defer (on viewport) {
+		<app-chapter-comments [chapterId]="currentChapter.id" />
+	} @placeholder {
+		<div style="min-height: 200px"></div>
+	}
 } @else {
 	<div
 		class="chapter-loading"
