@@ -1,34 +1,72 @@
-<!-- @if (isLoading()) {
-<div class="loading">Carregando...</div>
-} -->
 @if (mergingSelection) {
-<div id="merge">
-	<div class="title">
-		<h2>Mesclar Tags</h2>
-		<h3>
-			Selecione as tags que você deseja mesclar com "{{
-				mergingSelection.name
-			}}":
-		</h3>
-		<button type="button" class="cancel-button" (click)="mergingSelection = null">
-			<app-icons name="close" />
-		</button>
-	</div>
-	<div class="body">
-		<app-list-checkbox [items]="mergingTags" />
-	</div>
-	<app-button (click)="mergeTags()">Mesclar</app-button>
-</div>
-} @else{
-<div id="tags-list">
-	@for (item of tags; track $index) {
-	<div class="tag-item">
-		<div>{{ item.name }}</div>
-		<div>
-			<app-button (click)="mergeSelect(item)">Mesclar</app-button>
-			<!-- <app-button>Editar</app-button> não implementado -->
+<div class="glass-overlay">
+	<div id="merge-modal" class="premium-card nested-core">
+		<div class="title">
+			<div class="eyebrow">AÇÃO IRREVERSÍVEL</div>
+			<h2>Mesclar Tags</h2>
+			<p>
+				Selecione os itens que você deseja transferir e mesclar em "<strong>{{ mergingSelection.name }}</strong>".
+			</p>
+			<button type="button" class="cancel-button" (click)="cancelMerge()">
+				<app-icons name="close" />
+			</button>
+		</div>
+		<div class="modal-search">
+			<app-icons name="search" class="search-icon" />
+			<input type="text" [(ngModel)]="mergeSearchQuery" (ngModelChange)="mergeSearchQuery.set($event)" placeholder="Filtrar itens..." class="search-input" />
+		</div>
+		<div class="body">
+			<app-list-checkbox [items]="filteredMergingTags()" />
+		</div>
+		<div class="modal-actions">
+			<app-button class="danger-button" (click)="mergeTags()">Confirmar Mesclagem</app-button>
 		</div>
 	</div>
-	}
 </div>
 }
+
+<div id="dashboard-wrapper">
+	<header class="section-header">
+		<a routerLink="/dashboard/home" class="eyebrow back-link">
+			<app-icons name="arrow-left" /> Voltar
+		</a>
+		<h1 class="section-title">Tags</h1>
+	</header>
+
+	<div class="premium-card outer-shell search-bar-container">
+		<div class="inner-core search-core">
+			<app-icons name="search" class="search-icon" />
+			<input type="text" [(ngModel)]="searchQuery" (ngModelChange)="searchQuery.set($event)" placeholder="Pesquisar tags..." class="search-input" />
+		</div>
+	</div>
+
+	<div id="tags-list">
+		@if (isLoading()) {
+			<div class="skeleton-list">
+				@for (i of [1,2,3,4,5]; track $index) {
+					<div class="premium-card outer-shell skeleton-item">
+						<div class="inner-core placeholder"></div>
+					</div>
+				}
+			</div>
+		} @else {
+			@for (item of filteredTags(); track $index) {
+			<div class="premium-card outer-shell tag-item fluid-fade-up" [style.animation-delay]="$index * 50 + 'ms'">
+				<div class="inner-core content-core">
+					<div class="info">
+						<span class="name">{{ item.name }}</span>
+					</div>
+					<div class="actions">
+						<app-button class="secondary-btn" (click)="mergeSelect(item)">Mesclar</app-button>
+					</div>
+				</div>
+			</div>
+			} @empty {
+				<div class="empty-state">
+					<app-icons name="inbox" class="empty-icon" />
+					<p>Nenhuma tag encontrada.</p>
+				</div>
+			}
+		}
+	</div>
+</div>

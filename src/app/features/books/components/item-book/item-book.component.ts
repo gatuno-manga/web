@@ -1,5 +1,6 @@
 import { CommonModule, Location, NgOptimizedImage } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	ChangeDetectorRef,
 	Component,
 	computed,
@@ -20,6 +21,7 @@ import { UserTokenService } from '@core/services/user-token.service';
 import { BookList } from '@models/book.models';
 import { ContextMenuItem } from '@models/context-menu.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { firstValueFrom } from 'rxjs';
 
@@ -32,9 +34,11 @@ import { firstValueFrom } from 'rxjs';
 		BlurhashComponent,
 		CommonModule,
 		IconsComponent,
+		ImageFallbackDirective,
 	],
 	templateUrl: './item-book.component.html',
 	styleUrl: './item-book.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemBookComponent {
 	book = input.required<BookList>();
@@ -60,7 +64,6 @@ export class ItemBookComponent {
 	private router = inject(Router);
 	private location = inject(Location);
 
-	imageError = false;
 	isImageLoaded = signal(false);
 	isDownloaded = signal(false);
 
@@ -152,7 +155,6 @@ export class ItemBookComponent {
 	cardCoverStyle = computed(() => {
 		if (
 			this.book().cover &&
-			!this.imageError &&
 			!(this.book().blurHash || this.book().coverMetadata?.blurHash)
 		) {
 			return { '--card-cover': `url(${this.book().cover})` };
@@ -182,10 +184,6 @@ export class ItemBookComponent {
 
 	isBlobUrl(url: string | undefined | null): boolean {
 		return typeof url === 'string' && url.startsWith('blob:');
-	}
-
-	onImageError() {
-		this.imageError = true;
 	}
 
 	onContextMenu(event: MouseEvent) {

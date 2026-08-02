@@ -60,6 +60,7 @@ import { ScrapingStatusPipe } from '@shared/utils/pipes/scraping-status.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { SelectComponent } from '@ui/atoms/inputs/select/select.component';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import {
 	AddRelatedBookModalComponent,
@@ -120,6 +121,7 @@ interface ModulesLoad {
 		RouterLink,
 		HasPermissionDirective,
 		FormsModule,
+		ImageFallbackDirective,
 	],
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
@@ -303,9 +305,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 	// Cover edit modal state
 	editingCover = signal<Cover | null>(null);
-
-	// Track cover image loading errors
-	coverImageErrors = signal<Set<string>>(new Set());
 
 	@ViewChild('selector') selector!: ElementRef<HTMLDivElement>;
 	@ViewChildren('tabEl') tabEls!: QueryList<ElementRef<HTMLSpanElement>>;
@@ -1111,13 +1110,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 	}
 
-	onCoverImageError(coverId: string) {
-		this.coverImageErrors.update((set) => {
-			const newSet = new Set(set);
-			newSet.add(coverId);
-			return newSet;
-		});
-	}
+	hasCoversToSave = computed(() => {
+		return this.hasCoversChanged();
+	});
 
 	onSavedPageClick(savedPage: SavedPage) {
 		if (savedPage.page?.path) {
@@ -1961,8 +1956,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	onCoverContextMenu(event: MouseEvent, cover: Cover) {
 		const items: ContextMenuItem[] = [];
 
-		// Only show image-related options if cover has a URL and no error
-		if (cover.url && !this.coverImageErrors().has(cover.id)) {
+		// Only show image-related options if cover has a URL
+		if (cover.url) {
 			items.push(
 				{
 					label: 'Copiar Imagem',
@@ -2104,7 +2099,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			return;
 		}
 
-		if (cover.url && !this.coverImageErrors().has(cover.id)) {
+		if (cover.url) {
 			this.openImageViewer(cover.url, cover.title, '', cover.metadata);
 		} else {
 			// Open edit modal for covers without image or with loading error
@@ -2378,11 +2373,6 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 								}
 								next[coverIndex] = updatedCover;
 							}
-							return next;
-						});
-						this.coverImageErrors.update((set) => {
-							const next = new Set(set);
-							next.delete(data.id);
 							return next;
 						});
 						this.closeCoverEditModal();

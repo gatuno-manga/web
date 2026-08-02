@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
+	DestroyRef,
 	ElementRef,
 	HostListener,
 	inject,
@@ -10,6 +11,7 @@ import {
 	signal,
 	viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
@@ -38,6 +40,7 @@ export class UserMenuOrganismComponent implements OnInit {
 	private authService = inject(AuthService);
 	private sensitiveContentService = inject(SensitiveContentService);
 	private elementRef = inject(ElementRef);
+	private destroyRef = inject(DestroyRef);
 
 	isLargeScreen = signal(false);
 	isOpen = signal(false);
@@ -55,6 +58,7 @@ export class UserMenuOrganismComponent implements OnInit {
 	constructor() {
 		this.breakpointObserver
 			.observe(['(min-width: 768px)'])
+			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((result) => {
 				this.isLargeScreen.set(result.matches);
 			});
@@ -63,6 +67,7 @@ export class UserMenuOrganismComponent implements OnInit {
 	ngOnInit() {
 		this.sensitiveContentService
 			.getSensitiveContent()
+			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((filters) => {
 				this.availableFilters.set(filters);
 			});

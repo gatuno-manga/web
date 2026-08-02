@@ -1,4 +1,9 @@
-import { Component, computed, input } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	input,
+} from '@angular/core';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
@@ -7,6 +12,7 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 	imports: [IconsComponent],
 	templateUrl: './progress-notification.component.html',
 	styleUrls: ['./progress-notification.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgressNotificationComponent {
 	title = input<string>('Processando');

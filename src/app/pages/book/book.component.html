@@ -40,40 +40,39 @@
 				<div class="glass-panel-bg"></div>
 				<div class="book-header">
 				<div class="book-cover" [style.--book-aspect-ratio]="(b.coverMetadata?.width && b.coverMetadata?.height) ? (b.coverMetadata!.width + ' / ' + b.coverMetadata!.height) : '2 / 3'">
-						@if (b.cover && !coverImageError) {
-							@if (b.blurHash || b.coverMetadata?.blurHash) {
-								<div
-									class="blur-placeholder"
-									[class.fade-out]="isImageLoaded()"
-								>
-									<app-blurhash
-										[hash]="b.blurHash || b.coverMetadata?.blurHash || ''"
-										[width]="b.coverMetadata?.width || 32"
-										[height]="b.coverMetadata?.height || 32"
-									/>
-								</div>
-							}
-							<img
-								[src]="b.cover"
-								alt="Capa do livro {{ b.title }}"
-								[class.loaded]="isImageLoaded()"
-								(load)="onImageLoad()"
-								(error)="onCoverImageError()"
-							/>
-							@if (b.originalLanguageCode) {
-								<img
-									[src]="b.originalLanguageCode | flag"
-									class="book-origin-flag"
-									alt="Bandeira de origem"
-									title="Origem do livro"
+					<div class="cover-placeholder">
+						<app-icons name="image" />
+					</div>
+					@if (b.cover) {
+						@if (b.blurHash || b.coverMetadata?.blurHash) {
+							<div
+								class="blur-placeholder"
+								[class.fade-out]="isImageLoaded()"
+							>
+								<app-blurhash
+									[hash]="b.blurHash || b.coverMetadata?.blurHash || ''"
+									[width]="b.coverMetadata?.width || 32"
+									[height]="b.coverMetadata?.height || 32"
 								/>
-							}
-						} @else {
-							<div class="cover-placeholder">
-								<app-icons name="image" />
 							</div>
 						}
-					</div>
+						<img
+							[src]="b.cover"
+							alt="Capa do livro {{ b.title }}"
+							[class.loaded]="isImageLoaded()"
+							(load)="onImageLoad()"
+							appImageFallback
+						/>
+						@if (b.originalLanguageCode) {
+							<img
+								[src]="b.originalLanguageCode | flag"
+								class="book-origin-flag"
+								alt="Bandeira de origem"
+								title="Origem do livro"
+							/>
+						}
+					}
+				</div>
 					<div class="book-info">
 						<div class="top">
 							<h1
@@ -90,7 +89,7 @@
 								}
 							</h1>
 							<h6>
-								{{ getAuthorNames() }}
+								{{ authorNames() }}
 							</h6>
 						</div>
 						<div class="bottom">

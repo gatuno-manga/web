@@ -19,6 +19,7 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { SettingsService } from '@core/services/settings.service';
 import { ImageMetadata, Page } from '@models/book.models';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { fromEvent } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
@@ -41,14 +42,13 @@ export interface ContextMenuEvent {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './image-reader.component.html',
 	styleUrl: './image-reader.component.scss',
-	imports: [CommonModule, BlurhashComponent],
+	imports: [CommonModule, BlurhashComponent, ImageFallbackDirective],
 })
 export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	private _pages: (Page & { blurHash?: string })[] = [];
 	@Input() set pages(value: (Page & { blurHash?: string })[]) {
 		this._pages = value;
 		this.loadedPages.clear();
-		this.imageError = false;
 		this.cdr.markForCheck();
 	}
 	get pages() {
@@ -79,16 +79,11 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 		initialValue: this.settingsService.getSettings(),
 	});
 
-	imageError = false;
 	loadedPages = new Set<number>();
 
 	onImageLoad(index: number) {
 		this.loadedPages.add(index);
 		this.cdr.markForCheck();
-	}
-
-	onImageError() {
-		this.imageError = true;
 	}
 
 	ngOnInit() {

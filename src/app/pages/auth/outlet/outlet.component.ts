@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
@@ -7,5 +7,6 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 	imports: [RouterModule, RouterOutlet, IconsComponent],
 	templateUrl: './outlet.component.html',
 	styleUrl: './outlet.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OutletComponent {}

@@ -17,6 +17,7 @@ import { TagsService } from '@core/services/tags.service';
 import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
 import { BookList } from '@models/book.models';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
+import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
 import { firstValueFrom } from 'rxjs';
@@ -31,6 +32,7 @@ import { firstValueFrom } from 'rxjs';
 		NgOptimizedImage,
 		ItemBookComponent,
 		ButtonComponent,
+		ImageFallbackDirective,
 	],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
@@ -56,20 +58,6 @@ export class HomeComponent {
 
 	currentFeaturedIndex = signal(0);
 	private carouselInterval?: ReturnType<typeof setInterval>;
-
-	coverImageErrors = signal<Set<string>>(new Set());
-
-	onImageError(bookId: string) {
-		this.coverImageErrors.update((errors) => {
-			const newErrors = new Set(errors);
-			newErrors.add(bookId);
-			return newErrors;
-		});
-	}
-
-	hasImageError(bookId: string): boolean {
-		return this.coverImageErrors().has(bookId);
-	}
 
 	constructor() {
 		this.setMetaData();

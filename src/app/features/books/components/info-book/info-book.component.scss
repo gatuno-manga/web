@@ -96,14 +96,7 @@
 	display: flex;
 	align-items: flex-start;
 	overflow: hidden;
-	transition: height 0.3s ease;
 	min-height: 50vh;
-
-	@supports (-moz-appearance: none) {
-		@media (pointer: coarse) {
-			transition: none;
-		}
-	}
 }
 .container {
 	width: 100%;

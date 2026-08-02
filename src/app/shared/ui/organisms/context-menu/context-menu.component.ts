@@ -1,5 +1,6 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
 	effect,
@@ -17,6 +18,7 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 	imports: [CommonModule, IconsComponent],
 	templateUrl: './context-menu.component.html',
 	styleUrl: './context-menu.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContextMenuComponent {
 	private contextMenuService = inject(ContextMenuService);

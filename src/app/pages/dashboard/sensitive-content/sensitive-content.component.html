@@ -1,0 +1,113 @@
+@if (mergingSelection) {
+<div class="glass-overlay">
+	<div id="merge-modal" class="premium-card nested-core">
+		<div class="title">
+			<div class="eyebrow">AÇÃO IRREVERSÍVEL</div>
+			<h2>Mesclar Conteúdos</h2>
+			<p>
+				Selecione os itens que você deseja transferir e mesclar em "<strong>{{ mergingSelection.name }}</strong>".
+			</p>
+			<button type="button" class="cancel-button" (click)="cancelMerge()">
+				<app-icons name="close" />
+			</button>
+		</div>
+		<div class="modal-search">
+			<app-icons name="search" class="search-icon" />
+			<input type="text" [(ngModel)]="mergeSearchQuery" (ngModelChange)="mergeSearchQuery.set($event)" placeholder="Filtrar itens..." class="search-input" />
+		</div>
+		<div class="body">
+			<app-list-checkbox [items]="filteredMergingTags()" />
+		</div>
+		<div class="modal-actions">
+			<app-button class="danger-button" (click)="mergeContents()">Confirmar Mesclagem</app-button>
+		</div>
+	</div>
+</div>
+}
+
+<div id="dashboard-wrapper">
+	<header class="section-header">
+		<a routerLink="/dashboard/home" class="eyebrow back-link">
+			<app-icons name="arrow-left" /> Voltar
+		</a>
+		<h1 class="section-title">Conteúdos Sensíveis</h1>
+	</header>
+
+	<div class="premium-card outer-shell search-bar-container">
+		<div class="inner-core search-core">
+			<app-icons name="search" class="search-icon" />
+			<input type="text" [(ngModel)]="searchQuery" (ngModelChange)="searchQuery.set($event)" placeholder="Pesquisar conteúdos sensíveis..." class="search-input" />
+			<app-button class="new-btn" (click)="startCreate()">
+				Nova Categoria <span class="btn-icon"><app-icons name="plus" /></span>
+			</app-button>
+		</div>
+	</div>
+
+	@if (isCreating) {
+	<div class="premium-card outer-shell create-form-shell fluid-slide-down">
+		<div class="inner-core form-inline">
+			<input type="text" [(ngModel)]="newContentName" placeholder="Ex: Gore, Nudity..." class="premium-input" style="flex:1" />
+			<div class="actions">
+				<app-button (click)="createContent()">Salvar</app-button>
+				<button type="button" class="icon-btn close-btn" (click)="cancelCreate()"><app-icons name="close" /></button>
+			</div>
+		</div>
+	</div>
+	}
+
+	<div id="tags-list" cdkDropList (cdkDropListDropped)="onDrop($event)" [cdkDropListDisabled]="searchQuery().length > 0">
+		@if (isLoading()) {
+			<div class="skeleton-list">
+				@for (i of [1,2,3,4,5]; track $index) {
+					<div class="premium-card outer-shell skeleton-item">
+						<div class="inner-core placeholder"></div>
+					</div>
+				}
+			</div>
+		} @else {
+			@for (item of filteredContents(); track item.id) {
+			<div class="premium-card outer-shell tag-item fluid-fade-up" cdkDrag [style.animation-delay]="$index * 50 + 'ms'">
+				<div class="inner-core content-core">
+					@if (editingId === item.id) {
+						<div class="edit-form form-inline">
+							<input type="text" [(ngModel)]="editContentName" placeholder="Nome" class="premium-input" style="flex:1" />
+							<input type="number" [(ngModel)]="editContentWeight" placeholder="Peso" class="premium-input narrow" [appTooltip]="'Peso'" min="1" [max]="sensitiveContents().length" />
+							<div class="actions">
+								<app-button (click)="updateContent(item.id)">Salvar</app-button>
+								<button type="button" class="icon-btn close-btn" (click)="cancelEdit()"><app-icons name="close" /></button>
+							</div>
+						</div>
+					} @else {
+						<div class="info">
+							<!-- Drag Handle -->
+							<div class="drag-handle" cdkDragHandle [appTooltip]="'Segure para reordenar'">
+								<app-icons name="menu" />
+							</div>
+							@if (item.weight !== undefined) {
+								<span class="weight badge" [appTooltip]="'Peso: ' + item.weight + ' (define a ordem)'">P: {{ item.weight }}</span>
+							}
+							<span class="name">{{ item.name }}</span>
+						</div>
+						<div class="actions">
+							<button type="button" class="icon-btn" (click)="startEdit(item)" [appTooltip]="'Editar'">
+								<app-icons name="edit" />
+							</button>
+							<button type="button" class="icon-btn" (click)="mergeSelect(item)" [appTooltip]="'Mesclar com outro'">
+								<app-icons name="git-merge" />
+							</button>
+							<button type="button" class="icon-btn delete-btn" (click)="deleteContent(item.id)" [appTooltip]="'Excluir'">
+								<app-icons name="trash" />
+							</button>
+						</div>
+					}
+				</div>
+			</div>
+			} @empty {
+				<div class="empty-state">
+					<app-icons name="inbox" class="empty-icon" />
+					<p>Nenhum conteúdo sensível encontrado.</p>
+				</div>
+			}
+		}
+	</div>
+</div>

@@ -28,7 +28,7 @@ describe('SuccessDetailsNotificationComponent', () => {
 	});
 
 	it('should display custom title', () => {
-		component.title = 'Upload concluído!';
+		fixture.componentRef.setInput('title', 'Upload concluído!');
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(compiled.querySelector('h2')?.textContent).toBe(
@@ -37,7 +37,10 @@ describe('SuccessDetailsNotificationComponent', () => {
 	});
 
 	it('should display message', () => {
-		component.message = 'Operação realizada com sucesso';
+		fixture.componentRef.setInput(
+			'message',
+			'Operação realizada com sucesso',
+		);
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(compiled.querySelector('.main-message')?.textContent).toBe(
@@ -46,14 +49,14 @@ describe('SuccessDetailsNotificationComponent', () => {
 	});
 
 	it('should not display items list when items not provided', () => {
-		component.items = undefined;
+		fixture.componentRef.setInput('items', undefined);
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(compiled.querySelector('.items-list')).toBeFalsy();
 	});
 
 	it('should display items list when items provided', () => {
-		component.items = ['Item 1', 'Item 2', 'Item 3'];
+		fixture.componentRef.setInput('items', ['Item 1', 'Item 2', 'Item 3']);
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		const itemsList = compiled.querySelector('.items-list');
@@ -63,8 +66,8 @@ describe('SuccessDetailsNotificationComponent', () => {
 	});
 
 	it('should display custom items title', () => {
-		component.items = ['Item 1'];
-		component.itemsTitle = 'Arquivos processados';
+		fixture.componentRef.setInput('items', ['Item 1']);
+		fixture.componentRef.setInput('itemsTitle', 'Arquivos processados');
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(
@@ -73,23 +76,23 @@ describe('SuccessDetailsNotificationComponent', () => {
 	});
 
 	it('should not display action button when actionLabel not provided', () => {
-		component.actionLabel = undefined;
+		fixture.componentRef.setInput('actionLabel', undefined);
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(compiled.querySelector('app-button')).toBeFalsy();
 	});
 
 	it('should not display action button when actionCallback not provided', () => {
-		component.actionLabel = 'Clique aqui';
-		component.actionCallback = undefined;
+		fixture.componentRef.setInput('actionLabel', 'Clique aqui');
+		fixture.componentRef.setInput('actionCallback', undefined);
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(compiled.querySelector('app-button')).toBeFalsy();
 	});
 
 	it('should display action button when both actionLabel and actionCallback provided', async () => {
-		component.actionLabel = 'Ver detalhes';
-		component.actionCallback = () => {};
+		fixture.componentRef.setInput('actionLabel', 'Ver detalhes');
+		fixture.componentRef.setInput('actionCallback', () => {});
 		fixture.detectChanges();
 		await fixture.whenStable();
 		fixture.detectChanges();
@@ -101,8 +104,8 @@ describe('SuccessDetailsNotificationComponent', () => {
 
 	it('should call actionCallback when button clicked', () => {
 		const mockCallback = jasmine.createSpy('callback');
-		component.actionLabel = 'Ação';
-		component.actionCallback = mockCallback;
+		fixture.componentRef.setInput('actionLabel', 'Ação');
+		fixture.componentRef.setInput('actionCallback', mockCallback);
 		fixture.detectChanges();
 		const button = fixture.nativeElement.querySelector('app-button');
 		button.click();
@@ -118,12 +121,14 @@ describe('SuccessDetailsNotificationComponent', () => {
 	});
 
 	it('should display check marks for each item', async () => {
-		component.items = ['Item 1', 'Item 2'];
+		fixture.componentRef.setInput('items', ['Item 1', 'Item 2']);
 		fixture.detectChanges();
 		await fixture.whenStable();
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
-		const checks = compiled.querySelectorAll('app-icons[name="check"]');
+		const checks = compiled.querySelectorAll(
+			'app-icons[name="check-circle"]',
+		);
 		expect(checks.length).toBe(2);
 	});
 });

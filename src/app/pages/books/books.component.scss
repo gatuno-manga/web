@@ -147,7 +147,6 @@
 		border-radius: 50%;
 		display: inline-block;
 		animation: dot-pulse 1.4s infinite ease-in-out both;
-		will-change: transform, opacity;
 		transform: translateZ(0);
 
 		&:nth-child(1) {

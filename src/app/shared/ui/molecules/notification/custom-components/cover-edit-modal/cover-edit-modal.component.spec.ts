@@ -33,7 +33,6 @@ describe('CoverEditModalComponent', () => {
 
 		expect(component.editedTitle()).toBe(mockCover.title);
 		expect(component.previewUrl()).toBe(mockCover.url);
-		expect(component.imageError()).toBeFalse();
 	});
 
 	it('should update on cover changes', () => {
@@ -74,14 +73,6 @@ describe('CoverEditModalComponent', () => {
 		expect(component.hasImage()).toBeFalse();
 	});
 
-	it('should set imageError on image load error', () => {
-		expect(component.imageError()).toBeFalse();
-
-		component.onImageError();
-
-		expect(component.imageError()).toBeTrue();
-	});
-
 	it('should call close with save data on save', () => {
 		const closeSpy = jasmine.createSpy('close');
 		component.close = closeSpy;
@@ -118,7 +109,6 @@ describe('CoverEditModalComponent', () => {
 		component.onFileSelected(mockEvent);
 
 		expect(component.selectedFile()).toBe(mockFile);
-		expect(component.imageError()).toBeFalse();
 	});
 
 	it('should trigger file input click', () => {

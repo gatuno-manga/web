@@ -1,5 +1,6 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	computed,
 	inject,
@@ -21,6 +22,8 @@ import {
 	QueueStats,
 	RecentQueueEvent,
 } from '@models/dashboard.models';
+import { QueueLabelPipe } from '@shared/utils/pipes/queue-label-pipe';
+import { TimeAgoPipe } from '@shared/utils/pipes/time-ago-pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { interval, Subscription } from 'rxjs';
@@ -34,19 +37,20 @@ const EMPTY_COUNTS: QueueCounts = {
 };
 const EMPTY_QUEUE_STATS: QueueStats = { queues: [] };
 
-const QUEUE_LABELS: Record<string, string> = {
-	'book-update-queue': 'Atualização de Livros',
-	'chapter-scraping': 'Scraping de Capítulos',
-	'cover-image-queue': 'Imagens de Capa',
-	'fix-chapter-queue': 'Correção de Capítulos',
-};
-
 @Component({
 	selector: 'app-monitoring',
 	standalone: true,
-	imports: [CommonModule, IconsComponent, RouterModule, ButtonComponent],
+	imports: [
+		CommonModule,
+		IconsComponent,
+		RouterModule,
+		ButtonComponent,
+		QueueLabelPipe,
+		TimeAgoPipe,
+	],
 	templateUrl: './monitoring.component.html',
 	styleUrl: './monitoring.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonitoringComponent implements OnInit, OnDestroy {
 	private dashboardService = inject(DashboardService);
@@ -70,11 +74,6 @@ export class MonitoringComponent implements OnInit, OnDestroy {
 			{ ...EMPTY_COUNTS },
 		),
 	);
-
-	/** Label legível para o nome da fila */
-	queueLabel(name: string): string {
-		return QUEUE_LABELS[name] ?? name;
-	}
 
 	private wsSubscriptions: Subscription[] = [];
 	private pollSubscription?: Subscription;
@@ -200,19 +199,5 @@ export class MonitoringComponent implements OnInit, OnDestroy {
 			default:
 				return 'status-waiting';
 		}
-	}
-
-	formatTimestamp(timestamp?: number): string {
-		if (!timestamp) return '';
-		const date = new Date(timestamp);
-		const now = new Date();
-		const diff = now.getTime() - date.getTime();
-		const seconds = Math.floor(diff / 1000);
-		const minutes = Math.floor(seconds / 60);
-		const hours = Math.floor(minutes / 60);
-
-		if (hours > 0) return `${hours}h atrás`;
-		if (minutes > 0) return `${minutes}m atrás`;
-		return `${seconds}s atrás`;
 	}
 }

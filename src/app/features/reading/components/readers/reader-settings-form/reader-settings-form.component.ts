@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, inject, OnInit } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	Input,
+	inject,
+	OnInit,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FullscreenService } from '@core/services/fullscreen.service';
 import { SettingsService } from '@core/services/settings.service';
@@ -24,6 +30,7 @@ import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.compo
 	],
 	templateUrl: './reader-settings-form.component.html',
 	styleUrls: ['./reader-settings-form.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReaderSettingsFormComponent implements OnInit {
 	@Input() contentType: 'image' | 'text' | 'document' | 'all' = 'all';

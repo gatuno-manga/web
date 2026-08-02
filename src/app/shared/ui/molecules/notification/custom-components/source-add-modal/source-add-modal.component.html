@@ -21,7 +21,7 @@
 							<app-icons name="list" size="20" />
 						</div>
 						<div class="source-info">
-							<span class="host">{{ urlTransform(url) }}</span>
+							<span class="host">{{ url | urlTransform }}</span>
 							<span class="full-url">{{ url }}</span>
 						</div>
 						<button type="button" class="remove-btn" (click)="removeSource(i); $event.stopPropagation()" title="Remover fonte">

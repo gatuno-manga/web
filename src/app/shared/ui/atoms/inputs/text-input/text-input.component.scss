@@ -70,9 +70,9 @@ app-icons.clickable {
 		transition: background-color 0.3s ease;
 	}
 
-	&[data-score="1"] .strength-bar:nth-child(1) { background-color: var(--dark-red); }
-	&[data-score="2"] .strength-bar:nth-child(-n+2) { background-color: var(--orange); }
-	&[data-score="3"] .strength-bar:nth-child(-n+3) { background-color: var(--orange); }
+	&[data-score="1"] .strength-bar:nth-child(1) { background-color: var(--danger-color); }
+	&[data-score="2"] .strength-bar:nth-child(-n+2) { background-color: var(--warning-color); }
+	&[data-score="3"] .strength-bar:nth-child(-n+3) { background-color: var(--warning-color); }
 	&[data-score="4"] .strength-bar:nth-child(-n+4) { background-color: var(--primary-color); }
 }
 
@@ -88,7 +88,7 @@ app-icons.clickable {
 		align-items: center;
 		gap: 8px;
 		font-size: 0.8rem;
-		color: var(--white-muted);
+		color: var(--app-text-color-secondary);
 		transition: color 0.3s ease;
 
 		app-icons {

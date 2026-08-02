@@ -1,17 +1,30 @@
 .container {
 	display: flex;
-	align-items: center;
+	align-items: stretch;
 	justify-content: center;
 	border-radius: 12px;
 	border: 1px solid var(--border-color);
 	background-color: var(--secondary-color);
 	cursor: pointer;
-    overflow: hidden;
+	overflow: hidden;
+	position: relative;
     
-    &.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+	&.disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+.slider {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: calc(100% / var(--total-items));
+	transform: translateX(calc(100% * var(--selected-index)));
+	background-color: var(--hover-color);
+	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	z-index: 1;
 }
 
 .icon {
@@ -19,8 +32,8 @@
 	align-items: center;
 	justify-content: center;
 	padding: 10px;
-	transition: 0.3s;
-	&.select {
-		background-color: var(--hover-color);
-	}
+	flex: 1;
+	position: relative;
+	z-index: 2;
+	transition: color 0.3s;
 }

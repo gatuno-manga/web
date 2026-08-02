@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
 	AbstractControl,
 	FormBuilder,
@@ -31,6 +31,7 @@ import {
 	],
 	templateUrl: './register.component.html',
 	styleUrl: './register.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {
 	form: FormGroup;

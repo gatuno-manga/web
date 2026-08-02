@@ -1,45 +1,282 @@
-#tags-list {
-	max-height: 100%;
-	width: 100%;
-	max-width: 720px;
-	overflow-y: auto;
+@use '../../../../../public/assets/scss/mixins' as *;
+
+#dashboard-wrapper {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 40px 20px 100px;
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
-	padding: 0 20px;
-	margin: 30px auto;
+	gap: 2rem;
+}
 
-	.tag-item {
-		display: flex;
+.section-header {
+	margin-bottom: 2rem;
+	text-align: left;
+	
+	.eyebrow {
+		display: inline-flex;
 		align-items: center;
-		justify-content: space-between;
-		padding: 8px;
-		border-radius: 4px;
-		background-color: var(--secondary-color);
+		gap: 6px;
+		background: var(--primary-color-alpha-10, rgba(255, 255, 255, 0.05));
+		color: var(--primary-color);
+		padding: 4px 12px;
+		border-radius: 9999px;
+		font-size: 0.65rem;
+		text-transform: uppercase;
+		letter-spacing: 0.2em;
+		font-weight: 700;
+		margin-bottom: 12px;
+		text-decoration: none;
+		transition: all 300ms cubic-bezier(0.32, 0.72, 0, 1);
+		
+		&.back-link:hover {
+			background: rgba(255,255,255,0.1);
+			color: white;
+			transform: scale(0.98);
+		}
+	}
+
+	.section-title {
+		font-size: 2.5rem;
+		font-weight: 800;
+		letter-spacing: -0.02em;
+		margin: 0;
+		color: var(--app-text-color);
 	}
 }
 
-#merge {
-	position: relative;
-	width: 100%;
-	max-width: 720px;
-	margin: 30px auto;
-	.cancel-button {
-		position: absolute;
-		top: 0;
-		right: 0;
-		background-color: transparent;
-		border: none;
-		cursor: pointer;
-		color: var(--app-text-color);
-		font-size: 16px;
-		padding: 8px;
+// Double-Bezel Pattern
+.premium-card {
+	&.outer-shell {
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		border-radius: 1.5rem;
+		padding: 6px;
+	}
+	
+	.inner-core {
+		background: var(--secondary-color);
+		border-radius: calc(1.5rem - 6px);
+		box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+		padding: 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+}
 
-		&:hover {
-			color: var(--primary-color);
+// Search Bar
+.search-bar-container {
+	margin-bottom: 1rem;
+	
+	.search-core {
+		display: flex;
+		gap: 12px;
+		background: var(--app-background-color);
+		padding: 8px 8px 8px 16px;
+		
+		.search-icon {
+			color: var(--app-text-color-muted, #888);
+			font-size: 1.2rem;
+			display: flex;
+			align-items: center;
+		}
+
+		.search-input {
+			flex: 1;
+			background: transparent;
+			border: none;
+			color: var(--app-text-color);
+			font-size: 1rem;
+			outline: none;
+			&::placeholder {
+				color: var(--app-text-color-muted, #555);
+			}
 		}
 	}
-	.title {
-		text-align: center;
+}
+
+// List
+#tags-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.tag-item {
+	.content-core {
+		width: 100%;
+		transition: all 400ms cubic-bezier(0.32, 0.72, 0, 1);
+		
+		&:hover {
+			background: rgba(255,255,255,0.03);
+			transform: scale(0.995);
+		}
 	}
+	
+	.info {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		
+		.name {
+			font-weight: 600;
+			font-size: 1.1rem;
+		}
+	}
+
+	.actions {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+	}
+}
+
+// Glass Overlay / Modal
+.glass-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(24px);
+	-webkit-backdrop-filter: blur(24px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	animation: fadeIn 500ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+#merge-modal {
+	background: var(--app-background-color);
+	width: 90%;
+	max-width: 500px;
+	position: relative;
+	box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+	padding: 24px;
+	
+	.title {
+		padding-bottom: 1.5rem;
+		border-bottom: 1px solid rgba(255,255,255,0.05);
+		margin-bottom: 1rem;
+		position: relative;
+		
+		.eyebrow {
+			color: #ff4757;
+			font-size: 0.7rem;
+			font-weight: 800;
+			letter-spacing: 0.1em;
+			margin-bottom: 8px;
+		}
+		
+		h2 { margin: 0 0 10px 0; font-size: 1.5rem; }
+		p { margin: 0; color: var(--app-text-color-muted, #aaa); font-size: 0.9rem; line-height: 1.5; }
+		
+		.cancel-button {
+			position: absolute;
+			top: -10px;
+			right: -10px;
+			background: rgba(255,255,255,0.05);
+			border: none;
+			border-radius: 50%;
+			width: 32px;
+			height: 32px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: var(--app-text-color);
+			cursor: pointer;
+			transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+			&:hover { transform: scale(0.9); background: rgba(255,255,255,0.1); }
+		}
+	}
+	
+	.modal-search {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		background: rgba(255,255,255,0.02);
+		border: 1px solid rgba(255,255,255,0.05);
+		border-radius: 8px;
+		padding: 8px 12px;
+		margin-bottom: 1rem;
+		
+		.search-icon {
+			color: var(--app-text-color-muted, #888);
+		}
+		
+		.search-input {
+			flex: 1;
+			background: transparent;
+			border: none;
+			color: var(--app-text-color);
+			outline: none;
+			&::placeholder {
+				color: var(--app-text-color-muted, #555);
+			}
+		}
+	}
+
+	.body {
+		max-height: 40vh;
+		overflow-y: auto;
+		margin-bottom: 2rem;
+		padding-right: 10px;
+	}
+	
+	.modal-actions {
+		display: flex;
+		justify-content: flex-end;
+	}
+}
+
+// Skeletons & Empty State
+.skeleton-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+.skeleton-item {
+	.placeholder {
+		height: 60px;
+		@extend .placeholder;
+		animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+		background: rgba(255,255,255,0.05);
+	}
+}
+
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 4rem 2rem;
+	color: var(--app-text-color-muted, #666);
+	
+	.empty-icon {
+		font-size: 3rem;
+		margin-bottom: 1rem;
+		opacity: 0.5;
+	}
+}
+
+// Fluid Animations
+.fluid-fade-up {
+	opacity: 0;
+	transform: translateY(20px);
+	animation: fadeUp 700ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+@keyframes fadeUp {
+	from { opacity: 0; transform: translateY(20px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.5; }
 }

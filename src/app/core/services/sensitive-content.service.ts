@@ -68,9 +68,15 @@ export class SensitiveContentService {
 	/**
 	 * Cria uma nova tag de conteúdo sensível.
 	 */
-	createSensitiveContent(name: string): Observable<SensitiveContentResponse> {
+	createSensitiveContent(
+		name: string,
+		weight?: number,
+	): Observable<SensitiveContentResponse> {
 		return this.http
-			.post<SensitiveContentResponse>('sensitive-content', { name })
+			.post<SensitiveContentResponse>('sensitive-content', {
+				name,
+				weight,
+			})
 			.pipe(tap(() => this.invalidateCache()));
 	}
 
@@ -80,9 +86,13 @@ export class SensitiveContentService {
 	updateSensitiveContent(
 		id: string,
 		name: string,
+		weight?: number,
 	): Observable<SensitiveContentResponse> {
 		return this.http
-			.put<SensitiveContentResponse>(`sensitive-content/${id}`, { name })
+			.put<SensitiveContentResponse>(`sensitive-content/${id}`, {
+				name,
+				weight,
+			})
 			.pipe(tap(() => this.invalidateCache()));
 	}
 
@@ -99,11 +109,22 @@ export class SensitiveContentService {
 	 * Mescla tags de conteúdo sensível.
 	 */
 	mergeSensitiveContent(
-		contentId: string,
 		targetId: string,
+		sourceIds: string[],
 	): Observable<void> {
 		return this.http
-			.patch<void>(`sensitive-content/${contentId}/merge`, { targetId })
+			.patch<void>(`sensitive-content/${targetId}/merge`, sourceIds)
+			.pipe(tap(() => this.invalidateCache()));
+	}
+
+	/**
+	 * Atualiza múltiplas tags de conteúdo sensível em lote (ex: reordenação).
+	 */
+	updateSensitiveContentBatch(
+		items: Partial<SensitiveContentResponse>[],
+	): Observable<void> {
+		return this.http
+			.patch<void>('sensitive-content/batch', { items })
 			.pipe(tap(() => this.invalidateCache()));
 	}
 

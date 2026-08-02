@@ -1,5 +1,11 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	inject,
+	OnInit,
+	signal,
+} from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { PublicUserService } from '@core/services/public-user.service';
@@ -15,6 +21,7 @@ import {
 	imports: [RouterModule, DatePipe],
 	templateUrl: './public-user.component.html',
 	styleUrl: './public-user.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicUserComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);

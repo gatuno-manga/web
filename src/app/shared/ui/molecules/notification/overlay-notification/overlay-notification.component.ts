@@ -1,5 +1,10 @@
 import { NgComponentOutlet } from '@angular/common';
-import { Component, effect, inject } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	effect,
+	inject,
+} from '@angular/core';
 import { BodyScrollService } from '@core/services/body-scroll.service';
 import { NotificationService } from '@core/services/notification.service';
 
@@ -9,6 +14,7 @@ import { NotificationService } from '@core/services/notification.service';
 	imports: [NgComponentOutlet],
 	templateUrl: './overlay-notification.component.html',
 	styleUrl: './overlay-notification.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverlayNotificationComponent {
 	public notificationService = inject(NotificationService);

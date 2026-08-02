@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
+	DestroyRef,
 	ElementRef,
 	HostListener,
 	inject,
 	signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NotificationService } from '@core/services/notification.service';
 import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
@@ -37,9 +39,12 @@ export class NotificationMenuOrganismComponent {
 	notifications = this.notificationService.history;
 	unreadCount = this.notificationService.unreadCount;
 
+	private destroyRef = inject(DestroyRef);
+
 	constructor() {
 		this.breakpointObserver
 			.observe(['(min-width: 768px)'])
+			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((result) => {
 				this.isLargeScreen.set(result.matches);
 			});

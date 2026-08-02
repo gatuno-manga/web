@@ -1,5 +1,13 @@
-import { Component, computed, Input, OnInit, signal } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	Input,
+	OnInit,
+	signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ChapterLabelPipe } from '@shared/utils/pipes/chapter-label-pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 
@@ -19,9 +27,16 @@ import { CheckboxComponent } from '@ui/atoms/inputs/checkbox/checkbox.component'
 @Component({
 	selector: 'app-book-download-modal',
 	standalone: true,
-	imports: [FormsModule, ButtonComponent, IconsComponent, CheckboxComponent],
+	imports: [
+		FormsModule,
+		ButtonComponent,
+		IconsComponent,
+		CheckboxComponent,
+		ChapterLabelPipe,
+	],
 	templateUrl: './book-download-modal.component.html',
 	styleUrls: ['./book-download-modal.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookDownloadModalComponent implements OnInit {
 	@Input() chapters: BookDownloadChapter[] = [];

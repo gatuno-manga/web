@@ -55,7 +55,7 @@
 		display: flex;
 		flex-direction: column;
 		position: relative;
-		animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		animation: modalAppear 0.5s cubic-bezier(0.32, 0.72, 0, 1);
 		overflow: visible; // Alterado para visible para permitir dropdowns de saírem do modal
 
 		&.size-large {
@@ -134,15 +134,19 @@
 			padding: 0 24px 24px; // Padding inferior e lateral
 
 			button {
-				padding: 8px 20px;
-				border-radius: 4px;
+				padding: 10px 24px;
+				border-radius: 30px;
 				border: none;
 				font-weight: 600;
 				cursor: pointer;
-				transition: filter 0.2s;
+				transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
 
 				&:hover {
 					filter: brightness(0.9);
+				}
+
+				&:active {
+					transform: scale(0.98);
 				}
 
 				&.primary {
@@ -194,7 +198,7 @@
 		background: var(--app-background-color);
 		color: var(--app-text-color);
 		box-shadow: 0 4px 16px rgba(var(--shadow-base), 0.18);
-		animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		animation: slideIn 0.5s cubic-bezier(0.32, 0.72, 0, 1);
 
 		.toast-content {
 			flex: 1;

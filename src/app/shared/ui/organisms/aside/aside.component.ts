@@ -1,5 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	computed,
 	HostListener,
@@ -19,6 +20,7 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 	imports: [IconsComponent],
 	templateUrl: './aside.component.html',
 	styleUrl: './aside.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AsideComponent implements OnInit, OnDestroy {
 	position = input<'left' | 'right'>('right');

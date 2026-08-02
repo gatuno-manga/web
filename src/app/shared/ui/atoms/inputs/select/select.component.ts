@@ -1,3 +1,4 @@
+import { ConnectionPositionPair, OverlayModule } from '@angular/cdk/overlay';
 import {
 	ChangeDetectionStrategy,
 	ChangeDetectorRef,
@@ -35,7 +36,7 @@ export type SelectSize = 'sm' | 'md' | 'lg';
 @Component({
 	selector: 'app-select',
 	standalone: true,
-	imports: [IconsComponent, FormsModule],
+	imports: [IconsComponent, FormsModule, OverlayModule],
 	templateUrl: './select.component.html',
 	styleUrls: ['./select.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -70,6 +71,21 @@ export class SelectComponent implements ControlValueAccessor {
 	isDisabled = signal<boolean>(false);
 
 	searchQuery = signal<string>('');
+
+	positions = [
+		new ConnectionPositionPair(
+			{ originX: 'start', originY: 'bottom' },
+			{ overlayX: 'start', overlayY: 'top' },
+			0,
+			4, // offset Y
+		),
+		new ConnectionPositionPair(
+			{ originX: 'start', originY: 'top' },
+			{ overlayX: 'start', overlayY: 'bottom' },
+			0,
+			-4,
+		),
+	];
 
 	filteredOptions = computed(() => {
 		const query = this.searchQuery().toLowerCase();
@@ -131,9 +147,9 @@ export class SelectComponent implements ControlValueAccessor {
 		this.isOpen.set(false);
 	}
 
-	getSelectedLabel(): string {
-		return this.selectedOption()?.label ?? this.placeholder();
-	}
+	selectedLabel = computed(
+		() => this.selectedOption()?.label ?? this.placeholder(),
+	);
 
 	closeDropdown(): void {
 		this.isOpen.set(false);

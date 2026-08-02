@@ -54,7 +54,7 @@
 														<a [routerLink]="['/books', entry.bookId, 'chapters', entry.chapter.id]" class="chapter-title">
 															{{ entry.chapter.title }}
 														</a>
-														<span class="read-time">{{ formatTime(entry.updatedAt) }}</span>
+														<span class="read-time">{{ entry.updatedAt | date:'HH:mm' }}</span>
 													</div>
 												</div>
 											}

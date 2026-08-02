@@ -69,6 +69,32 @@
 		}
 	}
 
+	&.grid {
+		.info-skeleton {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			padding: 8px 4px;
+
+			.title {
+				width: 85%;
+				height: 16px;
+				border-radius: 4px;
+			}
+			.subtitle {
+				width: 50%;
+				height: 14px;
+				border-radius: 4px;
+			}
+		}
+	}
+
+	&.cover {
+		.info-skeleton {
+			display: none; // Cover uses an overlaid info box in the real layout, so the placeholder is just the cover itself
+		}
+	}
+
 	&.list {
 		flex-direction: row;
 		height: 180px;
@@ -87,13 +113,31 @@
 			flex-direction: column;
 			justify-content: center;
 			padding: 10px 14px;
+			gap: 12px;
+
+			.title {
+				width: 70%;
+				height: 18px;
+				border-radius: 4px;
+			}
+			.subtitle {
+				width: 40%;
+				height: 14px;
+				border-radius: 4px;
+			}
 		}
 	}
 }
 
 .no-books {
+	grid-column: 1 / -1;
 	width: 100%;
 	text-align: center;
-	padding: 40px;
+	padding: 60px 20px;
 	color: var(--white-muted);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+	opacity: 0.8;
 }

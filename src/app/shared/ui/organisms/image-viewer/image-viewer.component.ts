@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	Component,
 	EventEmitter,
 	HostListener,
@@ -17,6 +18,7 @@ import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 	imports: [CommonModule, IconButtonComponent, BlurhashComponent],
 	templateUrl: './image-viewer.component.html',
 	styleUrl: './image-viewer.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageViewerComponent {
 	@Input() imageUrl: string = '';

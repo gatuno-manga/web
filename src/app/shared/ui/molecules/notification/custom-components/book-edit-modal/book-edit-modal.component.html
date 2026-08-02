@@ -1,6 +1,6 @@
 <div class="book-edit-modal-content" role="dialog" aria-labelledby="book-edit-title">
 	<div class="modal-header">
-		<h2 id="book-edit-title">Editar Livro: {{ book.title }}</h2>
+		<h2 id="book-edit-title">Editar Livro: {{ book().title }}</h2>
 	</div>
 
 	<div class="modal-body">
@@ -10,196 +10,214 @@
 				<p>Carregando dados mestre...</p>
 			</div>
 		} @else {
+			<div class="tabs-header">
+				<button type="button" class="tab-btn" [class.active]="activeTab() === 'Básico'" (click)="activeTab.set('Básico')">Básico</button>
+				<button type="button" class="tab-btn" [class.active]="activeTab() === 'Sinopses'" (click)="activeTab.set('Sinopses')">Sinopses</button>
+				<button type="button" class="tab-btn" [class.active]="activeTab() === 'Categorias'" (click)="activeTab.set('Categorias')">Categorias</button>
+				<button type="button" class="tab-btn" [class.active]="activeTab() === 'Links'" (click)="activeTab.set('Links')">Links</button>
+			</div>
+
 			<form [formGroup]="editForm" class="edit-form">
 				<!-- Basic Info Section -->
-				<section class="form-section">
-					<h3>Informações Básicas</h3>
-					<div class="input-grid">
-						<div class="grid-span-2">
+				@if (activeTab() === 'Básico') {
+					<section class="form-section fade-in">
+						<h3>Informações Básicas</h3>
+						<div class="input-grid">
+							<div class="grid-span-2">
+								<app-input
+									type="text"
+									id="title"
+									formControlName="title"
+									placeholder="Título do Livro"
+									label="Título"
+									[errors]="editForm.get('title')?.errors"
+									[touched]="editForm.get('title')?.touched || false"
+								/>
+							</div>
 							<app-input
-								type="text"
-								id="title"
-								formControlName="title"
-								placeholder="Título do Livro"
-								label="Título"
-								[errors]="editForm.get('title')?.errors"
-								[touched]="editForm.get('title')?.touched || false"
+								type="number"
+								id="publication"
+								formControlName="publication"
+								placeholder="Ex: 2024"
+								label="Ano de Publicação"
+								[errors]="editForm.get('publication')?.errors"
+								[touched]="editForm.get('publication')?.touched || false"
+							/>
+							<app-select
+								id="type"
+								formControlName="type"
+								[options]="bookTypes"
+								placeholder="Tipo de Livro"
+							/>
+							<app-select
+								id="originalLanguageCode"
+								formControlName="originalLanguageCode"
+								[options]="languageCodes"
+								placeholder="Idioma Original"
 							/>
 						</div>
-						<app-input
-							type="number"
-							id="publication"
-							formControlName="publication"
-							placeholder="Ex: 2024"
-							label="Ano de Publicação"
-							[errors]="editForm.get('publication')?.errors"
-							[touched]="editForm.get('publication')?.touched || false"
-						/>
-						<app-select
-							id="type"
-							formControlName="type"
-							[options]="bookTypes"
-							placeholder="Tipo de Livro"
-						/>
-						<app-select
-							id="originalLanguageCode"
-							formControlName="originalLanguageCode"
-							[options]="languageCodes"
-							placeholder="Idioma Original"
-						/>
-					</div>
-				</section>
+					</section>
+				}
 
 				<!-- Multilingual Synopses Section -->
-				<section class="form-section">
-					<h3>Sinopses (Multilíngues)</h3>
-					<div class="list-manager">
-						<div class="scrollable-list" cdkDropList (cdkDropListDropped)="onLocalizedDescriptionDrop($event)">
-							@for (desc of localizedDescriptions(); track $index; let i = $index) {
-								<div class="list-item synopsis-item" cdkDrag>
-									<div class="drag-handle" cdkDragHandle>
-										<app-icons name="list" size="20" />
+				@if (activeTab() === 'Sinopses') {
+					<section class="form-section fade-in">
+						<h3>Sinopses (Multilíngues)</h3>
+						<div class="list-manager">
+							<div class="scrollable-list" cdkDropList (cdkDropListDropped)="onLocalizedDescriptionDrop($event)">
+								@for (desc of localizedDescriptions(); track $index; let i = $index) {
+									<div class="list-item synopsis-item" cdkDrag>
+										<div class="drag-handle" cdkDragHandle>
+											<app-icons name="list" size="20" />
+										</div>
+										<div class="synopsis-content">
+											<app-select
+												[ngModel]="desc.languageCode"
+												(ngModelChange)="updateLocalizedDescriptionLang(i, $event)"
+												[ngModelOptions]="{standalone: true}"
+												[options]="languageCodes"
+												placeholder="Idioma"
+											/>
+											<app-text-area
+												[ngModel]="desc.description"
+												(ngModelChange)="updateLocalizedDescriptionText(i, $event)"
+												[ngModelOptions]="{standalone: true}"
+												placeholder="Sinopse neste idioma..."
+												[rows]="4"
+											/>
+										</div>
+										<button type="button" class="remove-btn" (click)="removeLocalizedDescription(i)">
+											<app-icons name="trash" size="18" />
+										</button>
 									</div>
-									<div class="synopsis-content">
-										<app-select
-											[ngModel]="desc.languageCode"
-											(ngModelChange)="updateLocalizedDescriptionLang(i, $event)"
-											[ngModelOptions]="{standalone: true}"
-											[options]="languageCodes"
-											placeholder="Idioma"
-										/>
-										<app-text-area
-											[ngModel]="desc.description"
-											(ngModelChange)="updateLocalizedDescriptionText(i, $event)"
-											[ngModelOptions]="{standalone: true}"
-											placeholder="Sinopse neste idioma..."
-											[rows]="4"
-										/>
-									</div>
-									<button type="button" class="remove-btn" (click)="removeLocalizedDescription(i)">
-										<app-icons name="trash" size="18" />
-									</button>
-								</div>
-							}
+								}
+							</div>
+							<div class="add-row">
+								<app-button variant="outline" (click)="addLocalizedDescription()">
+									<app-icons name="plus" size="20" />
+									Adicionar Sinopse
+								</app-button>
+							</div>
 						</div>
-						<div class="add-row">
-							<app-button variant="outline" (click)="addLocalizedDescription()">
-								<app-icons name="plus" size="20" />
-								Adicionar Sinopse
-							</app-button>
-						</div>
-					</div>
-				</section>
+					</section>
+				}
 
-				<!-- Search Terms Section -->
-				<section class="form-section">
-					<h3>Termos de Busca / Sinônimos</h3>
-					<div class="list-manager">
-						<div class="scrollable-list" cdkDropList (cdkDropListDropped)="onSearchTermDrop($event)">
-							@for (term of searchTerms(); track term; let i = $index) {
-								<div class="list-item" cdkDrag>
-									<div class="drag-handle" cdkDragHandle>
-										<app-icons name="list" size="20" />
-									</div>
-									<span class="item-text">{{ term }}</span>
-									<button type="button" class="remove-btn" (click)="removeSearchTerm(i)">
-										<app-icons name="trash" size="18" />
-									</button>
+				<!-- Search Terms & Original URLs (Links Tab) -->
+				@if (activeTab() === 'Links') {
+					<div class="fade-in">
+						<section class="form-section">
+							<h3>Termos de Busca / Sinônimos</h3>
+							<div class="list-manager">
+								<div class="scrollable-list" cdkDropList (cdkDropListDropped)="onSearchTermDrop($event)">
+									@for (term of searchTerms(); track term; let i = $index) {
+										<div class="list-item" cdkDrag>
+											<div class="drag-handle" cdkDragHandle>
+												<app-icons name="list" size="20" />
+											</div>
+											<span class="item-text">{{ term }}</span>
+											<button type="button" class="remove-btn" (click)="removeSearchTerm(i)">
+												<app-icons name="trash" size="18" />
+											</button>
+										</div>
+									}
 								</div>
-							}
-						</div>
-						<div class="add-row">
-							<app-input
-								type="text"
-								[ngModel]="newSearchTerm()"
-								(ngModelChange)="newSearchTerm.set($event)"
-								[ngModelOptions]="{standalone: true}"
-								placeholder="Novo termo de busca"
-								(keyup.enter)="addSearchTerm()"
-							/>
-							<app-button variant="primary" (click)="addSearchTerm()" [disabled]="!newSearchTerm().trim()">
-								<app-icons name="plus" size="20" />
-							</app-button>
-						</div>
-					</div>
-				</section>
+								<div class="add-row">
+									<app-input
+										type="text"
+										[ngModel]="newSearchTerm()"
+										(ngModelChange)="newSearchTerm.set($event)"
+										[ngModelOptions]="{standalone: true}"
+										placeholder="Novo termo de busca"
+										[showLabel]="false"
+										(keyup.enter)="addSearchTerm()"
+									/>
+									<app-button variant="primary" (click)="addSearchTerm()" [disabled]="!newSearchTerm().trim()">
+										<app-icons name="plus" size="20" />
+									</app-button>
+								</div>
+							</div>
+						</section>
 
-				<!-- Original URLs Section -->
-				<section class="form-section">
-					<h3>Fontes Originais</h3>
-					<div class="list-manager">
-						<div class="scrollable-list" cdkDropList (cdkDropListDropped)="onUrlDrop($event)">
-							@for (url of originalUrls(); track url; let i = $index) {
-								<div class="list-item" cdkDrag>
-									<div class="drag-handle" cdkDragHandle>
-										<app-icons name="list" size="20" />
-									</div>
-									<div class="item-info">
-										<span class="host">{{ urlTransform(url) }}</span>
-										<span class="full-url">{{ url }}</span>
-									</div>
-									<button type="button" class="remove-btn" (click)="removeUrl(i)">
-										<app-icons name="trash" size="18" />
-									</button>
+						<section class="form-section">
+							<h3>Fontes Originais</h3>
+							<div class="list-manager">
+								<div class="scrollable-list" cdkDropList (cdkDropListDropped)="onUrlDrop($event)">
+									@for (url of originalUrls(); track url; let i = $index) {
+										<div class="list-item" cdkDrag>
+											<div class="drag-handle" cdkDragHandle>
+												<app-icons name="list" size="20" />
+											</div>
+											<div class="item-info">
+												<span class="host">{{ url | urlTransform }}</span>
+												<span class="full-url">{{ url }}</span>
+											</div>
+											<button type="button" class="remove-btn" (click)="removeUrl(i)">
+												<app-icons name="trash" size="18" />
+											</button>
+										</div>
+									}
 								</div>
-							}
-						</div>
-						<div class="add-row">
-							<app-input
-								type="text"
-								[ngModel]="newUrl()"
-								(ngModelChange)="newUrl.set($event)"
-								[ngModelOptions]="{standalone: true}"
-								placeholder="https://..."
-								(keyup.enter)="addUrl()"
-							/>
-							<app-button variant="primary" (click)="addUrl()" [disabled]="!newUrl().trim()">
-								<app-icons name="plus" size="20" />
-							</app-button>
-						</div>
+								<div class="add-row">
+									<app-input
+										type="text"
+										[ngModel]="newUrl()"
+										(ngModelChange)="newUrl.set($event)"
+										[ngModelOptions]="{standalone: true}"
+										placeholder="https://..."
+										[showLabel]="false"
+										(keyup.enter)="addUrl()"
+									/>
+									<app-button variant="primary" (click)="addUrl()" [disabled]="!newUrl().trim()">
+										<app-icons name="plus" size="20" />
+									</app-button>
+								</div>
+							</div>
+						</section>
 					</div>
-				</section>
+				}
 
 				<!-- Categorization Section -->
-				<section class="form-section">
-					<h3>Categorização</h3>
+				@if (activeTab() === 'Categorias') {
+					<section class="form-section fade-in">
+						<h3>Categorização</h3>
 
-					<div class="category-group">
-						<h4>Tags</h4>
-						<app-multi-select-tags
-							[options]="availableTags()"
-							[(selectedIds)]="selectedTagIds"
-							placeholderSearch="Filtrar tags..."
-							[groupSelectedAtTop]="true"
-							[allowCreate]="true"
-							(createOption)="onCreateTag($event)"
-						/>
-					</div>
+						<div class="category-group">
+							<h4>Tags</h4>
+							<app-multi-select-tags
+								[options]="availableTags()"
+								[(selectedIds)]="selectedTagIds"
+								placeholderSearch="Filtrar tags..."
+								[groupSelectedAtTop]="true"
+								[allowCreate]="true"
+								(createOption)="onCreateTag($event)"
+							/>
+						</div>
 
-					<div class="category-group">
-						<h4>Autores</h4>
-						<app-multi-select-tags
-							[options]="availableAuthors()"
-							[(selectedIds)]="selectedAuthorIds"
-							placeholderSearch="Filtrar autores..."
-							[groupSelectedAtTop]="true"
-							[allowCreate]="true"
-							(createOption)="onCreateAuthor($event)"
-						/>
-					</div>
+						<div class="category-group">
+							<h4>Autores</h4>
+							<app-multi-select-tags
+								[options]="availableAuthors()"
+								[(selectedIds)]="selectedAuthorIds"
+								placeholderSearch="Filtrar autores..."
+								[groupSelectedAtTop]="true"
+								[allowCreate]="true"
+								(createOption)="onCreateAuthor($event)"
+							/>
+						</div>
 
-					<div class="category-group">
-						<h4>Conteúdo Sensível</h4>
-						<app-multi-select-tags
-							[options]="availableSensitive()"
-							[(selectedIds)]="selectedSensitiveIds"
-							placeholderSearch="Filtrar conteúdos..."
-							[groupSelectedAtTop]="true"
-							[allowCreate]="true"
-							(createOption)="onCreateSensitive($event)"
-						/>
-					</div>
-				</section>
+						<div class="category-group">
+							<h4>Conteúdo Sensível</h4>
+							<app-multi-select-tags
+								[options]="availableSensitive()"
+								[(selectedIds)]="selectedSensitiveIds"
+								placeholderSearch="Filtrar conteúdos..."
+								[groupSelectedAtTop]="true"
+								[allowCreate]="true"
+								(createOption)="onCreateSensitive($event)"
+							/>
+						</div>
+					</section>
+				}
 			</form>
 		}
 	</div>

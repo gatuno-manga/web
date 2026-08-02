@@ -1,4 +1,9 @@
-import { Component, computed, Input } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	input,
+} from '@angular/core';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
@@ -7,12 +12,16 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 	imports: [IconsComponent],
 	templateUrl: './confirmation-notification.component.html',
 	styleUrls: ['./confirmation-notification.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfirmationNotificationComponent {
-	@Input() title: string = 'Confirmação';
-	@Input() message: string = '';
-	@Input() details?: string[];
-	@Input() showWarning: boolean = true;
+	title = input<string>('Confirmação');
+	message = input<string>('');
+	details = input<string[]>();
+	showWarning = input<boolean>(true);
 
-	hasDetails = computed(() => !!this.details && this.details.length > 0);
+	hasDetails = computed(() => {
+		const d = this.details();
+		return !!d && d.length > 0;
+	});
 }

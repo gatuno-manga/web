@@ -1,12 +1,16 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
+	ChangeDetectionStrategy,
 	ChangeDetectorRef,
 	Component,
+	computed,
 	inject,
 	NgZone,
 	PLATFORM_ID,
 	signal,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { MetaDataService } from '@core/services/meta-data.service';
 import { TagsService } from '@core/services/tags.service';
 import { Tag } from '@models/tags.models';
@@ -17,15 +21,40 @@ import { ListCheckboxItem } from '@ui/atoms/inputs/list-checkbox/list-checkbox.t
 
 @Component({
 	selector: 'app-tags',
-	imports: [ButtonComponent, ListCheckboxComponent, IconsComponent],
+	imports: [
+		ButtonComponent,
+		ListCheckboxComponent,
+		IconsComponent,
+		FormsModule,
+		RouterLink,
+	],
 	templateUrl: './tags.component.html',
 	styleUrl: './tags.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagsComponent {
 	tags: Tag[] = [];
+
+	searchQuery = signal('');
+	filteredTags = computed(() => {
+		const search = this.searchQuery().toLowerCase();
+		if (!search) return this.tags;
+		return this.tags.filter((t) => t.name.toLowerCase().includes(search));
+	});
+
 	isLoading = signal(true);
 	mergingSelection: Tag | null = null;
 	mergingTags: ListCheckboxItem[] = [];
+
+	mergeSearchQuery = signal('');
+	filteredMergingTags = computed(() => {
+		const search = this.mergeSearchQuery().toLowerCase();
+		if (!search) return this.mergingTags;
+		return this.mergingTags.filter((t) =>
+			t.label.toLowerCase().includes(search),
+		);
+	});
+
 	private platformId = inject(PLATFORM_ID);
 	private isBrowser = isPlatformBrowser(this.platformId);
 	private cdr = inject(ChangeDetectorRef);
@@ -74,6 +103,7 @@ export class TagsComponent {
 	cancelMerge() {
 		this.mergingSelection = null;
 		this.mergingTags = [];
+		this.mergeSearchQuery.set('');
 	}
 
 	mergeTags() {

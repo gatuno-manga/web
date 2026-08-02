@@ -89,9 +89,9 @@
 						<app-checkbox
 							[ngModel]="isChapterSelected(chapter.id)"
 							(ngModelChange)="toggleChapter(chapter.id)"
-							[attr.aria-label]="getChapterLabel(chapter)"
+							[attr.aria-label]="chapter | chapterLabel"
 						/>
-						<span>{{ getChapterLabel(chapter) }}</span>
+						<span>{{ chapter | chapterLabel }}</span>
 					</label>
 				}
 			</div>

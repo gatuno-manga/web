@@ -1,162 +1,208 @@
-<div id="infos" class="mural">
-	<div id="all-books" class="info-item item">
-		<app-icons name="book" />
-		<span class="label">Total de livros</span>
-		<span class="value">{{ overview.counts.books }}</span>
+<div id="infos" class="animate-fade-up delay-1">
+	<div class="db-card-shell info-item-books">
+		<div class="db-card-core info-item-core">
+			<app-icons name="book" />
+			<span class="label">Total de livros</span>
+			<span class="value">{{ overview().counts.books }}</span>
+		</div>
 	</div>
-	<div id="all-chapters" class="info-item item">
-		<app-icons name="file" />
-		<span class="label">Total de capítulos</span>
-		<span class="value">{{ overview.counts.chapters }}</span>
+	
+	<div class="db-card-shell info-item-chapters">
+		<div class="db-card-core info-item-core">
+			<app-icons name="file" />
+			<span class="label">Total de capítulos</span>
+			<span class="value">{{ overview().counts.chapters }}</span>
+		</div>
 	</div>
-	<div id="all-users" class="info-item item">
-		<app-icons name="user" />
-		<span class="label">Total de autores</span>
-		<span class="value">{{ overview.counts.authors }}</span>
+	
+	<div class="db-card-shell">
+		<div class="db-card-core info-item-core">
+			<app-icons name="user" />
+			<span class="label">Total de autores</span>
+			<span class="value">{{ overview().counts.authors }}</span>
+		</div>
 	</div>
-	<div id="all-pages" class="info-item item">
-		<app-icons name="file" />
-		<span class="label">Total de páginas</span>
-		<span class="value">{{ overview.counts.pages }}</span>
+	
+	<div class="db-card-shell">
+		<div class="db-card-core info-item-core">
+			<app-icons name="file" />
+			<span class="label">Total de páginas</span>
+			<span class="value">{{ overview().counts.pages }}</span>
+		</div>
 	</div>
-	<div id="all-sensitive" class="info-item item">
-		<app-icons name="alert-triangle" />
-		<span class="label">Conteúdos Sensíveis</span>
-		<span class="value">{{ overview.counts.sensitiveContent }}</span>
-	</div>
-	<a id="all-tags" class="info-item item" routerLink="/dashboard/tags">
-		<app-icons name="hash" />
-		<span class="label">Total de tags</span>
-		<span class="value">{{ overview.counts.tags }}</span>
+	
+	<a routerLink="/dashboard/sensitive-content" class="db-card-shell interactive-card">
+		<div class="db-card-core info-item-core">
+			<app-icons name="alert-triangle" />
+			<span class="label">Conteúdos Sensíveis</span>
+			<span class="value">{{ overview().counts.sensitiveContent }}</span>
+		</div>
+	</a>
+	
+	<a routerLink="/dashboard/tags" class="db-card-shell interactive-card">
+		<div class="db-card-core info-item-core">
+			<app-icons name="hash" />
+			<span class="label">Total de tags</span>
+			<span class="value">{{ overview().counts.tags }}</span>
+		</div>
 	</a>
 </div>
 
-<div class="item charts-wrapper">
+<div class="charts-wrapper content-visibility-auto animate-fade-up delay-2">
 	<div class="section-title">
 		<h4>Status de Scraping</h4>
 	</div>
 	<div class="charts-container">
 		@if (isBrowser) {
-			<div class="chart-card">
-				<div
-					echarts
-					[options]="scrapingStatusChartOption"
-					class="chart"
-				></div>
-			</div>
-			<div class="chart-card">
-				<div
-					echarts
-					[options]="chapterStatusChartOption"
-					class="chart"
-				></div>
-			</div>
+			@defer (on viewport) {
+				<div class="chart-card-shell">
+					<div class="chart-card-core">
+						<div echarts [options]="scrapingStatusChartOption()" class="chart"></div>
+					</div>
+				</div>
+			} @placeholder {
+				<div class="chart-card-shell" style="min-height: 300px"></div>
+			}
+			@defer (on viewport) {
+				<div class="chart-card-shell">
+					<div class="chart-card-core">
+						<div echarts [options]="chapterStatusChartOption()" class="chart"></div>
+					</div>
+				</div>
+			} @placeholder {
+				<div class="chart-card-shell" style="min-height: 300px"></div>
+			}
 		}
 	</div>
 </div>
 
-<div class="item charts-wrapper">
+<div class="charts-wrapper content-visibility-auto animate-fade-up delay-3">
 	<div class="section-title">
 		<h4>Distribuições</h4>
 	</div>
 	<div class="charts-container">
 		@if (isBrowser) {
-			<div class="chart-card full-width">
-				<div
-					echarts
-					[options]="sensitiveContentChartOption"
-					class="chart"
-				></div>
-			</div>
-			<div class="chart-card full-width">
-				<div echarts [options]="tagsChartOption" class="chart"></div>
-			</div>
+			@defer (on viewport) {
+				<div class="chart-card-shell full-width">
+					<div class="chart-card-core">
+						<div echarts [options]="sensitiveContentChartOption()" class="chart"></div>
+					</div>
+				</div>
+			} @placeholder {
+				<div class="chart-card-shell full-width" style="min-height: 300px"></div>
+			}
+			@defer (on viewport) {
+				<div class="chart-card-shell full-width">
+					<div class="chart-card-core">
+						<div echarts [options]="tagsChartOption()" class="chart"></div>
+					</div>
+				</div>
+			} @placeholder {
+				<div class="chart-card-shell full-width" style="min-height: 300px"></div>
+			}
 		}
 	</div>
 </div>
 
-<div id="book">
-	<div id="process-books" class="book-item item">
+<div id="book" class="animate-fade-up delay-4">
+	<div class="queue-wrapper">
 		<div class="section-title">
 			<h4>Livros em processamento</h4>
 		</div>
-		<div class="content">
-			@for (item of progressBooks.books; track $index) {
-				<div [routerLink]="['/books', item.id]" class="book">
-					<div class="book-image">
-						<img [src]="item.cover" alt="{{ item.title }}" />
-					</div>
-					<div class="book-title">{{ item.title }}</div>
-				</div>
-			} @empty {
-				<div class="empty-state">Nenhum livro em processamento</div>
-			}
-		</div>
+		
+		@if (progressBooks().books.length > 0) {
+			<div class="books-content">
+				@for (item of progressBooks().books; track item.id) {
+					<a [routerLink]="['/books', item.id]" class="book-item-shell interactive-card">
+						<div class="book-item-core">
+							<div class="book-image" [style.background-color]="item.dominantColor || 'var(--secondary-color)'">
+								<div class="cover-placeholder" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 0;">
+									<app-icons name="image" size="32" class="placeholder-icon" color="var(--app-text-color)" style="opacity: 0.15;" />
+								</div>
+								@if (item.cover) {
+									<img [src]="item.cover" alt="{{ item.title }}" appImageFallback style="position: relative; z-index: 1;" />
+								}
+							</div>
+							<div class="book-title">{{ item.title }}</div>
+						</div>
+					</a>
+				}
+			</div>
+		} @else {
+			<div class="elegant-empty">
+				<div class="empty-icon"><app-icons name="book-open" /></div>
+				<p>Nenhum livro em processamento</p>
+			</div>
+		}
 	</div>
 
-	<!-- Fila de jobs -->
-	<div id="queue-jobs" class="book-item item">
+	<div class="queue-wrapper">
 		<div class="section-title">
 			<h4>
 				Fila de Processamento
-				@if (allActiveJobs.length > 0 || allPendingJobs.length > 0) {
-				<span class="queue-count">{{ allActiveJobs.length + allPendingJobs.length }}</span>
+				@if (allActiveJobs().length > 0 || allPendingJobs().length > 0) {
+					<span class="queue-header-count">{{ allActiveJobs().length + allPendingJobs().length }}</span>
 				}
 			</h4>
 		</div>
 
-		<!-- Em execução -->
-		@if (allActiveJobs.length > 0) {
-		<div class="queue-group">
-			<span class="queue-group-label active">
-				<app-icons name="loader" class="spin" />
-				Em execução ({{ allActiveJobs.length }})
-			</span>
-			<div class="queue-list">
-				@for (job of allActiveJobs; track job.id) {
-				<a class="queue-job active" [routerLink]="job.bookId ? ['/books', job.bookId] : null">
+		@if (allActiveJobs().length > 0) {
+			<div class="queue-group">
+				<span class="queue-group-label active">
 					<app-icons name="loader" class="spin" />
-					<div class="queue-job-info">
-						<span class="queue-job-title">{{ job.bookTitle }}</span>
-						@if (job.chapterTitle) {
-						<span class="queue-job-sub">{{ job.chapterTitle }}</span>
-						}
-					</div>
-					<span class="queue-job-badge active">Processando</span>
-				</a>
-				}
+					Em execução ({{ allActiveJobs().length }})
+				</span>
+				<div class="queue-list">
+					@for (job of allActiveJobs(); track job.id) {
+						<a class="queue-job-shell interactive-card active" [routerLink]="job.bookId ? ['/books', job.bookId] : null">
+							<div class="queue-job-core">
+								<app-icons name="loader" class="spin" />
+								<div class="queue-job-info">
+									<span class="queue-job-title">{{ job.bookTitle }}</span>
+									@if (job.chapterTitle) {
+										<span class="queue-job-sub">{{ job.chapterTitle }}</span>
+									}
+								</div>
+								<span class="queue-job-badge">Processando</span>
+							</div>
+						</a>
+					}
+				</div>
 			</div>
-		</div>
 		}
 
-		<!-- Aguardando -->
-		@if (allPendingJobs.length > 0) {
-		<div class="queue-group">
-			<span class="queue-group-label waiting">
-				<app-icons name="clock" />
-				Aguardando ({{ allPendingJobs.length }})
-			</span>
-			<div class="queue-list">
-				@for (job of allPendingJobs; track job.id) {
-				<a class="queue-job waiting" [routerLink]="job.bookId ? ['/books', job.bookId] : null">
+		@if (allPendingJobs().length > 0) {
+			<div class="queue-group">
+				<span class="queue-group-label waiting">
 					<app-icons name="clock" />
-					<div class="queue-job-info">
-						<span class="queue-job-title">{{ job.bookTitle }}</span>
-						@if (job.chapterTitle) {
-						<span class="queue-job-sub">{{ job.chapterTitle }}</span>
-						}
-					</div>
-					<span class="queue-job-badge waiting">
-						{{ job.delayed ? 'Agendado' : 'Aguardando' }}
-					</span>
-				</a>
-				}
+					Aguardando ({{ allPendingJobs().length }})
+				</span>
+				<div class="queue-list">
+					@for (job of allPendingJobs(); track job.id) {
+						<a class="queue-job-shell interactive-card waiting" [routerLink]="job.bookId ? ['/books', job.bookId] : null">
+							<div class="queue-job-core">
+								<app-icons name="clock" />
+								<div class="queue-job-info">
+									<span class="queue-job-title">{{ job.bookTitle }}</span>
+									@if (job.chapterTitle) {
+										<span class="queue-job-sub">{{ job.chapterTitle }}</span>
+									}
+								</div>
+								<span class="queue-job-badge">
+									{{ job.delayed ? 'Agendado' : 'Aguardando' }}
+								</span>
+							</div>
+						</a>
+					}
+				</div>
 			</div>
-		</div>
 		}
 
-		@if (allActiveJobs.length === 0 && allPendingJobs.length === 0) {
-		<div class="empty-state">Fila vazia</div>
+		@if (allActiveJobs().length === 0 && allPendingJobs().length === 0) {
+			<div class="elegant-empty">
+				<div class="empty-icon"><app-icons name="coffee" /></div>
+				<p>Fila vazia</p>
+			</div>
 		}
 	</div>
 </div>

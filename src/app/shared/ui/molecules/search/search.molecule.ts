@@ -7,6 +7,7 @@ import {
 	viewChild,
 	viewChildren,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
@@ -62,6 +63,7 @@ export class SearchMoleculeComponent {
 					this.bookService.getBooks({ search: term, limit: 5 }),
 				),
 				tap(() => this.isSearching.set(false)),
+				takeUntilDestroyed(),
 			)
 			.subscribe((response) => {
 				this.searchResults.set(response.data);
@@ -184,6 +186,6 @@ export class SearchMoleculeComponent {
 
 	private focusResult(index: number) {
 		const items = this.resultItems();
-		items[index]?.nativeElement.focus();
+		items[index]?.nativeElement.scrollIntoView({ block: 'nearest' });
 	}
 }

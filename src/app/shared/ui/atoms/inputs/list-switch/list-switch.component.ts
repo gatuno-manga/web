@@ -1,4 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	input,
+	output,
+} from '@angular/core';
 import { SwitchComponent } from '../switch/switch.component';
 
 @Component({
@@ -7,6 +12,7 @@ import { SwitchComponent } from '../switch/switch.component';
 	imports: [SwitchComponent],
 	templateUrl: './list-switch.component.html',
 	styleUrl: './list-switch.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListSwitchComponent {
 	items = input<{ id: string; name: string }[]>([]);

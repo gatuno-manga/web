@@ -3,8 +3,16 @@ import {
 	DragDropModule,
 	moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { Component, computed, Input, OnInit, signal } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	Input,
+	OnInit,
+	signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { UrlTransformPipe } from '@shared/utils/pipes/url-transform-pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.component';
@@ -22,9 +30,11 @@ export interface SourceAddSaveEvent {
 		TextInputComponent,
 		IconsComponent,
 		DragDropModule,
+		UrlTransformPipe,
 	],
 	templateUrl: './source-add-modal.component.html',
 	styleUrls: ['./source-add-modal.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SourceAddModalComponent implements OnInit {
 	@Input() existingUrls: string[] = [];
@@ -120,14 +130,6 @@ export class SourceAddModalComponent implements OnInit {
 	onCancel(): void {
 		if (this.close) {
 			this.close(null);
-		}
-	}
-
-	urlTransform(url: string): string {
-		try {
-			return new URL(url).hostname;
-		} catch (_e) {
-			return url;
 		}
 	}
 }

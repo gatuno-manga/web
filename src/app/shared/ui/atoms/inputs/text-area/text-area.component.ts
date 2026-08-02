@@ -40,6 +40,7 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 	textareaRef = viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
 
 	id = input<string>();
+	label = input<string>('');
 	placeholder = input<string>('');
 	rows = input<number>(3);
 	maxLength = input<number | null>(null);

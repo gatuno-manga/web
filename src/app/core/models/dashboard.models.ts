@@ -23,6 +23,8 @@ export interface DashboardProgress {
 		id: string;
 		title: string;
 		cover: string;
+		blurHash?: string;
+		dominantColor?: string;
 		processingChapters: number;
 		totalChapters: number;
 	}[];

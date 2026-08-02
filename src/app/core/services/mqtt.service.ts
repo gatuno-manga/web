@@ -1,6 +1,13 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable, inject, OnDestroy, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import {
+	DestroyRef,
+	Inject,
+	Injectable,
+	inject,
+	OnDestroy,
+	signal,
+} from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { BookEvents } from '@constants/book-events.constants';
 import { ENVIRONMENT, Environment } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
@@ -70,6 +77,7 @@ export interface MqttWatchEvent {
 export class MqttService implements OnDestroy {
 	private http = inject(HttpClient);
 	private client: MqttClient | null = null;
+	private destroyRef = inject(DestroyRef);
 
 	private readonly _connected = signal<boolean>(false);
 	private readonly _connectionState = signal<WebSocketConnectionState>(
@@ -190,20 +198,22 @@ export class MqttService implements OnDestroy {
 				this.disconnectForOffline();
 			});
 
-		this.networkStatusService.wentOnline$.subscribe(() => {
-			if (
-				this._connectionState() ===
-				WebSocketConnectionState.OFFLINE_PAUSED
-			) {
-				logConnectionEvent(
-					this.serviceName,
-					'online',
-					'Rede online - reconectando MQTT',
-					LogLevel.INFO,
-				);
-				this.connect();
-			}
-		});
+		this.networkStatusService.wentOnline$
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(() => {
+				if (
+					this._connectionState() ===
+					WebSocketConnectionState.OFFLINE_PAUSED
+				) {
+					logConnectionEvent(
+						this.serviceName,
+						'online',
+						'Rede online - reconectando MQTT',
+						LogLevel.INFO,
+					);
+					this.connect();
+				}
+			});
 	}
 
 	private disconnectForOffline(): void {

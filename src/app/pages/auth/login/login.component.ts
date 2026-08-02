@@ -1,5 +1,11 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	inject,
+	OnInit,
+	PLATFORM_ID,
+} from '@angular/core';
 import {
 	FormBuilder,
 	FormGroup,
@@ -40,6 +46,7 @@ import { firstValueFrom } from 'rxjs';
 	],
 	templateUrl: './login.component.html',
 	styleUrl: './login.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent implements OnInit {
 	form: FormGroup;

@@ -28,7 +28,7 @@ describe('ConfirmationNotificationComponent', () => {
 	});
 
 	it('should display custom title', () => {
-		component.title = 'Confirmar exclusão';
+		fixture.componentRef.setInput('title', 'Confirmar exclusão');
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(compiled.querySelector('h2')?.textContent).toBe(
@@ -37,7 +37,7 @@ describe('ConfirmationNotificationComponent', () => {
 	});
 
 	it('should display message', () => {
-		component.message = 'Você tem certeza?';
+		fixture.componentRef.setInput('message', 'Você tem certeza?');
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(compiled.querySelector('.message')?.textContent).toBe(
@@ -52,21 +52,25 @@ describe('ConfirmationNotificationComponent', () => {
 	});
 
 	it('should hide warning box when showWarning is false', () => {
-		component.showWarning = false;
+		fixture.componentRef.setInput('showWarning', false);
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(compiled.querySelector('.warning-box')).toBeFalsy();
 	});
 
 	it('should not display details when not provided', () => {
-		component.details = undefined;
+		fixture.componentRef.setInput('details', undefined);
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		expect(compiled.querySelector('.details')).toBeFalsy();
 	});
 
 	it('should display details when provided', () => {
-		component.details = ['Detalhe 1', 'Detalhe 2', 'Detalhe 3'];
+		fixture.componentRef.setInput('details', [
+			'Detalhe 1',
+			'Detalhe 2',
+			'Detalhe 3',
+		]);
 		fixture.detectChanges();
 		const compiled = fixture.nativeElement;
 		const detailsDiv = compiled.querySelector('.details');
