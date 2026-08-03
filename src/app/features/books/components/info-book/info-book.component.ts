@@ -460,12 +460,12 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 		// Sincroniza a aba com a URL
 		const tabString = tab[tabName];
-		this.router.navigate([], {
+		const urlTree = this.router.createUrlTree([], {
 			relativeTo: this.route,
 			queryParams: { tab: tabString },
 			queryParamsHandling: 'merge',
-			replaceUrl: true,
 		});
+		this.location.replaceState(this.router.serializeUrl(urlTree));
 
 		let clickedElement: HTMLSpanElement | undefined;
 
