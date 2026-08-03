@@ -17,6 +17,7 @@ import { ModalNotificationService } from '@core/services/modal-notification.serv
 import { NotificationService } from '@core/services/notification.service';
 import { SavedPagesService } from '@core/services/saved-pages.service';
 import { UserTokenService } from '@core/services/user-token.service';
+import { UserService } from '@core/services/user.service';
 import { ScrapingStatus } from '@models/book.models';
 
 describe('InfoBookComponent', () => {
@@ -31,6 +32,7 @@ describe('InfoBookComponent', () => {
 		isAdminSignal: WritableSignal<boolean>;
 		hasValidAccessTokenSignal: WritableSignal<boolean>;
 	};
+	let mockUserService: any;
 	let mockDownloadService: any;
 	let mockChapterService: any;
 	let mockSavedPagesService: any;
@@ -83,6 +85,10 @@ describe('InfoBookComponent', () => {
 			hasValidAccessTokenSignal: signal(false),
 		};
 
+		mockUserService = {
+			hasPermission: jasmine.createSpy('hasPermission').and.returnValue(false)
+		};
+
 		mockDownloadService = {
 			downloadProgress$: of(new Map()),
 			isChapterDownloaded: jasmine
@@ -126,11 +132,9 @@ describe('InfoBookComponent', () => {
 					provide: ModalNotificationService,
 					useValue: mockModalService,
 				},
-				{
-					provide: ContextMenuService,
-					useValue: mockContextMenuService,
-				},
+				{ provide: ContextMenuService, useValue: mockContextMenuService },
 				{ provide: UserTokenService, useValue: mockUserTokenService },
+				{ provide: UserService, useValue: mockUserService },
 				{ provide: DownloadService, useValue: mockDownloadService },
 				{ provide: ChapterService, useValue: mockChapterService },
 				{ provide: SavedPagesService, useValue: mockSavedPagesService },
@@ -329,6 +333,7 @@ describe('InfoBookComponent', () => {
 
 	it('onCoverContextMenu should show Select Cover, Edit, Correct and Remove options for admin', () => {
 		mockUserTokenService.isAdminSignal.set(true);
+		mockUserService.hasPermission.and.callFake((perm: string) => perm === 'internal:books:edit');
 		const event = new MouseEvent('contextmenu');
 		const cover = { id: 'cv1', url: 'http://img' } as any;
 

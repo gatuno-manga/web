@@ -929,7 +929,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	onCoverDrop(event: CdkDragDrop<Cover[]>) {
-		if (!this.userTokenService.isAdminSignal()) return;
+		if (!this.userService.hasPermission('internal:books:edit')) return;
 
 		this.covers.update((current) => {
 			const newCovers = [...current];
@@ -1973,7 +1973,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			);
 		}
 
-		if (this.userTokenService.isAdminSignal()) {
+		if (this.userService.hasPermission('internal:books:edit')) {
 			if (items.length > 0) {
 				items.push({ type: 'separator' });
 			}
