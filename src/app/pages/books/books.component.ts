@@ -544,7 +544,12 @@ export class BooksComponent implements OnInit, OnDestroy, AfterViewInit {
 			const end = start + limit;
 			const paginated = filtered.slice(start, end);
 
-			this.clearCoverUrls();
+			if (
+				this.listSettings.listMode !== 'infinite-scroll' ||
+				this.currentPage === 1
+			) {
+				this.clearCoverUrls();
+			}
 
 			const newBooks = paginated.map((ob) => {
 				const url = URL.createObjectURL(ob.cover);
