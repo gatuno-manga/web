@@ -33,6 +33,8 @@
 		<img
 			[src]="page.path"
 			alt="Página {{ $index + 1 }}"
+			[attr.width]="page.metadata?.width"
+			[attr.height]="page.metadata?.height"
 			[attr.fetchpriority]="$index < 2 ? 'high' : 'auto'"
 			[attr.loading]="$index < 2 ? 'eager' : 'lazy'"
 			(load)="onImageLoad($index)"
