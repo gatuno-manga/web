@@ -518,6 +518,8 @@
 		position: relative;
 		background-color: var(--secondary-color);
 		flex-direction: column;
+		content-visibility: auto;
+		contain-intrinsic-size: auto 350px;
 
 		&:hover {
 			transform: scale(1.05);

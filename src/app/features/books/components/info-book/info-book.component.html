@@ -344,10 +344,9 @@
 								[src]="cover.url"
 								alt="Cover {{ cover.id }}"
 								appImageFallback
-								style="position: relative; z-index: 1;"
 							/>
 						}
-						<div class="info" style="position: relative; z-index: 2;">
+						<div class="info">
 							<span>{{ cover.title }}</span>
 						</div>
 					</div>
@@ -460,13 +459,12 @@
 								alt="Page {{ savedPage.page.index }}"
 								loading="lazy"
 								appImageFallback
-								style="position: relative; z-index: 1;"
 							/>
 						}
 						<div class="cover-placeholder" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 0;">
 							<app-icons name="image" />
 						</div>
-						<div class="info" style="position: relative; z-index: 2;">
+						<div class="info">
 							<span>Cap. {{ savedPage.chapter.index | chapterIndex }} - Pág. {{ savedPage.page.index | number: '1.0-5' : 'pt-BR' }}</span>
 							@if (savedPage.comment) {
 								<span class="description">"{{ savedPage.comment }}"</span>
