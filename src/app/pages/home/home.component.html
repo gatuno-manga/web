@@ -8,7 +8,9 @@
 
   <h1 class="visually-hidden">Início Gatuno</h1>
   <!-- Featured Carousel -->
-  @if (featuredBooks().length > 0) {
+  @if (isLoadingFeatured()) {
+    <section class="featured-carousel-section skeleton placeholder" style="border-radius: 0;"></section>
+  } @else if (featuredBooks().length > 0) {
     <section
       class="featured-carousel-section"
       aria-label="Livros em destaque"

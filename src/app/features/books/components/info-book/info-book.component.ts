@@ -325,7 +325,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		if (isPlatformBrowser(this.platformId)) {
 			this.setupResizeObserver();
 			this.setupIntersectionObserver();
-			window.addEventListener('resize', this.onWindowResize.bind(this));
+			window.addEventListener('resize', this.onWindowResize);
 		}
 
 		this.subscribeToWebSocketEvents();
@@ -371,7 +371,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		if (isPlatformBrowser(this.platformId)) {
 			window.removeEventListener(
 				'resize',
-				this.onWindowResize.bind(this),
+				this.onWindowResize,
 			);
 		}
 	}

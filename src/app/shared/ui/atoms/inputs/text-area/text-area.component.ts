@@ -17,11 +17,12 @@ import {
 	NG_VALUE_ACCESSOR,
 	ValidationErrors,
 } from '@angular/forms';
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
 	selector: 'app-text-area',
-	imports: [NgClass, IconsComponent],
+	imports: [NgClass, IconsComponent, TextFieldModule],
 	providers: [
 		{
 			provide: NG_VALUE_ACCESSOR,
@@ -70,20 +71,9 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 	};
 
 	constructor() {
-		effect(() => {
-			const expand = this.autoExpand();
-			if (expand) {
-				// Re-evaluate whenever value changes to adjust height
-				this.value();
-				setTimeout(() => this.adjustHeight(), 0);
-			}
-		});
 	}
 
 	ngAfterViewInit() {
-		if (this.autoExpand()) {
-			this.adjustHeight();
-		}
 	}
 
 	onFocus(): void {
@@ -128,14 +118,6 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 
 	onChange: (value: string) => void = () => {};
 	onTouched: () => void = () => {};
-
-	private adjustHeight(): void {
-		const textarea = this.textareaRef()?.nativeElement;
-		if (!textarea) return;
-
-		textarea.style.height = 'auto';
-		textarea.style.height = `${textarea.scrollHeight}px`;
-	}
 
 	errorMessages(): string[] {
 		const errorsValue = this.errors();

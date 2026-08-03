@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
 	ConfirmationNotificationComponent,
 	ProgressNotificationComponent,
@@ -14,6 +14,7 @@ import { NotificationSeverity } from './notification-strategy.interface';
 @Component({
 	selector: 'app-notification-example',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
         <div class="examples">
             <h2>Exemplos de Notificações</h2>

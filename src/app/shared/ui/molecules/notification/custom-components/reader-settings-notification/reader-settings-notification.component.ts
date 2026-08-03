@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ReaderSettingsFormComponent } from '@features/reading/components/readers';
 
 @Component({
@@ -11,8 +11,8 @@ import { ReaderSettingsFormComponent } from '@features/reading/components/reader
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReaderSettingsNotificationComponent {
-	@Input() title = 'Configurações do Leitor';
-	@Input() subtitle = 'Personalize sua experiência de leitura';
-	@Input() showResetButton = true;
-	@Input() contentType: 'image' | 'text' | 'document' | 'all' = 'image';
+	title = input('Configurações do Leitor');
+	subtitle = input('Personalize sua experiência de leitura');
+	showResetButton = input(true);
+	contentType = input<'image' | 'text' | 'document' | 'all'>('image');
 }

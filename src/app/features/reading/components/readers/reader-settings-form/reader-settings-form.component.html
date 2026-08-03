@@ -1,7 +1,7 @@
 <div class="reader-settings-form">
-	<div class="settings-body" [class.flat-mode]="flatMode">
+	<div class="settings-body" [class.flat-mode]="flatMode()">
 		<!-- Seletor de Abas Modular -->
-		@if (!flatMode) {
+		@if (!flatMode()) {
 			<div
 				class="view-selector"
 				role="tablist"
@@ -17,7 +17,7 @@
 					Geral
 				</app-button>
 
-				@if (contentType === 'text' || contentType === 'all') {
+				@if (contentType() === 'text' || contentType() === 'all') {
 				<app-button
 					[variant]="viewFilter === 'text' ? 'primary' : 'outline'"
 					role="tab"
@@ -27,8 +27,8 @@
 				>
 					Texto
 				</app-button>
-				} @if (contentType === 'image' || contentType === 'document' ||
-				contentType === 'all') {
+				} @if (contentType() === 'image' || contentType() === 'document' ||
+				contentType() === 'all') {
 				<app-button
 					[variant]="viewFilter === 'pages' ? 'primary' : 'outline'"
 					role="tab"
@@ -38,7 +38,7 @@
 				>
 					Páginas
 				</app-button>
-				} @if (contentType === 'image' || contentType === 'all') {
+				} @if (contentType() === 'image' || contentType() === 'all') {
 				<app-button
 					[variant]="viewFilter === 'filters' ? 'primary' : 'outline'"
 					role="tab"
@@ -498,7 +498,7 @@
 		}
 	</div>
 
-	@if(showResetButton) {
+	@if(showResetButton()) {
 	<div class="settings-footer">
 		<app-button (click)="resetSettings()" leftIcon="refresh-ccw">
 			<span>Restaurar Padrões</span>

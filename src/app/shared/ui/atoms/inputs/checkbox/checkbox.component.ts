@@ -1,4 +1,4 @@
-import { Component, forwardRef, input, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, input, model } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -13,6 +13,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 	],
 	templateUrl: './checkbox.component.html',
 	styleUrl: './checkbox.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckboxComponent implements ControlValueAccessor {
 	value = model<boolean>(false);

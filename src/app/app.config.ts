@@ -16,7 +16,7 @@ import {
 	withHttpTransferCacheOptions,
 } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideRouter, withRouterConfig } from '@angular/router';
+import { provideRouter, withRouterConfig, withPreloading, PreloadAllModules } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
 import { HttpClientRequestInterceptor } from '@core/interceptors/http-client-request.interceptor';
 import { httpClientResponseInterceptor } from '@core/interceptors/http-client-response.interceptor';
@@ -30,6 +30,7 @@ export const appConfig: ApplicationConfig = {
 		provideRouter(
 			routes,
 			withRouterConfig({ onSameUrlNavigation: 'reload' }),
+			withPreloading(PreloadAllModules),
 		),
 		provideClientHydration(
 			withEventReplay(),

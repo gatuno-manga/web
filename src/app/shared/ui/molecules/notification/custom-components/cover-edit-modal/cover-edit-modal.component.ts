@@ -2,11 +2,11 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	computed,
-	Input,
 	OnChanges,
 	OnInit,
 	SimpleChanges,
 	signal,
+	input,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Cover } from '@models/book.models';
@@ -36,8 +36,8 @@ export interface CoverEditSaveEvent {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CoverEditModalComponent implements OnInit, OnChanges {
-	@Input() cover!: Cover;
-	@Input() close!: (result: CoverEditSaveEvent | null) => void;
+	cover = input.required<Cover>();
+	close = input<(result: CoverEditSaveEvent | null) => void>();
 
 	editedTitle = signal<string>('');
 	selectedFile = signal<File | null>(null);
@@ -46,14 +46,14 @@ export class CoverEditModalComponent implements OnInit, OnChanges {
 	hasImage = computed(() => !!this.previewUrl());
 
 	ngOnInit(): void {
-		this.editedTitle.set(this.cover?.title || '');
-		this.previewUrl.set(this.cover?.url || null);
+		this.editedTitle.set(this.cover()?.title || '');
+		this.previewUrl.set(this.cover()?.url || null);
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if (changes['cover'] && this.cover) {
-			this.editedTitle.set(this.cover.title || '');
-			this.previewUrl.set(this.cover.url || null);
+		if (changes['cover'] && this.cover()) {
+			this.editedTitle.set(this.cover().title || '');
+			this.previewUrl.set(this.cover().url || null);
 			this.selectedFile.set(null);
 		}
 	}
@@ -71,9 +71,10 @@ export class CoverEditModalComponent implements OnInit, OnChanges {
 	}
 
 	onSave(): void {
-		if (this.close) {
-			this.close({
-				id: this.cover.id,
+		const closeFunc = this.close();
+		if (closeFunc) {
+			closeFunc({
+				id: this.cover().id,
 				title: this.editedTitle(),
 				file: this.selectedFile() || undefined,
 			});
@@ -86,8 +87,9 @@ export class CoverEditModalComponent implements OnInit, OnChanges {
 		if (file && preview) {
 			URL.revokeObjectURL(preview);
 		}
-		if (this.close) {
-			this.close(null);
+		const closeFunc = this.close();
+		if (closeFunc) {
+			closeFunc(null);
 		}
 	}
 }

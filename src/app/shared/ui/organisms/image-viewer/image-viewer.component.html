@@ -1,17 +1,17 @@
 <div class="image-viewer-backdrop" (click)="onBackdropClick($event)">
-    @if (blurHash) {
+    @if (blurHash()) {
         <div class="blur-background">
-            <app-blurhash [hash]="blurHash" [width]="metadata?.width || 32" [height]="metadata?.height || 32" />
+            <app-blurhash [hash]="blurHash()!" [width]="metadata()?.width || 32" [height]="metadata()?.height || 32" />
         </div>
     }
 	<app-icon-button name="close" variant="overlay" class="close-btn" (click)="closeViewer()"></app-icon-button>
 	<div class="image-container">
-		<img [src]="imageUrl" alt="Visualização" [attr.alt]="imageTitle || 'Visualização'" (load)="onImageLoad()" />
-		@if(imageTitle) {
-		<div class="image-title">{{ imageTitle }}</div>
+		<img [src]="imageUrl()" alt="Visualização" [attr.alt]="imageTitle() || 'Visualização'" (load)="onImageLoad()" />
+		@if(imageTitle()) {
+		<div class="image-title">{{ imageTitle() }}</div>
 		}
-		@if(imageDescription) {
-		<div class="image-description">{{ imageDescription }}</div>
+		@if(imageDescription()) {
+		<div class="image-description">{{ imageDescription() }}</div>
 		}
 	</div>
 </div>

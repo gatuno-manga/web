@@ -1,8 +1,8 @@
 import {
 	ChangeDetectionStrategy,
 	Component,
-	Input,
 	signal,
+	input,
 } from '@angular/core';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
@@ -23,15 +23,16 @@ export interface RandomFilterResult {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RandomFilterModalComponent {
-	@Input() close!: (result: RandomFilterResult | null) => void;
+	close = input<(result: RandomFilterResult | null) => void>();
 
 	randomizeTags = signal<boolean>(true);
 	randomizeTypes = signal<boolean>(false);
 	randomizeSensitive = signal<boolean>(false);
 
 	confirm(): void {
-		if (this.close) {
-			this.close({
+		const closeFunc = this.close();
+		if (closeFunc) {
+			closeFunc({
 				tags: this.randomizeTags(),
 				types: this.randomizeTypes(),
 				sensitive: this.randomizeSensitive(),
@@ -40,8 +41,9 @@ export class RandomFilterModalComponent {
 	}
 
 	cancel(): void {
-		if (this.close) {
-			this.close(null);
+		const closeFunc = this.close();
+		if (closeFunc) {
+			closeFunc(null);
 		}
 	}
 }

@@ -20,7 +20,7 @@ describe('CoverEditModalComponent', () => {
 
 		fixture = TestBed.createComponent(CoverEditModalComponent);
 		component = fixture.componentInstance;
-		component.cover = mockCover;
+		fixture.componentRef.setInput('cover', mockCover);
 		fixture.detectChanges();
 	});
 
@@ -51,7 +51,7 @@ describe('CoverEditModalComponent', () => {
 				isFirstChange: () => false,
 			},
 		});
-		component.cover = newCover;
+		fixture.componentRef.setInput('cover', newCover);
 		component.ngOnChanges({
 			cover: {
 				currentValue: newCover,
@@ -75,7 +75,7 @@ describe('CoverEditModalComponent', () => {
 
 	it('should call close with save data on save', () => {
 		const closeSpy = jasmine.createSpy('close');
-		component.close = closeSpy;
+		fixture.componentRef.setInput('close', closeSpy);
 		component.editedTitle.set('Updated Title');
 
 		component.onSave();
@@ -89,7 +89,7 @@ describe('CoverEditModalComponent', () => {
 
 	it('should call close with null on cancel', () => {
 		const closeSpy = jasmine.createSpy('close');
-		component.close = closeSpy;
+		fixture.componentRef.setInput('close', closeSpy);
 
 		component.onCancel();
 

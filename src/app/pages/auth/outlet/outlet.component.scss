@@ -21,6 +21,7 @@
 	position: absolute;
 	border-radius: 50%;
 	filter: blur(90px);
+	will-change: transform;
 	&--warm {
 		width: 700px;
 		height: 500px;
@@ -66,6 +67,7 @@
 }
 
 .aurora-mesh {
+	content-visibility: auto;
 	position: absolute;
 	inset: 0;
 	background:

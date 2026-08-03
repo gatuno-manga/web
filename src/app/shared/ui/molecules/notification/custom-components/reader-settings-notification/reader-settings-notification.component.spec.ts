@@ -27,14 +27,14 @@ describe('ReaderSettingsNotificationComponent', () => {
 	});
 
 	it('should respect input parameters', () => {
-		component.title = 'Configurações Customizadas';
-		component.subtitle = 'Teste';
-		component.showResetButton = false;
-		component.contentType = 'text';
+		fixture.componentRef.setInput('title', 'Configurações Customizadas');
+		fixture.componentRef.setInput('subtitle', 'Teste');
+		fixture.componentRef.setInput('showResetButton', false);
+		fixture.componentRef.setInput('contentType', 'text');
 
-		expect(component.title).toBe('Configurações Customizadas');
-		expect(component.subtitle).toBe('Teste');
-		expect(component.showResetButton).toBe(false);
-		expect(component.contentType).toBe('text');
+		expect(component.title()).toBe('Configurações Customizadas');
+		expect(component.subtitle()).toBe('Teste');
+		expect(component.showResetButton()).toBe(false);
+		expect(component.contentType()).toBe('text');
 	});
 });

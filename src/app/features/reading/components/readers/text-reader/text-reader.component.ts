@@ -5,17 +5,16 @@ import {
 	computed,
 	DestroyRef,
 	ElementRef,
-	EventEmitter,
-	Input,
 	inject,
 	OnChanges,
 	OnDestroy,
 	OnInit,
-	Output,
 	PLATFORM_ID,
 	SimpleChanges,
 	signal,
 	viewChild,
+	input,
+	output,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -44,10 +43,10 @@ const WORDS_PER_PAGE = 300;
 	styleUrl: './text-reader.component.scss',
 })
 export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
-	@Input() content = '';
-	@Input() format: ContentFormat = 'markdown';
-	@Input() initialScrollPercentage = 0;
-	@Output() progressChange = new EventEmitter<TextProgressEvent>();
+	content = input('');
+	format = input<ContentFormat>('markdown');
+	initialScrollPercentage = input(0);
+	progressChange = output<TextProgressEvent>();
 
 	contentRef = viewChild<ElementRef>('contentRef');
 
@@ -110,9 +109,9 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 			setTimeout(() => this.setupIntersectionObserver(), 500);
 
 			// Restore initial position after render
-			if (this.initialScrollPercentage > 0) {
+			if (this.initialScrollPercentage() > 0) {
 				setTimeout(
-					() => this.scrollToPercentage(this.initialScrollPercentage),
+					() => this.scrollToPercentage(this.initialScrollPercentage()),
 					100,
 				);
 			}
@@ -120,9 +119,9 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private updateSafeContent() {
-		if (this.format === 'html' && this.content) {
+		if (this.format() === 'html' && this.content()) {
 			this.safeContent.set(
-				this.sanitizer.bypassSecurityTrustHtml(this.content),
+				this.sanitizer.bypassSecurityTrustHtml(this.content()),
 			);
 		} else {
 			this.safeContent.set('');
@@ -137,7 +136,7 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 
 	private calculateWordCount() {
 		// Strip HTML/markdown and count words
-		const plainText = this.content
+		const plainText = this.content()
 			.replace(/<[^>]*>/g, ' ') // Remove HTML tags
 			.replace(/[#*_~`]/g, '') // Remove markdown symbols
 			.replace(/\s+/g, ' ') // Normalize whitespace

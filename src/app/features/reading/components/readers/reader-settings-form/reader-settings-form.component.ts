@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
-	Input,
 	inject,
 	OnInit,
+	input,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FullscreenService } from '@core/services/fullscreen.service';
@@ -33,9 +33,9 @@ import { TextInputComponent } from '@ui/atoms/inputs/text-input/text-input.compo
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReaderSettingsFormComponent implements OnInit {
-	@Input() contentType: 'image' | 'text' | 'document' | 'all' = 'all';
-	@Input() showResetButton = true;
-	@Input() flatMode = false;
+	contentType = input<'image' | 'text' | 'document' | 'all'>('all');
+	showResetButton = input(true);
+	flatMode = input(false);
 
 	private settingsService = inject(SettingsService);
 	fullscreenService = inject(FullscreenService);
@@ -87,9 +87,9 @@ export class ReaderSettingsFormComponent implements OnInit {
 	ngOnInit(): void {
 		this.refreshLocalSettings();
 		// Se o tipo for texto, a aba padrão deve ser texto ou all
-		if (this.contentType === 'text') {
+		if (this.contentType() === 'text') {
 			this.viewFilter = 'text';
-		} else if (this.contentType === 'all') {
+		} else if (this.contentType() === 'all') {
 			this.viewFilter = 'all';
 		}
 	}
@@ -131,7 +131,7 @@ export class ReaderSettingsFormComponent implements OnInit {
 
 	get showSidebar() {
 		return (
-			this.flatMode ||
+			this.flatMode() ||
 			this.viewFilter === 'all' ||
 			this.viewFilter === 'appearance'
 		);
@@ -139,36 +139,36 @@ export class ReaderSettingsFormComponent implements OnInit {
 
 	get showPages() {
 		return (
-			(this.flatMode ||
+			(this.flatMode() ||
 				this.viewFilter === 'all' ||
 				this.viewFilter === 'pages') &&
-			(this.contentType === 'image' ||
-				this.contentType === 'document' ||
-				this.contentType === 'all')
+			(this.contentType() === 'image' ||
+				this.contentType() === 'document' ||
+				this.contentType() === 'all')
 		);
 	}
 
 	get showFilters() {
 		return (
-			(this.flatMode ||
+			(this.flatMode() ||
 				this.viewFilter === 'all' ||
 				this.viewFilter === 'filters') &&
-			(this.contentType === 'image' || this.contentType === 'all')
+			(this.contentType() === 'image' || this.contentType() === 'all')
 		);
 	}
 
 	get showTextSettings() {
 		return (
-			(this.flatMode ||
+			(this.flatMode() ||
 				this.viewFilter === 'all' ||
 				this.viewFilter === 'text') &&
-			(this.contentType === 'text' || this.contentType === 'all')
+			(this.contentType() === 'text' || this.contentType() === 'all')
 		);
 	}
 
 	get showPrivacySettings() {
 		return (
-			this.flatMode ||
+			this.flatMode() ||
 			this.viewFilter === 'all' ||
 			this.viewFilter === 'privacy'
 		);

@@ -67,17 +67,17 @@ export class AsideComponent implements OnInit, OnDestroy {
 		if (this.isBrowser && typeof document !== 'undefined') {
 			document.addEventListener(
 				'touchstart',
-				this.handleTouchStart.bind(this),
+				this.handleTouchStart,
 				{ passive: true },
 			);
 			document.addEventListener(
 				'touchmove',
-				this.handleTouchMove.bind(this),
+				this.handleTouchMove,
 				{ passive: true },
 			);
 			document.addEventListener(
 				'touchend',
-				this.handleTouchEnd.bind(this),
+				this.handleTouchEnd,
 				{ passive: true },
 			);
 		}
@@ -87,20 +87,20 @@ export class AsideComponent implements OnInit, OnDestroy {
 		if (this.isBrowser && typeof document !== 'undefined') {
 			document.removeEventListener(
 				'touchstart',
-				this.handleTouchStart.bind(this),
+				this.handleTouchStart,
 			);
 			document.removeEventListener(
 				'touchmove',
-				this.handleTouchMove.bind(this),
+				this.handleTouchMove,
 			);
 			document.removeEventListener(
 				'touchend',
-				this.handleTouchEnd.bind(this),
+				this.handleTouchEnd,
 			);
 		}
 	}
 
-	private handleTouchStart(event: TouchEvent) {
+	private handleTouchStart = (event: TouchEvent) => {
 		if (!this.isBrowser) return;
 
 		this.touchStartX = event.touches[0].clientX;
@@ -117,7 +117,7 @@ export class AsideComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	private handleTouchMove(event: TouchEvent) {
+	private handleTouchMove = (event: TouchEvent) => {
 		if (!this.isDragging()) return;
 
 		const currentX = event.touches[0].clientX;
@@ -146,7 +146,7 @@ export class AsideComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	private handleTouchEnd(event: TouchEvent) {
+	private handleTouchEnd = (event: TouchEvent) => {
 		if (!this.isDragging()) return;
 
 		const touchEndX = event.changedTouches[0].clientX;

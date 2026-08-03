@@ -1,13 +1,13 @@
 <div class="reader-settings-content">
 	<div class="settings-header">
-		<h2>{{ title }}</h2>
-		<p class="subtitle">{{ subtitle }}</p>
+		<h2>{{ title() }}</h2>
+		<p class="subtitle">{{ subtitle() }}</p>
 	</div>
 
 	<div class="settings-body-wrapper">
 		<app-reader-settings-form
-			[contentType]="contentType"
-			[showResetButton]="showResetButton"
+			[contentType]="contentType()"
+			[showResetButton]="showResetButton()"
 		/>
 	</div>
 </div>

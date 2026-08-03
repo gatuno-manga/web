@@ -21,10 +21,10 @@ describe('ImageReaderComponent', () => {
 
 	it('should emit progress when page becomes visible', () => {
 		const _spy = spyOn(component.progressChange, 'emit');
-		component.pages = [
+		fixture.componentRef.setInput('pages', [
 			{ index: '0', path: 'http://example.com/page1.webp' },
 			{ index: '1', path: 'http://example.com/page2.webp' },
-		];
+		]);
 		fixture.detectChanges();
 
 		// Note: IntersectionObserver testing requires more complex setup
@@ -32,10 +32,10 @@ describe('ImageReaderComponent', () => {
 	});
 
 	it('should display page numbers when showPageNumbers is true', () => {
-		component.pages = [
+		fixture.componentRef.setInput('pages', [
 			{ index: '0', path: 'http://example.com/page1.webp' },
-		];
-		component.showPageNumbers = true;
+		]);
+		fixture.componentRef.setInput('showPageNumbers', true);
 		fixture.detectChanges();
 
 		const pageNumber = fixture.nativeElement.querySelector('.page-number');
@@ -46,9 +46,10 @@ describe('ImageReaderComponent', () => {
 		component.onImageLoad(0);
 		expect(component.loadedPages.has(0)).toBeTrue();
 
-		component.pages = [
+		fixture.componentRef.setInput('pages', [
 			{ index: '0', path: 'http://example.com/new-page1.webp' },
-		];
+		]);
+		fixture.detectChanges();
 
 		expect(component.loadedPages.has(0)).toBeFalse();
 		expect(component.loadedPages.size).toBe(0);
@@ -56,13 +57,13 @@ describe('ImageReaderComponent', () => {
 
 	it('should use page dominant color when available', () => {
 		const pageColor = '#ff0000';
-		component.pages = [
+		fixture.componentRef.setInput('pages', [
 			{
 				index: '0',
 				path: 'http://example.com/page1.webp',
 				metadata: { width: 100, height: 100, dominantColor: pageColor },
 			},
-		];
+		]);
 		fixture.detectChanges();
 
 		const container =
@@ -72,10 +73,10 @@ describe('ImageReaderComponent', () => {
 
 	it('should fallback to book dominant color if page color is missing', () => {
 		const bookColor = '#00ff00';
-		component.bookDominantColor = bookColor;
-		component.pages = [
+		fixture.componentRef.setInput('bookDominantColor', bookColor);
+		fixture.componentRef.setInput('pages', [
 			{ index: '0', path: 'http://example.com/page1.webp' },
-		];
+		]);
 		fixture.detectChanges();
 
 		const container =
@@ -84,13 +85,13 @@ describe('ImageReaderComponent', () => {
 	});
 
 	it('should set aspect-ratio when metadata is provided', () => {
-		component.pages = [
+		fixture.componentRef.setInput('pages', [
 			{
 				index: '0',
 				path: 'http://example.com/page1.webp',
 				metadata: { width: 800, height: 1200 },
 			},
-		];
+		]);
 		fixture.detectChanges();
 
 		const container =
@@ -99,10 +100,10 @@ describe('ImageReaderComponent', () => {
 	});
 
 	it('should fallback to book aspect-ratio when page metadata is missing', () => {
-		component.bookMetadata = { width: 600, height: 900 };
-		component.pages = [
+		fixture.componentRef.setInput('bookMetadata', { width: 600, height: 900 });
+		fixture.componentRef.setInput('pages', [
 			{ index: '0', path: 'http://example.com/page1.webp' },
-		];
+		]);
 		fixture.detectChanges();
 
 		const container =

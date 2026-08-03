@@ -2,9 +2,9 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	computed,
-	Input,
 	OnInit,
 	signal,
+	input,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChapterLabelPipe } from '@shared/utils/pipes/chapter-label-pipe';
@@ -39,9 +39,9 @@ import { CheckboxComponent } from '@ui/atoms/inputs/checkbox/checkbox.component'
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookDownloadModalComponent implements OnInit {
-	@Input() chapters: BookDownloadChapter[] = [];
-	@Input() bookTitle: string = '';
-	@Input() close!: (result: BookDownloadResult | null) => void;
+	chapters = input<BookDownloadChapter[]>([]);
+	bookTitle = input('');
+	close = input<(result: BookDownloadResult | null) => void>();
 
 	selectedFormat = signal<'images' | 'pdfs'>('images');
 	selectedChapters = signal<Set<string>>(new Set());
@@ -49,19 +49,19 @@ export class BookDownloadModalComponent implements OnInit {
 	// Computed para controlar estado do "selecionar todos"
 	allSelected = computed(() => {
 		return (
-			this.chapters.length > 0 &&
-			this.selectedChapters().size === this.chapters.length
+			this.chapters().length > 0 &&
+			this.selectedChapters().size === this.chapters().length
 		);
 	});
 
 	someSelected = computed(() => {
 		const size = this.selectedChapters().size;
-		return size > 0 && size < this.chapters.length;
+		return size > 0 && size < this.chapters().length;
 	});
 
 	ngOnInit(): void {
 		// Inicializa todos os capítulos como selecionados
-		const allIds = new Set(this.chapters.map((ch) => ch.id));
+		const allIds = new Set(this.chapters().map((ch) => ch.id));
 		this.selectedChapters.set(allIds);
 	}
 
@@ -69,7 +69,7 @@ export class BookDownloadModalComponent implements OnInit {
 		if (this.allSelected()) {
 			this.selectedChapters.set(new Set());
 		} else {
-			const allIds = new Set(this.chapters.map((ch) => ch.id));
+			const allIds = new Set(this.chapters().map((ch) => ch.id));
 			this.selectedChapters.set(allIds);
 		}
 	}
@@ -93,8 +93,9 @@ export class BookDownloadModalComponent implements OnInit {
 			return;
 		}
 
-		if (this.close) {
-			this.close({
+		const closeFunc = this.close();
+		if (closeFunc) {
+			closeFunc({
 				format: this.selectedFormat(),
 				chapterIds: Array.from(this.selectedChapters()),
 			});
@@ -102,8 +103,9 @@ export class BookDownloadModalComponent implements OnInit {
 	}
 
 	cancel(): void {
-		if (this.close) {
-			this.close(null);
+		const closeFunc = this.close();
+		if (closeFunc) {
+			closeFunc(null);
 		}
 	}
 

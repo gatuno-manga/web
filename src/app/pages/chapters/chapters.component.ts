@@ -133,6 +133,9 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private ngZone = inject(NgZone);
 	private bookService = inject(BookService);
 
+	private dragMoveListener: ((e: MouseEvent | TouchEvent) => void) | null = null;
+	private dragUpListener: (() => void) | null = null;
+
 	progressBarRef = viewChild<ElementRef>('progressBarRef');
 	@ViewChild(ImageReaderComponent) imageReader?: ImageReaderComponent;
 	@ViewChild(TextReaderComponent) textReader?: TextReaderComponent;
@@ -312,7 +315,21 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			});
 	}
 
+	private cleanupDragListeners() {
+		if (this.dragMoveListener) {
+			document.removeEventListener('mousemove', this.dragMoveListener as any);
+			document.removeEventListener('touchmove', this.dragMoveListener as any);
+			this.dragMoveListener = null;
+		}
+		if (this.dragUpListener) {
+			document.removeEventListener('mouseup', this.dragUpListener);
+			document.removeEventListener('touchend', this.dragUpListener);
+			this.dragUpListener = null;
+		}
+	}
+
 	ngOnDestroy() {
+		this.cleanupDragListeners();
 		this.headerStateService.setFixed(false);
 		for (const url of this.pageObjectUrls) {
 			URL.revokeObjectURL(url);
@@ -723,7 +740,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			}
 		};
 
-		const onMove = (moveEvent: MouseEvent | TouchEvent) => {
+		this.dragMoveListener = (moveEvent: MouseEvent | TouchEvent) => {
 			const clientX =
 				'touches' in moveEvent
 					? moveEvent.touches[0].clientX
@@ -731,18 +748,15 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			calculateProgress(clientX);
 		};
 
-		const onUp = () => {
+		this.dragUpListener = () => {
 			this.isDragging = false;
-			document.removeEventListener('mousemove', onMove);
-			document.removeEventListener('mouseup', onUp);
-			document.removeEventListener('touchmove', onMove);
-			document.removeEventListener('touchend', onUp);
+			this.cleanupDragListeners();
 		};
 
-		document.addEventListener('mousemove', onMove, { passive: true });
-		document.addEventListener('mouseup', onUp, { passive: true });
-		document.addEventListener('touchmove', onMove, { passive: true });
-		document.addEventListener('touchend', onUp, { passive: true });
+		document.addEventListener('mousemove', this.dragMoveListener, { passive: true });
+		document.addEventListener('mouseup', this.dragUpListener, { passive: true });
+		document.addEventListener('touchmove', this.dragMoveListener, { passive: true });
+		document.addEventListener('touchend', this.dragUpListener, { passive: true });
 
 		const clientX =
 			'touches' in event

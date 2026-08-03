@@ -50,7 +50,7 @@
 								@if (collection.coverUrl) {
 									<div class="item-collection__collage" data-count="1">
 										<div class="collage-item">
-											<img [src]="collection.coverUrl" alt="{{ collection.title }}" class="real-image" />
+											<img [src]="collection.coverUrl" alt="{{ collection.title }}" loading="lazy" class="real-image" />
 										</div>
 									</div>
 								} @else if (getCovers(collection.bookCovers || []); as covers) {
@@ -67,7 +67,7 @@
 															</app-blurhash>
 														</div>
 													}
-													<img [src]="cover.url" alt="{{ collection.title }}" class="real-image" />
+													<img [src]="cover.url" alt="{{ collection.title }}" loading="lazy" class="real-image" />
 												</div>
 											}
 										</div>

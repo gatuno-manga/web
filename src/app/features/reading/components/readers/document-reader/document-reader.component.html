@@ -12,7 +12,7 @@
 				<app-icons name="file" size="64" />
 				<h2>Erro ao carregar PDF</h2>
 				<p>{{ loadError() }}</p>
-				<a [href]="src" download class="download-btn">
+				<a [href]="src()" download class="download-btn">
 					<app-icons name="download" size="20" />
 					Baixar PDF
 				</a>
@@ -52,7 +52,7 @@
 									<span>Página {{ pageNum }}</span>
 								</div>
 							}
-							@if (showPageNumbers) {
+							@if (showPageNumbers()) {
 								<div class="page-number">{{ pageNum }}</div>
 							}
 						</div>
@@ -70,8 +70,8 @@
 	<div class="unsupported-format">
 		<app-icons name="file" size="64" />
 		<h2>Formato não suportado</h2>
-		<p>O formato "{{ format }}" ainda não é suportado para visualização.</p>
-		<a [href]="src" download class="download-btn">
+		<p>O formato "{{ format() }}" ainda não é suportado para visualização.</p>
+		<a [href]="src()" download class="download-btn">
 			<app-icons name="download" size="20" />
 			Baixar arquivo
 		</a>

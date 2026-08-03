@@ -1,4 +1,4 @@
-import { Component, forwardRef, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, model } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -14,6 +14,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 	],
 	templateUrl: './switch.component.html',
 	styleUrl: './switch.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SwitchComponent implements ControlValueAccessor {
 	value = model<boolean>(false);

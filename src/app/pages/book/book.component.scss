@@ -82,6 +82,7 @@ $page-size: 1200px;
 
 // ─── Aurora Scene ─────────────────────────────────────────────────────────────
 .aurora-scene {
+	content-visibility: auto;
 	position: fixed;
 	inset: 0;
 	z-index: -2;
@@ -93,6 +94,7 @@ $page-size: 1200px;
 	position: absolute;
 	border-radius: 50%;
 	filter: blur(90px);
+	will-change: transform;
 	&--warm {
 		width: 700px;
 		height: 500px;
