@@ -93,17 +93,54 @@
 }
 
 #container {
-	display: flex;
-	align-items: flex-start;
+	position: relative;
 	overflow: hidden;
 	min-height: 50vh;
 }
+
 .container {
 	width: 100%;
-	height: auto;
-	flex: none;
-	transition: transform 0.3s linear;
-	transform: translateX(calc(var(--current-tab-index) * -100%));
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 0;
+
+	// Slide animation (Default)
+	&:not(.reduced-motion) {
+		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.3s;
+		visibility: hidden;
+		pointer-events: none;
+		opacity: 1;
+
+		&.left {
+			transform: translateX(-100%);
+		}
+		&.right {
+			transform: translateX(100%);
+		}
+		&.selected {
+			transform: translateX(0);
+			visibility: visible;
+			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0s;
+			pointer-events: auto;
+			z-index: 1;
+		}
+	}
+
+	// Fade animation (Reduced motion)
+	&.reduced-motion {
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transition: opacity 0.25s ease, visibility 0.25s ease;
+
+		&.selected {
+			opacity: 1;
+			visibility: visible;
+			pointer-events: auto;
+			z-index: 1;
+		}
+	}
 
 	.scrollable {
 		width: 100%;
