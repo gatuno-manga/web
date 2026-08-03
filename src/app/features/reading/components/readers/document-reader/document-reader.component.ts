@@ -5,13 +5,12 @@ import {
 	Component,
 	DestroyRef,
 	ElementRef,
-	EventEmitter,
-	Input,
 	inject,
+	input,
 	OnChanges,
 	OnDestroy,
 	OnInit,
-	Output,
+	output,
 	PLATFORM_ID,
 	QueryList,
 	SimpleChanges,
@@ -50,11 +49,11 @@ const ESTIMATED_PAGE_HEIGHT = 1200;
 export class DocumentReaderComponent
 	implements OnInit, OnChanges, AfterViewInit, OnDestroy
 {
-	@Input() src = '';
-	@Input() format: DocumentFormat = 'pdf';
-	@Input() initialPage = 1;
-	@Input() showPageNumbers = false;
-	@Output() pageChange = new EventEmitter<DocumentProgressEvent>();
+	src = input('');
+	format = input<DocumentFormat>('pdf');
+	initialPage = input(1);
+	showPageNumbers = input(false);
+	pageChange = output<DocumentProgressEvent>();
 
 	@ViewChildren('pageRef') pageRefs!: QueryList<ElementRef>;
 
@@ -94,7 +93,7 @@ export class DocumentReaderComponent
 	});
 
 	get isPdfFormat(): boolean {
-		return this.format === 'pdf';
+		return this.format() === 'pdf';
 	}
 
 	onScroll() {
@@ -147,7 +146,7 @@ export class DocumentReaderComponent
 			this.loadError.set(null);
 
 			this.probeInputs = {
-				src: this.src,
+				src: this.src(),
 				page: 1,
 				onLoadComplete: (pdf: PDFDocumentProxy) =>
 					this.onPdfLoaded(pdf),
@@ -177,13 +176,13 @@ export class DocumentReaderComponent
 				.subscribe(() => this.onScroll());
 		}
 
-		if (this.initialPage > 1) {
-			this.currentPage.set(this.initialPage);
+		if (this.initialPage() > 1) {
+			this.currentPage.set(this.initialPage());
 		}
 
 		if (!this.probeInputs) {
 			this.probeInputs = {
-				src: this.src,
+				src: this.src(),
 				page: 1,
 				onLoadComplete: (pdf: PDFDocumentProxy) =>
 					this.onPdfLoaded(pdf),
@@ -259,7 +258,7 @@ export class DocumentReaderComponent
 		}
 
 		const inputs = {
-			src: this.pdfDocument() || this.src,
+			src: this.pdfDocument() || this.src(),
 			page: pageNum,
 		};
 
@@ -336,16 +335,19 @@ export class DocumentReaderComponent
 		this.isLoading.set(false);
 
 		// Initialize visible pages based on initial page
-		const startPage = Math.max(1, this.initialPage - PAGE_BUFFER);
-		const endPage = Math.min(pdf.numPages, this.initialPage + PAGE_BUFFER);
+		const startPage = Math.max(1, this.initialPage() - PAGE_BUFFER);
+		const endPage = Math.min(
+			pdf.numPages,
+			this.initialPage() + PAGE_BUFFER,
+		);
 		const initialVisible = new Set<number>();
 		for (let i = startPage; i <= endPage; i++) {
 			initialVisible.add(i);
 		}
 		this.visiblePages.set(initialVisible);
 
-		if (this.initialPage > 1) {
-			setTimeout(() => this.scrollToPage(this.initialPage - 1), 100);
+		if (this.initialPage() > 1) {
+			setTimeout(() => this.scrollToPage(this.initialPage() - 1), 100);
 		}
 
 		// Start updating visible pages
@@ -371,7 +373,7 @@ export class DocumentReaderComponent
 
 	private downloadPdf() {
 		const link = document.createElement('a');
-		link.href = this.src;
+		link.href = this.src();
 		link.download = 'document.pdf';
 		link.click();
 	}

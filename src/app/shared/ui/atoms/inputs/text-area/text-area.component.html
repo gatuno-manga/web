@@ -24,6 +24,7 @@
         (focus)="onFocus()"
 				[style.maxHeight]="maxHeight()"
 				[style.resize]="allowResize() ? 'vertical' : 'none'"
+				[cdkTextareaAutosize]="autoExpand()"
       ></textarea>
       <label
         [for]="id()"

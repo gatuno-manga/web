@@ -1,8 +1,8 @@
 import {
 	Directive,
 	effect,
-	Input,
 	inject,
+	input,
 	TemplateRef,
 	ViewContainerRef,
 } from '@angular/core';
@@ -18,23 +18,18 @@ export class HasPermissionDirective {
 	private userService = inject(UserService);
 
 	private hasView = false;
-	private permissions: string | string[] = [];
-
-	@Input() set appHasPermission(val: string | string[]) {
-		this.permissions = val;
-		this.updateView();
-	}
+	appHasPermission = input.required<string | string[]>();
 
 	constructor() {
-		// Update view when user profile changes
+		// Update view when user profile changes or permissions input changes
 		effect(() => {
-			// This registers the effect on profileSignal via hasPermission
 			this.updateView();
 		});
 	}
 
 	private updateView() {
-		const hasPerm = this.userService.hasPermission(this.permissions);
+		const permissions = this.appHasPermission();
+		const hasPerm = this.userService.hasPermission(permissions);
 
 		if (hasPerm && !this.hasView) {
 			this.viewContainer.createEmbeddedView(this.templateRef);

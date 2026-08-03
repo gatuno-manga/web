@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Injectable, inject, NgZone, PLATFORM_ID, signal } from '@angular/core';
 import { SettingsService } from './settings.service';
 
 @Injectable({
@@ -21,18 +21,22 @@ export class VisibilityPrivacyService {
 		}
 	}
 
+	private ngZone = inject(NgZone);
+
 	private setupVisibilityListener() {
-		document.addEventListener('visibilitychange', () => {
-			const settings = this.settingsService.getSettings();
-			if (settings.privacyBlurOnHide) {
-				if (document.visibilityState === 'hidden') {
-					this.isBlurred.set(true);
-				} else {
-					// We might keep it blurred until the user interacts or manually unblurs
-					// but for now let's auto-unblur if it was due to visibility
-					this.isBlurred.set(false);
-				}
-			}
+		this.ngZone.runOutsideAngular(() => {
+			document.addEventListener('visibilitychange', () => {
+				this.ngZone.run(() => {
+					const settings = this.settingsService.getSettings();
+					if (settings.privacyBlurOnHide) {
+						if (document.visibilityState === 'hidden') {
+							this.isBlurred.set(true);
+						} else {
+							this.isBlurred.set(false);
+						}
+					}
+				});
+			});
 		});
 	}
 
@@ -45,29 +49,46 @@ export class VisibilityPrivacyService {
 			'touchstart',
 		];
 
+		let lastActivity = Date.now();
+
 		const resetTimer = () => {
-			if (this.isInactive()) {
-				this.isInactive.set(false);
-				this.updateBlurState();
+			const now = Date.now();
+			// Throttle resetTimer to run at most once per second
+			if (now - lastActivity < 1000 && this.idleTimer) {
+				return;
 			}
+			lastActivity = now;
+
+			this.ngZone.run(() => {
+				if (this.isInactive()) {
+					this.isInactive.set(false);
+					this.updateBlurState();
+				}
+			});
 
 			clearTimeout(this.idleTimer);
 
 			const settings = this.settingsService.getSettings();
 			if (settings.privacyBlurOnIdle) {
 				const timeout = (settings.idleTimeoutSeconds || 60) * 1000;
-				this.idleTimer = setTimeout(() => {
-					this.isInactive.set(true);
-					this.updateBlurState();
-				}, timeout);
+				// setTimeout inside runOutsideAngular so it doesn't trigger CD on tick
+				this.ngZone.runOutsideAngular(() => {
+					this.idleTimer = setTimeout(() => {
+						this.ngZone.run(() => {
+							this.isInactive.set(true);
+							this.updateBlurState();
+						});
+					}, timeout);
+				});
 			}
 		};
 
-		activityEvents.forEach((event) => {
-			document.addEventListener(event, resetTimer, { passive: true });
+		this.ngZone.runOutsideAngular(() => {
+			activityEvents.forEach((event) => {
+				document.addEventListener(event, resetTimer, { passive: true });
+			});
+			resetTimer();
 		});
-
-		resetTimer();
 	}
 
 	private updateBlurState() {

@@ -65,42 +65,27 @@ export class AsideComponent implements OnInit, OnDestroy {
 
 	private addTouchListeners() {
 		if (this.isBrowser && typeof document !== 'undefined') {
-			document.addEventListener(
-				'touchstart',
-				this.handleTouchStart.bind(this),
-				{ passive: true },
-			);
-			document.addEventListener(
-				'touchmove',
-				this.handleTouchMove.bind(this),
-				{ passive: true },
-			);
-			document.addEventListener(
-				'touchend',
-				this.handleTouchEnd.bind(this),
-				{ passive: true },
-			);
+			document.addEventListener('touchstart', this.handleTouchStart, {
+				passive: true,
+			});
+			document.addEventListener('touchmove', this.handleTouchMove, {
+				passive: true,
+			});
+			document.addEventListener('touchend', this.handleTouchEnd, {
+				passive: true,
+			});
 		}
 	}
 
 	private removeTouchListeners() {
 		if (this.isBrowser && typeof document !== 'undefined') {
-			document.removeEventListener(
-				'touchstart',
-				this.handleTouchStart.bind(this),
-			);
-			document.removeEventListener(
-				'touchmove',
-				this.handleTouchMove.bind(this),
-			);
-			document.removeEventListener(
-				'touchend',
-				this.handleTouchEnd.bind(this),
-			);
+			document.removeEventListener('touchstart', this.handleTouchStart);
+			document.removeEventListener('touchmove', this.handleTouchMove);
+			document.removeEventListener('touchend', this.handleTouchEnd);
 		}
 	}
 
-	private handleTouchStart(event: TouchEvent) {
+	private handleTouchStart = (event: TouchEvent) => {
 		if (!this.isBrowser) return;
 
 		this.touchStartX = event.touches[0].clientX;
@@ -115,9 +100,9 @@ export class AsideComponent implements OnInit, OnDestroy {
 		if (isNearEdge || this.isOpen()) {
 			this.isDragging.set(true);
 		}
-	}
+	};
 
-	private handleTouchMove(event: TouchEvent) {
+	private handleTouchMove = (event: TouchEvent) => {
 		if (!this.isDragging()) return;
 
 		const currentX = event.touches[0].clientX;
@@ -144,9 +129,9 @@ export class AsideComponent implements OnInit, OnDestroy {
 				);
 			}
 		}
-	}
+	};
 
-	private handleTouchEnd(event: TouchEvent) {
+	private handleTouchEnd = (event: TouchEvent) => {
 		if (!this.isDragging()) return;
 
 		const touchEndX = event.changedTouches[0].clientX;
@@ -197,7 +182,7 @@ export class AsideComponent implements OnInit, OnDestroy {
 				return;
 			}
 		}
-	}
+	};
 
 	toggle() {
 		this.isOpen.update((v) => !v);

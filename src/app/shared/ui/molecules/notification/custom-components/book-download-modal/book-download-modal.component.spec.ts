@@ -21,8 +21,8 @@ describe('BookDownloadModalComponent', () => {
 
 		fixture = TestBed.createComponent(BookDownloadModalComponent);
 		component = fixture.componentInstance;
-		component.chapters = mockChapters;
-		component.bookTitle = 'Test Book';
+		fixture.componentRef.setInput('chapters', mockChapters);
+		fixture.componentRef.setInput('bookTitle', 'Test Book');
 		fixture.detectChanges();
 	});
 
@@ -83,7 +83,7 @@ describe('BookDownloadModalComponent', () => {
 
 	it('should call close with result on confirm', () => {
 		const closeSpy = jasmine.createSpy('close');
-		component.close = closeSpy;
+		fixture.componentRef.setInput('close', closeSpy);
 		component.ngOnInit();
 
 		component.confirm();
@@ -96,7 +96,7 @@ describe('BookDownloadModalComponent', () => {
 
 	it('should not call close on confirm when no chapters selected', () => {
 		const closeSpy = jasmine.createSpy('close');
-		component.close = closeSpy;
+		fixture.componentRef.setInput('close', closeSpy);
 		component.selectedChapters.set(new Set());
 
 		component.confirm();
@@ -106,7 +106,7 @@ describe('BookDownloadModalComponent', () => {
 
 	it('should call close with null on cancel', () => {
 		const closeSpy = jasmine.createSpy('close');
-		component.close = closeSpy;
+		fixture.componentRef.setInput('close', closeSpy);
 
 		component.cancel();
 

@@ -113,11 +113,11 @@ describe('ReaderSettingsFormComponent', () => {
 	});
 
 	it('should set initial view filter based on content type', () => {
-		component.contentType = 'text';
+		fixture.componentRef.setInput('contentType', 'text');
 		component.ngOnInit();
 		expect(component.viewFilter).toBe('text');
 
-		component.contentType = 'all';
+		fixture.componentRef.setInput('contentType', 'all');
 		component.ngOnInit();
 		expect(component.viewFilter).toBe('all');
 	});

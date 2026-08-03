@@ -1,3 +1,4 @@
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { NgClass } from '@angular/common';
 import {
 	AfterViewInit,
@@ -21,7 +22,7 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
 	selector: 'app-text-area',
-	imports: [NgClass, IconsComponent],
+	imports: [NgClass, IconsComponent, TextFieldModule],
 	providers: [
 		{
 			provide: NG_VALUE_ACCESSOR,
@@ -69,22 +70,9 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 		maxlength: 'Não pode ser maior que {{requiredLength}} caracteres',
 	};
 
-	constructor() {
-		effect(() => {
-			const expand = this.autoExpand();
-			if (expand) {
-				// Re-evaluate whenever value changes to adjust height
-				this.value();
-				setTimeout(() => this.adjustHeight(), 0);
-			}
-		});
-	}
+	constructor() {}
 
-	ngAfterViewInit() {
-		if (this.autoExpand()) {
-			this.adjustHeight();
-		}
-	}
+	ngAfterViewInit() {}
 
 	onFocus(): void {
 		this.isFocused = true;
@@ -128,14 +116,6 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 
 	onChange: (value: string) => void = () => {};
 	onTouched: () => void = () => {};
-
-	private adjustHeight(): void {
-		const textarea = this.textareaRef()?.nativeElement;
-		if (!textarea) return;
-
-		textarea.style.height = 'auto';
-		textarea.style.height = `${textarea.scrollHeight}px`;
-	}
 
 	errorMessages(): string[] {
 		const errorsValue = this.errors();

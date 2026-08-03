@@ -4,7 +4,7 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
-	Input,
+	input,
 	OnChanges,
 	OnDestroy,
 	SimpleChanges,
@@ -18,12 +18,12 @@ import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [PdfViewerModule, CommonModule],
 	template: `
-        @if (isProxy(src)) {
+        @if (isProxy(src())) {
             <canvas #pdfCanvas></canvas>
         } @else {
             <pdf-viewer
-                [src]="$any(src)"
-                [page]="page"
+                [src]="$any(src())"
+                [page]="page()"
                 [render-text]="false"
                 [original-size]="false"
                 [fit-to-page]="true"
@@ -60,10 +60,10 @@ import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer';
 	],
 })
 export class PdfPageComponent implements OnChanges, AfterViewInit, OnDestroy {
-	@Input() src: string | PDFDocumentProxy = '';
-	@Input() page: number = 1;
-	@Input() onLoadComplete?: (pdf: PDFDocumentProxy) => void;
-	@Input() onError?: (error: unknown) => void;
+	src = input<string | PDFDocumentProxy>('');
+	page = input<number>(1);
+	onLoadComplete = input<(pdf: PDFDocumentProxy) => void>();
+	onError = input<(error: unknown) => void>();
 
 	@ViewChild('pdfCanvas') canvasRef?: ElementRef<HTMLCanvasElement>;
 	private renderTask: { cancel: () => void; promise: Promise<void> } | null =
@@ -74,13 +74,13 @@ export class PdfPageComponent implements OnChanges, AfterViewInit, OnDestroy {
 	}
 
 	ngOnChanges(changes: SimpleChanges) {
-		if (this.isProxy(this.src) && (changes['src'] || changes['page'])) {
+		if (this.isProxy(this.src()) && (changes['src'] || changes['page'])) {
 			this.renderCanvasPage();
 		}
 	}
 
 	ngAfterViewInit() {
-		if (this.isProxy(this.src)) {
+		if (this.isProxy(this.src())) {
 			this.renderCanvasPage();
 		}
 	}
@@ -92,15 +92,15 @@ export class PdfPageComponent implements OnChanges, AfterViewInit, OnDestroy {
 	}
 
 	async renderCanvasPage() {
-		if (!this.isProxy(this.src) || !this.canvasRef) return;
+		if (!this.isProxy(this.src()) || !this.canvasRef) return;
 
 		// Cancel previous render
 		if (this.renderTask) {
 			this.renderTask.cancel();
 		}
 
-		const pdf = this.src as PDFDocumentProxy;
-		const pageNumber = this.page;
+		const pdf = this.src() as PDFDocumentProxy;
+		const pageNumber = this.page();
 
 		try {
 			const page = await pdf.getPage(pageNumber);
@@ -137,9 +137,10 @@ export class PdfPageComponent implements OnChanges, AfterViewInit, OnDestroy {
 			this.renderTask = page.render(renderContext);
 			await this.renderTask.promise;
 
-			if (this.onLoadComplete) {
+			const onLoadComplete = this.onLoadComplete();
+			if (onLoadComplete) {
 				// Call load complete for consistency, though we passed the proxy in
-				this.onLoadComplete(pdf);
+				onLoadComplete(pdf);
 			}
 		} catch (error: unknown) {
 			if (
@@ -153,14 +154,16 @@ export class PdfPageComponent implements OnChanges, AfterViewInit, OnDestroy {
 	}
 
 	handleLoadComplete(pdf: PDFDocumentProxy) {
-		if (this.onLoadComplete) {
-			this.onLoadComplete(pdf);
+		const onLoadComplete = this.onLoadComplete();
+		if (onLoadComplete) {
+			onLoadComplete(pdf);
 		}
 	}
 
 	handleError(error: unknown) {
-		if (this.onError) {
-			this.onError(error);
+		const onError = this.onError();
+		if (onError) {
+			onError(error);
 		}
 	}
 }

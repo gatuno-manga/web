@@ -6,12 +6,12 @@ import {
 	Component,
 	DestroyRef,
 	ElementRef,
-	EventEmitter,
-	Input,
+	effect,
 	inject,
+	input,
 	OnDestroy,
 	OnInit,
-	Output,
+	output,
 	PLATFORM_ID,
 	QueryList,
 	ViewChildren,
@@ -45,23 +45,22 @@ export interface ContextMenuEvent {
 	imports: [CommonModule, BlurhashComponent, ImageFallbackDirective],
 })
 export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
-	private _pages: (Page & { blurHash?: string })[] = [];
-	@Input() set pages(value: (Page & { blurHash?: string })[]) {
-		this._pages = value;
-		this.loadedPages.clear();
-		this.cdr.markForCheck();
-	}
-	get pages() {
-		return this._pages;
-	}
+	pages = input<(Page & { blurHash?: string })[]>([]);
+	showPageNumbers = input(false);
+	bookBlurHash = input<string>();
+	bookDominantColor = input<string>();
+	bookMetadata = input<ImageMetadata>();
+	isBlurred = input(false);
+	progressChange = output<ReadingProgressEvent>();
+	contextMenu = output<ContextMenuEvent>();
 
-	@Input() showPageNumbers = false;
-	@Input() bookBlurHash?: string;
-	@Input() bookDominantColor?: string;
-	@Input() bookMetadata?: ImageMetadata;
-	@Input() isBlurred = false;
-	@Output() progressChange = new EventEmitter<ReadingProgressEvent>();
-	@Output() contextMenu = new EventEmitter<ContextMenuEvent>();
+	constructor() {
+		effect(() => {
+			this.pages();
+			this.loadedPages.clear();
+			this.cdr.markForCheck();
+		});
+	}
 
 	@ViewChildren('pageRef') pageRefs!: QueryList<ElementRef>;
 
@@ -119,14 +118,14 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 					);
 					this.progressChange.emit({
 						pageIndex: this.currentPageIndex,
-						totalPages: this.pages.length,
+						totalPages: this.pages().length,
 						scrollPercentage,
 					});
 				} else if (totalHeight > 0) {
 					// Content fits in window or is smaller
 					this.progressChange.emit({
 						pageIndex: this.currentPageIndex,
-						totalPages: this.pages.length,
+						totalPages: this.pages().length,
 						scrollPercentage: 100,
 					});
 				}
@@ -184,7 +183,7 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 						this.maxReadPageIndex = index;
 						this.progressChange.emit({
 							pageIndex: index,
-							totalPages: this.pages.length,
+							totalPages: this.pages().length,
 						});
 					}
 				}
@@ -226,8 +225,8 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (this.loadedPages.has(index)) {
 			return 'auto';
 		}
-		if (this.bookMetadata?.width && this.bookMetadata?.height) {
-			return `${this.bookMetadata.width} / ${this.bookMetadata.height}`;
+		if (this.bookMetadata()?.width && this.bookMetadata()?.height) {
+			return `${this.bookMetadata()!.width} / ${this.bookMetadata()!.height}`;
 		}
 		return '2 / 3';
 	}
@@ -239,7 +238,7 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (this.loadedPages.has(index)) {
 			return 'auto';
 		}
-		if (this.bookMetadata?.height) {
+		if (this.bookMetadata()?.height) {
 			return 'auto';
 		}
 		return '600px';

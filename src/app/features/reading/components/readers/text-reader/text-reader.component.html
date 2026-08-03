@@ -8,15 +8,15 @@
 	[style.text-align]="settings().textAlign"
 	[class.night-mode]="settings().nightMode"
 >
-	@switch (format) {
+	@switch (format()) {
 		@case ('markdown') {
-			<markdown [data]="content" class="markdown-content" />
+			<markdown [data]="content()" class="markdown-content" />
 		}
 		@case ('html') {
 			<div class="html-content" [innerHTML]="safeContent()"></div>
 		}
 		@default {
-			<div class="plain-content">{{ content }}</div>
+			<div class="plain-content">{{ content() }}</div>
 		}
 	}
 </div>

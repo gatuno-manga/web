@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ListCheckboxItem } from './list-checkbox.type';
 
 @Component({
@@ -9,7 +9,7 @@ import { ListCheckboxItem } from './list-checkbox.type';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListCheckboxComponent {
-	@Input() items: ListCheckboxItem[] = [];
+	items = input<ListCheckboxItem[]>([]);
 
 	OnItemChange(item: ListCheckboxItem) {
 		item.checked = !item.checked;

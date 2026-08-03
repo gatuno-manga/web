@@ -1,18 +1,18 @@
-@for (page of pages; track $index) {
+@for (page of pages(); track $index) {
 	<div
 		class="page-container"
-		[class.is-blurred]="isBlurred"
+		[class.is-blurred]="isBlurred()"
 		id="page-{{ $index }}"
 		#pageRef
 		[attr.data-index]="$index"
-		[style.background-color]="page.metadata?.dominantColor || bookDominantColor"
+		[style.background-color]="page.metadata?.dominantColor || bookDominantColor()"
 		[style.aspect-ratio]="getPageAspectRatio(page, $index)"
 		[style.min-height]="getPageMinHeight(page, $index)"
 		(contextmenu)="onContextMenu($event, page, $index)"
 	>
 		<div
 			class="blur-placeholder"
-			[class.fade-out]="loadedPages.has($index) && !isBlurred"
+			[class.fade-out]="loadedPages.has($index) && !isBlurred()"
 		>
 			@if (page.blurHash || page.metadata?.blurHash) {
 				<app-blurhash
@@ -20,13 +20,13 @@
 					[width]="page.metadata?.width || 32"
 					[height]="page.metadata?.height || 32"
 				/>
-			} @else if (bookBlurHash) {
+			} @else if (bookBlurHash()) {
 				<app-blurhash
-					[hash]="bookBlurHash"
-					[width]="bookMetadata?.width || 32"
-					[height]="bookMetadata?.height || 32"
+					[hash]="bookBlurHash()!"
+					[width]="bookMetadata()?.width || 32"
+					[height]="bookMetadata()?.height || 32"
 				/>
-			} @else if (!(page.metadata?.dominantColor || bookDominantColor)) {
+			} @else if (!(page.metadata?.dominantColor || bookDominantColor())) {
 				<div class="placeholder"></div>
 			}
 		</div>
@@ -37,10 +37,10 @@
 			[attr.loading]="$index < 2 ? 'eager' : 'lazy'"
 			(load)="onImageLoad($index)"
 			appImageFallback
-			[class.loaded]="loadedPages.has($index) && !isBlurred"
-			[class.hidden]="isBlurred"
+			[class.loaded]="loadedPages.has($index) && !isBlurred()"
+			[class.hidden]="isBlurred()"
 		/>
-		@if (showPageNumbers) {
+		@if (showPageNumbers()) {
 			<div class="page-number">{{ $index + 1 }}</div>
 		}
 	</div>

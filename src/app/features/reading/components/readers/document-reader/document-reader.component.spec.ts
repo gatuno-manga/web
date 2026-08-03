@@ -22,17 +22,16 @@ describe('DocumentReaderComponent', () => {
 	});
 
 	it('should display pdf viewer for pdf format', () => {
-		component.src = 'http://example.com/test.pdf';
-		component.format = 'pdf';
-		component.ngOnInit();
+		fixture.componentRef.setInput('src', 'http://example.com/test.pdf');
+		fixture.componentRef.setInput('format', 'pdf');
 		fixture.detectChanges();
 
 		expect(component.isPdfFormat).toBe(true);
 	});
 
 	it('should display unsupported message for epub format', () => {
-		component.src = 'http://example.com/test.epub';
-		component.format = 'epub';
+		fixture.componentRef.setInput('src', 'http://example.com/test.epub');
+		fixture.componentRef.setInput('format', 'epub');
 		fixture.detectChanges();
 
 		expect(component.isPdfFormat).toBe(false);
@@ -44,7 +43,7 @@ describe('DocumentReaderComponent', () => {
 
 	it('should emit page change on init', () => {
 		const spy = spyOn(component.pageChange, 'emit');
-		component.src = 'http://example.com/test.pdf';
+		fixture.componentRef.setInput('src', 'http://example.com/test.pdf');
 		component.ngOnInit();
 
 		expect(spy).toHaveBeenCalledWith({
@@ -54,8 +53,8 @@ describe('DocumentReaderComponent', () => {
 	});
 
 	it('should use initial page parameter', () => {
-		component.src = 'http://example.com/test.pdf';
-		component.initialPage = 5;
+		fixture.componentRef.setInput('src', 'http://example.com/test.pdf');
+		fixture.componentRef.setInput('initialPage', 5);
 		component.ngOnInit();
 
 		expect(component.getCurrentPage()).toBe(5);

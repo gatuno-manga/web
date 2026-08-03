@@ -25,8 +25,8 @@ describe('TextReaderComponent', () => {
 	});
 
 	it('should render markdown content', () => {
-		component.content = '# Hello World';
-		component.format = 'markdown';
+		fixture.componentRef.setInput('content', '# Hello World');
+		fixture.componentRef.setInput('format', 'markdown');
 		fixture.detectChanges();
 
 		const container =
@@ -35,8 +35,8 @@ describe('TextReaderComponent', () => {
 	});
 
 	it('should render html content', () => {
-		component.content = '<p>Hello World</p>';
-		component.format = 'html';
+		fixture.componentRef.setInput('content', '<p>Hello World</p>');
+		fixture.componentRef.setInput('format', 'html');
 		fixture.detectChanges();
 
 		const container = fixture.nativeElement.querySelector('.html-content');
@@ -44,8 +44,8 @@ describe('TextReaderComponent', () => {
 	});
 
 	it('should render plain text content', () => {
-		component.content = 'Hello World';
-		component.format = 'plain';
+		fixture.componentRef.setInput('content', 'Hello World');
+		fixture.componentRef.setInput('format', 'plain');
 		fixture.detectChanges();
 
 		const container = fixture.nativeElement.querySelector('.plain-content');
@@ -103,7 +103,7 @@ describe('TextReaderComponent', () => {
 	it('should calculate virtual pages based on word count', () => {
 		// 600 words should result in 2 virtual pages (300 words per page)
 		const words = Array(600).fill('word').join(' ');
-		component.content = words;
+		fixture.componentRef.setInput('content', words);
 		component.ngOnInit();
 
 		expect(component.getVirtualPages()).toBe(2);

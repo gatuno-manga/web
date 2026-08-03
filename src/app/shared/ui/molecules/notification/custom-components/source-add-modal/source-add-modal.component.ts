@@ -7,7 +7,7 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	computed,
-	Input,
+	input,
 	OnInit,
 	signal,
 } from '@angular/core';
@@ -37,8 +37,8 @@ export interface SourceAddSaveEvent {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SourceAddModalComponent implements OnInit {
-	@Input() existingUrls: string[] = [];
-	@Input() close!: (result: SourceAddSaveEvent | null) => void;
+	existingUrls = input<string[]>([]);
+	close = input<(result: SourceAddSaveEvent | null) => void>();
 
 	urls = signal<string[]>([]);
 	newUrl = signal<string>('');
@@ -46,7 +46,7 @@ export class SourceAddModalComponent implements OnInit {
 	isLoading = signal<boolean>(false);
 
 	ngOnInit(): void {
-		this.urls.set([...this.existingUrls]);
+		this.urls.set([...this.existingUrls()]);
 	}
 
 	isValid = computed(() => {
@@ -122,14 +122,16 @@ export class SourceAddModalComponent implements OnInit {
 
 	onSave(): void {
 		this.isLoading.set(true);
-		if (this.close) {
-			this.close({ urls: this.urls() });
+		const closeFunc = this.close();
+		if (closeFunc) {
+			closeFunc({ urls: this.urls() });
 		}
 	}
 
 	onCancel(): void {
-		if (this.close) {
-			this.close(null);
+		const closeFunc = this.close();
+		if (closeFunc) {
+			closeFunc(null);
 		}
 	}
 }

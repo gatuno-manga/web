@@ -54,7 +54,7 @@ describe('RandomFilterModalComponent', () => {
 
 	it('should call close with result on confirm', () => {
 		const closeSpy = jasmine.createSpy('close');
-		component.close = closeSpy;
+		fixture.componentRef.setInput('close', closeSpy);
 
 		component.randomizeTags.set(true);
 		component.randomizeTypes.set(false);
@@ -71,7 +71,7 @@ describe('RandomFilterModalComponent', () => {
 
 	it('should call close with null on cancel', () => {
 		const closeSpy = jasmine.createSpy('close');
-		component.close = closeSpy;
+		fixture.componentRef.setInput('close', closeSpy);
 
 		component.cancel();
 
@@ -79,13 +79,13 @@ describe('RandomFilterModalComponent', () => {
 	});
 
 	it('should not throw if close is not defined on confirm', () => {
-		component.close = undefined as any;
+		fixture.componentRef.setInput('close', undefined as any);
 
 		expect(() => component.confirm()).not.toThrow();
 	});
 
 	it('should not throw if close is not defined on cancel', () => {
-		component.close = undefined as any;
+		fixture.componentRef.setInput('close', undefined as any);
 
 		expect(() => component.cancel()).not.toThrow();
 	});

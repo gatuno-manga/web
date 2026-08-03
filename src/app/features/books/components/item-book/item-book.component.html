@@ -85,6 +85,7 @@
 					alt="Capa do livro {{ book().title }}"
 					[class.loaded]="isImageLoaded()"
 					(load)="onImageLoad()"
+					loading="lazy"
 					appImageFallback
 				/>
 			} @else {

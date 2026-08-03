@@ -4,8 +4,8 @@ import {
 	Component,
 	EventEmitter,
 	HostListener,
-	Input,
-	Output,
+	input,
+	output,
 	signal,
 } from '@angular/core';
 import { ImageMetadata } from '@models/book.models';
@@ -21,12 +21,12 @@ import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageViewerComponent {
-	@Input() imageUrl: string = '';
-	@Input() imageTitle: string = '';
-	@Input() imageDescription: string = '';
-	@Input() blurHash?: string;
-	@Input() metadata?: ImageMetadata;
-	@Output() close = new EventEmitter<void>();
+	imageUrl = input('');
+	imageTitle = input('');
+	imageDescription = input('');
+	blurHash = input<string>();
+	metadata = input<ImageMetadata>();
+	close = output<void>();
 
 	@HostListener('document:keydown.escape')
 	onEscapeKey() {

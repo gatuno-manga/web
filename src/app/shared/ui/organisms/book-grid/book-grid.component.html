@@ -11,11 +11,21 @@
 		}
 	} @else {
 		@for (book of books(); track book.id; let i = $index) {
-			<app-item-book 
-				[book]="book" 
-				[type]="type()" 
-				[priority]="i < 2" 
-			/>
+			@defer (on viewport) {
+				<app-item-book 
+					[book]="book" 
+					[type]="type()" 
+					[priority]="i < 2" 
+				/>
+			} @placeholder {
+				<div class="book-card-skeleton" [class]="type()">
+					<div class="cover-skeleton placeholder"></div>
+					<div class="info-skeleton">
+						<div class="skeleton-text title"></div>
+						<div class="skeleton-text subtitle"></div>
+					</div>
+				</div>
+			}
 		} @empty {
 			<div class="no-books">
 				<app-icons name="book-open" size="48" color="var(--white-muted)" />

@@ -5,8 +5,8 @@
 >
 	<div class="settings-header">
 		<h2 id="download-title">Baixar Arquivos</h2>
-		@if (bookTitle) {
-			<p class="subtitle">{{ bookTitle }}</p>
+		@if (bookTitle()) {
+			<p class="subtitle">{{ bookTitle() }}</p>
 		}
 		<p class="description">
 			Selecione o formato e os capítulos que deseja baixar:
@@ -71,7 +71,7 @@
 						(ngModelChange)="toggleSelectAll()"
 						aria-label="Selecionar todos os capítulos"
 					/>
-					<span>Selecionar todos ({{ chapters.length }})</span>
+					<span>Selecionar todos ({{ chapters().length }})</span>
 				</label>
 			</div>
 
@@ -80,7 +80,7 @@
 				role="list"
 				aria-label="Lista de capítulos"
 			>
-				@for (chapter of chapters; track chapter.id) {
+				@for (chapter of chapters(); track chapter.id) {
 					<label
 						class="checkbox-label chapter-item"
 						[class.selected]="isChapterSelected(chapter.id)"
