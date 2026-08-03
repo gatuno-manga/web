@@ -1,8 +1,8 @@
 import {
 	ChangeDetectionStrategy,
 	Component,
-	signal,
 	input,
+	signal,
 } from '@angular/core';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';

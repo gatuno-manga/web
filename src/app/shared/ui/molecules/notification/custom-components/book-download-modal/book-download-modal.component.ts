@@ -2,9 +2,9 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	computed,
+	input,
 	OnInit,
 	signal,
-	input,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChapterLabelPipe } from '@shared/utils/pipes/chapter-label-pipe';

@@ -1,8 +1,8 @@
 import {
 	Directive,
 	effect,
-	input,
 	inject,
+	input,
 	TemplateRef,
 	ViewContainerRef,
 } from '@angular/core';

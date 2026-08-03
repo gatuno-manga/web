@@ -2,11 +2,11 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	computed,
+	input,
 	OnChanges,
 	OnInit,
 	SimpleChanges,
 	signal,
-	input,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Cover } from '@models/book.models';

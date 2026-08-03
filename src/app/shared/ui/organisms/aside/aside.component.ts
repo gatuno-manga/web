@@ -65,38 +65,23 @@ export class AsideComponent implements OnInit, OnDestroy {
 
 	private addTouchListeners() {
 		if (this.isBrowser && typeof document !== 'undefined') {
-			document.addEventListener(
-				'touchstart',
-				this.handleTouchStart,
-				{ passive: true },
-			);
-			document.addEventListener(
-				'touchmove',
-				this.handleTouchMove,
-				{ passive: true },
-			);
-			document.addEventListener(
-				'touchend',
-				this.handleTouchEnd,
-				{ passive: true },
-			);
+			document.addEventListener('touchstart', this.handleTouchStart, {
+				passive: true,
+			});
+			document.addEventListener('touchmove', this.handleTouchMove, {
+				passive: true,
+			});
+			document.addEventListener('touchend', this.handleTouchEnd, {
+				passive: true,
+			});
 		}
 	}
 
 	private removeTouchListeners() {
 		if (this.isBrowser && typeof document !== 'undefined') {
-			document.removeEventListener(
-				'touchstart',
-				this.handleTouchStart,
-			);
-			document.removeEventListener(
-				'touchmove',
-				this.handleTouchMove,
-			);
-			document.removeEventListener(
-				'touchend',
-				this.handleTouchEnd,
-			);
+			document.removeEventListener('touchstart', this.handleTouchStart);
+			document.removeEventListener('touchmove', this.handleTouchMove);
+			document.removeEventListener('touchend', this.handleTouchEnd);
 		}
 	}
 
@@ -115,7 +100,7 @@ export class AsideComponent implements OnInit, OnDestroy {
 		if (isNearEdge || this.isOpen()) {
 			this.isDragging.set(true);
 		}
-	}
+	};
 
 	private handleTouchMove = (event: TouchEvent) => {
 		if (!this.isDragging()) return;
@@ -144,7 +129,7 @@ export class AsideComponent implements OnInit, OnDestroy {
 				);
 			}
 		}
-	}
+	};
 
 	private handleTouchEnd = (event: TouchEvent) => {
 		if (!this.isDragging()) return;
@@ -197,7 +182,7 @@ export class AsideComponent implements OnInit, OnDestroy {
 				return;
 			}
 		}
-	}
+	};
 
 	toggle() {
 		this.isOpen.update((v) => !v);

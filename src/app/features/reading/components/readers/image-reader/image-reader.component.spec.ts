@@ -100,7 +100,10 @@ describe('ImageReaderComponent', () => {
 	});
 
 	it('should fallback to book aspect-ratio when page metadata is missing', () => {
-		fixture.componentRef.setInput('bookMetadata', { width: 600, height: 900 });
+		fixture.componentRef.setInput('bookMetadata', {
+			width: 600,
+			height: 900,
+		});
 		fixture.componentRef.setInput('pages', [
 			{ index: '0', path: 'http://example.com/page1.webp' },
 		]);

@@ -6,15 +6,15 @@ import {
 	DestroyRef,
 	ElementRef,
 	inject,
+	input,
 	OnChanges,
 	OnDestroy,
 	OnInit,
+	output,
 	PLATFORM_ID,
 	QueryList,
 	SimpleChanges,
 	signal,
-	input,
-	output,
 	Type,
 	ViewChildren,
 } from '@angular/core';
@@ -336,7 +336,10 @@ export class DocumentReaderComponent
 
 		// Initialize visible pages based on initial page
 		const startPage = Math.max(1, this.initialPage() - PAGE_BUFFER);
-		const endPage = Math.min(pdf.numPages, this.initialPage() + PAGE_BUFFER);
+		const endPage = Math.min(
+			pdf.numPages,
+			this.initialPage() + PAGE_BUFFER,
+		);
 		const initialVisible = new Set<number>();
 		for (let i = startPage; i <= endPage; i++) {
 			initialVisible.add(i);

@@ -1,3 +1,4 @@
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { NgClass } from '@angular/common';
 import {
 	AfterViewInit,
@@ -17,7 +18,6 @@ import {
 	NG_VALUE_ACCESSOR,
 	ValidationErrors,
 } from '@angular/forms';
-import { TextFieldModule } from '@angular/cdk/text-field';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({
@@ -70,11 +70,9 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 		maxlength: 'Não pode ser maior que {{requiredLength}} caracteres',
 	};
 
-	constructor() {
-	}
+	constructor() {}
 
-	ngAfterViewInit() {
-	}
+	ngAfterViewInit() {}
 
 	onFocus(): void {
 		this.isFocused = true;

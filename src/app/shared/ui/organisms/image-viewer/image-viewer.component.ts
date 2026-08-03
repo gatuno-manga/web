@@ -4,9 +4,9 @@ import {
 	Component,
 	EventEmitter,
 	HostListener,
-	signal,
 	input,
 	output,
+	signal,
 } from '@angular/core';
 import { ImageMetadata } from '@models/book.models';
 import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';

@@ -6,15 +6,15 @@ import {
 	Component,
 	DestroyRef,
 	ElementRef,
+	effect,
 	inject,
+	input,
 	OnDestroy,
 	OnInit,
+	output,
 	PLATFORM_ID,
 	QueryList,
 	ViewChildren,
-	input,
-	output,
-	effect,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { SettingsService } from '@core/services/settings.service';

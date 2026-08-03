@@ -369,10 +369,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			this.intersectionObserver.disconnect();
 		}
 		if (isPlatformBrowser(this.platformId)) {
-			window.removeEventListener(
-				'resize',
-				this.onWindowResize,
-			);
+			window.removeEventListener('resize', this.onWindowResize);
 		}
 	}
 

@@ -3,8 +3,8 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	inject,
-	OnInit,
 	input,
+	OnInit,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FullscreenService } from '@core/services/fullscreen.service';

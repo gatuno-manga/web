@@ -6,15 +6,15 @@ import {
 	DestroyRef,
 	ElementRef,
 	inject,
+	input,
 	OnChanges,
 	OnDestroy,
 	OnInit,
+	output,
 	PLATFORM_ID,
 	SimpleChanges,
 	signal,
 	viewChild,
-	input,
-	output,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -111,7 +111,8 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 			// Restore initial position after render
 			if (this.initialScrollPercentage() > 0) {
 				setTimeout(
-					() => this.scrollToPercentage(this.initialScrollPercentage()),
+					() =>
+						this.scrollToPercentage(this.initialScrollPercentage()),
 					100,
 				);
 			}

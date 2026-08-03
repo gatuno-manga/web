@@ -133,7 +133,8 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private ngZone = inject(NgZone);
 	private bookService = inject(BookService);
 
-	private dragMoveListener: ((e: MouseEvent | TouchEvent) => void) | null = null;
+	private dragMoveListener: ((e: MouseEvent | TouchEvent) => void) | null =
+		null;
 	private dragUpListener: (() => void) | null = null;
 
 	progressBarRef = viewChild<ElementRef>('progressBarRef');
@@ -317,8 +318,14 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	private cleanupDragListeners() {
 		if (this.dragMoveListener) {
-			document.removeEventListener('mousemove', this.dragMoveListener as any);
-			document.removeEventListener('touchmove', this.dragMoveListener as any);
+			document.removeEventListener(
+				'mousemove',
+				this.dragMoveListener as any,
+			);
+			document.removeEventListener(
+				'touchmove',
+				this.dragMoveListener as any,
+			);
 			this.dragMoveListener = null;
 		}
 		if (this.dragUpListener) {
@@ -753,10 +760,18 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.cleanupDragListeners();
 		};
 
-		document.addEventListener('mousemove', this.dragMoveListener, { passive: true });
-		document.addEventListener('mouseup', this.dragUpListener, { passive: true });
-		document.addEventListener('touchmove', this.dragMoveListener, { passive: true });
-		document.addEventListener('touchend', this.dragUpListener, { passive: true });
+		document.addEventListener('mousemove', this.dragMoveListener, {
+			passive: true,
+		});
+		document.addEventListener('mouseup', this.dragUpListener, {
+			passive: true,
+		});
+		document.addEventListener('touchmove', this.dragMoveListener, {
+			passive: true,
+		});
+		document.addEventListener('touchend', this.dragUpListener, {
+			passive: true,
+		});
 
 		const clientX =
 			'touches' in event

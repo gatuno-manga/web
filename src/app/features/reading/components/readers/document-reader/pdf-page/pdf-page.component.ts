@@ -4,11 +4,11 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
+	input,
 	OnChanges,
 	OnDestroy,
 	SimpleChanges,
 	ViewChild,
-	input,
 } from '@angular/core';
 import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer';
 
