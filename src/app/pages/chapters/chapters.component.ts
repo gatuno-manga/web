@@ -384,6 +384,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		const requestId = ++this.currentLoadRequestId;
 		this.maxReadPageIndex = 0;
 		this.readingProgress.set(0);
+		this.chapter.set(null);
 		try {
 			const chapter = await this.resolveChapterData(id, forceOnline);
 			if (this.currentLoadRequestId !== requestId) return;
