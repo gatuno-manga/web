@@ -1,19 +1,19 @@
 import { CommonModule, Location, NgOptimizedImage } from '@angular/common';
 import {
+	AfterViewInit,
 	ChangeDetectionStrategy,
 	ChangeDetectorRef,
 	Component,
 	computed,
+	DestroyRef,
+	ElementRef,
 	effect,
+	HostBinding,
 	inject,
 	input,
+	NgZone,
 	output,
 	signal,
-	ElementRef,
-	DestroyRef,
-	NgZone,
-	HostBinding,
-	AfterViewInit,
 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
@@ -176,7 +176,8 @@ export class ItemBookComponent implements AfterViewInit {
 							this.ngZone.run(() => {
 								if (!isIntersecting) {
 									// Lock the height so it doesn't collapse when unmounting
-									this.hostHeight = this.el.nativeElement.offsetHeight;
+									this.hostHeight =
+										this.el.nativeElement.offsetHeight;
 								} else {
 									// Let it size dynamically again
 									this.hostHeight = undefined;
@@ -186,7 +187,7 @@ export class ItemBookComponent implements AfterViewInit {
 							});
 						}
 					},
-					{ rootMargin: '1200px' }
+					{ rootMargin: '1200px' },
 				);
 				this.observer.observe(this.el.nativeElement);
 			}, 100);

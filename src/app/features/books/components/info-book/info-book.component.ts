@@ -27,7 +27,12 @@ import {
 	ViewChildren,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink, RouterModule } from '@angular/router';
+import {
+	ActivatedRoute,
+	Router,
+	RouterLink,
+	RouterModule,
+} from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
@@ -324,7 +329,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			if (tabParam) {
 				const numericValue = tab[tabParam as keyof typeof tab];
 				if (numericValue !== undefined) {
-					const index = this.tabsList.findIndex((t) => t.id === numericValue);
+					const index = this.tabsList.findIndex(
+						(t) => t.id === numericValue,
+					);
 					if (index >= 0) {
 						targetIndex = index;
 					}
@@ -334,8 +341,8 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			const targetEl = this.tabEls.toArray()[targetIndex];
 			if (targetEl) {
 				targetEl.nativeElement.click();
-				
-				// Garante que o indicador vá para o lugar certo após a fonte e layout carregarem, 
+
+				// Garante que o indicador vá para o lugar certo após a fonte e layout carregarem,
 				// lendo a aba correta no momento da execução
 				const recalculate = () => this.updateSelectorPosition();
 				if ('fonts' in document) {
@@ -486,7 +493,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 					clickedElement.offsetLeft -
 					header.offsetWidth / 2 +
 					clickedElement.offsetWidth / 2;
-				
+
 				header.scrollTo({
 					left: scrollLeft,
 					behavior: 'smooth',
