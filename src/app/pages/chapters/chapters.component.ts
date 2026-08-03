@@ -259,6 +259,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 						if (this.currentChapterRouteId !== chapterId) {
 							this.currentChapterRouteId = chapterId;
 							this.dismissedChapterLoadErrorModalId = null;
+							this.scrollToTop();
 						}
 						this.loadChapter(chapterId, false, false, 'route');
 						if (
@@ -382,6 +383,8 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	) {
 		const requestId = ++this.currentLoadRequestId;
 		this.maxReadPageIndex = 0;
+		this.readingProgress.set(0);
+		this.chapter.set(null);
 		try {
 			const chapter = await this.resolveChapterData(id, forceOnline);
 			if (this.currentLoadRequestId !== requestId) return;
@@ -703,6 +706,10 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	scrollToTop() {
 		if (isPlatformBrowser(this.platformId)) {
 			window.scrollTo({ top: 0, behavior: 'instant' });
+			const header = document.getElementById('header');
+			if (header) {
+				header.scrollIntoView({ behavior: 'instant', block: 'start' });
+			}
 		}
 	}
 
@@ -807,6 +814,9 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 					this.textReader.scrollToPage(targetPageIndex);
 				}
 			}, 200);
+		} else {
+			this.readingProgress.set(0);
+			setTimeout(() => this.scrollToTop(), 200);
 		}
 	}
 

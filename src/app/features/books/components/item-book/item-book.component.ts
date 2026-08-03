@@ -1,12 +1,17 @@
 import { CommonModule, Location, NgOptimizedImage } from '@angular/common';
 import {
+	AfterViewInit,
 	ChangeDetectionStrategy,
 	ChangeDetectorRef,
 	Component,
 	computed,
+	DestroyRef,
+	ElementRef,
 	effect,
+	HostBinding,
 	inject,
 	input,
+	NgZone,
 	output,
 	signal,
 } from '@angular/core';
@@ -40,7 +45,7 @@ import { firstValueFrom } from 'rxjs';
 	styleUrl: './item-book.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ItemBookComponent {
+export class ItemBookComponent implements AfterViewInit {
 	book = input.required<BookList>();
 	type = input<'grid' | 'list' | 'cover'>('grid');
 	priority = input(false);
@@ -63,9 +68,15 @@ export class ItemBookComponent {
 	private cdr = inject(ChangeDetectorRef);
 	private router = inject(Router);
 	private location = inject(Location);
+	private el = inject(ElementRef);
+	private destroyRef = inject(DestroyRef);
+	private ngZone = inject(NgZone);
 
 	isImageLoaded = signal(false);
 	isDownloaded = signal(false);
+	isVisible = signal(true);
+
+	@HostBinding('style.height.px') hostHeight?: number;
 
 	// Fetch dynamic progress updates from DownloadService
 	downloadProgress = signal<
@@ -123,6 +134,9 @@ export class ItemBookComponent {
 		return 70 - (70 * percent) / 100;
 	});
 
+	private observer?: IntersectionObserver;
+	private timeout?: any;
+
 	constructor() {
 		effect(() => {
 			const bookId = this.book()?.id;
@@ -143,6 +157,40 @@ export class ItemBookComponent {
 					});
 				onCleanup(() => sub.unsubscribe());
 			}
+		});
+
+		this.destroyRef.onDestroy(() => {
+			if (this.timeout) clearTimeout(this.timeout);
+			if (this.observer) this.observer.disconnect();
+		});
+	}
+
+	ngAfterViewInit() {
+		// Run intersection observer outside angular to prevent CD cycles on every layout
+		this.ngZone.runOutsideAngular(() => {
+			this.timeout = setTimeout(() => {
+				this.observer = new IntersectionObserver(
+					(entries) => {
+						const isIntersecting = entries[0].isIntersecting;
+						if (isIntersecting !== this.isVisible()) {
+							this.ngZone.run(() => {
+								if (!isIntersecting) {
+									// Lock the height so it doesn't collapse when unmounting
+									this.hostHeight =
+										this.el.nativeElement.offsetHeight;
+								} else {
+									// Let it size dynamically again
+									this.hostHeight = undefined;
+								}
+								this.isVisible.set(isIntersecting);
+								this.cdr.markForCheck();
+							});
+						}
+					},
+					{ rootMargin: '1200px' },
+				);
+				this.observer.observe(this.el.nativeElement);
+			}, 100);
 		});
 	}
 

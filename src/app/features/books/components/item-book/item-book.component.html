@@ -1,9 +1,10 @@
-<a
-	[routerLink]="['/books', book().id]"
-	[class]="'book-card ' + type()"
-	[ngStyle]="cardCoverStyle()"
-	(contextmenu)="onContextMenu($event)"
-	>
+@if (isVisible()) {
+	<a
+		[routerLink]="['/books', book().id]"
+		[class]="'book-card ' + type()"
+		[ngStyle]="cardCoverStyle()"
+		(contextmenu)="onContextMenu($event)"
+		>
 	@if (book().blurHash || book().coverMetadata?.blurHash) {
 		<div
 			class="card-blur-background"
@@ -112,3 +113,4 @@
 		</div>
 	}
 </a>
+}

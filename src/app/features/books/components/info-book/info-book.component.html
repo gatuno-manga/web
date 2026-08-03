@@ -11,12 +11,14 @@
 <div
 	id="container"
 	#container
-	[style.--current-tab-index]="selectedTab()"
 	[style.height]="containerHeight()"
 >
 	<div
 		id="chapters"
 		[class.selected]="selectedTab() === tab.chapters"
+		[class.left]="tab.chapters < selectedTab()"
+		[class.right]="tab.chapters > selectedTab()"
+		[class.reduced-motion]="reducedAnimations()"
 		class="container"
 	>
 		@defer (when modulesLoad[tab.chapters].load()) {
@@ -265,6 +267,9 @@
 	<div
 		id="covers"
 		[class.selected]="selectedTab() === tab.covers"
+		[class.left]="tab.covers < selectedTab()"
+		[class.right]="tab.covers > selectedTab()"
+		[class.reduced-motion]="reducedAnimations()"
 		class="container"
 	>
 		@defer (when modulesLoad[tab.covers].load()) {
@@ -343,11 +348,11 @@
 							<img
 								[src]="cover.url"
 								alt="Cover {{ cover.id }}"
+								loading="lazy"
 								appImageFallback
-								style="position: relative; z-index: 1;"
 							/>
 						}
-						<div class="info" style="position: relative; z-index: 2;">
+						<div class="info">
 							<span>{{ cover.title }}</span>
 						</div>
 					</div>
@@ -364,6 +369,9 @@
 	<div
 		id="extra-info"
 		[class.selected]="selectedTab() === tab.extraInfo"
+		[class.left]="tab.extraInfo < selectedTab()"
+		[class.right]="tab.extraInfo > selectedTab()"
+		[class.reduced-motion]="reducedAnimations()"
 		class="container"
 	>
 		<div class="scrollable">
@@ -442,6 +450,9 @@
 	<div
 		id="saved-pages"
 		[class.selected]="selectedTab() === tab.savedPages"
+		[class.left]="tab.savedPages < selectedTab()"
+		[class.right]="tab.savedPages > selectedTab()"
+		[class.reduced-motion]="reducedAnimations()"
 		class="container"
 	>
 		@defer (when modulesLoad[tab.savedPages].load()) {
@@ -460,13 +471,12 @@
 								alt="Page {{ savedPage.page.index }}"
 								loading="lazy"
 								appImageFallback
-								style="position: relative; z-index: 1;"
 							/>
 						}
 						<div class="cover-placeholder" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 0;">
 							<app-icons name="image" />
 						</div>
-						<div class="info" style="position: relative; z-index: 2;">
+						<div class="info">
 							<span>Cap. {{ savedPage.chapter.index | chapterIndex }} - Pág. {{ savedPage.page.index | number: '1.0-5' : 'pt-BR' }}</span>
 							@if (savedPage.comment) {
 								<span class="description">"{{ savedPage.comment }}"</span>
@@ -490,6 +500,9 @@
 	<div
 		id="related-books"
 		[class.selected]="selectedTab() === tab.relatedBooks"
+		[class.left]="tab.relatedBooks < selectedTab()"
+		[class.right]="tab.relatedBooks > selectedTab()"
+		[class.reduced-motion]="reducedAnimations()"
 		class="container"
 	>
 		@defer (when modulesLoad[tab.relatedBooks].load()) {
@@ -550,6 +563,9 @@
 	<div
 		id="reviews"
 		[class.selected]="selectedTab() === tab.reviews"
+		[class.left]="tab.reviews < selectedTab()"
+		[class.right]="tab.reviews > selectedTab()"
+		[class.reduced-motion]="reducedAnimations()"
 		class="container"
 	>
 		@defer (when modulesLoad[tab.reviews].load()) {

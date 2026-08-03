@@ -27,7 +27,12 @@ import {
 	ViewChildren,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink, RouterModule } from '@angular/router';
+import {
+	ActivatedRoute,
+	Router,
+	RouterLink,
+	RouterModule,
+} from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
@@ -144,6 +149,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	private platformId = inject(PLATFORM_ID);
 	private ngZone = inject(NgZone);
 	private router = inject(Router);
+	private route = inject(ActivatedRoute);
 	private location = inject(Location);
 	private resizeObserver?: ResizeObserver;
 	private mutationObserver?: MutationObserver;
@@ -157,6 +163,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	updated = output<void>();
 
 	selectedTab = signal<tab>(tab.chapters);
+	reducedAnimations = signal(false);
 	sortAscending = signal(true);
 
 	tabsList = [
@@ -314,11 +321,35 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	containerHeight = signal('auto');
 
 	ngAfterViewInit() {
-		// Clique inicial na primeira aba disponível
+		// Clique inicial baseado na URL ou na primeira aba
 		setTimeout(() => {
-			const first = this.tabEls.first;
-			if (first) {
-				first.nativeElement.click();
+			const tabParam = this.route.snapshot.queryParamMap.get('tab');
+			let targetIndex = 0;
+
+			if (tabParam) {
+				const numericValue = tab[tabParam as keyof typeof tab];
+				if (numericValue !== undefined) {
+					const index = this.tabsList.findIndex(
+						(t) => t.id === numericValue,
+					);
+					if (index >= 0) {
+						targetIndex = index;
+					}
+				}
+			}
+
+			const targetEl = this.tabEls.toArray()[targetIndex];
+			if (targetEl) {
+				targetEl.nativeElement.click();
+
+				// Garante que o indicador vá para o lugar certo após a fonte e layout carregarem,
+				// lendo a aba correta no momento da execução
+				const recalculate = () => this.updateSelectorPosition();
+				if ('fonts' in document) {
+					document.fonts.ready.then(recalculate);
+				}
+				setTimeout(recalculate, 150);
+				setTimeout(recalculate, 500);
 			}
 		});
 
@@ -434,6 +465,15 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		this.selectedTab.set(tabName);
 		this.loadResults(tabName);
 
+		// Sincroniza a aba com a URL
+		const tabString = tab[tabName];
+		const urlTree = this.router.createUrlTree([], {
+			relativeTo: this.route,
+			queryParams: { tab: tabString },
+			queryParamsHandling: 'merge',
+		});
+		this.location.replaceState(this.router.serializeUrl(urlTree));
+
 		let clickedElement: HTMLSpanElement | undefined;
 
 		if (event) {
@@ -447,11 +487,18 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		}
 
 		if (clickedElement) {
-			clickedElement.scrollIntoView({
-				behavior: 'smooth',
-				block: 'nearest',
-				inline: 'center',
-			});
+			const header = clickedElement.parentElement;
+			if (header) {
+				const scrollLeft =
+					clickedElement.offsetLeft -
+					header.offsetWidth / 2 +
+					clickedElement.offsetWidth / 2;
+
+				header.scrollTo({
+					left: scrollLeft,
+					behavior: 'smooth',
+				});
+			}
 			this.updateSelectorPosition(clickedElement);
 		}
 
@@ -929,7 +976,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	}
 
 	onCoverDrop(event: CdkDragDrop<Cover[]>) {
-		if (!this.userTokenService.isAdminSignal()) return;
+		if (!this.userService.hasPermission('internal:books:edit')) return;
 
 		this.covers.update((current) => {
 			const newCovers = [...current];
@@ -1973,7 +2020,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			);
 		}
 
-		if (this.userTokenService.isAdminSignal()) {
+		if (this.userService.hasPermission('internal:books:edit')) {
 			if (items.length > 0) {
 				items.push({ type: 'separator' });
 			}
