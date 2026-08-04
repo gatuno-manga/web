@@ -30,18 +30,18 @@
 				<div class="placeholder"></div>
 			}
 		</div>
-		<img
-			[src]="page.path"
-			alt="Página {{ $index + 1 }}"
-			[attr.width]="page.metadata?.width"
-			[attr.height]="page.metadata?.height"
-			[attr.fetchpriority]="$index < 2 ? 'high' : 'auto'"
-			[attr.loading]="$index < 2 ? 'eager' : 'lazy'"
-			(load)="onImageLoad($index)"
-			appImageFallback
-			[class.loaded]="loadedPages.has($index) && !isBlurred()"
-			[class.hidden]="isBlurred()"
-		/>
+		@if (shouldLoadPages.has($index) || $index < 2) {
+			<img
+				[src]="page.path"
+				alt="Página {{ $index + 1 }}"
+				[attr.width]="page.metadata?.width"
+				[attr.height]="page.metadata?.height"
+				(load)="onImageLoad($index)"
+				appImageFallback
+				[class.loaded]="loadedPages.has($index) && !isBlurred()"
+				[class.hidden]="isBlurred()"
+			/>
+		}
 		@if (showPageNumbers()) {
 			<div class="page-number">{{ $index + 1 }}</div>
 		}
