@@ -58,19 +58,19 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 		effect(() => {
 			this.pages();
 			this.loadedPages.clear();
+			this.shouldLoadPages.clear();
 			this.cdr.markForCheck();
 		});
 	}
 
 	@ViewChildren('pageRef') pageRefs!: QueryList<ElementRef>;
-
-	private elRef = inject(ElementRef);
 	private platformId = inject(PLATFORM_ID);
 	private destroyRef = inject(DestroyRef);
 	private settingsService = inject(SettingsService);
 	private cdr = inject(ChangeDetectorRef);
 
 	private intersectionObserver: IntersectionObserver | null = null;
+	private lazyLoadObserver: IntersectionObserver | null = null;
 	private maxReadPageIndex = 0;
 	private currentPageIndex = 0;
 
@@ -79,6 +79,7 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	});
 
 	loadedPages = new Set<number>();
+	shouldLoadPages = new Set<number>();
 
 	onImageLoad(index: number) {
 		this.loadedPages.add(index);
@@ -94,35 +95,27 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	private setupScrollListener() {
 		fromEvent(window, 'scroll', { capture: true })
 			.pipe(
-				throttleTime(20, undefined, { leading: true, trailing: true }),
+				throttleTime(100, undefined, { leading: true, trailing: true }),
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe(() => {
-				const container = this.elRef.nativeElement;
-				const rect = container.getBoundingClientRect();
+				const scrollTop =
+					window.scrollY || document.documentElement.scrollTop;
 				const windowHeight = window.innerHeight;
-
-				// rect.top is the distance from the top of the viewport to the top of the container
-				// scrollOffset is how much of the container has passed the top of the viewport
-				const scrollOffset = -rect.top;
-				const totalHeight = rect.height;
-
-				// We subtract windowHeight because the progress is 100% when the bottom of the container
-				// reaches the bottom of the viewport
-				const maxScroll = totalHeight - windowHeight;
+				const documentHeight = document.documentElement.scrollHeight;
+				const maxScroll = documentHeight - windowHeight;
 
 				if (maxScroll > 0) {
 					const scrollPercentage = Math.max(
 						0,
-						Math.min(100, (scrollOffset / maxScroll) * 100),
+						Math.min(100, (scrollTop / maxScroll) * 100),
 					);
 					this.progressChange.emit({
 						pageIndex: this.currentPageIndex,
 						totalPages: this.pages().length,
 						scrollPercentage,
 					});
-				} else if (totalHeight > 0) {
-					// Content fits in window or is smaller
+				} else {
 					this.progressChange.emit({
 						pageIndex: this.currentPageIndex,
 						totalPages: this.pages().length,
@@ -159,6 +152,9 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (this.intersectionObserver) {
 			this.intersectionObserver.disconnect();
 		}
+		if (this.lazyLoadObserver) {
+			this.lazyLoadObserver.disconnect();
+		}
 
 		if (!isPlatformBrowser(this.platformId)) return;
 
@@ -190,8 +186,37 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 			}
 		}, options);
 
+		this.lazyLoadObserver = new IntersectionObserver(
+			(entries) => {
+				let hasChanges = false;
+				for (const entry of entries) {
+					const index = Number.parseInt(
+						entry.target.getAttribute('data-index') || '0',
+						10,
+					);
+					if (entry.isIntersecting) {
+						if (!this.shouldLoadPages.has(index)) {
+							this.shouldLoadPages.add(index);
+							hasChanges = true;
+						}
+					} else {
+						// Se saiu da margem de segurança (2 telas pra cima ou pra baixo), descarregamos a imagem
+						if (this.shouldLoadPages.has(index)) {
+							this.shouldLoadPages.delete(index);
+							hasChanges = true;
+						}
+					}
+				}
+				if (hasChanges) {
+					this.cdr.markForCheck();
+				}
+			},
+			{ rootMargin: '200% 0px' },
+		);
+
 		for (const el of this.pageRefs) {
 			this.intersectionObserver?.observe(el.nativeElement);
+			this.lazyLoadObserver?.observe(el.nativeElement);
 		}
 	}
 
@@ -226,7 +251,7 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 			return 'auto';
 		}
 		if (this.bookMetadata()?.width && this.bookMetadata()?.height) {
-			return `${this.bookMetadata()!.width} / ${this.bookMetadata()!.height}`;
+			return `${this.bookMetadata()?.width} / ${this.bookMetadata()?.height}`;
 		}
 		return '2 / 3';
 	}

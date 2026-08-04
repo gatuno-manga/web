@@ -135,7 +135,7 @@ export class ItemBookComponent implements AfterViewInit {
 	});
 
 	private observer?: IntersectionObserver;
-	private timeout?: any;
+	private timeout?: ReturnType<typeof setTimeout>;
 
 	constructor() {
 		effect(() => {

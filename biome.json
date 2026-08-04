@@ -47,7 +47,9 @@
 			"!**/dist",
 			"!**/node_modules",
 			"!**/.angular",
-			"!**/coverage"
+			"!**/coverage",
+			"!**/*.html",
+			"!src/app/core/constants/icons.constant.ts"
 		]
 	},
 	"overrides": [

@@ -6,7 +6,6 @@ import {
 	Component,
 	computed,
 	ElementRef,
-	effect,
 	forwardRef,
 	input,
 	model,
@@ -69,8 +68,6 @@ export class TextAreaComponent implements ControlValueAccessor, AfterViewInit {
 		minlength: 'Não pode ser menor que {{requiredLength}} caracteres',
 		maxlength: 'Não pode ser maior que {{requiredLength}} caracteres',
 	};
-
-	constructor() {}
 
 	ngAfterViewInit() {}
 

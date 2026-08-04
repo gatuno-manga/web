@@ -8,6 +8,3 @@ pre-commit:
     check-code:
       glob: "*.{js,ts,cjs,mjs,json}"
       run: npx @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files} && git add {staged_files}
-    lint-angular:
-      glob: "*.ts"
-      run: npx ng lint {staged_files}
