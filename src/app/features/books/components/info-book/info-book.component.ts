@@ -1199,7 +1199,7 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			},
 			{
 				label: 'Editar Comentário',
-				icon: 'edit',
+				icon: 'edit-2',
 				action: () => {
 					this.notificationService.notify({
 						message: '',
@@ -1502,25 +1502,21 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 				(id) => !status.get(id) || status.get(id) === 'error',
 			);
 
-			if (
-				hasNotDownloaded &&
-				this.userService.hasPermission('books:download')
-			) {
+			if (hasNotDownloaded) {
 				items.push({
 					label: `Baixar ${selectedCount} Capítulos`,
 					icon: 'download',
+					disabled: !this.userService.hasPermission('books:download'),
 					action: () => this.downloadSelectedChapters(),
 				});
 			}
 
-			if (
-				hasDownloaded &&
-				this.userService.hasPermission('books:download')
-			) {
+			if (hasDownloaded) {
 				items.push({
 					label: `Excluir ${selectedCount} Downloads`,
 					icon: 'trash',
 					danger: true,
+					disabled: !this.userService.hasPermission('books:download'),
 					action: () => this.deleteSelectedChaptersDownloads(),
 				});
 			}
@@ -1531,18 +1527,19 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 			);
 			const hasReadChapter = selectedChapters.some((c) => c.read);
 
-			if (this.userService.hasPermission('reading-progress:manage')) {
-				items.push(
-					{ type: 'separator' },
-					{
-						label: hasReadChapter
-							? `Marcar ${selectedCount} como Não Lidos`
-							: `Marcar ${selectedCount} como Lidos`,
-						icon: hasReadChapter ? 'eye-close' : 'eye',
-						action: () => this.toggleSelectedReadStatus(),
-					},
-				);
-			}
+			items.push(
+				{ type: 'separator' },
+				{
+					label: hasReadChapter
+						? `Marcar ${selectedCount} como Não Lidos`
+						: `Marcar ${selectedCount} como Lidos`,
+					icon: hasReadChapter ? 'eye-close' : 'eye',
+					disabled: !this.userService.hasPermission(
+						'reading-progress:manage',
+					),
+					action: () => this.toggleSelectedReadStatus(),
+				},
+			);
 
 			if (this.userTokenService.isAdminSignal()) {
 				items.push(
@@ -1598,23 +1595,19 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 
 		const downloadStatus = this.chaptersDownloadStatus().get(chapter.id);
 
-		if (
-			downloadStatus === 'downloaded' &&
-			this.userService.hasPermission('books:download')
-		) {
+		if (downloadStatus === 'downloaded') {
 			items.push({
 				label: 'Excluir Download',
 				icon: 'trash',
 				danger: true,
+				disabled: !this.userService.hasPermission('books:download'),
 				action: () => this.deleteChapterDownload(chapter),
 			});
-		} else if (
-			(!downloadStatus || downloadStatus === 'error') &&
-			this.userService.hasPermission('books:download')
-		) {
+		} else if (!downloadStatus || downloadStatus === 'error') {
 			items.push({
 				label: 'Baixar Capítulo',
 				icon: 'download',
+				disabled: !this.userService.hasPermission('books:download'),
 				action: () => this.downloadChapter(chapter),
 			});
 		}
