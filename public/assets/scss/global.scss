@@ -48,10 +48,14 @@ html {
 	color-scheme: light dark;
 	background-color: var(--app-background-color);
 	color: var(--app-text-color);
+	touch-action: manipulation;
+	-webkit-text-size-adjust: 100%;
 }
 
 body {
 	min-height: 100dvh;
+	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+	-webkit-tap-highlight-color: transparent;
 }
 
 @media (max-width: 768px) {
