@@ -64,7 +64,7 @@ jobs:
         if: |
             github.event_name == 'push' &&
             (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/developer')
-        runs-on: self-hosted
+        runs-on: ubuntu-latest
         permissions:
             contents: write
             issues: write

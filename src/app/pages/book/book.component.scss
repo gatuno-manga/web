@@ -32,7 +32,6 @@ $page-size: 1200px;
 	background-color: rgb(from var(--app-background-color) r g b / 0.7);
 	background-blend-mode: multiply;
 	pointer-events: none;
-	filter: blur(50px);
 	opacity: 0;
 	transition: opacity 0.8s ease-in-out;
 
@@ -59,7 +58,7 @@ $page-size: 1200px;
 				height: 100% !important;
 				object-fit: cover;
 				filter: blur(40px) saturate(120%);
-				transform: scale(1.1);
+				transform: scale(1.25);
 			}
 		}
 
