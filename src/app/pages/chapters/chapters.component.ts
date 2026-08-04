@@ -321,11 +321,11 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		if (this.dragMoveListener) {
 			document.removeEventListener(
 				'mousemove',
-				this.dragMoveListener as any,
+				this.dragMoveListener as EventListener,
 			);
 			document.removeEventListener(
 				'touchmove',
-				this.dragMoveListener as any,
+				this.dragMoveListener as EventListener,
 			);
 			this.dragMoveListener = null;
 		}

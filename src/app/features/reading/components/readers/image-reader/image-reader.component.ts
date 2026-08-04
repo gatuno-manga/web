@@ -64,8 +64,6 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	@ViewChildren('pageRef') pageRefs!: QueryList<ElementRef>;
-
-	private elRef = inject(ElementRef);
 	private platformId = inject(PLATFORM_ID);
 	private destroyRef = inject(DestroyRef);
 	private settingsService = inject(SettingsService);
@@ -101,7 +99,8 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe(() => {
-				const scrollTop = window.scrollY || document.documentElement.scrollTop;
+				const scrollTop =
+					window.scrollY || document.documentElement.scrollTop;
 				const windowHeight = window.innerHeight;
 				const documentHeight = document.documentElement.scrollHeight;
 				const maxScroll = documentHeight - windowHeight;
@@ -187,27 +186,33 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 			}
 		}, options);
 
-		this.lazyLoadObserver = new IntersectionObserver((entries) => {
-			let hasChanges = false;
-			for (const entry of entries) {
-				const index = Number.parseInt(entry.target.getAttribute('data-index') || '0', 10);
-				if (entry.isIntersecting) {
-					if (!this.shouldLoadPages.has(index)) {
-						this.shouldLoadPages.add(index);
-						hasChanges = true;
-					}
-				} else {
-					// Se saiu da margem de segurança (2 telas pra cima ou pra baixo), descarregamos a imagem
-					if (this.shouldLoadPages.has(index)) {
-						this.shouldLoadPages.delete(index);
-						hasChanges = true;
+		this.lazyLoadObserver = new IntersectionObserver(
+			(entries) => {
+				let hasChanges = false;
+				for (const entry of entries) {
+					const index = Number.parseInt(
+						entry.target.getAttribute('data-index') || '0',
+						10,
+					);
+					if (entry.isIntersecting) {
+						if (!this.shouldLoadPages.has(index)) {
+							this.shouldLoadPages.add(index);
+							hasChanges = true;
+						}
+					} else {
+						// Se saiu da margem de segurança (2 telas pra cima ou pra baixo), descarregamos a imagem
+						if (this.shouldLoadPages.has(index)) {
+							this.shouldLoadPages.delete(index);
+							hasChanges = true;
+						}
 					}
 				}
-			}
-			if (hasChanges) {
-				this.cdr.markForCheck();
-			}
-		}, { rootMargin: '200% 0px' });
+				if (hasChanges) {
+					this.cdr.markForCheck();
+				}
+			},
+			{ rootMargin: '200% 0px' },
+		);
 
 		for (const el of this.pageRefs) {
 			this.intersectionObserver?.observe(el.nativeElement);
@@ -246,7 +251,7 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 			return 'auto';
 		}
 		if (this.bookMetadata()?.width && this.bookMetadata()?.height) {
-			return `${this.bookMetadata()!.width} / ${this.bookMetadata()!.height}`;
+			return `${this.bookMetadata()?.width} / ${this.bookMetadata()?.height}`;
 		}
 		return '2 / 3';
 	}

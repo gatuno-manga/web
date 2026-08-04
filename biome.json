@@ -48,6 +48,7 @@
 			"!**/node_modules",
 			"!**/.angular",
 			"!**/coverage",
+			"!**/*.html",
 			"!src/app/core/constants/icons.constant.ts"
 		]
 	},
