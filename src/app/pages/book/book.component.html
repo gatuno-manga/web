@@ -61,6 +61,7 @@
 							alt="Capa do livro {{ b.title }}"
 							[class.loaded]="isImageLoaded()"
 							(load)="onImageLoad()"
+							fetchpriority="high"
 							appImageFallback
 						/>
 						@if (b.originalLanguageCode) {
