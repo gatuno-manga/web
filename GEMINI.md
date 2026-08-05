@@ -77,7 +77,14 @@ This section contains mandatory rules for any AI agent or developer working on t
     - `npm run api:graphql -- --operation OperationName` to ver os detalhes de uma query ou mutation.
     - `npm run api:graphql -- --type TypeName` to ver o schema de um tipo GraphQL específico.
 
-### 7. Core AI Execution Rules (12-Rule Template)
+### 7. Frontend Performance & CPU Optimization (CRITICAL)
+**Rule:** Avoid visual and structural bottlenecks that drain CPU/GPU or cause frame drops (jank).
+- **CSS Filters:** NEVER use `filter: blur()` with large radii (e.g. `blur(40px)`, `blur(90px)`) on large, animated, or frequently re-rendered elements (like full-screen auroras or backgrounds). If a blur is necessary for privacy or placeholders, keep the radius low (e.g. `10px`) or rely on canvas-based `BlurHash`.
+- **Change Detection:** Maintain strict usage of `ChangeDetectionStrategy.OnPush` and Angular Signals (`computed`, `signal`). DO NOT bind heavy function calls directly in HTML templates (e.g. `{{ calculateHeavyStuff() }}`).
+- **Scroll/Resize Events:** Any listener attached to `scroll` or `resize` MUST run outside the Angular zone (`this.ngZone.runOutsideAngular`) and use `IntersectionObserver` or `requestAnimationFrame`/`throttleTime` to avoid triggering endless Change Detection cycles.
+- **LCP (Largest Contentful Paint):** Always prioritize the loading of the main content image (like a book cover) using `fetchpriority="high"`.
+
+### 8. Core AI Execution Rules (12-Rule Template)
 
 These rules apply to every task in this project unless explicitly overridden.
 Bias: caution over speed on non-trivial work. Use judgment on trivial tasks.

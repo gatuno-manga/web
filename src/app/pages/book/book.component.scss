@@ -57,7 +57,7 @@ $page-size: 1200px;
 				width: 100% !important;
 				height: 100% !important;
 				object-fit: cover;
-				filter: blur(40px) saturate(120%);
+				filter: saturate(120%);
 				transform: scale(1.25);
 			}
 		}
@@ -92,7 +92,6 @@ $page-size: 1200px;
 .aurora-orb {
 	position: absolute;
 	border-radius: 50%;
-	filter: blur(90px);
 	will-change: transform;
 	&--warm {
 		width: 700px;
