@@ -35,7 +35,7 @@
                 <app-blurhash [hash]="book.blurHash" class="bg-blur" />
               }
               @if (book.cover) {
-                <img [ngSrc]="book.cover" fill priority alt="" class="bg-image" appImageFallback />
+                <img [ngSrc]="book.cover" fill [priority]="i === 0" alt="" class="bg-image" appImageFallback />
               }
               <div class="gradient-overlay"></div>
             </div>
@@ -48,7 +48,7 @@
                     <img src="assets/icons/image-placeholder-14824e.svg" alt="Sem capa" class="placeholder-icon" />
                   </div>
                   @if (book.cover) {
-                    <img [ngSrc]="book.cover" alt="" width="298" height="453" priority appImageFallback style="position: relative; z-index: 1;" />
+                    <img [ngSrc]="book.cover" alt="" width="298" height="453" [priority]="i === 0" appImageFallback style="position: relative; z-index: 1;" />
                   }
                 </div>
                 <div class="info-container">

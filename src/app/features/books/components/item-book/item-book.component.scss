@@ -220,8 +220,8 @@
 		background-image: var(--card-cover);
 		background-size: cover;
 		background-position: center;
-		filter: blur(30px) saturate(1.2);
-		opacity: 0.3;
+		filter: saturate(1.2);
+		opacity: 0.15;
 		z-index: 0;
 	}
 
