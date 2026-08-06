@@ -7,6 +7,7 @@ import {
 	ElementRef,
 	inject,
 	input,
+	NgZone,
 	OnChanges,
 	OnDestroy,
 	OnInit,
@@ -55,6 +56,7 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	private settingsService = inject(SettingsService);
 	private highlightService = inject(HighlightService);
 	private sanitizer = inject(DomSanitizer);
+	private ngZone = inject(NgZone);
 	private intersectionObserver: IntersectionObserver | null = null;
 
 	settings = toSignal(this.settingsService.settings$, {
@@ -149,12 +151,17 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private setupScrollListener() {
-		fromEvent(window, 'scroll', { capture: true })
-			.pipe(
-				throttleTime(20, undefined, { leading: true, trailing: true }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => this.onScroll());
+		this.ngZone.runOutsideAngular(() => {
+			fromEvent(window, 'scroll', { capture: true })
+				.pipe(
+					throttleTime(20, undefined, {
+						leading: true,
+						trailing: true,
+					}),
+					takeUntilDestroyed(this.destroyRef),
+				)
+				.subscribe(() => this.onScroll());
+		});
 	}
 
 	private setupSelectionListener() {

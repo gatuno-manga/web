@@ -131,9 +131,6 @@ interface ModulesLoad {
 	templateUrl: './info-book.component.html',
 	styleUrl: './info-book.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	host: {
-		'(window:resize)': 'updateContainerHeight()',
-	},
 })
 export class InfoBookComponent implements AfterViewInit, OnDestroy {
 	public userService = inject(UserService);
@@ -356,7 +353,9 @@ export class InfoBookComponent implements AfterViewInit, OnDestroy {
 		if (isPlatformBrowser(this.platformId)) {
 			this.setupResizeObserver();
 			this.setupIntersectionObserver();
-			window.addEventListener('resize', this.onWindowResize);
+			this.ngZone.runOutsideAngular(() => {
+				window.addEventListener('resize', this.onWindowResize);
+			});
 		}
 
 		this.subscribeToWebSocketEvents();

@@ -7,6 +7,7 @@ import {
 	ElementRef,
 	inject,
 	input,
+	NgZone,
 	OnChanges,
 	OnDestroy,
 	OnInit,
@@ -62,6 +63,7 @@ export class DocumentReaderComponent
 	private destroyRef = inject(DestroyRef);
 	private contextMenuService = inject(ContextMenuService);
 	private settingsService = inject(SettingsService);
+	private ngZone = inject(NgZone);
 
 	private intersectionObserver: IntersectionObserver | null = null;
 	private maxReadPageIndex = 0;
@@ -165,15 +167,17 @@ export class DocumentReaderComponent
 		this.isBrowser = isPlatformBrowser(this.platformId);
 
 		if (this.isBrowser) {
-			fromEvent(window, 'scroll', { capture: true })
-				.pipe(
-					throttleTime(20, undefined, {
-						leading: true,
-						trailing: true,
-					}),
-					takeUntilDestroyed(this.destroyRef),
-				)
-				.subscribe(() => this.onScroll());
+			this.ngZone.runOutsideAngular(() => {
+				fromEvent(window, 'scroll', { capture: true })
+					.pipe(
+						throttleTime(20, undefined, {
+							leading: true,
+							trailing: true,
+						}),
+						takeUntilDestroyed(this.destroyRef),
+					)
+					.subscribe(() => this.onScroll());
+			});
 		}
 
 		if (this.initialPage() > 1) {
