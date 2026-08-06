@@ -7,6 +7,7 @@ import {
 	ElementRef,
 	inject,
 	input,
+	NgZone,
 	OnChanges,
 	OnDestroy,
 	OnInit,
@@ -15,7 +16,6 @@ import {
 	SimpleChanges,
 	signal,
 	viewChild,
-	NgZone,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -154,7 +154,10 @@ export class TextReaderComponent implements OnInit, OnChanges, OnDestroy {
 		this.ngZone.runOutsideAngular(() => {
 			fromEvent(window, 'scroll', { capture: true })
 				.pipe(
-					throttleTime(20, undefined, { leading: true, trailing: true }),
+					throttleTime(20, undefined, {
+						leading: true,
+						trailing: true,
+					}),
 					takeUntilDestroyed(this.destroyRef),
 				)
 				.subscribe(() => this.onScroll());

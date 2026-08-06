@@ -69,7 +69,6 @@ export class ContextMenuComponent {
 		this.contextMenuService.close();
 	}
 
-
 	onItemClick(
 		event: MouseEvent,
 		item: { disabled?: boolean; type?: string; action?: () => void },

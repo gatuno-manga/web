@@ -9,13 +9,13 @@ import {
 	effect,
 	inject,
 	input,
+	NgZone,
 	OnDestroy,
 	OnInit,
 	output,
 	PLATFORM_ID,
 	QueryList,
 	ViewChildren,
-	NgZone,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { SettingsService } from '@core/services/settings.service';
@@ -98,14 +98,18 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.ngZone.runOutsideAngular(() => {
 			fromEvent(window, 'scroll', { capture: true })
 				.pipe(
-					throttleTime(100, undefined, { leading: true, trailing: true }),
+					throttleTime(100, undefined, {
+						leading: true,
+						trailing: true,
+					}),
 					takeUntilDestroyed(this.destroyRef),
 				)
 				.subscribe(() => {
 					const scrollTop =
 						window.scrollY || document.documentElement.scrollTop;
 					const windowHeight = window.innerHeight;
-					const documentHeight = document.documentElement.scrollHeight;
+					const documentHeight =
+						document.documentElement.scrollHeight;
 					const maxScroll = documentHeight - windowHeight;
 
 					if (maxScroll > 0) {

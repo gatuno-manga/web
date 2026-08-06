@@ -297,15 +297,21 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.ngZone.runOutsideAngular(() => {
 			fromEvent(window, 'scroll')
 				.pipe(
-					throttleTime(50, undefined, { leading: true, trailing: true }),
+					throttleTime(50, undefined, {
+						leading: true,
+						trailing: true,
+					}),
 					takeUntilDestroyed(this.destroyRef),
 				)
 				.subscribe(() => {
 					const currentScroll =
-						window.scrollY || document.documentElement.scrollTop || 0;
+						window.scrollY ||
+						document.documentElement.scrollTop ||
+						0;
 
 					const isScrolledDown = currentScroll > 400;
-					const isScrollingUp = currentScroll < this.lastScrollPosition;
+					const isScrollingUp =
+						currentScroll < this.lastScrollPosition;
 
 					if (isScrolledDown && isScrollingUp) {
 						this.showScrollToTopButton.set(true);

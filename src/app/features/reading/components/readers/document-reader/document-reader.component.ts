@@ -7,6 +7,7 @@ import {
 	ElementRef,
 	inject,
 	input,
+	NgZone,
 	OnChanges,
 	OnDestroy,
 	OnInit,
@@ -17,7 +18,6 @@ import {
 	signal,
 	Type,
 	ViewChildren,
-	NgZone,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ContextMenuService } from '@core/services/context-menu.service';
