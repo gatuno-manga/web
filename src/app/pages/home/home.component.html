@@ -121,7 +121,7 @@
   }
 
   <!-- Latest Updated Section -->
-  <section class="home-section latest-updates content-visibility-auto">
+  <section class="home-section latest-updates">
     <div class="section-header">
       <h2 class="section-title">Atualizações Recentes</h2>
       <a routerLink="/books" [queryParams]="{ orderBy: 'updatedAt', order: 'DESC' }" class="view-more" aria-label="Ver todas as atualizações recentes">Ver tudo</a>
@@ -140,7 +140,7 @@
   </section>
 
   <!-- Recently Added Section -->
-  <section class="home-section recently-added content-visibility-auto">
+  <section class="home-section recently-added">
     <div class="section-header">
       <h2 class="section-title">Novidades no Gatuno</h2>
       <a routerLink="/books" [queryParams]="{ orderBy: 'createdAt', order: 'DESC' }" class="view-more" aria-label="Ver todas as novidades no Gatuno">Ver tudo</a>
