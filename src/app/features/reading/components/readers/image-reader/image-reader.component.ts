@@ -15,6 +15,7 @@ import {
 	PLATFORM_ID,
 	QueryList,
 	ViewChildren,
+	NgZone,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { SettingsService } from '@core/services/settings.service';
@@ -68,6 +69,7 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	private destroyRef = inject(DestroyRef);
 	private settingsService = inject(SettingsService);
 	private cdr = inject(ChangeDetectorRef);
+	private ngZone = inject(NgZone);
 
 	private intersectionObserver: IntersectionObserver | null = null;
 	private lazyLoadObserver: IntersectionObserver | null = null;
@@ -93,36 +95,38 @@ export class ImageReaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	private setupScrollListener() {
-		fromEvent(window, 'scroll', { capture: true })
-			.pipe(
-				throttleTime(100, undefined, { leading: true, trailing: true }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => {
-				const scrollTop =
-					window.scrollY || document.documentElement.scrollTop;
-				const windowHeight = window.innerHeight;
-				const documentHeight = document.documentElement.scrollHeight;
-				const maxScroll = documentHeight - windowHeight;
+		this.ngZone.runOutsideAngular(() => {
+			fromEvent(window, 'scroll', { capture: true })
+				.pipe(
+					throttleTime(100, undefined, { leading: true, trailing: true }),
+					takeUntilDestroyed(this.destroyRef),
+				)
+				.subscribe(() => {
+					const scrollTop =
+						window.scrollY || document.documentElement.scrollTop;
+					const windowHeight = window.innerHeight;
+					const documentHeight = document.documentElement.scrollHeight;
+					const maxScroll = documentHeight - windowHeight;
 
-				if (maxScroll > 0) {
-					const scrollPercentage = Math.max(
-						0,
-						Math.min(100, (scrollTop / maxScroll) * 100),
-					);
-					this.progressChange.emit({
-						pageIndex: this.currentPageIndex,
-						totalPages: this.pages().length,
-						scrollPercentage,
-					});
-				} else {
-					this.progressChange.emit({
-						pageIndex: this.currentPageIndex,
-						totalPages: this.pages().length,
-						scrollPercentage: 100,
-					});
-				}
-			});
+					if (maxScroll > 0) {
+						const scrollPercentage = Math.max(
+							0,
+							Math.min(100, (scrollTop / maxScroll) * 100),
+						);
+						this.progressChange.emit({
+							pageIndex: this.currentPageIndex,
+							totalPages: this.pages().length,
+							scrollPercentage,
+						});
+					} else {
+						this.progressChange.emit({
+							pageIndex: this.currentPageIndex,
+							totalPages: this.pages().length,
+							scrollPercentage: 100,
+						});
+					}
+				});
+		});
 	}
 
 	ngAfterViewInit() {

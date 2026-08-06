@@ -294,27 +294,29 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.lastScrollPosition =
 			window.scrollY || document.documentElement.scrollTop || 0;
 
-		fromEvent(window, 'scroll')
-			.pipe(
-				throttleTime(50, undefined, { leading: true, trailing: true }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => {
-				const currentScroll =
-					window.scrollY || document.documentElement.scrollTop || 0;
+		this.ngZone.runOutsideAngular(() => {
+			fromEvent(window, 'scroll')
+				.pipe(
+					throttleTime(50, undefined, { leading: true, trailing: true }),
+					takeUntilDestroyed(this.destroyRef),
+				)
+				.subscribe(() => {
+					const currentScroll =
+						window.scrollY || document.documentElement.scrollTop || 0;
 
-				const isScrolledDown = currentScroll > 400;
-				const isScrollingUp = currentScroll < this.lastScrollPosition;
+					const isScrolledDown = currentScroll > 400;
+					const isScrollingUp = currentScroll < this.lastScrollPosition;
 
-				if (isScrolledDown && isScrollingUp) {
-					this.showScrollToTopButton.set(true);
-				} else {
-					this.showScrollToTopButton.set(false);
-				}
+					if (isScrolledDown && isScrollingUp) {
+						this.showScrollToTopButton.set(true);
+					} else {
+						this.showScrollToTopButton.set(false);
+					}
 
-				this.lastScrollPosition = currentScroll;
-				this.cdr.markForCheck();
-			});
+					this.lastScrollPosition = currentScroll;
+					this.cdr.detectChanges(); // Use detectChanges instead of markForCheck since we are outside NgZone and want to force the update
+				});
+		});
 	}
 
 	private cleanupDragListeners() {

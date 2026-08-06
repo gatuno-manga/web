@@ -69,24 +69,6 @@ export class ContextMenuComponent {
 		this.contextMenuService.close();
 	}
 
-	@HostListener('window:resize')
-	@HostListener('window:scroll')
-	onWindowEvents() {
-		if (this.state().visible) {
-			// If we scroll, we want to check if it's still in view or close it?
-			// User said "aconpanhe" (follow) -> handled by position: absolute
-			// "quando sair da tela ele desapareça" -> disappear when off screen.
-			// Since it's absolute, it scrolls with page. If it goes off viewport, it disappears naturally.
-			// Do we need to force close it?
-			// Many context menus close on scroll. But if the user wants it to follow the element...
-			// If I scroll the page, the context menu moves up/down.
-			// If I scroll fast, it might go off screen.
-			// If the user meant "close it if I scroll", then I should call close() here.
-			// But "acompanhe" suggests it should stick to the anchor.
-			// So I will NOT close on scroll, just let it move with the document.
-			// However, re-adjust position if window resizes is good.
-		}
-	}
 
 	onItemClick(
 		event: MouseEvent,
