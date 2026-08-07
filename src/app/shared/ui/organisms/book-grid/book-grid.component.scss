@@ -141,3 +141,8 @@
 	gap: 16px;
 	opacity: 0.8;
 }
+
+// Static placeholder for @defer blocks — no animation to avoid animationcancel storms
+.static-placeholder {
+	background-color: rgba(var(--shadow-base), 0.15);
+}

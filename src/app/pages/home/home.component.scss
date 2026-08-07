@@ -90,6 +90,15 @@
   .aurora-orb, .aurora-scene * { animation: none; }
 }
 
+// Disable aurora animations on mobile — Firefox's accessibility notifications
+// fire on every animation frame, causing 400-650ms RefreshDriverTick spikes
+@media (max-width: 768px) {
+  .aurora-orb {
+    animation: none;
+    will-change: auto;
+  }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
