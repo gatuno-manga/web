@@ -198,6 +198,10 @@
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 	user-select: none;
 	z-index: 1;
+	
+	/* Use browser native rendering optimization for offscreen items */
+	content-visibility: auto;
+	contain-intrinsic-size: auto 300px;
 
 	&:hover {
 		transform: translateY(-4px);
