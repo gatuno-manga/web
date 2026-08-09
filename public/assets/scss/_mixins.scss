@@ -19,7 +19,15 @@
 			rgba(255, 255, 255, 0) 100%
 		);
 		animation: skeleton-shimmer 2s infinite;
-		will-change: transform;
+	}
+
+	// O shimmer roda `infinite` e mantém o refresh driver do Firefox acordado
+	// (~90 ticks/s) enquanto houver qualquer skeleton na página. Respeitar
+	// reduced-motion desliga isso por completo para quem optou por menos animação.
+	@media (prefers-reduced-motion: reduce) {
+		&::after {
+			animation: none;
+		}
 	}
 }
 

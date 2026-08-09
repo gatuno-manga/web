@@ -182,7 +182,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		// Apply CSS blur for non-image readers (Text/Document)
 		if (this.privacyService.isBlurred() && !this.isImageReader()) {
-			parts.push('blur(10px)');
+			parts.push('blur(40px)');
 		}
 
 		return parts.length > 0 ? parts.join(' ') : 'none';

@@ -100,11 +100,21 @@
 		height: 180px;
 		padding: 4px;
 
+		// Precisa acompanhar .list do item-book (min-height 150px em <=768px),
+		// senão cada troca do @defer desloca o layout em 30px por card.
+		@media (max-width: 768px) {
+			height: 150px;
+		}
+
 		.cover-skeleton {
 			width: 120px;
 			height: 100%;
 			flex-shrink: 0;
 			border-radius: 8px;
+
+			@media (max-width: 768px) {
+				width: 100px;
+			}
 		}
 
 		.info-skeleton {
@@ -140,9 +150,4 @@
 	align-items: center;
 	gap: 16px;
 	opacity: 0.8;
-}
-
-// Static placeholder for @defer blocks — no animation to avoid animationcancel storms
-.static-placeholder {
-	background-color: rgba(var(--shadow-base), 0.15);
 }
