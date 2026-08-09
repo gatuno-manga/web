@@ -112,7 +112,6 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		@include glass-light;
 		border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
@@ -126,7 +125,6 @@
 		width: 24px;
 		height: 24px;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-		@include glass-light;
 		border: 1px solid rgba(255, 255, 255, 0.2);
 	}
 
@@ -138,7 +136,6 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		@include glass-light;
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		position: relative;
 
@@ -198,10 +195,12 @@
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 	user-select: none;
 	z-index: 1;
-	
-	/* Use browser native rendering optimization for offscreen items */
+
+	/* Use browser native rendering optimization for offscreen items.
+	   O contain-intrinsic-size é definido por tipo de card mais abaixo: um valor
+	   único erra a altura nos dois sentidos (list tem 180px, grid ~380px), e o
+	   erro acumulado ao longo da lista provoca saltos de scroll e reinvalidação. */
 	content-visibility: auto;
-	contain-intrinsic-size: auto 300px;
 
 	&:hover {
 		transform: translateY(-4px);
@@ -222,8 +221,8 @@
 		background-image: var(--card-cover);
 		background-size: cover;
 		background-position: center;
-		filter: saturate(1.2);
-		opacity: 0.15;
+		filter: blur(30px) saturate(1.2);
+		opacity: 0.3;
 		z-index: 0;
 	}
 
@@ -244,6 +243,14 @@
 	align-items: center;
 	flex-direction: column;
 	width: 100%;
+
+	// Coluna >= 200px com capa em aspect-ratio 2/3 (~300px) + info (~78px).
+	contain-intrinsic-size: auto 380px;
+
+	@media (max-width: 768px) {
+		// Coluna >= 140px -> capa ~210px + info ~70px.
+		contain-intrinsic-size: auto 280px;
+	}
 
 	.info {
 		padding: 20px;
@@ -276,6 +283,13 @@
 	width: 100%;
 	border: none;
 	background: transparent;
+
+	// .info é absoluto aqui, então a altura do card é só a capa (2/3).
+	contain-intrinsic-size: auto 300px;
+
+	@media (max-width: 768px) {
+		contain-intrinsic-size: auto 210px;
+	}
 
 	&:hover {
 		transform: scale(1.05);
@@ -330,9 +344,11 @@
 	width: 100%;
 	background-color: var(--secondary-color);
 	align-items: stretch;
+	contain-intrinsic-size: auto 180px;
 
 	@media (max-width: 768px) {
 		min-height: 150px;
+		contain-intrinsic-size: auto 150px;
 	}
 
 	.cover-image-container {

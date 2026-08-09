@@ -19,6 +19,7 @@
 .aurora-orb {
   position: absolute;
   border-radius: 50%;
+  filter: blur(90px);
   will-change: transform;
   &--warm {
     width: 700px;
@@ -90,15 +91,6 @@
   .aurora-orb, .aurora-scene * { animation: none; }
 }
 
-// Disable aurora animations on mobile — Firefox's accessibility notifications
-// fire on every animation frame, causing 400-650ms RefreshDriverTick spikes
-@media (max-width: 768px) {
-  .aurora-orb {
-    animation: none;
-    will-change: auto;
-  }
-}
-
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -159,6 +151,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      filter: blur(15px);
       transform: scale(1.1);
     }
 
@@ -427,5 +420,20 @@
 
   .home-section .section-title {
     font-size: 1.2rem;
+  }
+}
+
+// ─── Firefox Mobile Performance Overrides ─────────────────────────────────────
+// Mesmo tratamento já aplicado em book.component.scss: o backdrop-filter do
+// painel do carrossel fica acima da dobra e cobre uma área grande, e o fundo
+// atrás dele já é uma imagem com blur(15px) — o blur do backdrop praticamente
+// não agrega nada visualmente, mas força readback do backdrop a cada frame.
+@supports (-moz-appearance: none) {
+  @media (pointer: coarse), (max-width: 768px) {
+    .featured-carousel-section .item-content .glass-panel {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: rgb(from var(--app-background-color) r g b / 0.95) !important;
+    }
   }
 }
