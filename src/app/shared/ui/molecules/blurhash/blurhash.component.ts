@@ -22,11 +22,13 @@ class LRUCache<K, V> {
 
 	get(key: K): V | undefined {
 		if (this.cache.has(key)) {
-			const val = this.cache.get(key)!;
-			// move to end to mark as recently used
-			this.cache.delete(key);
-			this.cache.set(key, val);
-			return val;
+			const val = this.cache.get(key);
+			if (val !== undefined) {
+				// move to end to mark as recently used
+				this.cache.delete(key);
+				this.cache.set(key, val);
+				return val;
+			}
 		}
 		return undefined;
 	}

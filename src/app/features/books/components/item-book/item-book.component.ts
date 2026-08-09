@@ -4,13 +4,9 @@ import {
 	ChangeDetectorRef,
 	Component,
 	computed,
-	DestroyRef,
-	ElementRef,
 	effect,
-	HostBinding,
 	inject,
 	input,
-	NgZone,
 	output,
 	signal,
 } from '@angular/core';
@@ -67,9 +63,6 @@ export class ItemBookComponent {
 	private cdr = inject(ChangeDetectorRef);
 	private router = inject(Router);
 	private location = inject(Location);
-	private el = inject(ElementRef);
-	private destroyRef = inject(DestroyRef);
-	private ngZone = inject(NgZone);
 
 	isImageLoaded = signal(false);
 	isDownloaded = signal(false);
