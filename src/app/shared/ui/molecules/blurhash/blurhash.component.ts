@@ -1,6 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
-	AfterViewInit,
 	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
@@ -46,7 +45,9 @@ class LRUCache<K, V> {
 	}
 }
 
-// Global cache to prevent re-decoding the same blurhash multiple times (limited to ~3MB)
+// Global cache to prevent re-decoding the same blurhash multiple times.
+// Com o lado maior limitado a 64px em decodeSize(), cada entrada custa no
+// máximo 64*64*4 = 16KB, então 500 entradas ficam abaixo de ~8MB no pior caso.
 const blurhashCache = new LRUCache<string, Uint8ClampedArray>(500);
 
 @Component({
@@ -56,7 +57,7 @@ const blurhashCache = new LRUCache<string, Uint8ClampedArray>(500);
 	styleUrl: './blurhash.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BlurhashComponent implements AfterViewInit {
+export class BlurhashComponent {
 	hash = input<string>();
 	width = input<number>(32);
 	height = input<number>(32);
@@ -67,6 +68,9 @@ export class BlurhashComponent implements AfterViewInit {
 	canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
 
 	constructor() {
+		// O effect já dispara quando o viewChild do canvas resolve, então ele
+		// cobre sozinho o caso do primeiro render. Um ngAfterViewInit aqui
+		// decodificaria o mesmo hash duas vezes por instância.
 		effect(() => {
 			this.hash();
 			this.width();
@@ -78,8 +82,39 @@ export class BlurhashComponent implements AfterViewInit {
 		});
 	}
 
-	ngAfterViewInit() {
-		this.render();
+	/**
+	 * decode() custa width * height * componentX * componentY * 2 chamadas a
+	 * Math.cos, sem memoização da base. Derivar a altura direto da proporção da
+	 * imagem (32 * height/width) é ilimitado: uma tira de webtoon 800x8000 vira
+	 * decode(32, 320) = ~245 mil Math.cos numa única chamada síncrona na main
+	 * thread. O blurhash é uma aproximação de baixa frequência (no máximo 9x9
+	 * coeficientes) e ainda é escalado por CSS, então limitar o lado maior não
+	 * tem custo visual — mantemos a proporção para o object-fit não recortar.
+	 */
+	private decodeSize(): { width: number; height: number } {
+		const MAX_SIDE = 64;
+		const BASE = 32;
+
+		const w = this.width();
+		const h = this.height();
+		if (!w || !h || w <= 0 || h <= 0) {
+			return { width: BASE, height: BASE };
+		}
+
+		const ratio = h / w;
+		let decodeWidth = BASE;
+		let decodeHeight = Math.round(BASE * ratio);
+
+		// Só a altura pode estourar: a largura é fixa em BASE (< MAX_SIDE).
+		if (decodeHeight > MAX_SIDE) {
+			decodeHeight = MAX_SIDE;
+			decodeWidth = Math.round(MAX_SIDE / ratio);
+		}
+
+		return {
+			width: Math.max(4, decodeWidth),
+			height: Math.max(4, decodeHeight),
+		};
 	}
 
 	private render() {
@@ -92,15 +127,9 @@ export class BlurhashComponent implements AfterViewInit {
 			const canvasEl = this.canvasRef()?.nativeElement;
 			if (!canvasEl) return;
 
-			const widthValue = this.width();
-			const heightValue = this.height();
-
-			// Always decode to a small resolution for performance
-			const decodeWidth = 32;
-			const decodeHeight =
-				widthValue && heightValue
-					? Math.round(32 * (heightValue / widthValue))
-					: 32;
+			// Always decode to a small, bounded resolution for performance
+			const { width: decodeWidth, height: decodeHeight } =
+				this.decodeSize();
 
 			const cacheKey = `${hashValue}-${decodeWidth}-${decodeHeight}-${this.punch()}`;
 			let pixels = blurhashCache.get(cacheKey);
@@ -115,8 +144,11 @@ export class BlurhashComponent implements AfterViewInit {
 				blurhashCache.set(cacheKey, pixels);
 			}
 
-			canvasEl.width = decodeWidth;
-			canvasEl.height = decodeHeight;
+			// Atribuir canvas.width/height realoca o backing store mesmo quando
+			// o valor não muda, então só escrevemos se for diferente.
+			if (canvasEl.width !== decodeWidth) canvasEl.width = decodeWidth;
+			if (canvasEl.height !== decodeHeight)
+				canvasEl.height = decodeHeight;
 
 			const ctx = canvasEl.getContext('2d');
 			if (ctx) {

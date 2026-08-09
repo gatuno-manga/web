@@ -36,6 +36,7 @@
 				alt="Página {{ $index + 1 }}"
 				[attr.width]="page.metadata?.width"
 				[attr.height]="page.metadata?.height"
+				decoding="async"
 				(load)="onImageLoad($index)"
 				appImageFallback
 				[class.loaded]="loadedPages.has($index) && !isBlurred()"
