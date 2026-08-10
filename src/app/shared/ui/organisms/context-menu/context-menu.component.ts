@@ -2,13 +2,14 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
 	ChangeDetectionStrategy,
 	Component,
+	DestroyRef,
 	ElementRef,
 	effect,
-	HostListener,
 	inject,
 	PLATFORM_ID,
 	ViewChild,
 } from '@angular/core';
+import { BodyScrollService } from '@core/services/body-scroll.service';
 import { ContextMenuService } from '@core/services/context-menu.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
@@ -22,8 +23,10 @@ import { IconsComponent } from '@ui/atoms/icons/icons.component';
 })
 export class ContextMenuComponent {
 	private contextMenuService = inject(ContextMenuService);
+	private bodyScrollService = inject(BodyScrollService);
 	private elementRef = inject(ElementRef);
 	private platformId = inject(PLATFORM_ID);
+	private destroyRef = inject(DestroyRef);
 
 	state = this.contextMenuService.state;
 
@@ -34,28 +37,30 @@ export class ContextMenuComponent {
 			if (this.state().visible) {
 				// Logic to keep menu within viewport bounds could go here
 				// We need to wait for render to get dimensions
-				setTimeout(() => this.adjustPosition(), 0);
-				this.lockScroll();
+				if (isPlatformBrowser(this.platformId)) {
+					requestAnimationFrame(() => this.adjustPosition());
+				}
+				this.bodyScrollService.disableScroll();
 			} else {
-				this.unlockScroll();
+				this.bodyScrollService.enableScroll();
 			}
 		});
-	}
 
-	private lockScroll(): void {
+		// Registrado fora do binding do Angular: num app zoneless, um
+		// @HostListener dispararia um ciclo de change detection global a
+		// cada clique da aplicação, mesmo com o menu fechado.
 		if (isPlatformBrowser(this.platformId)) {
-			document.body.style.overflow = 'hidden';
+			const handler = (event: Event) =>
+				this.onDocumentClick(event as MouseEvent);
+			document.addEventListener('click', handler);
+			document.addEventListener('contextmenu', handler);
+			this.destroyRef.onDestroy(() => {
+				document.removeEventListener('click', handler);
+				document.removeEventListener('contextmenu', handler);
+			});
 		}
 	}
 
-	private unlockScroll(): void {
-		if (isPlatformBrowser(this.platformId)) {
-			document.body.style.overflow = '';
-		}
-	}
-
-	@HostListener('document:click', ['$event'])
-	@HostListener('document:contextmenu', ['$event'])
 	onDocumentClick(event: MouseEvent) {
 		if (
 			this.state().visible &&

@@ -1,5 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
+	afterNextRender,
 	computed,
 	Injectable,
 	inject,
@@ -76,20 +77,28 @@ export class NotificationService {
 
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
-			this.dbPromise = openDB<GatunoNotificationsDB>(
-				'GatunoNotificationsDB',
-				1,
-				{
-					upgrade(db) {
-						const store = db.createObjectStore('notifications', {
-							keyPath: 'id',
-						});
-						store.createIndex('by-date', 'createdAt');
+			// Adiado para depois do primeiro render: abrir o IndexedDB e
+			// percorrer o cursor do histórico não precisa competir com o
+			// bootstrap/hydration inicial da aplicação.
+			afterNextRender(() => {
+				this.dbPromise = openDB<GatunoNotificationsDB>(
+					'GatunoNotificationsDB',
+					1,
+					{
+						upgrade(db) {
+							const store = db.createObjectStore(
+								'notifications',
+								{
+									keyPath: 'id',
+								},
+							);
+							store.createIndex('by-date', 'createdAt');
+						},
 					},
-				},
-			);
+				);
 
-			this.loadHistory();
+				this.loadHistory();
+			});
 		}
 	}
 
