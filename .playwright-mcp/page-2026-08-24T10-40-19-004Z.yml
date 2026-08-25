@@ -1,0 +1,1266 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img "MangaDex logo" [ref=e8]
+          - img "MangaDex" [ref=e9]
+        - button [ref=e10] [cursor=pointer]
+      - link "Home" [ref=e12] [cursor=pointer]:
+        - /url: /
+      - link "Feed New" [ref=e20] [cursor=pointer]:
+        - /url: /feed
+        - generic [ref=e21]:
+          - generic [ref=e25]: Feed
+          - paragraph [ref=e27]: New
+      - generic [ref=e28]:
+        - generic [ref=e29]: Follows
+        - link "Updates" [ref=e34] [cursor=pointer]:
+          - /url: /titles/feed
+        - link "Library" [ref=e37] [cursor=pointer]:
+          - /url: /titles/follows
+        - link "MDLists" [ref=e40] [cursor=pointer]:
+          - /url: /my/lists
+        - link "My Groups" [ref=e43] [cursor=pointer]:
+          - /url: /my/groups
+        - link "Reading History" [ref=e46] [cursor=pointer]:
+          - /url: /my/history
+      - generic [ref=e49]:
+        - generic [ref=e50]: Titles
+        - link "Advanced Search" [ref=e55] [cursor=pointer]:
+          - /url: /titles
+        - link "Recently Added" [ref=e58] [cursor=pointer]:
+          - /url: /titles/recent
+        - link "Latest Updates" [ref=e61] [cursor=pointer]:
+          - /url: /titles/latest
+        - link "Random" [ref=e64] [cursor=pointer]:
+          - /url: /title/random
+      - generic [ref=e67]:
+        - generic [ref=e68]: Community
+        - link "Forums" [ref=e73] [cursor=pointer]:
+          - /url: https://forums.mangadex.org
+        - link "Groups" [ref=e76] [cursor=pointer]:
+          - /url: /groups
+      - generic [ref=e79]:
+        - generic [ref=e80]: MangaDex
+        - link "Notice 3" [ref=e85] [cursor=pointer]:
+          - /url: /notice
+          - generic [ref=e86]:
+            - generic [ref=e87]: Notice
+            - paragraph [ref=e89]: "3"
+        - link "Community Guidelines" [ref=e90] [cursor=pointer]:
+          - /url: /guidelines
+        - link "About Us" [ref=e93] [cursor=pointer]:
+          - /url: /about
+        - link "Contact" [ref=e96] [cursor=pointer]:
+          - /url: /contact
+        - link "Advertise" [ref=e99] [cursor=pointer]:
+          - /url: /advertise
+      - generic [ref=e102]:
+        - generic [ref=e103]: Compliance
+        - link "Rightsholders" [ref=e108] [cursor=pointer]:
+          - /url: /rightsholders
+        - link "Copyright Center" [ref=e111] [cursor=pointer]:
+          - /url: /copyright
+      - generic [ref=e115]:
+        - separator [ref=e116]
+        - generic [ref=e117]:
+          - link "X/Twitter" [ref=e118] [cursor=pointer]:
+            - /url: https://twitter.com/MangaDex
+          - link "Instagram" [ref=e121] [cursor=pointer]:
+            - /url: https://www.instagram.com/mangadexofficial
+          - link "System status" [ref=e124] [cursor=pointer]:
+            - /url: https://status.mangadex.org
+        - generic "7334ba6c" [ref=e127]: v2026.8.19
+        - generic [ref=e128]: © MangaDex 2026
+        - link "Terms & Policies" [ref=e130] [cursor=pointer]:
+          - /url: /compliance
+        - generic [ref=e132]:
+          - img "Visa" [ref=e133]
+          - img "Mastercard" [ref=e134]
+          - img "American Express" [ref=e135]
+    - generic [ref=e136]:
+      - generic [ref=e139]:
+        - generic [ref=e140]:
+          - button "Open sidebar" [ref=e141] [cursor=pointer]
+          - link [ref=e142] [cursor=pointer]:
+            - /url: /
+            - img "MangaDex logo" [ref=e143]
+            - img "MangaDex" [ref=e144]
+        - generic [ref=e145]:
+          - generic [ref=e147]:
+            - textbox "Search" [ref=e149]
+            - generic [ref=e154]:
+              - generic [ref=e155]: Ctrl
+              - generic [ref=e156]: K
+            - generic: Enter a search query...
+          - button [ref=e158] [cursor=pointer]
+      - generic [ref=e164]:
+        - generic [ref=e165]:
+          - button [ref=e166] [cursor=pointer]
+          - heading "Advanced Search" [level=2] [ref=e167]
+        - generic [ref=e168]:
+          - textbox "Search" [ref=e170]
+          - button "Show filters" [ref=e175] [cursor=pointer]
+        - generic [ref=e176]:
+          - button "Reset filters" [disabled]
+          - button "I'm feeling lucky" [ref=e177] [cursor=pointer]
+          - button "Search" [ref=e178] [cursor=pointer]
+        - generic [ref=e180]:
+          - generic [ref=e181] [cursor=pointer]
+          - generic [ref=e184] [cursor=pointer]
+          - generic [ref=e187] [cursor=pointer]
+        - link [ref=e192] [cursor=pointer]:
+          - /url: https://store.steampowered.com/app/3133650/?utm_source=MangaDex_Beach&utm_campaign=MangaDex
+          - img "mangadex_M_beach" [ref=e193]
+        - generic [ref=e194]:
+          - generic [ref=e195]:
+            - generic [ref=e196]:
+              - link [ref=e197] [cursor=pointer]:
+                - /url: /title/439a50ea-40f1-4e90-9a50-e1aa36f110f2/donna-kakkou-demo-shite-kureru-kanojo
+                - img "Japanese flag icon" [ref=e198]
+                - text: Donna Kakkou demo Shite Kureru Kanojo
+              - link [ref=e200] [cursor=pointer]:
+                - /url: /title/439a50ea-40f1-4e90-9a50-e1aa36f110f2/donna-kakkou-demo-shite-kureru-kanojo
+                - img "Cover image" [ref=e201]
+              - generic [ref=e202]: Ongoing
+              - generic [ref=e207]:
+                - generic [ref=e208]: Suggestive
+                - link "Web Comic" [ref=e209] [cursor=pointer]:
+                  - /url: /tag/e197df38-d0e7-43b5-9b09-2842d0c326dd/web-comic
+              - generic [ref=e210]:
+                - generic [ref=e211]: "8.13"
+                - generic "2366" [ref=e214]: 2,366
+                - generic [ref=e217]: N/A
+                - button "1" [ref=e222] [cursor=pointer]
+            - generic [ref=e227]:
+              - link [ref=e228] [cursor=pointer]:
+                - /url: /title/e0766c87-16e6-414f-90e4-3efc1c7c2a1d/kimi-ga-deneb-ni-hikaru-made
+                - img "Japanese flag icon" [ref=e229]
+                - text: Kimi ga Deneb ni Hikaru Made
+              - link [ref=e231] [cursor=pointer]:
+                - /url: /title/e0766c87-16e6-414f-90e4-3efc1c7c2a1d/kimi-ga-deneb-ni-hikaru-made
+                - img "Cover image" [ref=e232]
+              - generic [ref=e233]: Ongoing
+              - generic [ref=e238] [cursor=pointer]:
+                - link "Girls' Love" [ref=e239]:
+                  - /url: /tag/a3c67850-4684-404e-9b7f-c69850ee5da6/girls-love
+                - link "Drama" [ref=e240]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "School Life" [ref=e241]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Slice of Life" [ref=e242]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - link "Music" [ref=e243]:
+                  - /url: /tag/f42fbf9e-188a-447b-9fdc-f19dc1e4d685/music
+                - text: MORE
+              - generic [ref=e244]:
+                - generic [ref=e245]: "8.40"
+                - generic "1110" [ref=e248]: 1,110
+                - generic [ref=e251]: N/A
+                - button "3" [ref=e256] [cursor=pointer]
+              - paragraph [ref=e262]: Raika, who loves helping people, and Atori, who adores musicals, are childhood friends. Since they were little, the two of them would put on plays just for each other, with no audience. Raika always thought that Atori's acting was impressive. Raika thought that if Atori loved it so much, she should join the drama club. But Atori wouldn't hear of it, saying, “Raika isn't in the drama club,” and “It's enough that Raika watches me.” Then, due to certain circumstances, Atori ends up taking the stage.
+            - generic [ref=e263]:
+              - link [ref=e264] [cursor=pointer]:
+                - /url: /title/3bc7236f-4eb0-43f1-bd4f-16085e98805a/taidana-akuyaku-kizoku-no-ore-ni-kon-yaku-haki-sareta-akuyaku-reijou-ga-totsuidara-saikyou-no-fuufu
+                - img "Japanese flag icon" [ref=e265]
+                - text: Taidana Akuyaku Kizoku no Ore ni, Kon'yaku Haki Sareta Akuyaku Reijou ga Totsuidara Saikyou no Fuufu ni Narimashita
+              - link [ref=e267] [cursor=pointer]:
+                - /url: /title/3bc7236f-4eb0-43f1-bd4f-16085e98805a/taidana-akuyaku-kizoku-no-ore-ni-kon-yaku-haki-sareta-akuyaku-reijou-ga-totsuidara-saikyou-no-fuufu
+                - img "Cover image" [ref=e268]
+              - generic [ref=e269]: Ongoing
+              - generic [ref=e274] [cursor=pointer]:
+                - generic [ref=e275]: Suggestive
+                - link "Reincarnation" [ref=e276]:
+                  - /url: /tag/0bc90acb-ccc1-44ca-a34a-b9f3a73259d0/reincarnation
+                - link "Romance" [ref=e277]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Magic" [ref=e278]:
+                  - /url: /tag/a1f53773-c69a-4ce5-8cab-fffcd90b1565/magic
+                - link "Isekai" [ref=e279]:
+                  - /url: /tag/ace04997-f6bd-436e-b261-779182193d3d/isekai
+                - link "Drama" [ref=e280]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "Fantasy" [ref=e281]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Villainess" [ref=e282]:
+                  - /url: /tag/d14322ac-4d6f-4e9b-afd9-629d5f4d8a41/villainess
+                - link "Adaptation" [ref=e283]:
+                  - /url: /tag/f4122d1c-3b44-44d0-9936-ff7502c39ad3/adaptation
+                - text: MORE
+              - generic [ref=e284]:
+                - generic [ref=e285]: "8.45"
+                - generic "71380" [ref=e288]: 71k
+                - generic [ref=e291]: N/A
+                - button "65" [ref=e296] [cursor=pointer]
+              - generic [ref=e301]:
+                - paragraph [ref=e302]: Alban realized he had been reincarnated as the villainous noble in a certain novel. Just as he began training in swordsmanship and magic to avoid defeat by the protagonist, he learned that Leticia, a noblewoman surrounded by nasty rumors, was to become his wife!
+                - paragraph [ref=e303]: He was nervous about what kind of "evil woman" she might be... but, upon meeting her, he found an incredibly pure girl — angelic, and exactly his type! Alban, forgetting all about avoiding his doom due to her adorableness, resolved to take revenge on the mastermind who had set up his beloved wife!
+                - paragraph [ref=e304]: Using their villainous reputation to their advantage, they set out to lure the culprit, but... will they succeed?
+                - separator [ref=e305]
+                - paragraph [ref=e306]:
+                  - link "Original Web Novel" [ref=e307] [cursor=pointer]:
+                    - /url: https://ncode.syosetu.com/n5938ii/
+            - generic [ref=e308]:
+              - link [ref=e309] [cursor=pointer]:
+                - /url: /title/841358dd-887a-402d-bb83-fe8bf59bfff9/love-interest-zone
+                - img "Korean flag icon" [ref=e310]
+                - text: Love Interest Zone
+              - link [ref=e312] [cursor=pointer]:
+                - /url: /title/841358dd-887a-402d-bb83-fe8bf59bfff9/love-interest-zone
+                - img "Cover image" [ref=e313]
+              - generic [ref=e314]: Completed
+              - generic [ref=e319] [cursor=pointer]:
+                - link "Long Strip" [ref=e320]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Romance" [ref=e321]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Boys' Love" [ref=e322]:
+                  - /url: /tag/5920b825-4181-4a17-beeb-9918b0ff7a30/boys-love
+                - link "Drama" [ref=e323]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "School Life" [ref=e324]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Fantasy" [ref=e325]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Full Color" [ref=e326]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - text: MORE
+              - generic [ref=e327]:
+                - generic [ref=e328]: "8.17"
+                - generic "170" [ref=e331]
+                - generic [ref=e334]: N/A
+                - button "0" [ref=e339] [cursor=pointer]
+              - paragraph [ref=e345]: Myungha Tae is going to die in 300 days. Well… maybe. After getting sucked into his friend’s novel, "Love Interest Zone," 29-year-old Myungha becomes a 19-year-old high schooler again with one mission—make Yeowoon Cha happy or die. With only 300 days to succeed, Myungha must break past Yeowoon’s barriers and prevent him from experiencing the same tragic fate as he did in the novel. But with Yeowoon’s favorability toward him in the negatives, will he be able to survive?
+            - generic [ref=e346]:
+              - link [ref=e347] [cursor=pointer]:
+                - /url: /title/1c31adbb-e6e1-4cec-a3d8-da603257049b/amber-alert
+                - img "Korean flag icon" [ref=e348]
+                - text: Amber Alert
+              - link [ref=e350] [cursor=pointer]:
+                - /url: /title/1c31adbb-e6e1-4cec-a3d8-da603257049b/amber-alert
+                - img "Cover image" [ref=e351]
+              - generic [ref=e352]: Ongoing
+              - generic [ref=e357] [cursor=pointer]:
+                - generic [ref=e358]: Erotica
+                - link "Action" [ref=e359]:
+                  - /url: /tag/391b0423-d847-456f-aff0-8b0cfc03066b/action
+                - link "Psychological" [ref=e360]:
+                  - /url: /tag/3b60b75c-a2d7-4860-ab56-05f391bb889c/psychological
+                - link "Long Strip" [ref=e361]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Romance" [ref=e362]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Boys' Love" [ref=e363]:
+                  - /url: /tag/5920b825-4181-4a17-beeb-9918b0ff7a30/boys-love
+                - link "Drama" [ref=e364]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "Adaptation" [ref=e365]:
+                  - /url: /tag/f4122d1c-3b44-44d0-9936-ff7502c39ad3/adaptation
+                - link "Full Color" [ref=e366]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - text: MORE
+              - generic [ref=e367]:
+                - generic [ref=e368]: "8.26"
+                - generic "322" [ref=e371]
+                - generic [ref=e374]: N/A
+                - button "0" [ref=e379] [cursor=pointer]
+              - generic [ref=e384]:
+                - paragraph [ref=e385]: Tennessee, a hitman for hire, has stayed true to himself and his past, which has left him at the bottom of the ethics ladder. His life is monotonous, but he has no problem with it. That is, until he unintentionally kidnaps a young child with wildly flowing black hair in a stolen car...
+                - paragraph [ref=e386]:
+                  - emphasis [ref=e387]: “Put it in your mouth.”
+                - paragraph [ref=e388]: Take it all the way down your throat. Without shame, dignity, or self-respect, Amber climaxed, naked and exposed under Tennessee’s gaze. But Tennessee's lips were as firmly locked as before. Still, Amber reminded himself that he had never lost a single battle against Tennessee. It may not have been a victory won fair and square, but isn't a loss by submission still a loss?
+                - paragraph [ref=e389]: What a cold-hearted man. The victory was mine.
+                - paragraph [ref=e390]:
+                  - strong [ref=e391]: "Original Novel:"
+                  - link "RIDI" [ref=e392] [cursor=pointer]:
+                    - /url: https://ridibooks.com/books/3049005297
+                  - text: ","
+                  - link "Bomtoon" [ref=e393] [cursor=pointer]:
+                    - /url: https://www.bomtoon.com/detail/amberalert
+                  - text: ","
+                  - link "Mr Blue" [ref=e394] [cursor=pointer]:
+                    - /url: https://www.mrblue.com/novel/viewcommz0083
+                  - text: ","
+                  - link "Bookcube" [ref=e395] [cursor=pointer]:
+                    - /url: https://www.bookcube.com/detail.asp?series_num=920016600
+                - paragraph [ref=e396]:
+                  - link [ref=e397] [cursor=pointer]:
+                    - /url: https://ridibooks.com/books/4928003862
+                    - strong [ref=e398]: Original Webtoon
+            - generic [ref=e399]:
+              - link [ref=e400] [cursor=pointer]:
+                - /url: /title/09599e3b-527a-47e3-b847-65c4d609ee7a/watashi-no-shiranai-senpai-no-100-ko-no-koto
+                - img "Japanese flag icon" [ref=e401]
+                - text: Watashi no Shiranai, Senpai no 100 Ko no Koto
+              - link [ref=e403] [cursor=pointer]:
+                - /url: /title/09599e3b-527a-47e3-b847-65c4d609ee7a/watashi-no-shiranai-senpai-no-100-ko-no-koto
+                - img "Cover image" [ref=e404]
+              - generic [ref=e405]: Completed
+              - generic [ref=e410] [cursor=pointer]:
+                - link "Romance" [ref=e411]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Comedy" [ref=e412]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "School Life" [ref=e413]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Slice of Life" [ref=e414]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - link "Adaptation" [ref=e415]:
+                  - /url: /tag/f4122d1c-3b44-44d0-9936-ff7502c39ad3/adaptation
+                - text: MORE
+              - generic [ref=e416]:
+                - generic [ref=e417]: "8.00"
+                - generic "13591" [ref=e420]: 13k
+                - generic [ref=e423]: N/A
+                - button "29" [ref=e428] [cursor=pointer]
+              - generic [ref=e433]:
+                - paragraph [ref=e434]: 「Senpai, you dropped this.」
+                - paragraph [ref=e435]: "That sudden call marked the beginning of a relationship of an aloof senpai and his cute overenthusiastic kouhai-chan. Despite not having any contact previously except for using the same train station to get to school, senpai unwillingly agreed to a promise: from that day on, they would have to answer one question every day no matter what it was without telling any lie."
+                - paragraph [ref=e436]: The disinterested senpai who doesn’t want to give up on his peaceful commuting time, and the passionate kouhai-chan who doesn’t want to give up on the only student taking the same train as her. This is the story of how their relationship will progress with just one question a day.
+                - paragraph [ref=e437]: A new fluffy senpai- kouhai romcom from the popular web novel!
+            - generic [ref=e438]:
+              - link [ref=e439] [cursor=pointer]:
+                - /url: /title/aad826a4-07b6-4717-af59-ee6f45a24312/kimi-ni-sasageru-otokomae
+                - img "Japanese flag icon" [ref=e440]
+                - text: Kimi ni Sasageru Otokomae
+              - link [ref=e442] [cursor=pointer]:
+                - /url: /title/aad826a4-07b6-4717-af59-ee6f45a24312/kimi-ni-sasageru-otokomae
+                - img "Cover image" [ref=e443]
+              - generic [ref=e444]: Ongoing
+              - generic [ref=e449]:
+                - link "Romance" [ref=e450] [cursor=pointer]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Comedy" [ref=e451] [cursor=pointer]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "School Life" [ref=e452] [cursor=pointer]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Slice of Life" [ref=e453] [cursor=pointer]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+              - generic [ref=e454]:
+                - generic [ref=e455]: "8.48"
+                - generic "6338" [ref=e458]: 6,338
+                - generic [ref=e461]: N/A
+                - button "21" [ref=e466] [cursor=pointer]
+              - paragraph [ref=e472]: "\"I'm going to tell you I love you every day!\" A younger handsome guy confesses his love on their first meeting! An uneven love story between a good looking boy and a manly girl begins."
+            - generic [ref=e473]:
+              - link [ref=e474] [cursor=pointer]:
+                - /url: /title/38554690-65d0-476f-909a-9b14b3c04e60/kinenbi-manga
+                - img "Japanese flag icon" [ref=e475]
+                - text: Kinenbi Manga
+              - link [ref=e477] [cursor=pointer]:
+                - /url: /title/38554690-65d0-476f-909a-9b14b3c04e60/kinenbi-manga
+                - img "Cover image" [ref=e478]
+              - generic [ref=e479]: Completed
+              - generic [ref=e484] [cursor=pointer]:
+                - link "Psychological" [ref=e485]:
+                  - /url: /tag/3b60b75c-a2d7-4860-ab56-05f391bb889c/psychological
+                - link "Comedy" [ref=e486]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Girls' Love" [ref=e487]:
+                  - /url: /tag/a3c67850-4684-404e-9b7f-c69850ee5da6/girls-love
+                - link "Web Comic" [ref=e488]:
+                  - /url: /tag/e197df38-d0e7-43b5-9b09-2842d0c326dd/web-comic
+                - link "Slice of Life" [ref=e489]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - link "Supernatural" [ref=e490]:
+                  - /url: /tag/eabc5b4c-6aff-42f3-b657-3e90cbd00b75/supernatural
+                - link "Full Color" [ref=e491]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - text: MORE
+              - generic [ref=e492]:
+                - generic [ref=e493]: "8.37"
+                - generic "5010" [ref=e496]: 5,010
+                - generic [ref=e499]: N/A
+                - button "9" [ref=e504] [cursor=pointer]
+              - paragraph [ref=e510]: A manga about celebrating all the different holidays a year has.
+            - generic [ref=e511]:
+              - link [ref=e512] [cursor=pointer]:
+                - /url: /title/aceca98f-04df-4d5c-8438-8911ca70decb/enma-no-kyoushitsu
+                - img "Japanese flag icon" [ref=e513]
+                - text: Enma no Kyoushitsu
+              - link [ref=e515] [cursor=pointer]:
+                - /url: /title/aceca98f-04df-4d5c-8438-8911ca70decb/enma-no-kyoushitsu
+                - img "Cover image" [ref=e516]
+              - generic [ref=e517]: Ongoing
+              - generic [ref=e522]:
+                - link "School Life" [ref=e523] [cursor=pointer]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Fantasy" [ref=e524] [cursor=pointer]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Supernatural" [ref=e525] [cursor=pointer]:
+                  - /url: /tag/eabc5b4c-6aff-42f3-b657-3e90cbd00b75/supernatural
+              - generic [ref=e526]:
+                - generic [ref=e527]: "8.17"
+                - generic "126" [ref=e530]
+                - generic [ref=e533]: N/A
+                - button "0" [ref=e538] [cursor=pointer]
+              - paragraph [ref=e544]: 地獄の人口過密問題を解決するため、親父である閻魔大王によって、“教師”として地上に送り込まれた二代目閻魔大王こと「怨馬典明」。だが、赴任した学校は問題児が多いことで有名な冥童高校。人間の価値観で生きていない怨馬典明は生徒たちに何を語るのか――。果たして、それは『指導』か、それとも『裁き』か。
+            - generic [ref=e545]:
+              - link [ref=e546] [cursor=pointer]:
+                - /url: /title/fffbfac3-b7ad-41ee-9581-b4d90ecec941/grand-blue-dreaming
+                - img "Japanese flag icon" [ref=e547]
+                - text: Grand Blue Dreaming
+              - link [ref=e549] [cursor=pointer]:
+                - /url: /title/fffbfac3-b7ad-41ee-9581-b4d90ecec941/grand-blue-dreaming
+                - img "Cover image" [ref=e550]
+              - generic [ref=e551]: Ongoing
+              - generic [ref=e556] [cursor=pointer]:
+                - generic [ref=e557]: Suggestive
+                - link "Romance" [ref=e558]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Comedy" [ref=e559]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Harem" [ref=e560]:
+                  - /url: /tag/aafb99c1-7f60-43fa-b75f-fc9502ce29c7/harem
+                - link "Drama" [ref=e561]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "School Life" [ref=e562]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Slice of Life" [ref=e563]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - text: MORE
+              - generic [ref=e564]:
+                - generic [ref=e565]: "9.47"
+                - generic "80605" [ref=e568]: 80k
+                - generic [ref=e571]: N/A
+                - button "365" [ref=e576] [cursor=pointer]
+              - generic [ref=e581]:
+                - paragraph [ref=e582]: A new life begins for Kitahara Iori as he begins his college career near the ocean in Izu city, full of excitement for his new life. He will be moving into his uncle's diving store "Grand Blue." There he finds the ocean, beautiful women, and men that love diving and alcohol. Will Iori be able to live his dream college life?
+                - separator [ref=e583]
+                - paragraph [ref=e584]:
+                  - strong [ref=e585]: "Links:"
+                - list [ref=e586]:
+                  - listitem [ref=e587]:
+                    - text: Alternative Official English -
+                    - link "K MANGA" [ref=e588] [cursor=pointer]:
+                      - /url: https://kmanga.kodansha.com/title/10058/episode/318585
+                    - text: (U.S. Only),
+                    - link "INKR" [ref=e589] [cursor=pointer]:
+                      - /url: https://comics.inkr.com/title/306-grand-blue-dreaming
+            - generic [ref=e590]:
+              - link [ref=e591] [cursor=pointer]:
+                - /url: /title/c679bf28-e054-4bb7-93e6-18c089ee79f1/chikasugiru-futari
+                - img "Japanese flag icon" [ref=e592]
+                - text: Chikasugiru Futari
+              - link [ref=e594] [cursor=pointer]:
+                - /url: /title/c679bf28-e054-4bb7-93e6-18c089ee79f1/chikasugiru-futari
+                - img "Cover image" [ref=e595]
+              - generic [ref=e596]: Ongoing
+              - generic [ref=e601] [cursor=pointer]:
+                - generic [ref=e602]: Suggestive
+                - link "Romance" [ref=e603]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Comedy" [ref=e604]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "School Life" [ref=e605]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Slice of Life" [ref=e606]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - text: MORE
+              - generic [ref=e607]:
+                - generic [ref=e608]: "8.39"
+                - generic "27385" [ref=e611]: 27k
+                - generic [ref=e614]: N/A
+                - button "52" [ref=e619] [cursor=pointer]
+              - paragraph [ref=e625]: From the moment they were born, they’ve been together through everything—waking hours, sleeping, and even bath time. At this point, calling them "childhood friends" feels a bit too soft. No, these two are "Sh**-tier Friends." More than childhood friends, but less than lovers. Having come full circle, they're basically an old married couple.
+            - generic [ref=e626]:
+              - link [ref=e627] [cursor=pointer]:
+                - /url: /title/deb17077-6e45-4c60-b87d-5e323eac8385/i-made-a-harem-in-the-underworld
+                - img "Chinese (Simplified) flag icon" [ref=e628]
+                - text: I Made a Harem in the Underworld
+              - link [ref=e630] [cursor=pointer]:
+                - /url: /title/deb17077-6e45-4c60-b87d-5e323eac8385/i-made-a-harem-in-the-underworld
+                - img "Cover image" [ref=e631]
+              - generic [ref=e632]: Hiatus
+              - generic [ref=e637] [cursor=pointer]:
+                - generic [ref=e638]: Suggestive
+                - link "Action" [ref=e639]:
+                  - /url: /tag/391b0423-d847-456f-aff0-8b0cfc03066b/action
+                - link "Long Strip" [ref=e640]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Comedy" [ref=e641]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Adventure" [ref=e642]:
+                  - /url: /tag/87cc87cd-a395-47af-b27a-93258283bbc6/adventure
+                - link "Harem" [ref=e643]:
+                  - /url: /tag/aafb99c1-7f60-43fa-b75f-fc9502ce29c7/harem
+                - link "Isekai" [ref=e644]:
+                  - /url: /tag/ace04997-f6bd-436e-b261-779182193d3d/isekai
+                - link "Fantasy" [ref=e645]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Web Comic" [ref=e646]:
+                  - /url: /tag/e197df38-d0e7-43b5-9b09-2842d0c326dd/web-comic
+                - link "Full Color" [ref=e647]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - text: MORE
+              - generic [ref=e648]:
+                - generic [ref=e649]: "7.71"
+                - generic "2448" [ref=e652]: 2,448
+                - generic [ref=e655]: N/A
+                - button "0" [ref=e660] [cursor=pointer]
+              - paragraph [ref=e666]: Zhang Xiao entered a game called “King of Hell”, but after his death, he came back to life in another body. From then on, he counterattacked and reached the peak of his life. Can he overturn the conspiracy of the whole hell on his own and conquer all the girls here!
+            - generic [ref=e667]:
+              - link [ref=e668] [cursor=pointer]:
+                - /url: /title/ffed9e72-03b6-4ac1-9686-3299ee28a379/paradise-hell
+                - img "Japanese flag icon" [ref=e669]
+                - text: Paradise Hell
+              - link [ref=e671] [cursor=pointer]:
+                - /url: /title/ffed9e72-03b6-4ac1-9686-3299ee28a379/paradise-hell
+                - img "Cover image" [ref=e672]
+              - generic [ref=e673]: Completed
+              - generic [ref=e678] [cursor=pointer]:
+                - generic [ref=e679]: Erotica
+                - generic [ref=e680]: Gore
+                - generic [ref=e681]: Sexual Violence
+                - link "Action" [ref=e682]:
+                  - /url: /tag/391b0423-d847-456f-aff0-8b0cfc03066b/action
+                - link "Demons" [ref=e683]:
+                  - /url: /tag/39730448-9a5f-48a2-85b0-a70db87b1233/demons
+                - link "Comedy" [ref=e684]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Drama" [ref=e685]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "Horror" [ref=e686]:
+                  - /url: /tag/cdad7e68-1419-41dd-bdce-27753074a640/horror
+                - text: MORE
+              - generic [ref=e687]:
+                - generic [ref=e688]: "6.71"
+                - generic "9205" [ref=e691]: 9,205
+                - generic [ref=e694]: N/A
+                - button "31" [ref=e699] [cursor=pointer]
+              - generic [ref=e704]:
+                - paragraph [ref=e705]: Shizuka Kamishiro is 21 years old, with no money, no friends, and no girlfriend. He was stuck at home, after he got scammed by a college acquaintance who wasn't even really a friend, when he heard a loud gasp from his neighbor, a college girl who was fucking her boyfriend while he's lying on his mattress suffering all alone. The absurd difference in circumstances drove him crazy, and he punched the wall so hard that he broke through. The neighbors came over, and her boyfriend beat him almost senseless. As despair and dark emotions overwhelmed him, a messenger from the demon world appeared. Immediately, the boyfriend's head flew off, and the demon told him, "So, go ahead and XXX this girl."
+                - paragraph [ref=e706]: "(Source: Futabasha, translated)"
+            - generic [ref=e707]:
+              - link [ref=e708] [cursor=pointer]:
+                - /url: /title/c4ca02fb-8378-433b-8049-fbbea5d25cba/haimiya-senpai-wa-kowakute-kawaii
+                - img "Japanese flag icon" [ref=e709]
+                - text: Haimiya-senpai wa Kowakute Kawaii
+              - link [ref=e711] [cursor=pointer]:
+                - /url: /title/c4ca02fb-8378-433b-8049-fbbea5d25cba/haimiya-senpai-wa-kowakute-kawaii
+                - img "Cover image" [ref=e712]
+              - generic [ref=e713]: Ongoing
+              - generic [ref=e718] [cursor=pointer]:
+                - link "Romance" [ref=e719]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Comedy" [ref=e720]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Drama" [ref=e721]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "School Life" [ref=e722]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Slice of Life" [ref=e723]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - text: MORE
+              - generic [ref=e724]:
+                - generic [ref=e725]: "9.43"
+                - generic "120165" [ref=e728]: 120k
+                - generic [ref=e731]: N/A
+                - button "88" [ref=e736] [cursor=pointer]
+              - paragraph [ref=e742]: At my high school, Haimiya-senpai is feared by all and considered too scary. This is apparently due to her intimidating appearance and blunt way of speaking... and those sparkling piercings! The long, gray wolf-cut hair! Even her Kansai accent is intimidating!!! But for some reason, this scary senpai treats me kindly...? As "scary" turns into "cute," this scary (heart-pounding) senpai rom-com begins!
+            - generic [ref=e743]:
+              - link [ref=e744] [cursor=pointer]:
+                - /url: /title/4f87fb0e-01b6-4248-88f9-1ed661d20c3b/konoyude-anatato
+                - img "Japanese flag icon" [ref=e745]
+                - text: Konoyude, Anatato
+              - link [ref=e747] [cursor=pointer]:
+                - /url: /title/4f87fb0e-01b6-4248-88f9-1ed661d20c3b/konoyude-anatato
+                - img "Cover image" [ref=e748]
+              - generic [ref=e749]: Completed
+              - generic [ref=e754] [cursor=pointer]:
+                - generic [ref=e755]: Suggestive
+                - link "Romance" [ref=e756]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Girls' Love" [ref=e757]:
+                  - /url: /tag/a3c67850-4684-404e-9b7f-c69850ee5da6/girls-love
+                - link "Slice of Life" [ref=e758]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - text: MORE
+              - generic [ref=e759]:
+                - generic [ref=e760]: "8.04"
+                - generic "2116" [ref=e763]: 2,116
+                - generic [ref=e766]: N/A
+                - button "0" [ref=e771] [cursor=pointer]
+              - generic [ref=e776]:
+                - paragraph [ref=e777]: “I don’t think I could ever live my life with someone else…”
+                - paragraph [ref=e778]: Igarashi Tsubaki is 32 years old. Lately, she's found herself emotionally drained by the casual pressures of her coworkers, who drop comments like, "Aren’t you cutting it close for marriage?" and "Kids are just the cutest.”
+                - paragraph [ref=e779]: Her only true escape is the local bathhouse. But one day, her peaceful sanctuary is interrupted when she meets Izumi, a bright, free-spirited idol. Though initially wary of Izumi’s over enthusiastic personality, Tsubaki slowly begins to open her heart...
+                - paragraph [ref=e780]: Brought to you by Nanbu Kumako and Haruki Yachika, this is a heartwarming story of the life and love of two women.
+            - generic [ref=e781]:
+              - link [ref=e782] [cursor=pointer]:
+                - /url: /title/494868d1-f9d9-405d-82c6-8bb8cfdc3980/hiiragi-chan-to-tomikawa-chan
+                - img "Japanese flag icon" [ref=e783]
+                - text: Hiiragi-chan to Tomikawa-chan
+              - link [ref=e785] [cursor=pointer]:
+                - /url: /title/494868d1-f9d9-405d-82c6-8bb8cfdc3980/hiiragi-chan-to-tomikawa-chan
+                - img "Cover image" [ref=e786]
+              - generic [ref=e787]: Ongoing
+              - generic [ref=e792] [cursor=pointer]:
+                - link "Psychological" [ref=e793]:
+                  - /url: /tag/3b60b75c-a2d7-4860-ab56-05f391bb889c/psychological
+                - link "Comedy" [ref=e794]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Girls' Love" [ref=e795]:
+                  - /url: /tag/a3c67850-4684-404e-9b7f-c69850ee5da6/girls-love
+                - link "4-Koma" [ref=e796]:
+                  - /url: /tag/b11fda93-8f1d-4bef-b2ed-8803d3733170/4-koma
+                - link "Web Comic" [ref=e797]:
+                  - /url: /tag/e197df38-d0e7-43b5-9b09-2842d0c326dd/web-comic
+                - link "Slice of Life" [ref=e798]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - text: MORE
+              - generic [ref=e799]:
+                - generic [ref=e800]: "8.25"
+                - generic "3327" [ref=e803]: 3,327
+                - generic [ref=e806]: N/A
+                - button "9" [ref=e811] [cursor=pointer]
+              - generic [ref=e816]:
+                - paragraph [ref=e817]: Hiiragi-chan is shy and not good at communicating, while Tomikawa-chan is cheerful and sociable. These two, who should be as incompatible as oil and water, meet one day. The days that begin with awkwardness and mutual consideration gradually transform into an irreplaceable everyday life. They're polar opposites who are drawn to each other, and the distance between them gradually closes in this depression × lily comedy.
+                - separator [ref=e818]
+                - paragraph [ref=e819]:
+                  - strong [ref=e820]: "Alt Official Raw:"
+                  - link "X" [ref=e821] [cursor=pointer]:
+                    - /url: https://x.com/search?q=from%3Akore_inu%20%23%E6%9F%8A%E3%81%A1%E3%82%83%E3%82%93%E3%81%A8%E5%AF%8C%E5%B7%9D%E3%81%A1%E3%82%83%E3%82%93&f=live
+            - generic [ref=e822]:
+              - link [ref=e823] [cursor=pointer]:
+                - /url: /title/394398f2-6287-48c7-9713-cd1759c97291/xue-ji-yu-qishi
+                - img "Chinese (Simplified) flag icon" [ref=e824]
+                - text: The Blood Princess and the Knight
+              - link [ref=e826] [cursor=pointer]:
+                - /url: /title/394398f2-6287-48c7-9713-cd1759c97291/xue-ji-yu-qishi
+                - img "Cover image" [ref=e827]
+              - generic [ref=e828]: Ongoing
+              - generic [ref=e833] [cursor=pointer]:
+                - generic [ref=e834]: Suggestive
+                - link "Genderswap" [ref=e835]:
+                  - /url: /tag/2bd2e8d0-f146-434a-9b51-fc9ff2c5fe6a/genderswap
+                - link "Action" [ref=e836]:
+                  - /url: /tag/391b0423-d847-456f-aff0-8b0cfc03066b/action
+                - link "Psychological" [ref=e837]:
+                  - /url: /tag/3b60b75c-a2d7-4860-ab56-05f391bb889c/psychological
+                - link "Long Strip" [ref=e838]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Adventure" [ref=e839]:
+                  - /url: /tag/87cc87cd-a395-47af-b27a-93258283bbc6/adventure
+                - link "Drama" [ref=e840]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "Fantasy" [ref=e841]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Vampires" [ref=e842]:
+                  - /url: /tag/d7d1730f-6eb0-4ba6-9437-602cac38664c/vampires
+                - link "Web Comic" [ref=e843]:
+                  - /url: /tag/e197df38-d0e7-43b5-9b09-2842d0c326dd/web-comic
+                - link "Full Color" [ref=e844]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - link "Tragedy" [ref=e845]:
+                  - /url: /tag/f8f62932-27da-4fe4-8ee1-6779a8c5edba/tragedy
+                - text: MORE
+              - generic [ref=e846]:
+                - generic [ref=e847]: "7.81"
+                - generic "23782" [ref=e850]: 23k
+                - generic [ref=e853]: N/A
+                - button "286" [ref=e858] [cursor=pointer]
+              - generic [ref=e863]:
+                - paragraph [ref=e864]: I, who was a sacred knight, was defeated and captured in a battle against the vampire clan.
+                - paragraph [ref=e865]: "\"Oh? Letting you die? In your dreams! Accept my embrace, and in the future, please take care of me, my lovely daughter~\""
+                - paragraph [ref=e866]: The silver-haired Queen of the Vampire Clan lifted my chin and smiled cunningly, her sharp canines drawing closer to my neck…
+                - separator [ref=e867]
+                - paragraph [ref=e868]:
+                  - strong [ref=e869]: "Links:"
+                - list [ref=e870]:
+                  - listitem [ref=e871]:
+                    - link "Alternative raw (Bilibili)" [ref=e872] [cursor=pointer]:
+                      - /url: https://manga.bilibili.com/detail/mc28199
+            - generic [ref=e873]:
+              - link [ref=e874] [cursor=pointer]:
+                - /url: /title/bbed470c-5ca5-45ec-8101-474323387734/survivalism
+                - img "Korean flag icon" [ref=e875]
+                - text: Survivalism
+              - link [ref=e877] [cursor=pointer]:
+                - /url: /title/bbed470c-5ca5-45ec-8101-474323387734/survivalism
+                - img "Cover image" [ref=e878]
+              - generic [ref=e879]: Ongoing
+              - generic [ref=e884] [cursor=pointer]:
+                - generic [ref=e885]: Suggestive
+                - generic [ref=e886]: Gore
+                - link "Sci-Fi" [ref=e887]:
+                  - /url: /tag/256c8bd9-4904-4360-bf4f-508a76d67183/sci-fi
+                - link "Monsters" [ref=e888]:
+                  - /url: /tag/36fd93ea-e8b8-445e-b836-358f02b3d33d/monsters
+                - link "Action" [ref=e889]:
+                  - /url: /tag/391b0423-d847-456f-aff0-8b0cfc03066b/action
+                - link "Long Strip" [ref=e890]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Survival" [ref=e891]:
+                  - /url: /tag/5fff9cde-849c-4d78-aab0-0d52b2ee1d25/survival
+                - link "Adventure" [ref=e892]:
+                  - /url: /tag/87cc87cd-a395-47af-b27a-93258283bbc6/adventure
+                - link "Isekai" [ref=e893]:
+                  - /url: /tag/ace04997-f6bd-436e-b261-779182193d3d/isekai
+                - link "Horror" [ref=e894]:
+                  - /url: /tag/cdad7e68-1419-41dd-bdce-27753074a640/horror
+                - link "Fantasy" [ref=e895]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Full Color" [ref=e896]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - text: MORE
+              - generic [ref=e897]:
+                - generic [ref=e898]: "8.05"
+                - generic "95" [ref=e901]
+                - generic [ref=e904]: N/A
+                - button "1" [ref=e909] [cursor=pointer]
+              - paragraph [ref=e915]: A school bus crashes into an alternative world full of monsters. Amidst the hopeless despair, only the protagonist's Chat AI works.
+            - generic [ref=e916]:
+              - link [ref=e917] [cursor=pointer]:
+                - /url: /title/6ad54367-4165-43ed-9a7d-71179c520180/yani-neko
+                - img "Japanese flag icon" [ref=e918]
+                - text: Yani Neko
+              - link [ref=e920] [cursor=pointer]:
+                - /url: /title/6ad54367-4165-43ed-9a7d-71179c520180/yani-neko
+                - img "Cover image" [ref=e921]
+              - generic [ref=e922]: Ongoing
+              - generic [ref=e927] [cursor=pointer]:
+                - generic [ref=e928]: Suggestive
+                - link "Psychological" [ref=e929]:
+                  - /url: /tag/3b60b75c-a2d7-4860-ab56-05f391bb889c/psychological
+                - link "Animals" [ref=e930]:
+                  - /url: /tag/3de8c75d-8ee3-48ff-98ee-e20a65c86451/animals
+                - link "Comedy" [ref=e931]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Slice of Life" [ref=e932]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - text: MORE
+              - generic [ref=e933]:
+                - generic [ref=e934]: "8.19"
+                - generic "9603" [ref=e937]: 9,603
+                - generic [ref=e940]: N/A
+                - button "31" [ref=e945] [cursor=pointer]
+              - generic [ref=e950]:
+                - paragraph [ref=e951]: Welcome to Yani's apartment. Please don't mind the smell. Yani is a catgirl with a seriously bad smoking habit. Every time she tries to quit, she becomes weak to the cravings and gives in almost instantly. Behind on her rent and unable to hold down a job, her friends and sister rally around to help her out. But when she's using her pee to put out cigarette fires, they may just have their work cut out for them. Will she ever get her life together, or is she doomed to live as a chainsmoking slob forever?
+                - separator [ref=e952]
+                - paragraph [ref=e953]:
+                  - strong [ref=e954]: "Additional Links:"
+                - list [ref=e955]:
+                  - listitem [ref=e956]:
+                    - link "Official X" [ref=e957] [cursor=pointer]:
+                      - /url: https://x.com/yani_neko1111
+            - generic [ref=e958]:
+              - link [ref=e959] [cursor=pointer]:
+                - /url: /title/b232c191-6e14-4522-a1a2-c4b0f688f00d/shinimodori-oujo-wa-ikinobiru-tame-ni-yuri-harem-o-tsukuru-koto-ni-shita
+                - img "Japanese flag icon" [ref=e960]
+                - text: Shinimodori Oujo wa Ikinobiru tame ni Yuri Harem o Tsukuru koto ni shita
+              - link [ref=e962] [cursor=pointer]:
+                - /url: /title/b232c191-6e14-4522-a1a2-c4b0f688f00d/shinimodori-oujo-wa-ikinobiru-tame-ni-yuri-harem-o-tsukuru-koto-ni-shita
+                - img "Cover image" [ref=e963]
+              - generic [ref=e964]: Ongoing
+              - generic [ref=e969] [cursor=pointer]:
+                - generic [ref=e970]: Erotica
+                - generic [ref=e971]: Gore
+                - generic [ref=e972]: Sexual Violence
+                - link "Time Travel" [ref=e973]:
+                  - /url: /tag/292e862b-2d17-4062-90a2-0356caa4ae27/time-travel
+                - link "Loli" [ref=e974]:
+                  - /url: /tag/2d1f5d56-a1e5-4d0d-a961-2193588b08ec/loli
+                - link "Comedy" [ref=e975]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Incest" [ref=e976]:
+                  - /url: /tag/5bd0e105-4481-44ca-b6e7-7544da56b1a3/incest
+                - link "Girls' Love" [ref=e977]:
+                  - /url: /tag/a3c67850-4684-404e-9b7f-c69850ee5da6/girls-love
+                - link "Harem" [ref=e978]:
+                  - /url: /tag/aafb99c1-7f60-43fa-b75f-fc9502ce29c7/harem
+                - link "Fantasy" [ref=e979]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Villainess" [ref=e980]:
+                  - /url: /tag/d14322ac-4d6f-4e9b-afd9-629d5f4d8a41/villainess
+                - text: MORE
+              - generic [ref=e981]:
+                - generic [ref=e982]: "8.36"
+                - generic "64779" [ref=e985]: 64k
+                - generic [ref=e988]: N/A
+                - button "126" [ref=e993] [cursor=pointer]
+              - paragraph [ref=e999]: Marie, a domineering and selfish princess, faced her end under the guillotine's blade after her subjects had enough of her. Yet, after dying, Marie finds herself back to the year before, discovering that no matter what she does she can never escape the fate that awaits her in a year. Eventually, after Marie learns that the only way to escape her own execution is to conquer a large swathe of "romantically troubled" women, she decides to use her own 'royal charisma' to build a yuri harem!
+            - generic [ref=e1000]:
+              - link [ref=e1001] [cursor=pointer]:
+                - /url: /title/dc07afaa-643a-4bf4-a9d0-b21ecc101736/i-met-the-male-lead-in-prison
+                - img "Korean flag icon" [ref=e1002]
+                - text: I Met the Male Lead in Prison
+              - link [ref=e1004] [cursor=pointer]:
+                - /url: /title/dc07afaa-643a-4bf4-a9d0-b21ecc101736/i-met-the-male-lead-in-prison
+                - img "Cover image" [ref=e1005]
+              - generic [ref=e1006]: Ongoing
+              - generic [ref=e1011] [cursor=pointer]:
+                - link "Reincarnation" [ref=e1012]:
+                  - /url: /tag/0bc90acb-ccc1-44ca-a34a-b9f3a73259d0/reincarnation
+                - link "Long Strip" [ref=e1013]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Romance" [ref=e1014]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Reverse Harem" [ref=e1015]:
+                  - /url: /tag/65761a2a-415e-47f3-bef2-a9dababba7a6/reverse-harem
+                - link "Isekai" [ref=e1016]:
+                  - /url: /tag/ace04997-f6bd-436e-b261-779182193d3d/isekai
+                - link "Drama" [ref=e1017]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "Fantasy" [ref=e1018]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Adaptation" [ref=e1019]:
+                  - /url: /tag/f4122d1c-3b44-44d0-9936-ff7502c39ad3/adaptation
+                - link "Full Color" [ref=e1020]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - text: MORE
+              - generic [ref=e1021]:
+                - generic [ref=e1022]: "8.29"
+                - generic "1770" [ref=e1025]: 1,770
+                - generic [ref=e1028]: N/A
+                - button "0" [ref=e1033] [cursor=pointer]
+              - generic [ref=e1038]:
+                - paragraph [ref=e1039]: I met the male lead in the prison. I know he's supposed to be a 19+ tragedy novel male lead, but... Why is he like that?
+                - paragraph [ref=e1040]: "\"Woof! Woof! Woof! Grrr.\""
+                - paragraph [ref=e1041]: It was said that he was cursed to turn into a beast... So, what is it like to awaken from the curse?
+                - paragraph [ref=e1042]: "\"T-t-take responsibility, or d-don't touch me!\""
+                - paragraph [ref=e1043]: I just felt relieved, thinking there wouldn't be any romantic feelings or involvement between me and the male lead.
+                - paragraph [ref=e1044]: "\"One year later. P-please meet me... on the day I get out of here!\""
+                - paragraph [ref=e1045]: Meeting him didn't seem too difficult, so I agreed. So I was released first, but...
+                - paragraph [ref=e1046]: "**"
+                - paragraph [ref=e1047]: ”Come on in. My lovely little sister who's as charming as the flower."
+                - paragraph [ref=e1048]: On the day I was released, the man who approached me turned out to be my brother. I was the villain's sister.
+                - paragraph [ref=e1049]: "\"You went through a lot on my behalf, didn't you? I've been waiting for you.\""
+                - paragraph [ref=e1050]: …Fuck. On top of it all, I’m the precious little sister of the villain who is the male lead’s nemesis?
+                - paragraph [ref=e1051]: "**"
+                - paragraph [ref=e1052]: Three years later, when we met again, the male lead smiled with a completely different face.
+                - paragraph [ref=e1053]: "\"Hello, Iyana. I'm going to kidnap you from now on.\""
+            - generic [ref=e1054]:
+              - link [ref=e1055] [cursor=pointer]:
+                - /url: /title/c174ddf6-24b3-4705-ad97-c80586cf9480/odebu-akujo-ni-tensei-shitara-naze-ka-last-boss-ouji-sama-ni-shuuchaku-sareteimasu
+                - img "Japanese flag icon" [ref=e1056]
+                - text: O Debu Akujo ni Tensei Shitara, Naze ka Last Boss Ōji-sama ni Shūchaku sa rete imasu
+              - link [ref=e1058] [cursor=pointer]:
+                - /url: /title/c174ddf6-24b3-4705-ad97-c80586cf9480/odebu-akujo-ni-tensei-shitara-naze-ka-last-boss-ouji-sama-ni-shuuchaku-sareteimasu
+                - img "Cover image" [ref=e1059]
+              - generic [ref=e1060]: Ongoing
+              - generic [ref=e1065] [cursor=pointer]:
+                - link "Long Strip" [ref=e1066]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Romance" [ref=e1067]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Magic" [ref=e1068]:
+                  - /url: /tag/a1f53773-c69a-4ce5-8cab-fffcd90b1565/magic
+                - link "Isekai" [ref=e1069]:
+                  - /url: /tag/ace04997-f6bd-436e-b261-779182193d3d/isekai
+                - link "Drama" [ref=e1070]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "Fantasy" [ref=e1071]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Villainess" [ref=e1072]:
+                  - /url: /tag/d14322ac-4d6f-4e9b-afd9-629d5f4d8a41/villainess
+                - link "Full Color" [ref=e1073]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - text: MORE
+              - generic [ref=e1074]:
+                - generic [ref=e1075]: "7.93"
+                - generic "385" [ref=e1078]
+                - generic [ref=e1081]: N/A
+                - button "0" [ref=e1086] [cursor=pointer]
+              - generic [ref=e1091]:
+                - paragraph [ref=e1092]: After dying of illness, she has been reincarnated as Celine, the selfish, fat, villainous duchess, sister of the heroine of a popular novel. If she stays this way, she will be killed by the hero prince and die a miserable death, just as in the novel. She vows to reform herself with all her might and begins to struggle, but she finds herself caught up in unexpected doting and obsession..! Will Celine be able to find "peaceful happiness"?
+                - paragraph [ref=e1093]: A fantasy love story about a reincarnation in another world where she is loved too much by a Yandere.
+            - generic [ref=e1094]:
+              - link [ref=e1095] [cursor=pointer]:
+                - /url: /title/65f11e08-e97c-4d4b-bb81-bac7bac91fd0/namdeul-ropan-yeoju-hal-ttae-naneun-jangrong-goemul-doem
+                - img "Korean flag icon" [ref=e1096]
+                - text: Everyone Else Became a Romance Fantasy Heroine, But I Became a Closet Monster
+              - link [ref=e1098] [cursor=pointer]:
+                - /url: /title/65f11e08-e97c-4d4b-bb81-bac7bac91fd0/namdeul-ropan-yeoju-hal-ttae-naneun-jangrong-goemul-doem
+                - img "Cover image" [ref=e1099]
+              - generic [ref=e1100]: Ongoing
+              - generic [ref=e1105]:
+                - link "Long Strip" [ref=e1106] [cursor=pointer]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Romance" [ref=e1107] [cursor=pointer]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Fantasy" [ref=e1108] [cursor=pointer]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Full Color" [ref=e1109] [cursor=pointer]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+              - generic [ref=e1110]:
+                - generic [ref=e1111]: "8.11"
+                - generic "169" [ref=e1114]
+                - generic [ref=e1117]: N/A
+                - button "0" [ref=e1122] [cursor=pointer]
+              - generic [ref=e1127]:
+                - paragraph [ref=e1128]: When others were reincarnating as beautiful people or adorable animals, I ended up in the body of a creepy monster living in the male lead’s closet.
+                - paragraph [ref=e1129]: Why?
+                - paragraph [ref=e1130]: Not only that, but I also became the nasty monster that torments the male lead. According to the original story, the male lead was supposed to fear me. But—
+                - paragraph [ref=e1131]: “Your horns are more beautiful than roses.”
+                - paragraph [ref=e1132]: “Can I give you a name?”
+                - paragraph [ref=e1133]: The male lead doesn’t seem to be scared of me at all. I thought it was fortunate that I, now a tenant (?), was able to get along with the male lead, the owner of the room.
+                - paragraph [ref=e1134]: “I’m scared to sleep alone. Let’s sleep together.”
+                - paragraph [ref=e1135]: But I didn’t expect us to get this close….
+                - paragraph [ref=e1136]: Dedrick stared at the monster sleeping soundly in his closet. This monster, who had suddenly appeared one day, had saved him from his hellish life. The corners of his lips curled up in satisfaction.
+                - paragraph [ref=e1137]: ‘My very own monster.’
+                - paragraph [ref=e1138]: Something that was only his, something he would never let go of.
+            - generic [ref=e1139]:
+              - link [ref=e1140] [cursor=pointer]:
+                - /url: /title/780a8d0f-f64c-4fe9-a5b7-f5a45756696c/yami-kakusei-shite-shujinkou-ni-bokosareru-kamaseinu-ni-hyoui-shita-ga-gensaku-to-chigaisugite
+                - img "Japanese flag icon" [ref=e1141]
+                - text: Yami Kakusei Shite Shujinkou ni Bokosareru Kamaseinu ni Hyoui Shita ga Gensaku to Chigaisugite Tomadotteru
+              - link [ref=e1143] [cursor=pointer]:
+                - /url: /title/780a8d0f-f64c-4fe9-a5b7-f5a45756696c/yami-kakusei-shite-shujinkou-ni-bokosareru-kamaseinu-ni-hyoui-shita-ga-gensaku-to-chigaisugite
+                - img "Cover image" [ref=e1144]
+              - generic [ref=e1145]: Ongoing
+              - generic [ref=e1150] [cursor=pointer]:
+                - link "Reincarnation" [ref=e1151]:
+                  - /url: /tag/0bc90acb-ccc1-44ca-a34a-b9f3a73259d0/reincarnation
+                - link "Romance" [ref=e1152]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Comedy" [ref=e1153]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Magic" [ref=e1154]:
+                  - /url: /tag/a1f53773-c69a-4ce5-8cab-fffcd90b1565/magic
+                - link "Isekai" [ref=e1155]:
+                  - /url: /tag/ace04997-f6bd-436e-b261-779182193d3d/isekai
+                - link "Fantasy" [ref=e1156]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Adaptation" [ref=e1157]:
+                  - /url: /tag/f4122d1c-3b44-44d0-9936-ff7502c39ad3/adaptation
+                - text: MORE
+              - generic [ref=e1158]:
+                - generic [ref=e1159]: "8.25"
+                - generic "35765" [ref=e1162]: 35k
+                - generic [ref=e1165]: N/A
+                - button "22" [ref=e1170] [cursor=pointer]
+              - paragraph [ref=e1176]: The villainous noble, Zenon Restinata, is a disappointing "underdog" who gets beaten up by the protagonist in the original anime. "I," a mere fan of the original work, have possessed such a Zenon!? This place is completely the world of the anime, and when I tried out magic for starters, it was super fun. I've decided-- I'm going to change Zenon's disappointing ending! The "do-over" life of a magic maniac begins!!
+            - generic [ref=e1177]:
+              - link [ref=e1178] [cursor=pointer]:
+                - /url: /title/cb98bd40-a903-4416-bdd0-dab93d8f36ad/r15-ja-dame-desu-ka
+                - img "Japanese flag icon" [ref=e1179]
+                - text: R15+ ja Dame desu ka?
+              - link [ref=e1181] [cursor=pointer]:
+                - /url: /title/cb98bd40-a903-4416-bdd0-dab93d8f36ad/r15-ja-dame-desu-ka
+                - img "Cover image" [ref=e1182]
+              - generic [ref=e1183]: Completed
+              - generic [ref=e1188] [cursor=pointer]:
+                - generic [ref=e1189]: Suggestive
+                - link "Romance" [ref=e1190]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Comedy" [ref=e1191]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Harem" [ref=e1192]:
+                  - /url: /tag/aafb99c1-7f60-43fa-b75f-fc9502ce29c7/harem
+                - link "School Life" [ref=e1193]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Slice of Life" [ref=e1194]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - text: MORE
+              - generic [ref=e1195]:
+                - generic [ref=e1196]: "8.60"
+                - generic "28080" [ref=e1199]: 28k
+                - generic [ref=e1202]: N/A
+                - button "34" [ref=e1207] [cursor=pointer]
+              - paragraph [ref=e1213]: What should I do to become an adult? Akane Amou, who grew up with her parents forbidding any kind of entertainment, is a little bad with "stimulating" stuff, to the point she can't even watch a kissing scene in a drama. Now that she's a highschool student, she somehow wants to overcome it! Those are her intentions, but it's not that easy. Meanwhile, she got acquainted with a movie otaku named Fuyumine. Will she be able to watch an R15 movie...?
+            - generic [ref=e1214]:
+              - link [ref=e1215] [cursor=pointer]:
+                - /url: /title/c5ab8b19-cf17-4f8d-8afb-a5832f1199e8/grey-and-red
+                - img "Japanese flag icon" [ref=e1216]
+                - text: Haiiro to Aka
+              - link [ref=e1218] [cursor=pointer]:
+                - /url: /title/c5ab8b19-cf17-4f8d-8afb-a5832f1199e8/grey-and-red
+                - img "Cover image" [ref=e1219]
+              - generic [ref=e1220]: Completed
+              - generic [ref=e1225] [cursor=pointer]:
+                - generic [ref=e1226]: Erotica
+                - generic [ref=e1227]: Sexual Violence
+                - link "Psychological" [ref=e1228]:
+                  - /url: /tag/3b60b75c-a2d7-4860-ab56-05f391bb889c/psychological
+                - link "Boys' Love" [ref=e1229]:
+                  - /url: /tag/5920b825-4181-4a17-beeb-9918b0ff7a30/boys-love
+                - link "School Life" [ref=e1230]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Delinquents" [ref=e1231]:
+                  - /url: /tag/da2d50ca-3018-4cc0-ac7a-6b7d472a29ea/delinquents
+                - text: MORE
+              - generic [ref=e1232]:
+                - generic [ref=e1233]: "7.83"
+                - generic "314" [ref=e1236]
+                - generic [ref=e1239]: N/A
+                - button "0" [ref=e1244] [cursor=pointer]
+              - paragraph [ref=e1250]: Yuki Tachibana, a second-year high school student, has been living life in grey. No one has been watching him, he has only been breathing in a colorless world. Only Hotta, a delinquent, has found Tachibana. "From now on, you're my slave," Hotta declares. He's violent and sharp-tongued, yet Tachibana knows that whenever he's with Hotta, color bleeds into his world. He savored the pain Hotta inflicted, but his true desire lay elsewhere.
+            - generic [ref=e1251]:
+              - link [ref=e1252] [cursor=pointer]:
+                - /url: /title/1081031e-7065-48fd-aa4b-8b388ed0c0ae/i-live-in-isekai
+                - img "English flag icon" [ref=e1253]
+                - text: I Live in Isekai
+              - link [ref=e1255] [cursor=pointer]:
+                - /url: /title/1081031e-7065-48fd-aa4b-8b388ed0c0ae/i-live-in-isekai
+                - img "Cover image" [ref=e1256]
+              - generic [ref=e1257]: Ongoing
+              - generic [ref=e1262] [cursor=pointer]:
+                - generic [ref=e1263]: Suggestive
+                - generic [ref=e1264]: Gore
+                - link "Monsters" [ref=e1265]:
+                  - /url: /tag/36fd93ea-e8b8-445e-b836-358f02b3d33d/monsters
+                - link "Action" [ref=e1266]:
+                  - /url: /tag/391b0423-d847-456f-aff0-8b0cfc03066b/action
+                - link "Demons" [ref=e1267]:
+                  - /url: /tag/39730448-9a5f-48a2-85b0-a70db87b1233/demons
+                - link "Ghosts" [ref=e1268]:
+                  - /url: /tag/3bb26d85-09d5-4d2e-880c-c34b974339e9/ghosts
+                - link "Animals" [ref=e1269]:
+                  - /url: /tag/3de8c75d-8ee3-48ff-98ee-e20a65c86451/animals
+                - link "Romance" [ref=e1270]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Comedy" [ref=e1271]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Boys' Love" [ref=e1272]:
+                  - /url: /tag/5920b825-4181-4a17-beeb-9918b0ff7a30/boys-love
+                - link "Survival" [ref=e1273]:
+                  - /url: /tag/5fff9cde-849c-4d78-aab0-0d52b2ee1d25/survival
+                - link "Zombies" [ref=e1274]:
+                  - /url: /tag/631ef465-9aba-4afb-b0fc-ea10efe274a8/zombies
+                - link "Martial Arts" [ref=e1275]:
+                  - /url: /tag/799c202e-7daa-44eb-9cf7-8a3c0441531e/martial-arts
+                - link "Adventure" [ref=e1276]:
+                  - /url: /tag/87cc87cd-a395-47af-b27a-93258283bbc6/adventure
+                - link "Self-Published" [ref=e1277]:
+                  - /url: /tag/891cf039-b895-47f0-9229-bef4c96eccd4/self-published
+                - link "Magic" [ref=e1278]:
+                  - /url: /tag/a1f53773-c69a-4ce5-8cab-fffcd90b1565/magic
+                - link "Harem" [ref=e1279]:
+                  - /url: /tag/aafb99c1-7f60-43fa-b75f-fc9502ce29c7/harem
+                - link "Isekai" [ref=e1280]:
+                  - /url: /tag/ace04997-f6bd-436e-b261-779182193d3d/isekai
+                - link "Drama" [ref=e1281]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "Fantasy" [ref=e1282]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Vampires" [ref=e1283]:
+                  - /url: /tag/d7d1730f-6eb0-4ba6-9437-602cac38664c/vampires
+                - link "Delinquents" [ref=e1284]:
+                  - /url: /tag/da2d50ca-3018-4cc0-ac7a-6b7d472a29ea/delinquents
+                - link "Monster Girls" [ref=e1285]:
+                  - /url: /tag/dd1f77c5-dea9-4e2b-97ae-224af09caf99/monster-girls
+                - link "Slice of Life" [ref=e1286]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - link "Supernatural" [ref=e1287]:
+                  - /url: /tag/eabc5b4c-6aff-42f3-b657-3e90cbd00b75/supernatural
+                - link "Adaptation" [ref=e1288]:
+                  - /url: /tag/f4122d1c-3b44-44d0-9936-ff7502c39ad3/adaptation
+                - text: MORE
+              - generic [ref=e1289]:
+                - generic [ref=e1290]: "5.89"
+                - generic "457" [ref=e1293]
+                - generic [ref=e1296]: N/A
+                - button "6" [ref=e1301] [cursor=pointer]
+              - paragraph [ref=e1307]: Michi gets into another world without any memory of his past life, now he is just following his new life... and a lots of secrets are being revealed and dark shades are started to cover the life of Michi!
+            - generic [ref=e1308]:
+              - link [ref=e1309] [cursor=pointer]:
+                - /url: /title/8791c515-0245-4fcc-81cc-22863a0aba6b/mezametara-saikyou-soubi-to-uchuusen-mochi-datta-node-ikkodate-mezashite-youhei-to-shite-jiyuu-ni
+                - img "Japanese flag icon" [ref=e1310]
+                - text: Mezametara Saikyou Soubi to Uchuusen-mochi datta node, Ikkodate Mezashite Youhei to shite Jiyuu ni Ikitai
+              - link [ref=e1312] [cursor=pointer]:
+                - /url: /title/8791c515-0245-4fcc-81cc-22863a0aba6b/mezametara-saikyou-soubi-to-uchuusen-mochi-datta-node-ikkodate-mezashite-youhei-to-shite-jiyuu-ni
+                - img "Cover image" [ref=e1313]
+              - generic [ref=e1314]: Ongoing
+              - generic [ref=e1319] [cursor=pointer]:
+                - generic [ref=e1320]: Suggestive
+                - link "Sci-Fi" [ref=e1321]:
+                  - /url: /tag/256c8bd9-4904-4360-bf4f-508a76d67183/sci-fi
+                - link "Action" [ref=e1322]:
+                  - /url: /tag/391b0423-d847-456f-aff0-8b0cfc03066b/action
+                - link "Romance" [ref=e1323]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Comedy" [ref=e1324]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Harem" [ref=e1325]:
+                  - /url: /tag/aafb99c1-7f60-43fa-b75f-fc9502ce29c7/harem
+                - link "Military" [ref=e1326]:
+                  - /url: /tag/ac72833b-c4e9-4878-b9db-6c8a4a99444a/military
+                - link "Isekai" [ref=e1327]:
+                  - /url: /tag/ace04997-f6bd-436e-b261-779182193d3d/isekai
+                - link "Drama" [ref=e1328]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "Fantasy" [ref=e1329]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Aliens" [ref=e1330]:
+                  - /url: /tag/e64f6742-c834-471d-8d72-dd51fc02b835/aliens
+                - link "Adaptation" [ref=e1331]:
+                  - /url: /tag/f4122d1c-3b44-44d0-9936-ff7502c39ad3/adaptation
+                - text: MORE
+              - generic [ref=e1332]:
+                - generic [ref=e1333]: "8.68"
+                - generic "91371" [ref=e1336]: 91k
+                - generic [ref=e1339]: N/A
+                - button "452" [ref=e1344] [cursor=pointer]
+              - generic [ref=e1349]:
+                - paragraph [ref=e1350]: Sato Takahiro was an ordinary office worker and hobbyist gamer until the day he woke up on a spaceship–one that strangely resembled a craft from a favorite space-shooter game. With a decked-out ship, a crew full of babes, and a fantastic universe to explore, he’s going to make the most of his good luck and create the life he's always dreamed of!
+                - separator [ref=e1351]
+                - list [ref=e1352]:
+                  - listitem [ref=e1353]:
+                    - link "Official Light Novel" [ref=e1354] [cursor=pointer]:
+                      - /url: https://sevenseasentertainment.com/series/reborn-as-a-space-mercenary-i-woke-up-piloting-the-strongest-starship-light-novel/
+                    - text: (EN)
+            - generic [ref=e1355]:
+              - link [ref=e1356] [cursor=pointer]:
+                - /url: /title/c8909273-7dea-4739-ac2e-c24da08b0b93/angnyeogyosil
+                - img "Korean flag icon" [ref=e1357]
+                - text: Villain Classroom
+              - link [ref=e1359] [cursor=pointer]:
+                - /url: /title/c8909273-7dea-4739-ac2e-c24da08b0b93/angnyeogyosil
+                - img "Cover image" [ref=e1360]
+              - generic [ref=e1361]: Completed
+              - generic [ref=e1366] [cursor=pointer]:
+                - link "Psychological" [ref=e1367]:
+                  - /url: /tag/3b60b75c-a2d7-4860-ab56-05f391bb889c/psychological
+                - link "Long Strip" [ref=e1368]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Drama" [ref=e1369]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "School Life" [ref=e1370]:
+                  - /url: /tag/caaa44eb-cd40-4177-b930-79d3ef2afe87/school-life
+                - link "Delinquents" [ref=e1371]:
+                  - /url: /tag/da2d50ca-3018-4cc0-ac7a-6b7d472a29ea/delinquents
+                - link "Full Color" [ref=e1372]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - text: MORE
+              - generic [ref=e1373]:
+                - generic [ref=e1374]: "8.48"
+                - generic "3731" [ref=e1377]: 3,731
+                - generic [ref=e1380]: N/A
+                - button "11" [ref=e1385] [cursor=pointer]
+              - generic [ref=e1390]:
+                - paragraph [ref=e1391]: Heo Jeong-woo, a high school student who is bullied by a girl in his class for his weakness.
+                - paragraph [ref=e1392]: Han Bo-ra, a transfer student, comes to Jeong-woo's class, where he was spending his miserable days.
+                - paragraph [ref=e1393]: Jeong-woo feels a strong sense of déjà vu when he sees the child with straight black hair and stains on his legs. Sure enough, Han Bo-ra, who has subdued the arguing classmates, asks them.
+                - paragraph [ref=e1394]: "\"'Have you ever seen a child similar to me?"
+                - paragraph [ref=e1395]: Jeong-woo decides to approach Bo-ra, who might be able to correct what is wrong...
+                - separator [ref=e1396]
+                - paragraph [ref=e1397]:
+                  - strong [ref=e1398]: "Links:"
+                - list [ref=e1399]:
+                  - listitem [ref=e1400]:
+                    - text: Alternative Official Raw -
+                    - link "Naver Series" [ref=e1401] [cursor=pointer]:
+                      - /url: https://series.naver.com/comic/detail.series?originalProductId=522173
+            - generic [ref=e1402]:
+              - link [ref=e1403] [cursor=pointer]:
+                - /url: /title/48c8ad67-059f-4ca5-b7f4-729fdc72c154/lanxi-zhen
+                - img "Chinese (Simplified) flag icon" [ref=e1404]
+                - text: Lanxi Zhen
+              - link [ref=e1406] [cursor=pointer]:
+                - /url: /title/48c8ad67-059f-4ca5-b7f4-729fdc72c154/lanxi-zhen
+                - img "Cover image" [ref=e1407]
+              - generic [ref=e1408]: Ongoing
+              - generic [ref=e1413] [cursor=pointer]:
+                - link "Historical" [ref=e1414]:
+                  - /url: /tag/33771934-028e-4cb3-8744-691e866a923e/historical
+                - link "Long Strip" [ref=e1415]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Comedy" [ref=e1416]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Adventure" [ref=e1417]:
+                  - /url: /tag/87cc87cd-a395-47af-b27a-93258283bbc6/adventure
+                - link "Fantasy" [ref=e1418]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Web Comic" [ref=e1419]:
+                  - /url: /tag/e197df38-d0e7-43b5-9b09-2842d0c326dd/web-comic
+                - link "Slice of Life" [ref=e1420]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - link "Full Color" [ref=e1421]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - text: MORE
+              - generic [ref=e1422]:
+                - generic [ref=e1423]: "8.55"
+                - generic "2319" [ref=e1426]: 2,319
+                - generic [ref=e1429]: N/A
+                - button "22" [ref=e1434] [cursor=pointer]
+              - paragraph [ref=e1440]: Lanxi Zhen tells the story of Laojun, Xuanli, and Qingning during the war. It shows a different world of demons and gods.
+            - generic [ref=e1441]:
+              - link [ref=e1442] [cursor=pointer]:
+                - /url: /title/7991e715-40ae-4c3e-b0e0-aa8bee90ece7/shachou-to-sake-to-hoshi
+                - img "Japanese flag icon" [ref=e1443]
+                - text: Shachou to Sake to Hoshi
+              - link [ref=e1445] [cursor=pointer]:
+                - /url: /title/7991e715-40ae-4c3e-b0e0-aa8bee90ece7/shachou-to-sake-to-hoshi
+                - img "Cover image" [ref=e1446]
+              - generic [ref=e1447]: Ongoing
+              - generic [ref=e1452] [cursor=pointer]:
+                - generic [ref=e1453]: Suggestive
+                - link "Romance" [ref=e1454]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Comedy" [ref=e1455]:
+                  - /url: /tag/4d32cc48-9f00-4cca-9b5a-a839f0764984/comedy
+                - link "Office Workers" [ref=e1456]:
+                  - /url: /tag/92d6d951-ca5e-429c-ac78-451071cbf064/office-workers
+                - link "Slice of Life" [ref=e1457]:
+                  - /url: /tag/e5301a23-ebd9-49dd-a0cb-2add944c7fe9/slice-of-life
+                - text: MORE
+              - generic [ref=e1458]:
+                - generic [ref=e1459]: "8.94"
+                - generic "70472" [ref=e1462]: 70k
+                - generic [ref=e1465]: N/A
+                - button "92" [ref=e1470] [cursor=pointer]
+              - paragraph [ref=e1476]: After the sudden death of her father, 24-year-old Reina Izutsu finds herself at the helm of the family business, Izutsu Printing. Thrust into the role of company president, the pressure quickly hardens her demeanor—leaving her employees walking on eggshells, especially Kenichi Ishizumi, the stoic 37-year-old senior supervisor. One night, overwhelmed and tipsy in a quiet park, Reina blurts out, "That's it! I quit being everyone's boss!"—completely unaware that the man beside her is her employee. Under the soft glow of the stars, he listens silently... and makes a quiet vow to stand by her side.
+            - generic [ref=e1477]:
+              - link [ref=e1478] [cursor=pointer]:
+                - /url: /title/0760b585-beae-47d2-88a1-aa2d7e3f2e56/drowning-sorrows-in-raging-fire
+                - img "Chinese (Simplified) flag icon" [ref=e1479]
+                - text: Drowning Sorrows in Raging Fire
+              - link [ref=e1481] [cursor=pointer]:
+                - /url: /title/0760b585-beae-47d2-88a1-aa2d7e3f2e56/drowning-sorrows-in-raging-fire
+                - img "Cover image" [ref=e1482]
+              - generic [ref=e1483]: Ongoing
+              - generic [ref=e1488] [cursor=pointer]:
+                - link "Reincarnation" [ref=e1489]:
+                  - /url: /tag/0bc90acb-ccc1-44ca-a34a-b9f3a73259d0/reincarnation
+                - link "Action" [ref=e1490]:
+                  - /url: /tag/391b0423-d847-456f-aff0-8b0cfc03066b/action
+                - link "Demons" [ref=e1491]:
+                  - /url: /tag/39730448-9a5f-48a2-85b0-a70db87b1233/demons
+                - link "Long Strip" [ref=e1492]:
+                  - /url: /tag/3e2b8dae-350e-4ab8-a8ce-016e844b9f0d/long-strip
+                - link "Romance" [ref=e1493]:
+                  - /url: /tag/423e2eae-a7a2-4a8b-ac03-a8351462d71d/romance
+                - link "Boys' Love" [ref=e1494]:
+                  - /url: /tag/5920b825-4181-4a17-beeb-9918b0ff7a30/boys-love
+                - link "Martial Arts" [ref=e1495]:
+                  - /url: /tag/799c202e-7daa-44eb-9cf7-8a3c0441531e/martial-arts
+                - link "Adventure" [ref=e1496]:
+                  - /url: /tag/87cc87cd-a395-47af-b27a-93258283bbc6/adventure
+                - link "Drama" [ref=e1497]:
+                  - /url: /tag/b9af3a63-f058-46de-a9a0-e0c13906197a/drama
+                - link "Fantasy" [ref=e1498]:
+                  - /url: /tag/cdc58593-87dd-415e-bbc0-2ec27bf404cc/fantasy
+                - link "Police" [ref=e1499]:
+                  - /url: /tag/df33b754-73a3-4c54-80e6-1a74a8058539/police
+                - link "Web Comic" [ref=e1500]:
+                  - /url: /tag/e197df38-d0e7-43b5-9b09-2842d0c326dd/web-comic
+                - link "Mystery" [ref=e1501]:
+                  - /url: /tag/ee968100-4191-4968-93d3-f82d72be7e46/mystery
+                - link "Adaptation" [ref=e1502]:
+                  - /url: /tag/f4122d1c-3b44-44d0-9936-ff7502c39ad3/adaptation
+                - link "Full Color" [ref=e1503]:
+                  - /url: /tag/f5ba408b-0e7a-484d-8d49-4e9125ac96de/full-color
+                - text: MORE
+              - generic [ref=e1504]:
+                - generic [ref=e1505]: "8.13"
+                - generic "215" [ref=e1508]
+                - generic [ref=e1511]: N/A
+                - button "1" [ref=e1516] [cursor=pointer]
+              - generic [ref=e1521]:
+                - paragraph [ref=e1522]: "\"Qi Zheng Emperor Sheng Lingyuan was reawakened a thousand years later after he jumped off the fiery Red Lake."
+                - paragraph [ref=e1523]: Xuan Ji, a newly transferred staff to the Reparations Division of the Deviant Control Office, finds himself having to clean up the mess of a revived tyrannical monarch.
+                - paragraph [ref=e1524]: The two seemed to share something from the past, but unbeknownst to them, a big conspiracy is stirring right underneath their noses that could destroy the balance of the world."
+          - generic [ref=e1525]:
+            - generic [ref=e1526] [cursor=pointer]: "1"
+            - generic [ref=e1527] [cursor=pointer]: "2"
+            - generic [ref=e1528] [cursor=pointer]: "3"
+            - button [ref=e1529] [cursor=pointer]
+            - generic [ref=e1530] [cursor=pointer]: "313"
+            - generic [ref=e1531] [cursor=pointer]
+  - link [ref=e1534] [cursor=pointer]:
+    - /url: /
+    - img "MangaDex logo" [ref=e1535]
+    - img "MangaDex" [ref=e1536]
