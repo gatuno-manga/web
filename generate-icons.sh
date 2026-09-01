@@ -52,7 +52,7 @@ for size in "${SIZES[@]}"; do
 
     echo -n "Gerando icon-${size}x${size}.png... "
 
-    if $CONVERT_CMD -background none -density 300 "$SOURCE_SVG" -resize "${size}x${size}" "$output_file" 2>/dev/null; then
+    if $CONVERT_CMD -background none -density 300 "$SOURCE_SVG" -resize "${size}x${size}" -gravity center -extent "${size}x${size}" "$output_file" 2>/dev/null; then
         echo -e "${GREEN}✓${NC}"
     else
         echo -e "${RED}✗${NC}"

@@ -253,25 +253,56 @@ export class MqttService implements OnDestroy {
 			'Iniciando conexão MQTT',
 		);
 
-		const brokerUrl =
-			this.env.mqttBrokerUrl ||
-			`ws://${this.window.location?.hostname || 'localhost'}:8083/mqtt`;
-
+		const { brokerUrl, protocol } = this.getBrokerConfig();
 		const userId = this.userTokenService.userIdSignal();
 
-		this.client = mqtt.connect(brokerUrl, {
+		this.client = this.createMqttClient(brokerUrl, {
 			protocolId: 'MQTT',
 			protocolVersion: 4,
 			clientId: `gatuno_web_${Math.random().toString(16).substring(2, 8)}`,
 			username: userId || 'gatuno-user',
 			password: token,
-			protocol: 'ws',
+			protocol,
 			keepalive: 5,
 			clean: true,
 			reconnectPeriod: 5000,
 		});
 
 		this.setupClientListeners();
+	}
+
+	protected createMqttClient(
+		brokerUrl: string,
+		options: mqtt.IClientOptions,
+	): MqttClient {
+		return mqtt.connect(brokerUrl, options);
+	}
+
+	/**
+	 * Determina a URL e o protocolo do broker MQTT com base no ambiente e segurança (HTTP vs HTTPS).
+	 * Em páginas carregadas via HTTPS, conexões ws:// inseguras são proibidas pelos navegadores
+	 * (Mixed Content / SecurityError), exigindo wss://.
+	 */
+	public getBrokerConfig(): { brokerUrl: string; protocol: 'ws' | 'wss' } {
+		const isHttps = this.window.location?.protocol === 'https:';
+		let brokerUrl = this.env.mqttBrokerUrl;
+
+		if (brokerUrl) {
+			if (isHttps && brokerUrl.startsWith('ws://')) {
+				brokerUrl = brokerUrl.replace(/^ws:\/\//, 'wss://');
+			}
+		} else {
+			const protocol = isHttps ? 'wss' : 'ws';
+			const host = isHttps
+				? this.window.location?.host || 'localhost'
+				: `${this.window.location?.hostname || 'localhost'}:8083`;
+			brokerUrl = `${protocol}://${host}/mqtt`;
+		}
+
+		const protocol: 'ws' | 'wss' = brokerUrl.startsWith('wss://')
+			? 'wss'
+			: 'ws';
+		return { brokerUrl, protocol };
 	}
 
 	private setupClientListeners(): void {
