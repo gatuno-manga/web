@@ -53,7 +53,13 @@ export class SensitiveContentService {
 			this.sensitiveContentCache$ = this.http
 				.get<SensitiveContentResponse[]>('sensitive-content')
 				.pipe(
-					catchError(() => of([])),
+					catchError(() => {
+						// Não cacheia falhas: libera o cache para que a próxima
+						// chamada tente uma nova requisição em vez de repetir
+						// permanentemente uma lista vazia.
+						this.invalidateCache();
+						return of([]);
+					}),
 					shareReplay(1),
 				);
 		}

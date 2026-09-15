@@ -87,10 +87,12 @@ export class MqttService implements OnDestroy {
 	public readonly connected = this._connected.asReadonly();
 	public readonly connectionState = this._connectionState.asReadonly();
 
-	private subscribedTopics = new Set<string>();
+	private subscribedTopics = new Map<string, number>();
 	private networkSubscription: Subscription | null = null;
 	private readonly serviceName = 'MqttService';
 	private readonly isBrowser: boolean;
+	private reconnectAttempts = 0;
+	private readonly maxReconnectAttempts = 10;
 
 	// Subjects para eventos
 	private bookCreatedSubject = new Subject<BookEvent>();
@@ -216,6 +218,16 @@ export class MqttService implements OnDestroy {
 			});
 	}
 
+	private isAuthError(err: Error): boolean {
+		const message = err.message?.toLowerCase() ?? '';
+		return (
+			message.includes('not authorized') ||
+			message.includes('bad username or password') ||
+			message.includes('identifier rejected') ||
+			message.includes('connection refused')
+		);
+	}
+
 	private disconnectForOffline(): void {
 		if (this.client) {
 			this.client.end(true);
@@ -320,6 +332,7 @@ export class MqttService implements OnDestroy {
 				'MQTT conectado com sucesso',
 			);
 			this._connected.set(true);
+			this.reconnectAttempts = 0;
 			this.resubscribeAll();
 
 			// Assinar tópicos globais dinamicamente via API
@@ -380,9 +393,31 @@ export class MqttService implements OnDestroy {
 			logWebSocketError(this.serviceName, err, 'Erro MQTT');
 			this.errorSubject.next({ message: err.message });
 			this.transitionTo(WebSocketConnectionState.ERROR, err.message);
+
+			if (this.isAuthError(err)) {
+				logConnectionEvent(
+					this.serviceName,
+					'auth-error',
+					'Credenciais MQTT inválidas/expiradas - interrompendo reconexão automática',
+					LogLevel.WARN,
+				);
+				this.disconnect();
+			}
 		});
 
 		this.client.on('reconnect', () => {
+			this.reconnectAttempts += 1;
+			if (this.reconnectAttempts > this.maxReconnectAttempts) {
+				logConnectionEvent(
+					this.serviceName,
+					'reconnect-limit',
+					`Limite de ${this.maxReconnectAttempts} tentativas de reconexão MQTT atingido - desistindo`,
+					LogLevel.WARN,
+				);
+				this.disconnect();
+				return;
+			}
+
 			this.transitionTo(
 				WebSocketConnectionState.RECONNECTING,
 				'Tentativa de reconexão MQTT',
@@ -410,7 +445,8 @@ export class MqttService implements OnDestroy {
 				}
 
 				const eventName = data.event;
-				const notification = data.payload as NotificationPayload;
+				const notification = (data.payload ??
+					{}) as NotificationPayload;
 
 				let type: 'info' | 'success' | 'warning' | 'error' = 'info';
 				if (eventName === 'book_request.approved') type = 'success';
@@ -545,9 +581,16 @@ export class MqttService implements OnDestroy {
 	}
 
 	private subscribeTopic(topic: string): void {
-		// Adiciona ao set de tópicos desejados imediatamente.
-		// Assim, quando conectar, o resubscribeAll() inscreverá nele.
-		this.subscribedTopics.add(topic);
+		// Contagem de referência: múltiplos watchers podem compartilhar o mesmo tópico
+		// (ex: watchBook + watchChapter no mesmo livro). Só desinscrevemos de fato
+		// quando o último interessado sair.
+		const currentCount = this.subscribedTopics.get(topic) ?? 0;
+		this.subscribedTopics.set(topic, currentCount + 1);
+
+		if (currentCount > 0) {
+			// Já estamos inscritos (ou a inscrição já está em fila); apenas somamos a referência.
+			return;
+		}
 
 		if (!this.client || !this._connected()) {
 			console.warn(
@@ -578,8 +621,14 @@ export class MqttService implements OnDestroy {
 	}
 
 	private unsubscribeTopic(topic: string): void {
-		// Remove do set imediatamente
-		this.subscribedTopics.delete(topic);
+		const currentCount = this.subscribedTopics.get(topic) ?? 0;
+		if (currentCount <= 1) {
+			this.subscribedTopics.delete(topic);
+		} else {
+			this.subscribedTopics.set(topic, currentCount - 1);
+			// Ainda há outros watchers interessados neste tópico; não desinscrever do broker.
+			return;
+		}
 
 		if (!this.client || !this._connected()) return;
 
@@ -587,8 +636,16 @@ export class MqttService implements OnDestroy {
 	}
 
 	private resubscribeAll(): void {
-		for (const topic of this.subscribedTopics) {
-			this.subscribeTopic(topic);
+		for (const topic of this.subscribedTopics.keys()) {
+			this.client?.subscribe(topic, { qos: 1 }, (err) => {
+				if (err) {
+					logWebSocketError(
+						this.serviceName,
+						err,
+						`Falha ao reinscrever: ${topic}`,
+					);
+				}
+			});
 		}
 	}
 

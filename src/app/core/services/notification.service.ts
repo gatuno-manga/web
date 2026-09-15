@@ -118,7 +118,22 @@ export class NotificationService {
 				cursor = await cursor.continue();
 			}
 
-			this._history.set(loaded);
+			// Mescla em vez de sobrescrever: addHistory() pode ter sido chamado
+			// (e já atualizado o signal) antes desta leitura assíncrona do
+			// IndexedDB resolver, e não podemos perder essa entrada.
+			this._history.update((current) => {
+				const merged = new Map(loaded.map((n) => [n.id, n]));
+				for (const notif of current) {
+					if (!merged.has(notif.id)) {
+						merged.set(notif.id, notif);
+					}
+				}
+				return Array.from(merged.values()).sort(
+					(a, b) =>
+						new Date(b.createdAt).getTime() -
+						new Date(a.createdAt).getTime(),
+				);
+			});
 		} catch (e) {
 			console.error(
 				'Erro ao carregar histórico de notificações do IndexedDB',

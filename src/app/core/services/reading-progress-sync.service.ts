@@ -39,6 +39,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private isBrowser: boolean;
 	private pendingChanges: Map<string, SaveProgressDto> = new Map();
 	private mqttSubscription: Subscription | null = null;
+	private mqttConnectionSubscription: Subscription | null = null;
 	private networkSubscription: Subscription | null = null;
 	private readonly serviceName = 'ReadingProgressSync';
 	private readonly baseUrl = 'users/me/reading-progress';
@@ -108,6 +109,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 
 	ngOnDestroy(): void {
 		this.mqttSubscription?.unsubscribe();
+		this.mqttConnectionSubscription?.unsubscribe();
 		this.networkSubscription?.unsubscribe();
 	}
 
@@ -121,6 +123,14 @@ export class ReadingProgressSyncService implements OnDestroy {
 	}
 
 	private setupMqttListeners(): void {
+		// Reflete o estado real da conexão MQTT em vez de assumir "conectado"
+		// no instante em que connect() é chamado.
+		this.mqttConnectionSubscription = this.mqttService.connected$.subscribe(
+			(connected) => {
+				this.updateSyncStatus({ connected });
+			},
+		);
+
 		this.mqttSubscription = this.mqttService.progressSynced$.subscribe(
 			async (response: SyncResponse) => {
 				logConnectionEvent(
@@ -159,7 +169,6 @@ export class ReadingProgressSyncService implements OnDestroy {
 	connect(): void {
 		if (!this.isBrowser) return;
 		this.mqttService.connect();
-		this.updateSyncStatus({ connected: true });
 	}
 
 	disconnect(): void {
@@ -185,20 +194,6 @@ export class ReadingProgressSyncService implements OnDestroy {
 		this.pendingChanges.set(chapterId, progressData);
 		this.updateSyncStatus({ pendingChanges: this.pendingChanges.size });
 
-		// Prepara para Background Sync (salva no IndexedDB e registra tag)
-		const token = this.userTokenService.accessToken;
-		if (token && this.isBrowser) {
-			await this.localProgressService.enqueueSync({
-				...progressData,
-				timestamp: progressData.timestamp ?? Date.now(),
-				accessToken: token,
-			});
-
-			this.backgroundSyncService
-				.register('sync-reading-progress')
-				.catch(() => {});
-		}
-
 		// Tenta sincronizar via HTTP imediatamente
 		try {
 			await this.syncViaHttp(progressData);
@@ -214,11 +209,67 @@ export class ReadingProgressSyncService implements OnDestroy {
 				'Falha no sync via HTTP. Background Sync agendado.',
 				LogLevel.DEBUG,
 			);
+
+			// Só recorre ao Background Sync (IndexedDB + tag) quando o HTTP
+			// imediato falha - offline, rede instável etc. Evita I/O extra
+			// em toda gravação enquanto o usuário está online.
+			const token = this.userTokenService.accessToken;
+			if (token && this.isBrowser) {
+				await this.localProgressService.enqueueSync({
+					...progressData,
+					timestamp: progressData.timestamp ?? Date.now(),
+					accessToken: token,
+				});
+
+				this.backgroundSyncService
+					.register('sync-reading-progress')
+					.catch(() => {});
+			}
 		}
 	}
 
 	async getProgress(chapterId: string): Promise<ReadingProgress | undefined> {
-		return await this.localProgressService.getProgress(chapterId);
+		const localProgress =
+			await this.localProgressService.getProgress(chapterId);
+
+		if (!this.isBrowser || !this.userTokenService.hasValidAccessToken) {
+			return localProgress;
+		}
+
+		try {
+			const remote = await firstValueFrom(
+				this.http
+					.get<{ data: RemoteReadingProgress | null }>(
+						`${this.baseUrl}/chapter/${chapterId}`,
+					)
+					.pipe(map((res) => res.data)),
+			);
+
+			if (
+				!remote ||
+				(localProgress && localProgress.pageIndex >= remote.pageIndex)
+			) {
+				return localProgress;
+			}
+
+			await this.localProgressService.saveProgress(
+				remote.chapterId,
+				remote.bookId,
+				remote.pageIndex,
+				undefined,
+				remote.updatedAt
+					? new Date(remote.updatedAt)
+					: new Date(remote.timestamp),
+			);
+			return this.localProgressService.getProgress(chapterId);
+		} catch (error) {
+			logWebSocketError(
+				this.serviceName,
+				error,
+				'Falha ao obter progresso do servidor, usando cache local',
+			);
+			return localProgress;
+		}
 	}
 
 	async syncAll(): Promise<void> {

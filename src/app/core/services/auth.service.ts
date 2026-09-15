@@ -9,6 +9,7 @@ import {
 } from '@models/user.models';
 import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { tap } from 'rxjs/operators';
+import { CsrfService } from './csrf.service';
 import { SensitiveContentService } from './sensitive-content.service';
 import { UnifiedReadingProgressService } from './unified-reading-progress.service';
 import { UserTokenService } from './user-token.service';
@@ -19,6 +20,7 @@ import { UserTokenService } from './user-token.service';
 export class AuthService {
 	private readonly http = inject(HttpClient);
 	private readonly userTokenService = inject(UserTokenService);
+	private readonly csrfService = inject(CsrfService);
 	private readonly readingProgressService = inject(
 		UnifiedReadingProgressService,
 	);
@@ -28,6 +30,7 @@ export class AuthService {
 		return this.http
 			.post<loginResponse>('/auth/signin', payload, {
 				observe: 'response',
+				withCredentials: true,
 			})
 			.pipe(
 				tap((response) => {
@@ -50,12 +53,12 @@ export class AuthService {
 			.post<authTokensResponse>(
 				'/auth/mfa/verify-login',
 				{ mfaToken, code },
-				{ observe: 'response' },
+				{ observe: 'response', withCredentials: true },
 			)
 			.pipe(
 				tap((response) => {
 					const body = response.body;
-					if (body) {
+					if (body && isAuthTokensResponse(body)) {
 						this.userTokenService.setTokens(
 							body.accessToken,
 							body.csrfToken,
@@ -69,24 +72,31 @@ export class AuthService {
 	}
 
 	logout() {
-		return this.http.get<void>('/auth/logout').pipe(
-			tap(() => {
-				this.userTokenService.removeTokens();
-				this.readingProgressService.onUserLogout();
-				this.sensitiveContentService.invalidateCache();
-			}),
-		);
+		const csrfToken = this.csrfService.csrfToken;
+		return this.http
+			.get<void>('/auth/logout', {
+				withCredentials: true,
+				headers: csrfToken ? { 'x-csrf-token': csrfToken } : undefined,
+			})
+			.pipe(
+				tap(() => {
+					this.userTokenService.removeTokens();
+					this.readingProgressService.onUserLogout();
+					this.sensitiveContentService.invalidateCache();
+				}),
+			);
 	}
 
 	register(payload: registerRequest) {
 		return this.http
 			.post<authTokensResponse>('/auth/signup', payload, {
 				observe: 'response',
+				withCredentials: true,
 			})
 			.pipe(
 				tap((response) => {
 					const body = response.body;
-					if (body) {
+					if (body && isAuthTokensResponse(body)) {
 						this.userTokenService.setTokens(
 							body.accessToken,
 							body.csrfToken,
@@ -116,7 +126,7 @@ export class AuthService {
 			.post<loginResponse>(
 				'/auth/passkeys/authenticate/verify',
 				{ response, ...(email && { email }) },
-				{ observe: 'response' },
+				{ observe: 'response', withCredentials: true },
 			)
 			.pipe(
 				tap((res) => {
