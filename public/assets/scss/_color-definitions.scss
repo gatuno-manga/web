@@ -7,7 +7,6 @@
 	--secondary-color: var(--dark-surface);
 	--scrollbar-color: var(--dark-gray);
 	--scrollbar-thumb-color: var(--orange);
-	--erro-message-color: var(--orange);
 	--scraping-status-ready-color: var(--dark-green);
 	--scraping-status-processing-color: var(--orange);
 	--scraping-status-error-color: var(--dark-red);
@@ -23,14 +22,13 @@
 	--shadow-color: rgba(var(--shadow-base), 0.2);
 
 	// Extended Semantic Tokens
-	--app-bg-color: var(--app-background-color);
 	--app-text-color-secondary: rgba(
 		233,
 		225,
 		209,
 		0.55
 	); // --beige com 55% opacidade
-	--white-muted: rgba(253, 253, 253, 0.45);
+	--app-text-color-muted: rgba(253, 253, 253, 0.45);
 	--border-color: rgba(233, 225, 209, 0.15);
 	--hover-color: rgba(233, 225, 209, 0.08);
 	--danger-color: var(--dark-red);
@@ -74,7 +72,6 @@
 	--secondary-color: var(--dark-surface);
 	--scrollbar-color: var(--dark-gray);
 	--scrollbar-thumb-color: var(--orange);
-	--erro-message-color: var(--orange);
 	--scraping-status-ready-color: var(--dark-green);
 	--scraping-status-processing-color: var(--orange);
 	--scraping-status-error-color: var(--dark-red);
@@ -90,14 +87,13 @@
 	--shadow-color: rgba(0, 0, 0, 0.4);
 
 	// Extended Semantic Tokens
-	--app-bg-color: var(--app-background-color);
 	--app-text-color-secondary: rgba(
 		233,
 		225,
 		209,
 		0.45
 	); // mais apagado no true-dark
-	--white-muted: rgba(253, 253, 253, 0.35);
+	--app-text-color-muted: rgba(253, 253, 253, 0.35);
 	--border-color: rgba(233, 225, 209, 0.1);
 	--hover-color: rgba(233, 225, 209, 0.06);
 	--danger-color: var(--dark-red);
@@ -141,7 +137,6 @@
 	--secondary-color: var(--gray-300);
 	--scrollbar-color: var(--gray-300);
 	--scrollbar-thumb-color: #a0a0a0;
-	--erro-message-color: var(--orange);
 	--scraping-status-ready-color: var(--green);
 	--scraping-status-processing-color: var(--orange);
 	--scraping-status-error-color: var(--red);
@@ -158,9 +153,8 @@
 	--shadow-color: rgba(var(--shadow-base), 0.15);
 
 	// Extended Semantic Tokens
-	--app-bg-color: var(--app-background-color);
 	--app-text-color-secondary: rgba(43, 45, 49, 0.65);
-	--white-muted: rgba(43, 45, 49, 0.45);
+	--app-text-color-muted: rgba(43, 45, 49, 0.45);
 	--border-color: rgba(43, 45, 49, 0.12);
 	--hover-color: rgba(43, 45, 49, 0.06);
 	--danger-color: var(--red);
@@ -204,7 +198,6 @@
 	--secondary-color: var(--dracula-surface);
 	--scrollbar-color: var(--dracula-surface);
 	--scrollbar-thumb-color: var(--dracula-purple);
-	--erro-message-color: var(--dracula-red);
 	--scraping-status-ready-color: var(--dracula-green);
 	--scraping-status-processing-color: var(--dracula-yellow);
 	--scraping-status-error-color: var(--dracula-red);
@@ -214,9 +207,8 @@
 	--overlay-bg: rgba(0, 0, 0, 0.75);
 	--shadow-color: rgba(0, 0, 0, 0.5);
 
-	--app-bg-color: var(--app-background-color);
 	--app-text-color-secondary: var(--dracula-text-sec);
-	--white-muted: color-mix(in srgb, var(--dracula-text) 45%, transparent);
+	--app-text-color-muted: color-mix(in srgb, var(--dracula-text) 45%, transparent);
 	--border-color: color-mix(in srgb, var(--dracula-text) 15%, transparent);
 	--hover-color: color-mix(in srgb, var(--dracula-text) 8%, transparent);
 	--danger-color: var(--dracula-red);
@@ -253,7 +245,6 @@
 	--secondary-color: var(--slate-surface);
 	--scrollbar-color: var(--slate-surface);
 	--scrollbar-thumb-color: var(--orange);
-	--erro-message-color: var(--slate-red);
 	--scraping-status-ready-color: var(--slate-green);
 	--scraping-status-processing-color: var(--slate-orange);
 	--scraping-status-error-color: var(--slate-red);
@@ -263,9 +254,8 @@
 	--overlay-bg: rgba(0, 0, 0, 0.7);
 	--shadow-color: rgba(0, 0, 0, 0.4);
 
-	--app-bg-color: var(--app-background-color);
 	--app-text-color-secondary: var(--slate-text-sec);
-	--white-muted: color-mix(in srgb, var(--slate-text) 45%, transparent);
+	--app-text-color-muted: color-mix(in srgb, var(--slate-text) 45%, transparent);
 	--border-color: color-mix(in srgb, var(--slate-text) 15%, transparent);
 	--hover-color: color-mix(in srgb, var(--slate-text) 8%, transparent);
 	--danger-color: var(--slate-red);

@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 .progress-content {
 	padding: 16px;
 	min-width: 350px;
@@ -80,7 +81,7 @@
 	}
 }
 
-@media (max-width: 768px) {
+@include mobile {
 	.progress-content {
 		min-width: 280px;
 		max-width: 100%;

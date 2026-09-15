@@ -20,7 +20,7 @@
 	
 	// Glassmorphism effect
 	background-color: rgb(from var(--app-background-color) r g b / 0.75);
-	@include glass-heavy;
+	@include glass-dropdown;
 }
 
 .mobile-menu-container {

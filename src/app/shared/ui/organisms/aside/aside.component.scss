@@ -57,7 +57,7 @@
 
 .close-icon {
 	cursor: pointer;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	transition: color 0.2s, transform 0.2s;
 
 	&:hover {

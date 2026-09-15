@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 .reader-settings-content {
 	width: 100%;
 	display: flex;
@@ -32,7 +33,7 @@
 	flex-direction: column;
 }
 
-@media (max-width: 768px) {
+@include mobile {
 	.settings-header {
 		padding: 20px 16px 12px;
 

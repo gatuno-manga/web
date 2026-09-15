@@ -21,7 +21,7 @@
 	}
 
 	.left-icon {
-		color: var(--white-muted);
+		color: var(--app-text-color-muted);
 	}
 
 	input {
@@ -33,7 +33,7 @@
 		font-size: 16px;
 
 		&::placeholder {
-			color: var(--white-muted);
+			color: var(--app-text-color-muted);
 		}
 	}
 
@@ -70,7 +70,7 @@
 	&.no-results {
 		padding: 16px;
 		text-align: center;
-		color: var(--white-muted);
+		color: var(--app-text-color-muted);
 		font-size: 14px;
 	}
 }
@@ -105,7 +105,7 @@
 		}
 
 		.option-description {
-			color: var(--white-muted);
+			color: var(--app-text-color-muted);
 			font-size: 12px;
 		}
 	}

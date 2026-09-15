@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 .random-filter-modal-content {
 	width: 100%;
 	display: flex;
@@ -86,7 +87,7 @@
 	border-top: 1px solid var(--app-text-color);
 }
 
-@media (max-width: 768px) {
+@include mobile {
 	.random-filter-modal-content {
 		max-width: 100%;
 	}

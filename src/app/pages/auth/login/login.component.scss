@@ -48,7 +48,7 @@
 
 .form-subtitle {
 	font-size: 0.875rem;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
 	line-height: 1.5;
 }
@@ -129,7 +129,7 @@
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
-		color: var(--white-muted);
+		color: var(--app-text-color-muted);
 		font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
 	}
 }
@@ -211,7 +211,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--white-muted);
+		color: var(--app-text-color-muted);
 		flex-shrink: 0;
 		transition: all 0.3s ease;
 		position: relative;
@@ -237,12 +237,12 @@
 
 	&__sub {
 		font-size: 0.7rem;
-		color: var(--white-muted);
+		color: var(--app-text-color-muted);
 		font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
 	}
 
 	&__arrow {
-		color: var(--white-muted);
+		color: var(--app-text-color-muted);
 		flex-shrink: 0;
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		position: relative;
@@ -285,7 +285,7 @@
 .auth-link {
 	text-align: center;
 	font-size: 0.8rem;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
 	margin-top: 0.25rem;
 

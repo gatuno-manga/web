@@ -104,7 +104,7 @@
 	top: 50%;
 	transform: translateY(-50%);
 	font-size: var(--select-font);
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	pointer-events: none;
 	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 	transform-origin: left center;
@@ -152,14 +152,14 @@
 	transition: color 0.2s ease;
 
 	&.placeholder {
-		color: var(--white-muted);
+		color: var(--app-text-color-muted);
 	}
 }
 
 .arrow {
 	margin-left: 8px;
 	flex-shrink: 0;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
 
 	.open & {
@@ -242,7 +242,7 @@
 	flex-shrink: 0;
 
 	.search-icon {
-		color: var(--white-muted);
+		color: var(--app-text-color-muted);
 		flex-shrink: 0;
 	}
 
@@ -256,7 +256,7 @@
 		font-family: inherit;
 
 		&::placeholder {
-			color: var(--white-muted);
+			color: var(--app-text-color-muted);
 		}
 	}
 }
@@ -328,7 +328,7 @@
 
 .option-icon {
 	flex-shrink: 0;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	transition: color 0.15s ease;
 }
 
@@ -350,7 +350,7 @@
 
 .option-description {
 	font-size: 11px;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -364,7 +364,7 @@
 .no-options {
 	padding: 24px 16px;
 	text-align: center;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	font-size: 13px;
 	display: flex;
 	flex-direction: column;
@@ -406,7 +406,7 @@
 }
 
 // ─── Responsive ───────────────────────────────────────────────────────────────
-@media (max-width: 768px) {
+@include mobile {
 	:host([data-size='md']),
 	:host([data-size='lg']) {
 		--select-height: 44px;

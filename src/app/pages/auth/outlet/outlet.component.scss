@@ -132,7 +132,7 @@
 	align-items: center;
 	gap: 6px;
 	font-size: 14px;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	padding: 6px 10px;
 	border-radius: 8px;
 	transition: color 0.2s ease, background 0.2s ease;
@@ -236,7 +236,7 @@
 	text-align: center;
 	padding: 1rem;
 	font-size: 11px;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
 	letter-spacing: 0.02em;
 }

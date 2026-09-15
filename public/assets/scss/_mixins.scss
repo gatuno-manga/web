@@ -45,6 +45,17 @@
 }
 
 // ==========================================
+// Breakpoints
+// ==========================================
+
+// Breakpoint padrão de mobile usado em toda a aplicação.
+@mixin mobile {
+	@media (max-width: 768px) {
+		@content;
+	}
+}
+
+// ==========================================
 // Glassmorphism / Blur effects
 // ==========================================
 
@@ -78,12 +89,11 @@
 	@include glass-backdrop(8px, 160%);
 }
 
-// Para painéis flutuantes grandes (ex: container modal)
+// Para painéis flutuantes grandes (ex: container modal). Blur moderado (24px)
+// em vez de valores extremos (ex: 96px): o custo de backdrop-filter escala
+// de forma superlinear com o raio do blur, e a partir de ~24-32px o ganho
+// visual já satura — usar mais do que isso só queima GPU sem diferença
+// perceptível, especialmente em mobile.
 @mixin glass-panel {
 	@include glass-backdrop(24px, 180%);
-}
-
-// Para efeitos densos estilo macOS
-@mixin glass-heavy {
-	@include glass-backdrop(96px, 200%);
 }

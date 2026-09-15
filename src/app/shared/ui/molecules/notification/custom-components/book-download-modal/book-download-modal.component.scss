@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 .book-download-modal-content {
 	width: 100%;
 	display: flex;
@@ -180,7 +181,7 @@
 	}
 }
 
-@media (max-width: 768px) {
+@include mobile {
 	.book-download-modal-content {
 		max-width: 100%;
 	}

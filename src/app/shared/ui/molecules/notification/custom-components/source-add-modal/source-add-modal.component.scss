@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 .source-add-modal-content {
 	display: flex;
 	flex-direction: column;
@@ -233,7 +234,7 @@
 	gap: 12px;
 }
 
-@media (max-width: 768px) {
+@include mobile {
 	.source-add-modal-content {
 		max-width: 100%;
 	}

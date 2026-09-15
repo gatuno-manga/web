@@ -24,7 +24,7 @@
 
 		h3 {
 			margin: 0;
-			font-family: 'Epilogue', sans-serif;
+			font-family: var(--font-secondary);
 			font-size: clamp(1.5rem, 4vw, 1.875rem); // 24px a 30px
 			font-weight: 700;
 			color: #f8f5fd;
