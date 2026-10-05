@@ -9,7 +9,6 @@ import {
 	signal,
 } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 
 /**
@@ -41,7 +40,6 @@ import { Observable, Subject } from 'rxjs';
 export class NetworkStatusService implements OnDestroy {
 	private platformId = inject(PLATFORM_ID);
 	private ngZone = inject(NgZone);
-	private router = inject(Router);
 
 	/** Signal reativo indicando se há conexão de rede */
 	private _isOnline = signal(true);
@@ -104,26 +102,17 @@ export class NetworkStatusService implements OnDestroy {
 
 	/**
 	 * Handler para quando a conexão é restaurada.
-	 * Recarrega a página automaticamente, exceto se o usuário
-	 * estiver na página de chapters lendo um livro.
+	 * Notifica os consumidores sobre a reconexão.
 	 */
 	private handleOnline() {
 		this.updateStatus(true);
 
-		// Só recarrega se estava offline antes
+		// Só notifica se estava offline antes
 		if (this.wasOffline) {
 			this.wasOffline = false;
 
-			// Emite evento para reconectar WebSockets
+			// Emite evento para reconectar WebSockets e sincronizar dados
 			this._wentOnline$.next();
-
-			// Não recarrega se estiver na página de chapters
-			const currentUrl = this.router.url;
-			const isOnChaptersPage = currentUrl.includes('/chapters/');
-
-			if (!isOnChaptersPage) {
-				window.location.reload();
-			}
 		}
 	}
 
