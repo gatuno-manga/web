@@ -6,7 +6,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ENVIRONMENT } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
 import { SyncResponse } from '@models/reading-progress-events.model';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
 import { MqttService } from './mqtt.service';
 import { NetworkStatusService } from './network-status.service';
@@ -57,13 +57,17 @@ describe('ReadingProgressSyncService', () => {
 		);
 		backgroundSyncSpy.register.and.returnValue(Promise.resolve());
 
+		const connectedSubject = new BehaviorSubject<boolean>(false);
 		const mqttSpy = jasmine.createSpyObj(
 			'MqttService',
 			['connect', 'disconnect', 'isConnected'],
 			{
 				progressSynced$: new Subject<SyncResponse>(),
+				connected$: connectedSubject.asObservable(),
 			},
 		);
+		mqttSpy.connect.and.callFake(() => connectedSubject.next(true));
+		mqttSpy.disconnect.and.callFake(() => connectedSubject.next(false));
 
 		TestBed.configureTestingModule({
 			imports: [HttpClientTestingModule],
@@ -137,7 +141,7 @@ describe('ReadingProgressSyncService', () => {
 		req.flush({ data: progressData });
 	}));
 
-	it('should save progress locally and register background sync', fakeAsync(() => {
+	it('should save progress locally and register background sync when HTTP fails', fakeAsync(() => {
 		const progressData = {
 			chapterId: 'c2',
 			bookId: 'b1',
@@ -153,13 +157,15 @@ describe('ReadingProgressSyncService', () => {
 			'b1',
 			10,
 		);
+
+		const req = httpMock.expectOne('users/me/reading-progress');
+		req.error(new ProgressEvent('Network error'));
+		tick();
+
 		expect(localProgressServiceSpy.enqueueSync).toHaveBeenCalled();
 		expect(backgroundSyncServiceSpy.register).toHaveBeenCalledWith(
 			'sync-reading-progress',
 		);
-
-		const req = httpMock.expectOne('users/me/reading-progress');
-		req.flush({ data: {} });
 	}));
 
 	it('should return local progress in getProgress', async () => {
@@ -175,7 +181,12 @@ describe('ReadingProgressSyncService', () => {
 			Promise.resolve(mockLocalProgress),
 		);
 
-		const result = await service.getProgress('c1');
+		const getProgressPromise = service.getProgress('c1');
+		await Promise.resolve();
+		const req = httpMock.expectOne('users/me/reading-progress/chapter/c1');
+		req.flush({ data: null });
+
+		const result = await getProgressPromise;
 		expect(result).toEqual(mockLocalProgress);
 	});
 });

@@ -6,7 +6,7 @@ import { TestBed } from '@angular/core/testing';
 import { WebSocketConnectionState } from '@core/models/websocket-state.model';
 import { ENVIRONMENT } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
-import mqtt, { MqttClient } from 'mqtt';
+import type { MqttClient } from 'mqtt';
 import { Subject } from 'rxjs';
 import { MqttService } from './mqtt.service';
 import { NetworkStatusService } from './network-status.service';
