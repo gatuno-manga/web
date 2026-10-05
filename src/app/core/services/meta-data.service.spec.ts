@@ -5,18 +5,23 @@ import { MetaDataService } from './meta-data.service';
 
 describe('MetaDataService', () => {
 	let service: MetaDataService;
-	const mockMeta = {
-		addTag: jasmine.createSpy('addTag'),
-		updateTag: jasmine.createSpy('updateTag').and.returnValue(null),
-		removeTagElement: jasmine.createSpy('removeTagElement'),
-	} as any;
-	const mockTitle = { setTitle: jasmine.createSpy('setTitle') } as any;
-	const mockRouter = {
-		events: { subscribe: jasmine.createSpy('subscribe') },
-	} as any;
-	const mockDoc = document.implementation.createHTMLDocument('test');
+	let mockMeta: any;
+	let mockTitle: any;
+	let mockRouter: any;
+	let mockDoc: Document;
 
 	beforeEach(() => {
+		mockMeta = {
+			addTag: jasmine.createSpy('addTag'),
+			updateTag: jasmine.createSpy('updateTag').and.returnValue(null),
+			removeTagElement: jasmine.createSpy('removeTagElement'),
+		};
+		mockTitle = { setTitle: jasmine.createSpy('setTitle') };
+		mockRouter = {
+			events: { subscribe: jasmine.createSpy('subscribe') },
+		};
+		mockDoc = document.implementation.createHTMLDocument('test');
+
 		TestBed.configureTestingModule({
 			providers: [
 				{ provide: Meta, useValue: mockMeta },
@@ -33,14 +38,69 @@ describe('MetaDataService', () => {
 		);
 	});
 
-	it('should set title and meta tags', () => {
+	it('should set title and update meta tags without using addTag', () => {
 		service.setTitle('MyTitle');
-		expect(mockTitle.setTitle).toHaveBeenCalled();
-		expect(mockMeta.addTag).toHaveBeenCalled();
+		expect(mockTitle.setTitle).toHaveBeenCalledWith('MyTitle | Gatuno');
+		expect(mockMeta.addTag).not.toHaveBeenCalled();
+
+		expect(mockMeta.updateTag).toHaveBeenCalledWith({
+			property: 'og:site_name',
+			content: 'Gatuno',
+		});
+		expect(mockMeta.updateTag).toHaveBeenCalledWith({
+			name: 'twitter:site',
+			content: 'Gatuno',
+		});
+		expect(mockMeta.updateTag).toHaveBeenCalledWith({
+			property: 'og:title',
+			content: 'MyTitle | Gatuno',
+		});
+		expect(mockMeta.updateTag).toHaveBeenCalledWith({
+			name: 'twitter:title',
+			content: 'MyTitle | Gatuno',
+		});
+	});
+
+	it('should keep default title without | Gatuno suffix', () => {
+		service.setTitle('Gatuno');
+		expect(mockTitle.setTitle).toHaveBeenCalledWith('Gatuno');
+		expect(mockMeta.updateTag).toHaveBeenCalledWith({
+			property: 'og:title',
+			content: 'Gatuno',
+		});
 	});
 
 	it('setDescription should update tags', () => {
 		service.setDescription('desc');
-		expect(mockMeta.updateTag).toHaveBeenCalled();
+		expect(mockMeta.updateTag).toHaveBeenCalledWith({
+			name: 'description',
+			content: 'desc',
+		});
+		expect(mockMeta.updateTag).toHaveBeenCalledWith({
+			property: 'og:description',
+			content: 'desc',
+		});
+		expect(mockMeta.updateTag).toHaveBeenCalledWith({
+			name: 'twitter:description',
+			content: 'desc',
+		});
+	});
+
+	it('setUrl should update tags and canonical link', () => {
+		service.setUrl('https://gatuno.com/books/123');
+		expect(mockMeta.updateTag).toHaveBeenCalledWith({
+			property: 'og:url',
+			content: 'https://gatuno.com/books/123',
+		});
+		expect(mockMeta.updateTag).toHaveBeenCalledWith({
+			name: 'twitter:url',
+			content: 'https://gatuno.com/books/123',
+		});
+
+		const canonicalLink = mockDoc.querySelector('link[rel="canonical"]');
+		expect(canonicalLink).toBeTruthy();
+		expect(canonicalLink?.getAttribute('href')).toBe(
+			'https://gatuno.com/books/123',
+		);
 	});
 });

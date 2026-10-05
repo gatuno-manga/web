@@ -61,12 +61,20 @@ export class MetaDataService {
 		const resolvedTitle =
 			title !== this.defaultMeta.title ? `${title} | Gatuno` : title;
 		this.titleService.setTitle(resolvedTitle);
-		this.metaService.addTag({
+		this.updateTag({
 			property: 'og:site_name',
+			content: 'Gatuno',
+		});
+		this.updateTag({
+			name: 'twitter:site',
+			content: 'Gatuno',
+		});
+		this.updateTag({
+			property: 'og:title',
 			content: resolvedTitle,
 		});
-		this.metaService.addTag({
-			name: 'twitter:site',
+		this.updateTag({
+			name: 'twitter:title',
 			content: resolvedTitle,
 		});
 	}

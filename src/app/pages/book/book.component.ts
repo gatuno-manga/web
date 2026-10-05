@@ -24,6 +24,8 @@ import { SensitiveContentService } from '@core/services/sensitive-content.servic
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
 import { UserService } from '@core/services/user.service';
 import { UserTokenService } from '@core/services/user-token.service';
+import { ENVIRONMENT } from '@core/tokens/environment.token';
+import { environment } from '@environments/environment';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
 import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
@@ -114,6 +116,7 @@ export class BookComponent implements OnInit, OnDestroy {
 	private sensitiveContentService = inject(SensitiveContentService);
 	private location = inject(Location);
 	private platformId = inject(PLATFORM_ID);
+	private env = inject(ENVIRONMENT, { optional: true });
 
 	goBack() {
 		this.location.back();
@@ -349,11 +352,20 @@ export class BookComponent implements OnInit, OnDestroy {
 	setMetaData() {
 		const b = this.book();
 		if (!b) return;
+		const base =
+			this.env?.publicURL ||
+			environment.publicURL ||
+			(isPlatformBrowser(this.platformId) ? window.location.origin : '');
+		const normalizedBase = base ? base.replace(/\/$/, '') : '';
+		const url = normalizedBase
+			? `${normalizedBase}/books/${b.id}`
+			: `/books/${b.id}`;
+
 		this.metaService.setMetaData({
 			title: b.title,
 			description: b.description,
 			image: b.cover,
-			url: `https://example.com/books/${b.id}`,
+			url,
 		});
 	}
 

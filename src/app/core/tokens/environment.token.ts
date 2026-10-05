@@ -6,6 +6,7 @@ import { environment } from '@environments/environment';
  */
 export interface Environment {
 	production: boolean;
+	publicURL?: string;
 	apiURL: string;
 	apiURLServer?: string;
 	mqttBrokerUrl?: string;
