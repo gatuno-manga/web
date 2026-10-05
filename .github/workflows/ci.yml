@@ -35,7 +35,7 @@ jobs:
         with:
             node_version: "24.11.1"
             setup_chrome: true
-            lint_command: "npm run lint"
+            lint_command: "npm run lint && npm run audit"
             test_command: "npm run test:headless"
 
     build-and-publish:
