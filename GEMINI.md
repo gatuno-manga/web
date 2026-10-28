@@ -19,8 +19,8 @@
 
 ## Infrastructure & Performance
 
-- **Environment Management:** Automated environment variable generation via `generate-env.ts`.
-- **Branding:** Custom icon generation script (`generate-icons.sh`) from SVG assets.
+- **Environment Management:** Automated environment variable generation via `scripts/generate-env.ts`.
+- **Branding:** Custom icon generation script (`scripts/generate-icons.sh`) from SVG assets.
 - **Quality & Maintenance:**
   - Robust testing setup with Karma and Jasmine.
   - Modular project structure for better feature encapsulation.

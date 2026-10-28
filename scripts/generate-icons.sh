@@ -4,8 +4,9 @@
 # Requer ImageMagick instalado
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SOURCE_SVG="$SCRIPT_DIR/public/assets/icons/logo.svg"
-OUTPUT_DIR="$SCRIPT_DIR/public/icons"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+SOURCE_SVG="$ROOT_DIR/public/assets/icons/logo.svg"
+OUTPUT_DIR="$ROOT_DIR/public/icons"
 
 # Tamanhos dos ícones para PWA
 SIZES=(72 96 128 144 152 192 384 512)

@@ -6,7 +6,7 @@
 		"start": "ng serve",
 		"start:docker": "ng serve --host 0.0.0.0 --poll 2000",
 		"prestart": "npm run build:icons",
-		"prebuild": "npm run build:icons && node generate-env.ts",
+		"prebuild": "npm run build:icons && node scripts/generate-env.ts",
 		"build:icons": "node scripts/build-icons.js",
 		"build": "ng build",
 		"lint": "biome check . && secretlint \"**/*\"",

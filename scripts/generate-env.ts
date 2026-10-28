@@ -1,14 +1,14 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const envDirectory = path.join(__dirname, 'src/environments');
+const envDirectory = path.join(__dirname, '..', 'src/environments');
 const targetPath = path.join(envDirectory, 'environment.prod.ts');
 
 if (!fs.existsSync(envDirectory)) {
 	fs.mkdirSync(envDirectory, { recursive: true });
 }
 
-const envPath = path.join(__dirname, '.env');
+const envPath = path.join(__dirname, '..', '.env');
 if (fs.existsSync(envPath)) {
 	try {
 		// Tenta usar a função nativa do Node 20.6+
