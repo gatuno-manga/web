@@ -41,6 +41,7 @@ import { UserTokenService } from '@core/services/user-token.service';
 import { VisibilityPrivacyService } from '@core/services/visibility-privacy.service';
 import { WakeLockService } from '@core/services/wake-lock.service';
 import { ChapterCommentsComponent } from '@features/reading/components/chapter-comments/chapter-comments.component';
+import { ReaderSettingsNotificationComponent } from '@features/reading/components/reader-settings-notification/reader-settings-notification.component';
 import {
 	DocumentProgressEvent,
 	DocumentReaderComponent,
@@ -55,7 +56,6 @@ import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
-import { ReaderSettingsNotificationComponent } from '@ui/molecules/notification/custom-components';
 import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
 import { AsideComponent } from '@ui/organisms/aside/aside.component';
 import { fromEvent, lastValueFrom } from 'rxjs';

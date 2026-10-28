@@ -34,6 +34,7 @@ import {
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { TagsService } from '@core/services/tags.service';
 import { BookFilterComponent } from '@features/books/components/book-filter/book-filter.component';
+import { BookGridComponent } from '@features/books/components/book-grid/book-grid.component';
 import {
 	BookFilterInput,
 	BookList,
@@ -46,7 +47,6 @@ import {
 	DEFAULT_BOOK_LIST_SETTINGS,
 } from '@models/settings.models';
 import { SelectCycleComponent } from '@ui/atoms/select/select-cycle.component';
-import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
 import { distinctUntilChanged, Subscription } from 'rxjs';
 
 interface BookQueryParams {

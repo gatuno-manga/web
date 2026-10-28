@@ -14,12 +14,12 @@ import { MetaDataService } from '@core/services/meta-data.service';
 import { ReadingProgressService } from '@core/services/reading-progress.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { TagsService } from '@core/services/tags.service';
+import { BookGridComponent } from '@features/books/components/book-grid/book-grid.component';
 import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
 import { BookList } from '@models/book.models';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
-import { BookGridComponent } from '@ui/organisms/book-grid/book-grid.component';
 import { firstValueFrom } from 'rxjs';
 
 @Component({

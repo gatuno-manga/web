@@ -15,7 +15,7 @@ import { ContextMenuService } from '@core/services/context-menu.service';
 import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
 import { NotificationService } from '@core/services/notification.service';
-import { BookGridComponent } from '@shared/ui/organisms/book-grid/book-grid.component';
+import { BookGridComponent } from '@features/books/components/book-grid/book-grid.component';
 import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';

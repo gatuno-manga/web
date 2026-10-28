@@ -69,6 +69,90 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": ["src/app/core/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@ui/**",
+											"@ui/*",
+											"@shared/ui/**",
+											"@shared/ui/*",
+											"@features/**",
+											"@features/*",
+											"@pages/**",
+											"@pages/*",
+											"../*/ui/**",
+											"../*/shared/ui/**",
+											"../*/features/**",
+											"../*/pages/**"
+										],
+										"message": "Core cannot import from UI, Shared, Features, or Pages."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/app/shared/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@features/**",
+											"@features/*",
+											"@pages/**",
+											"@pages/*",
+											"../*/features/**",
+											"../*/pages/**"
+										],
+										"message": "Shared cannot import from Features or Pages."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/app/features/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": [
+											"@pages/**",
+											"@pages/*",
+											"../*/pages/**"
+										],
+										"message": "Features cannot import from Pages."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
 		}
 	]
 }
