@@ -11,16 +11,12 @@ import {
 } from '@models/user.models';
 import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { AuthService } from './auth.service';
-import { SensitiveContentService } from './sensitive-content.service';
-import { UnifiedReadingProgressService } from './unified-reading-progress.service';
 import { UserTokenService } from './user-token.service';
 
 describe('AuthService', () => {
 	let service: AuthService;
 	let httpMock: HttpTestingController;
 	let userTokenServiceSpy: jasmine.SpyObj<UserTokenService>;
-	let readingProgressServiceSpy: jasmine.SpyObj<UnifiedReadingProgressService>;
-	let sensitiveContentServiceSpy: jasmine.SpyObj<SensitiveContentService>;
 
 	const mockAssertion: AuthenticationResponseJSON = {
 		id: 'cred',
@@ -43,28 +39,12 @@ describe('AuthService', () => {
 				csrfToken: 'mock-csrf',
 			},
 		);
-		const readingProgressSpy = jasmine.createSpyObj(
-			'UnifiedReadingProgressService',
-			['onUserLogin', 'onUserLogout'],
-		);
-		const sensitiveContentSpy = jasmine.createSpyObj(
-			'SensitiveContentService',
-			['invalidateCache'],
-		);
 
 		TestBed.configureTestingModule({
 			imports: [HttpClientTestingModule],
 			providers: [
 				AuthService,
 				{ provide: UserTokenService, useValue: userTokenSpy },
-				{
-					provide: UnifiedReadingProgressService,
-					useValue: readingProgressSpy,
-				},
-				{
-					provide: SensitiveContentService,
-					useValue: sensitiveContentSpy,
-				},
 			],
 		});
 
@@ -73,12 +53,6 @@ describe('AuthService', () => {
 		userTokenServiceSpy = TestBed.inject(
 			UserTokenService,
 		) as jasmine.SpyObj<UserTokenService>;
-		readingProgressServiceSpy = TestBed.inject(
-			UnifiedReadingProgressService,
-		) as jasmine.SpyObj<UnifiedReadingProgressService>;
-		sensitiveContentServiceSpy = TestBed.inject(
-			SensitiveContentService,
-		) as jasmine.SpyObj<SensitiveContentService>;
 	});
 
 	afterEach(() => {
@@ -106,12 +80,6 @@ describe('AuthService', () => {
 					'access',
 					'csrf',
 				);
-				expect(
-					readingProgressServiceSpy.onUserLogin,
-				).toHaveBeenCalled();
-				expect(
-					sensitiveContentServiceSpy.invalidateCache,
-				).toHaveBeenCalled();
 			});
 
 			const req = httpMock.expectOne('/auth/signin');
@@ -135,12 +103,6 @@ describe('AuthService', () => {
 						'access',
 						'csrf',
 					);
-					expect(
-						readingProgressServiceSpy.onUserLogin,
-					).toHaveBeenCalled();
-					expect(
-						sensitiveContentServiceSpy.invalidateCache,
-					).toHaveBeenCalled();
 				});
 
 			const req = httpMock.expectOne('/auth/mfa/verify-login');
@@ -157,12 +119,6 @@ describe('AuthService', () => {
 		it('should call logout endpoint and remove tokens', () => {
 			service.logout().subscribe(() => {
 				expect(userTokenServiceSpy.removeTokens).toHaveBeenCalled();
-				expect(
-					readingProgressServiceSpy.onUserLogout,
-				).toHaveBeenCalled();
-				expect(
-					sensitiveContentServiceSpy.invalidateCache,
-				).toHaveBeenCalled();
 			});
 
 			const req = httpMock.expectOne('/auth/logout');
@@ -188,12 +144,6 @@ describe('AuthService', () => {
 					'access',
 					'csrf',
 				);
-				expect(
-					readingProgressServiceSpy.onUserLogin,
-				).toHaveBeenCalled();
-				expect(
-					sensitiveContentServiceSpy.invalidateCache,
-				).toHaveBeenCalled();
 			});
 
 			const req = httpMock.expectOne('/auth/signup');
@@ -236,12 +186,6 @@ describe('AuthService', () => {
 						'access',
 						'csrf',
 					);
-					expect(
-						readingProgressServiceSpy.onUserLogin,
-					).toHaveBeenCalled();
-					expect(
-						sensitiveContentServiceSpy.invalidateCache,
-					).toHaveBeenCalled();
 				});
 
 			const req = httpMock.expectOne(
@@ -253,19 +197,6 @@ describe('AuthService', () => {
 				email: 'test@example.com',
 			});
 			req.flush(mockRes);
-		});
-
-		it('verifyPasskeyAuthentication should call verify endpoint without email', () => {
-			service.verifyPasskeyAuthentication(mockAssertion).subscribe();
-
-			const req = httpMock.expectOne(
-				'/auth/passkeys/authenticate/verify',
-			);
-			expect(req.request.method).toBe('POST');
-			expect(req.request.body).toEqual({
-				response: mockAssertion,
-			});
-			req.flush({});
 		});
 	});
 });

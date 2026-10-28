@@ -6,6 +6,7 @@ import {
 import {
 	ApplicationConfig,
 	importProvidersFrom,
+	inject,
 	isDevMode,
 	LOCALE_ID,
 	provideZonelessChangeDetection,
@@ -25,6 +26,8 @@ import {
 import { provideServiceWorker } from '@angular/service-worker';
 import { HttpClientRequestInterceptor } from '@core/interceptors/http-client-request.interceptor';
 import { httpClientResponseInterceptor } from '@core/interceptors/http-client-response.interceptor';
+import { NotificationSettingsService } from '@core/services/notification-settings.service';
+import { NOTIFICATIONS_ENABLED } from '@core/tokens/notifications-enabled.token';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { provideMarkdown } from 'ngx-markdown';
 import { routes } from './app.routes';
@@ -59,6 +62,11 @@ export const appConfig: ApplicationConfig = {
 			}),
 		),
 		{ provide: LOCALE_ID, useValue: 'pt-BR' },
+		{
+			provide: NOTIFICATIONS_ENABLED,
+			useFactory: () =>
+				inject(NotificationSettingsService).enableAllNotifications,
+		},
 		provideMarkdown(),
 	],
 };

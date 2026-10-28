@@ -1,5 +1,11 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Inject, Injectable, OnDestroy, PLATFORM_ID } from '@angular/core';
+import {
+	effect,
+	Inject,
+	Injectable,
+	OnDestroy,
+	PLATFORM_ID,
+} from '@angular/core';
 import { toObservable as signalToObservable } from '@angular/core/rxjs-interop';
 import {
 	RemoteReadingProgress,
@@ -46,6 +52,21 @@ export class UnifiedReadingProgressService implements OnDestroy {
 		this.isBrowser = isPlatformBrowser(platformId);
 		this.setupSyncListener();
 		this.initializeUser();
+
+		if (typeof this.userTokenService?.userIdSignal === 'function') {
+			let previousUserId = this.userTokenService.userIdSignal();
+			effect(() => {
+				const currentUserId = this.userTokenService.userIdSignal();
+				if (currentUserId !== previousUserId) {
+					previousUserId = currentUserId;
+					if (currentUserId) {
+						this.onUserLogin();
+					} else {
+						this.onUserLogout();
+					}
+				}
+			});
+		}
 	}
 
 	/**

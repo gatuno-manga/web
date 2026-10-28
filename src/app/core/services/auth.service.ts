@@ -10,8 +10,6 @@ import {
 import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { tap } from 'rxjs/operators';
 import { CsrfService } from './csrf.service';
-import { SensitiveContentService } from './sensitive-content.service';
-import { UnifiedReadingProgressService } from './unified-reading-progress.service';
 import { UserTokenService } from './user-token.service';
 
 @Injectable({
@@ -21,10 +19,6 @@ export class AuthService {
 	private readonly http = inject(HttpClient);
 	private readonly userTokenService = inject(UserTokenService);
 	private readonly csrfService = inject(CsrfService);
-	private readonly readingProgressService = inject(
-		UnifiedReadingProgressService,
-	);
-	private readonly sensitiveContentService = inject(SensitiveContentService);
 
 	login(payload: loginRequest) {
 		return this.http
@@ -40,9 +34,6 @@ export class AuthService {
 							body.accessToken,
 							body.csrfToken,
 						);
-						// Sincroniza o histórico de leitura após o login
-						this.readingProgressService.onUserLogin();
-						this.sensitiveContentService.invalidateCache();
 					}
 				}),
 			);
@@ -63,9 +54,6 @@ export class AuthService {
 							body.accessToken,
 							body.csrfToken,
 						);
-						// Sincroniza o histórico de leitura após o login
-						this.readingProgressService.onUserLogin();
-						this.sensitiveContentService.invalidateCache();
 					}
 				}),
 			);
@@ -81,8 +69,6 @@ export class AuthService {
 			.pipe(
 				tap(() => {
 					this.userTokenService.removeTokens();
-					this.readingProgressService.onUserLogout();
-					this.sensitiveContentService.invalidateCache();
 				}),
 			);
 	}
@@ -101,9 +87,6 @@ export class AuthService {
 							body.accessToken,
 							body.csrfToken,
 						);
-						// Sincroniza o histórico de leitura após o registro
-						this.readingProgressService.onUserLogin();
-						this.sensitiveContentService.invalidateCache();
 					}
 				}),
 			);
@@ -136,9 +119,6 @@ export class AuthService {
 							body.accessToken,
 							body.csrfToken,
 						);
-						// Sincroniza o histórico de leitura após o login
-						this.readingProgressService.onUserLogin();
-						this.sensitiveContentService.invalidateCache();
 					}
 				}),
 			);

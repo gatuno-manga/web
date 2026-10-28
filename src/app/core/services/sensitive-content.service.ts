@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject, signal } from '@angular/core';
+import { effect, Injectable, inject, signal } from '@angular/core';
 import { SensitiveContentResponse } from '@models/book.models';
 import { Observable, of, shareReplay } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { CookieService } from './cookie.service';
+import { UserTokenService } from './user-token.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -11,6 +12,20 @@ import { CookieService } from './cookie.service';
 export class SensitiveContentService {
 	private readonly http = inject(HttpClient);
 	private readonly cookieService = inject(CookieService);
+	private readonly userTokenService = inject(UserTokenService);
+
+	constructor() {
+		if (typeof this.userTokenService?.userIdSignal === 'function') {
+			let previousUserId = this.userTokenService.userIdSignal();
+			effect(() => {
+				const currentUserId = this.userTokenService.userIdSignal();
+				if (currentUserId !== previousUserId) {
+					previousUserId = currentUserId;
+					this.invalidateCache();
+				}
+			});
+		}
+	}
 
 	KEY = 'sensitive-content-allow';
 

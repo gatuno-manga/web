@@ -34,9 +34,9 @@ import {
 } from '@shared/utils/websocket-logger.utils';
 import mqtt, { MqttClient } from 'mqtt';
 import { Observable, Subject, Subscription } from 'rxjs';
+import { NOTIFICATIONS_ENABLED } from '../tokens/notifications-enabled.token';
 import { NetworkStatusService } from './network-status.service';
 import { NotificationService } from './notification.service';
-import { NotificationSettingsService } from './notification-settings.service';
 import { UserTokenService } from './user-token.service';
 
 export type MqttPayloadData =
@@ -151,11 +151,14 @@ export class MqttService implements OnDestroy {
 	public commentDeleted$ = this.commentDeletedSubject.asObservable();
 	public error$ = this.errorSubject.asObservable();
 
+	private readonly notificationsEnabled = inject(NOTIFICATIONS_ENABLED, {
+		optional: true,
+	});
+
 	constructor(
 		private userTokenService: UserTokenService,
 		private networkStatusService: NetworkStatusService,
 		private notificationService: NotificationService,
-		private notificationSettings: NotificationSettingsService,
 		@Inject(ENVIRONMENT) private env: Environment,
 		@Inject(WINDOW) private window: Window,
 	) {
@@ -437,7 +440,7 @@ export class MqttService implements OnDestroy {
 
 			// Lógica de notificação pessoal
 			if (topic.includes('/notifications')) {
-				if (!this.notificationSettings.enableAllNotifications()) {
+				if (this.notificationsEnabled && !this.notificationsEnabled()) {
 					console.log(
 						'[MQTT_DEBUG] 🚫 Notificação ignorada pois o usuário desativou nas configurações.',
 					);

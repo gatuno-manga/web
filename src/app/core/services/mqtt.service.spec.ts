@@ -2,16 +2,17 @@ import {
 	HttpClientTestingModule,
 	HttpTestingController,
 } from '@angular/common/http/testing';
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { WebSocketConnectionState } from '@core/models/websocket-state.model';
 import { ENVIRONMENT } from '@core/tokens/environment.token';
+import { NOTIFICATIONS_ENABLED } from '@core/tokens/notifications-enabled.token';
 import { WINDOW } from '@core/tokens/window.token';
 import type { MqttClient } from 'mqtt';
 import { Subject } from 'rxjs';
 import { MqttService } from './mqtt.service';
 import { NetworkStatusService } from './network-status.service';
 import { NotificationService } from './notification.service';
-import { NotificationSettingsService } from './notification-settings.service';
 import { UserTokenService } from './user-token.service';
 
 describe('MqttService', () => {
@@ -20,7 +21,7 @@ describe('MqttService', () => {
 	let userTokenServiceSpy: jasmine.SpyObj<UserTokenService>;
 	let networkStatusServiceSpy: jasmine.SpyObj<NetworkStatusService>;
 	let notificationServiceSpy: jasmine.SpyObj<NotificationService>;
-	let notificationSettingsSpy: jasmine.SpyObj<NotificationSettingsService>;
+	let notificationsEnabledSignal = signal(true);
 
 	let mockEnv: {
 		production?: boolean;
@@ -86,10 +87,7 @@ describe('MqttService', () => {
 			'warning',
 		]);
 
-		notificationSettingsSpy = jasmine.createSpyObj(
-			'NotificationSettingsService',
-			['areNotificationsEnabled'],
-		);
+		notificationsEnabledSignal = signal(true);
 
 		TestBed.configureTestingModule({
 			imports: [HttpClientTestingModule],
@@ -105,8 +103,8 @@ describe('MqttService', () => {
 					useValue: notificationServiceSpy,
 				},
 				{
-					provide: NotificationSettingsService,
-					useValue: notificationSettingsSpy,
+					provide: NOTIFICATIONS_ENABLED,
+					useValue: notificationsEnabledSignal,
 				},
 				{ provide: ENVIRONMENT, useValue: mockEnv },
 				{ provide: WINDOW, useValue: mockWindow },
