@@ -10,12 +10,12 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
-import { ReadingProgressService } from '@core/services/reading-progress.service';
 import { BookGridComponent } from '@features/books/components/book-grid/book-grid.component';
 import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
 import { BookService } from '@features/books/services/book.service';
 import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
 import { TagsService } from '@features/books/services/tags.service';
+import { ReadingProgressService } from '@features/reading/services/reading-progress.service';
 import { BookList } from '@models/book.models';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';

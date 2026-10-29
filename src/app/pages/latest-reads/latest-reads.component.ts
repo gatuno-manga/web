@@ -9,13 +9,13 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
-import { ChapterService } from '@core/services/chapter.service';
+import { BookService } from '@features/books/services/book.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+import { ChapterService } from '@features/reading/services/chapter.service';
 import {
 	ReadingProgress,
 	ReadingProgressService,
-} from '@core/services/reading-progress.service';
-import { BookService } from '@features/books/services/book.service';
-import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+} from '@features/reading/services/reading-progress.service';
 import {
 	BookBasic,
 	Chapter,

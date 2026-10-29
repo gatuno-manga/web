@@ -10,13 +10,13 @@ import { InfoBookComponent } from './info-book.component';
 registerLocaleData(localePt, 'pt-BR');
 
 import { UserTokenService } from '@core/services/auth/user-token.service';
-import { ChapterService } from '@core/services/chapter.service';
 import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
 import { NotificationService } from '@core/services/notification/notification.service';
 import { UserService } from '@core/services/user.service';
 import { BookService } from '@features/books/services/book.service';
 import { DownloadService } from '@features/books/services/download.service';
 import { SavedPagesService } from '@features/books/services/saved-pages.service';
+import { ChapterService } from '@features/reading/services/chapter.service';
 import { ScrapingStatus } from '@models/book.models';
 import { ContextMenuService } from '@ui/organisms/context-menu/context-menu.service';
 

@@ -12,12 +12,10 @@ import {
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { UserTokenService } from '@core/services/auth/user-token.service';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
-import { ChapterService } from '@core/services/chapter.service';
 import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
 import { NotificationService } from '@core/services/notification/notification.service';
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
 import { MqttService } from '@core/services/realtime/mqtt.service';
-import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
 import { UserService } from '@core/services/user.service';
 import { ENVIRONMENT } from '@core/tokens/environment.token';
 import { environment } from '@environments/environment';
@@ -27,6 +25,8 @@ import { BookInteractionService } from '@features/books/services/book-interactio
 import { DownloadService } from '@features/books/services/download.service';
 import { DownloadManagerService } from '@features/books/services/download-manager.service';
 import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+import { ChapterService } from '@features/reading/services/chapter.service';
+import { UnifiedReadingProgressService } from '@features/reading/services/unified-reading-progress.service';
 import { BookBasic, Chapterlist, ScrapingStatus } from '@models/book.models';
 import { HasPermissionDirective } from '@shared/directives/has-permission.directive';
 import { TooltipDirective } from '@shared/ui/atoms/tooltip/tooltip.directive';

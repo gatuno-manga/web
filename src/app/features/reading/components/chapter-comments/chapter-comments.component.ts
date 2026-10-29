@@ -12,10 +12,10 @@ import {
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Router, RouterModule } from '@angular/router';
 import { UserTokenService } from '@core/services/auth/user-token.service';
-import { ChapterCommentsService } from '@core/services/chapter-comments.service';
 import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
 import { NotificationService } from '@core/services/notification/notification.service';
 import { UserService } from '@core/services/user.service';
+import { ChapterCommentsService } from '@features/reading/services/chapter-comments.service';
 import { ChapterCommentNode } from '@models/book.models';
 import { Paginated as PaginatedResponse } from '@models/miscellaneous.models';
 import { CommentInitialsPipe } from '@shared/utils/pipes/comment-initials-pipe';

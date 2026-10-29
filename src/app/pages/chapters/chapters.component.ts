@@ -26,8 +26,6 @@ import { UserTokenService } from '@core/services/auth/user-token.service';
 import { HeaderStateService } from '@core/services/browser/header-state.service';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { WakeLockService } from '@core/services/browser/wake-lock.service';
-import { ChapterService } from '@core/services/chapter.service';
-import { HighlightService } from '@core/services/highlight.service';
 import { NotificationSeverity } from '@core/services/notification';
 import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
 import { NotificationService } from '@core/services/notification/notification.service';
@@ -37,8 +35,6 @@ import {
 } from '@core/services/realtime/mqtt.service';
 import { NetworkStatusService } from '@core/services/realtime/network-status.service';
 import { SettingsService } from '@core/services/settings.service';
-import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
-import { VisibilityPrivacyService } from '@core/services/visibility-privacy.service';
 import { BookService } from '@features/books/services/book.service';
 import { DownloadService } from '@features/books/services/download.service';
 import { SavedPagesService } from '@features/books/services/saved-pages.service';
@@ -52,6 +48,10 @@ import {
 	TextProgressEvent,
 	TextReaderComponent,
 } from '@features/reading/components/readers';
+import { ChapterService } from '@features/reading/services/chapter.service';
+import { HighlightService } from '@features/reading/services/highlight.service';
+import { UnifiedReadingProgressService } from '@features/reading/services/unified-reading-progress.service';
+import { VisibilityPrivacyService } from '@features/reading/services/visibility-privacy.service';
 import { Chapter, ContentType, ImageMetadata, Page } from '@models/book.models';
 import { ContextMenuItem } from '@models/context-menu.models';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';

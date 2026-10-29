@@ -12,11 +12,11 @@ import {
 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { UserTokenService } from '@core/services/auth/user-token.service';
-import { ChapterService } from '@core/services/chapter.service';
 import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
 import { NotificationService } from '@core/services/notification/notification.service';
 import { BookService } from '@features/books/services/book.service';
 import { DownloadService } from '@features/books/services/download.service';
+import { ChapterService } from '@features/reading/services/chapter.service';
 import { BookList } from '@models/book.models';
 import { ContextMenuItem } from '@models/context-menu.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
