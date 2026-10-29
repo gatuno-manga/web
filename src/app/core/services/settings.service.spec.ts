@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { LocalStorageService } from '@core/services/storage/local-storage.service';
 import { DEFAULT_SETTINGS } from '@models/settings.models';
-import { LocalStorageService } from './local-storage.service';
 import { SettingsService } from './settings.service';
 
 describe('SettingsService', () => {

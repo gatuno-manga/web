@@ -4,7 +4,7 @@ import {
 	inject,
 	input,
 } from '@angular/core';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { ReaderSettingsFormComponent } from '@features/reading/components/readers';
 
 @Component({

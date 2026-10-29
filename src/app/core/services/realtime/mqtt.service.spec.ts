@@ -5,6 +5,8 @@ import {
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { WebSocketConnectionState } from '@core/models/websocket-state.model';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { ENVIRONMENT } from '@core/tokens/environment.token';
 import { NOTIFICATIONS_ENABLED } from '@core/tokens/notifications-enabled.token';
 import { WINDOW } from '@core/tokens/window.token';
@@ -12,8 +14,6 @@ import type { MqttClient } from 'mqtt';
 import { Subject } from 'rxjs';
 import { MqttService } from './mqtt.service';
 import { NetworkStatusService } from './network-status.service';
-import { NotificationService } from './notification.service';
-import { UserTokenService } from './user-token.service';
 
 describe('MqttService', () => {
 	let service: MqttService;

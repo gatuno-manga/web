@@ -8,8 +8,8 @@ import {
 	OnInit,
 	signal,
 } from '@angular/core';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { DownloadService } from '@core/services/download.service';
-import { MetaDataService } from '@core/services/meta-data.service';
 import { SearchService } from '@core/services/search.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { TagsService } from '@core/services/tags.service';

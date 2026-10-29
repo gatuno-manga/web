@@ -10,20 +10,20 @@ import {
 	signal,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { BookService } from '@core/services/book.service';
 import { BookInteractionService } from '@core/services/book-interaction.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { ChapterService } from '@core/services/chapter.service';
 import { DownloadService } from '@core/services/download.service';
 import { DownloadManagerService } from '@core/services/download-manager.service';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { MqttService } from '@core/services/mqtt.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
-import { NotificationService } from '@core/services/notification.service';
+import { MqttService } from '@core/services/realtime/mqtt.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
 import { UserService } from '@core/services/user.service';
-import { UserTokenService } from '@core/services/user-token.service';
 import { ENVIRONMENT } from '@core/tokens/environment.token';
 import { environment } from '@environments/environment';
 import { InfoBookComponent } from '@features/books/components/info-book/info-book.component';

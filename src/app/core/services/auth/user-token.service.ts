@@ -11,14 +11,17 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { NotificationService } from '@core/services/notification/notification.service';
+import {
+	AuthSyncMessage,
+	CrossTabSyncService,
+} from '@core/services/storage/cross-tab-sync.service';
 import { payloadToken, Role } from '@models/user.models';
 import { jwtDecode } from 'jwt-decode';
 import { Observable, Subscription, throwError, timer } from 'rxjs';
 import { catchError, finalize, shareReplay, tap } from 'rxjs/operators';
 import { CookieService } from './cookie.service';
-import { AuthSyncMessage, CrossTabSyncService } from './cross-tab-sync.service';
 import { CsrfService } from './csrf.service';
-import { NotificationService } from './notification.service';
 
 @Injectable({
 	providedIn: 'root',

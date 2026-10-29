@@ -1,6 +1,8 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, NgZone, PLATFORM_ID } from '@angular/core';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { MqttService } from '@core/services/realtime/mqtt.service';
 import { environment } from '@environments/environment';
 import {
 	Book,
@@ -23,10 +25,8 @@ import { Paginated } from '@models/miscellaneous.models';
 import { firstValueFrom, from, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { DownloadService } from './download.service';
-import { MqttService } from './mqtt.service';
 import { SensitiveContentService } from './sensitive-content.service';
 import { TagsService } from './tags.service';
-import { UserTokenService } from './user-token.service';
 
 @Injectable({
 	providedIn: 'root',

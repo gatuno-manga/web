@@ -7,7 +7,7 @@ import {
 	OnInit,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { FullscreenService } from '@core/services/fullscreen.service';
+import { FullscreenService } from '@core/services/browser/fullscreen.service';
 import { SettingsService } from '@core/services/settings.service';
 import { ReaderSettings } from '@models/settings.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';

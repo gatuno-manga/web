@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { ReadingProgressService } from '@core/services/reading-progress.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { TagsService } from '@core/services/tags.service';

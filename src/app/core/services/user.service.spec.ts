@@ -4,9 +4,9 @@ import {
 } from '@angular/common/http/testing';
 import { signal, WritableSignal } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { Role, UserProfile } from '@models/user.models';
 import { UserService } from './user.service';
-import { UserTokenService } from './user-token.service';
 
 describe('UserService', () => {
 	let service: UserService;

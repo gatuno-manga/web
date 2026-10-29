@@ -9,6 +9,8 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { BookEvents } from '@constants/book-events.constants';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { ENVIRONMENT, Environment } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
 import {
@@ -34,10 +36,8 @@ import {
 } from '@shared/utils/websocket-logger.utils';
 import mqtt, { MqttClient } from 'mqtt';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { NOTIFICATIONS_ENABLED } from '../tokens/notifications-enabled.token';
+import { NOTIFICATIONS_ENABLED } from '@core/tokens/notifications-enabled.token';
 import { NetworkStatusService } from './network-status.service';
-import { NotificationService } from './notification.service';
-import { UserTokenService } from './user-token.service';
 
 export type MqttPayloadData =
 	| BookEvent

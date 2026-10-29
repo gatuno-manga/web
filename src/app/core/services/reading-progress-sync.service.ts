@@ -1,5 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, inject, OnDestroy, signal } from '@angular/core';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { BackgroundSyncRegistrationService } from '@core/services/realtime/background-sync-registration.service';
+import { MqttService } from '@core/services/realtime/mqtt.service';
+import { NetworkStatusService } from '@core/services/realtime/network-status.service';
 import { ENVIRONMENT, Environment } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
 import {
@@ -16,14 +20,10 @@ import {
 import { IDBPDatabase, openDB } from 'idb';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
-import { MqttService } from './mqtt.service';
-import { NetworkStatusService } from './network-status.service';
 import {
 	ReadingProgress,
 	ReadingProgressService,
 } from './reading-progress.service';
-import { UserTokenService } from './user-token.service';
 
 export interface SyncStatus {
 	connected: boolean;

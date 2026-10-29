@@ -1,11 +1,11 @@
 import { PLATFORM_ID, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { Subject } from 'rxjs';
 import { ReadingProgressService } from './reading-progress.service';
 import { ReadingProgressSyncService } from './reading-progress-sync.service';
 import { SensitiveContentService } from './sensitive-content.service';
 import { UnifiedReadingProgressService } from './unified-reading-progress.service';
-import { UserTokenService } from './user-token.service';
 
 describe('UnifiedReadingProgressService & SensitiveContentService react to userIdSignal', () => {
 	let readingService: UnifiedReadingProgressService;

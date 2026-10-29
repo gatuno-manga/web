@@ -7,7 +7,7 @@ import {
 	input,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { NotificationSettingsService } from '@core/services/notification-settings.service';
 import { SearchService } from '@core/services/search.service';
 import { SelectComponent } from '@ui/atoms/inputs/select/select.component';

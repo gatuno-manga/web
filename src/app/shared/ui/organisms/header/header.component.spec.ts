@@ -3,10 +3,10 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { BookService } from '@core/services/book.service';
-import { ThemeService } from '@core/services/theme.service';
+import { ThemeService } from '@core/services/theme/theme.service';
 import { UserService } from '@core/services/user.service';
-import { UserTokenService } from '@core/services/user-token.service';
 import { of } from 'rxjs';
 import { HeaderComponent } from './header.component';
 

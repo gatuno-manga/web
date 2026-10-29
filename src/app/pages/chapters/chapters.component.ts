@@ -22,24 +22,26 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { BookService } from '@core/services/book.service';
+import { HeaderStateService } from '@core/services/browser/header-state.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
+import { WakeLockService } from '@core/services/browser/wake-lock.service';
 import { ChapterService } from '@core/services/chapter.service';
-import { ContextMenuService } from '@core/services/context-menu.service';
 import { DownloadService } from '@core/services/download.service';
-import { HeaderStateService } from '@core/services/header-state.service';
 import { HighlightService } from '@core/services/highlight.service';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { MqttService, MqttWatchEvent } from '@core/services/mqtt.service';
-import { NetworkStatusService } from '@core/services/network-status.service';
 import { NotificationSeverity } from '@core/services/notification';
-import { NotificationService } from '@core/services/notification.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
+import {
+	MqttService,
+	MqttWatchEvent,
+} from '@core/services/realtime/mqtt.service';
+import { NetworkStatusService } from '@core/services/realtime/network-status.service';
 import { SavedPagesService } from '@core/services/saved-pages.service';
 import { SettingsService } from '@core/services/settings.service';
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
-import { UserTokenService } from '@core/services/user-token.service';
 import { VisibilityPrivacyService } from '@core/services/visibility-privacy.service';
-import { WakeLockService } from '@core/services/wake-lock.service';
 import { ChapterCommentsComponent } from '@features/reading/components/chapter-comments/chapter-comments.component';
 import { ReaderSettingsNotificationComponent } from '@features/reading/components/reader-settings-notification/reader-settings-notification.component';
 import {
@@ -58,6 +60,7 @@ import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
 import { AsideComponent } from '@ui/organisms/aside/aside.component';
+import { ContextMenuService } from '@ui/organisms/context-menu/context-menu.service';
 import { fromEvent, lastValueFrom } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 

@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { TagsService } from '@core/services/tags.service';
 import { Tag } from '@models/tags.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';

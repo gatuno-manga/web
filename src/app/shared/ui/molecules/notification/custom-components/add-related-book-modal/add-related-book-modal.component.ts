@@ -14,7 +14,7 @@ import {
 } from '@angular/forms';
 import { BookService } from '@core/services/book.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { BookList } from '@models/book.models';
 import {
 	CreateBookRelationshipDto,

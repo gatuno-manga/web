@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { environment } from '@environments/environment';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { NotificationService } from './notification.service';
-import { UserTokenService } from './user-token.service';
 
 export interface DownloadTask {
 	id: string;

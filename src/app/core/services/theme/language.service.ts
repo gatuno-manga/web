@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
-import { LocalStorageService } from './local-storage.service';
+import { LocalStorageService } from '@core/services/storage/local-storage.service';
 
 const LANGUAGE_KEY = 'app-language';
 

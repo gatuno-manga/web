@@ -14,8 +14,8 @@ import {
 	Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '@core/services/auth.service';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { AuthService } from '@core/services/auth/auth.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { SearchService } from '@core/services/search.service';
 import { UserService } from '@core/services/user.service';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';

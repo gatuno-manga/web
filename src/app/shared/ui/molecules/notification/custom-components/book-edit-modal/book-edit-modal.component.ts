@@ -21,7 +21,7 @@ import {
 	Validators,
 } from '@angular/forms';
 import { AuthorsService } from '@core/services/authors.service';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { TagsService } from '@core/services/tags.service';
 import {

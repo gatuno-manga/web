@@ -9,12 +9,12 @@ import {
 	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LanguageService } from '@core/services/language.service';
-import { LocalStorageService } from '@core/services/local-storage.service';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { SearchService } from '@core/services/search.service';
 import { SettingsService } from '@core/services/settings.service';
-import { AppTheme, ThemeService } from '@core/services/theme.service';
+import { LocalStorageService } from '@core/services/storage/local-storage.service';
+import { LanguageService } from '@core/services/theme/language.service';
+import { AppTheme, ThemeService } from '@core/services/theme/theme.service';
 import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,

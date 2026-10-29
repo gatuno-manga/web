@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { effect, Injectable, inject, signal } from '@angular/core';
+import { CookieService } from '@core/services/auth/cookie.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { SensitiveContentResponse } from '@models/book.models';
 import { Observable, of, shareReplay } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { CookieService } from './cookie.service';
-import { UserTokenService } from './user-token.service';
 
 @Injectable({
 	providedIn: 'root',

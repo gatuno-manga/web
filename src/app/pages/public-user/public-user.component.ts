@@ -7,7 +7,7 @@ import {
 	signal,
 } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { PublicUserService } from '@core/services/public-user.service';
 import {
 	PublicUserCollection,

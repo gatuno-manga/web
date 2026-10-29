@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { DashboardService } from '@core/services/dashboard.service';
-import { MqttService } from '@core/services/mqtt.service';
+import { MqttService } from '@core/services/realtime/mqtt.service';
 import {
 	UpdateCompletedEvent,
 	UpdateFailedEvent,

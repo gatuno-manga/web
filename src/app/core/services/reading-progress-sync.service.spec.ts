@@ -3,16 +3,16 @@ import {
 	HttpTestingController,
 } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { BackgroundSyncRegistrationService } from '@core/services/realtime/background-sync-registration.service';
+import { MqttService } from '@core/services/realtime/mqtt.service';
+import { NetworkStatusService } from '@core/services/realtime/network-status.service';
 import { ENVIRONMENT } from '@core/tokens/environment.token';
 import { WINDOW } from '@core/tokens/window.token';
 import { SyncResponse } from '@models/reading-progress-events.model';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { BackgroundSyncRegistrationService } from './background-sync-registration.service';
-import { MqttService } from './mqtt.service';
-import { NetworkStatusService } from './network-status.service';
 import { ReadingProgressService } from './reading-progress.service';
 import { ReadingProgressSyncService } from './reading-progress-sync.service';
-import { UserTokenService } from './user-token.service';
 
 describe('ReadingProgressSyncService', () => {
 	let service: ReadingProgressSyncService;

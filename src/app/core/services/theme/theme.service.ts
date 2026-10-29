@@ -8,8 +8,8 @@ import {
 	RendererFactory2,
 	signal,
 } from '@angular/core';
-import { CookieService } from './cookie.service';
-import { LocalStorageService } from './local-storage.service';
+import { CookieService } from '@core/services/auth/cookie.service';
+import { LocalStorageService } from '@core/services/storage/local-storage.service';
 
 const THEME_KEY = 'theme';
 const CUSTOM_COLORS_KEY = 'custom_colors';

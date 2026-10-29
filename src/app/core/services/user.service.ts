@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { Role, UserProfile } from '@models/user.models';
 import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
-import { UserTokenService } from './user-token.service';
 
 @Injectable({
 	providedIn: 'root',

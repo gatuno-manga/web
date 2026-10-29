@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { LocalStorageService } from '@core/services/storage/local-storage.service';
 import { DEFAULT_SETTINGS, ReaderSettings } from '@models/settings.models';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { LocalStorageService } from './local-storage.service';
 
 const MIN_LINE_HEIGHT = 1;
 const MAX_LINE_HEIGHT = 3;

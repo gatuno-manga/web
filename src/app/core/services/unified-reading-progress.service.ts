@@ -7,6 +7,7 @@ import {
 	PLATFORM_ID,
 } from '@angular/core';
 import { toObservable as signalToObservable } from '@angular/core/rxjs-interop';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import {
 	RemoteReadingProgress,
 	SaveProgressDto,
@@ -20,7 +21,6 @@ import {
 	ReadingProgressService,
 } from './reading-progress.service';
 import { ReadingProgressSyncService } from './reading-progress-sync.service';
-import { UserTokenService } from './user-token.service';
 
 /**
  * Facade para gerenciamento unificado do progresso de leitura

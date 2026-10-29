@@ -1,12 +1,12 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { MqttService } from '@core/services/realtime/mqtt.service';
 import { OfflineBook } from '@models/offline.models';
 import { BookService } from './book.service';
 import { DownloadService } from './download.service';
-import { MqttService } from './mqtt.service';
 import { SensitiveContentService } from './sensitive-content.service';
-import { UserTokenService } from './user-token.service';
 
 describe('BookService', () => {
 	let service: BookService;

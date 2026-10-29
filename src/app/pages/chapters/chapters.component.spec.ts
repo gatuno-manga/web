@@ -3,8 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { BookService } from '@core/services/book.service';
 import { DownloadService } from '@core/services/download.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { NotificationService } from '@core/services/notification.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { of, ReplaySubject } from 'rxjs';
 

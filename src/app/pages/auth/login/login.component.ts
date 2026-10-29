@@ -13,8 +13,8 @@ import {
 	Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { AuthService } from '@core/services/auth.service';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { AuthService } from '@core/services/auth/auth.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import {
 	isAuthTokensResponse,
 	isMfaChallengeResponse,

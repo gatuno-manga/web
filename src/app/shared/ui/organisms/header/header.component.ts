@@ -8,9 +8,9 @@ import {
 	output,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ThemeService } from '@core/services/theme.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { ThemeService } from '@core/services/theme/theme.service';
 import { UserService } from '@core/services/user.service';
-import { UserTokenService } from '@core/services/user-token.service';
 import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { SearchMoleculeComponent } from '@ui/molecules/search/search.molecule';

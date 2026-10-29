@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { APP_ICONS } from '../constants/icons.constant';
+import { APP_ICONS } from '@constants/icons.constant';
 
 @Injectable({ providedIn: 'root' })
 export class IconRegistryService {

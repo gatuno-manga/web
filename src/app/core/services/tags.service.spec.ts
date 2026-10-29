@@ -4,11 +4,11 @@ import {
 } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { OfflineBook } from '@models/offline.models';
 import { DownloadService } from './download.service';
 import { SensitiveContentService } from './sensitive-content.service';
 import { TagsService } from './tags.service';
-import { UserTokenService } from './user-token.service';
 
 describe('TagsService', () => {
 	let service: TagsService;

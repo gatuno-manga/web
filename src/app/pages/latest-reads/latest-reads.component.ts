@@ -9,8 +9,8 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BookService } from '@core/services/book.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { ChapterService } from '@core/services/chapter.service';
-import { MetaDataService } from '@core/services/meta-data.service';
 import {
 	ReadingProgress,
 	ReadingProgressService,

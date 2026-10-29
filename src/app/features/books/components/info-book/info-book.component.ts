@@ -33,17 +33,16 @@ import {
 	RouterLink,
 	RouterModule,
 } from '@angular/router';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { BookService } from '@core/services/book.service';
 import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
-import { ContextMenuService } from '@core/services/context-menu.service';
 import { DownloadService } from '@core/services/download.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
 import { NotificationSeverity } from '@core/services/notification';
-import { NotificationService } from '@core/services/notification.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { SavedPagesService } from '@core/services/saved-pages.service';
 import { UserService } from '@core/services/user.service';
-import { UserTokenService } from '@core/services/user-token.service';
 import {
 	Book,
 	BookBasic,
@@ -83,6 +82,7 @@ import {
 	SourceAddModalComponent,
 	SourceAddSaveEvent,
 } from '@ui/molecules/notification/custom-components/source-add-modal/source-add-modal.component';
+import { ContextMenuService } from '@ui/organisms/context-menu/context-menu.service';
 import { ImageViewerComponent } from '@ui/organisms/image-viewer/image-viewer.component';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { BookReviewFormComponent } from '../book-review-form/book-review-form.component';

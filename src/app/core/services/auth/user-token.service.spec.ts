@@ -16,12 +16,15 @@ import {
 } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { HttpClientRequestInterceptor } from '@core/interceptors/http-client-request.interceptor';
+import { NotificationService } from '@core/services/notification/notification.service';
+import {
+	AuthSyncMessage,
+	CrossTabSyncService,
+} from '@core/services/storage/cross-tab-sync.service';
 import { Role } from '@models/user.models';
 import { Subject } from 'rxjs';
 import { CookieService } from './cookie.service';
-import { AuthSyncMessage, CrossTabSyncService } from './cross-tab-sync.service';
 import { CsrfService } from './csrf.service';
-import { NotificationService } from './notification.service';
 import { UserTokenService } from './user-token.service';
 
 describe('UserTokenService', () => {

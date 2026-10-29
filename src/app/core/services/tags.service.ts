@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
+import { CookieService } from '@core/services/auth/cookie.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { Tag, TagsPageOptions } from '@models/tags.models';
 import { from } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { CookieService } from './cookie.service';
 import { DownloadService } from './download.service';
 import { SensitiveContentService } from './sensitive-content.service';
-import { UserTokenService } from './user-token.service';
 
 @Injectable({
 	providedIn: 'root',

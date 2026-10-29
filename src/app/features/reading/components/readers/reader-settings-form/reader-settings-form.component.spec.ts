@@ -1,7 +1,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LocalStorageService } from '@core/services/local-storage.service';
 import { SettingsService } from '@core/services/settings.service';
+import { LocalStorageService } from '@core/services/storage/local-storage.service';
 import { ReaderSettingsFormComponent } from './reader-settings-form.component';
 
 describe('ReaderSettingsFormComponent', () => {

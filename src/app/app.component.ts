@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { ThemeService } from '@core/services/theme.service';
+import { ThemeService } from '@core/services/theme/theme.service';
 import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
 import { OverlayNotificationComponent } from '@ui/molecules/notification/overlay-notification/overlay-notification.component';
 import { ContextMenuComponent } from '@ui/organisms/context-menu/context-menu.component';

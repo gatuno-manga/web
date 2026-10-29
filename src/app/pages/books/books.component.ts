@@ -22,16 +22,16 @@ import {
 	RouterModule,
 } from '@angular/router';
 import { BookService } from '@core/services/book.service';
-import { DownloadService } from '@core/services/download.service';
-import { LocalStorageService } from '@core/services/local-storage.service';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { NetworkStatusService } from '@core/services/network-status.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import {
 	ScrollRestorationService,
 	ScrollRestorationState,
-} from '@core/services/scroll-restoration.service';
+} from '@core/services/browser/scroll-restoration.service';
+import { DownloadService } from '@core/services/download.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NetworkStatusService } from '@core/services/realtime/network-status.service';
 import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { LocalStorageService } from '@core/services/storage/local-storage.service';
 import { TagsService } from '@core/services/tags.service';
 import { BookFilterComponent } from '@features/books/components/book-filter/book-filter.component';
 import { BookGridComponent } from '@features/books/components/book-grid/book-grid.component';
