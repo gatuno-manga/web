@@ -34,15 +34,15 @@ import {
 	RouterModule,
 } from '@angular/router';
 import { UserTokenService } from '@core/services/auth/user-token.service';
-import { BookService } from '@core/services/book.service';
-import { BookRelationshipService } from '@core/services/book-relationship.service';
 import { ChapterService } from '@core/services/chapter.service';
-import { DownloadService } from '@core/services/download.service';
 import { NotificationSeverity } from '@core/services/notification';
 import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
 import { NotificationService } from '@core/services/notification/notification.service';
-import { SavedPagesService } from '@core/services/saved-pages.service';
 import { UserService } from '@core/services/user.service';
+import { BookService } from '@features/books/services/book.service';
+import { BookRelationshipService } from '@features/books/services/book-relationship.service';
+import { DownloadService } from '@features/books/services/download.service';
+import { SavedPagesService } from '@features/books/services/saved-pages.service';
 import {
 	Book,
 	BookBasic,

@@ -20,10 +20,10 @@ import {
 	ReactiveFormsModule,
 	Validators,
 } from '@angular/forms';
-import { AuthorsService } from '@core/services/authors.service';
 import { NotificationService } from '@core/services/notification/notification.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { TagsService } from '@core/services/tags.service';
+import { AuthorsService } from '@features/books/services/authors.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+import { TagsService } from '@features/books/services/tags.service';
 import {
 	Author,
 	BookBasic,

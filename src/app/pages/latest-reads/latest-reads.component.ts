@@ -8,14 +8,14 @@ import {
 	signal,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { BookService } from '@core/services/book.service';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { ChapterService } from '@core/services/chapter.service';
 import {
 	ReadingProgress,
 	ReadingProgressService,
 } from '@core/services/reading-progress.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { BookService } from '@features/books/services/book.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
 import {
 	BookBasic,
 	Chapter,

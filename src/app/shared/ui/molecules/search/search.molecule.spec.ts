@@ -5,7 +5,7 @@ import {
 	tick,
 } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BookService } from '@core/services/book.service';
+import { BookService } from '@features/books/services/book.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { of } from 'rxjs';
 import { SearchMoleculeComponent } from './search.molecule';

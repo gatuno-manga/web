@@ -21,20 +21,20 @@ import {
 	Router,
 	RouterModule,
 } from '@angular/router';
-import { BookService } from '@core/services/book.service';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
 import {
 	ScrollRestorationService,
 	ScrollRestorationState,
 } from '@core/services/browser/scroll-restoration.service';
-import { DownloadService } from '@core/services/download.service';
 import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
 import { NetworkStatusService } from '@core/services/realtime/network-status.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
 import { LocalStorageService } from '@core/services/storage/local-storage.service';
-import { TagsService } from '@core/services/tags.service';
 import { BookFilterComponent } from '@features/books/components/book-filter/book-filter.component';
 import { BookGridComponent } from '@features/books/components/book-grid/book-grid.component';
+import { BookService } from '@features/books/services/book.service';
+import { DownloadService } from '@features/books/services/download.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+import { TagsService } from '@features/books/services/tags.service';
 import {
 	BookFilterInput,
 	BookList,

@@ -13,8 +13,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
 import { NotificationService } from '@core/services/notification/notification.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { TagsService } from '@core/services/tags.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+import { TagsService } from '@features/books/services/tags.service';
 import {
 	BookPageOptions,
 	SensitiveContentResponse,

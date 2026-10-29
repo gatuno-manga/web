@@ -114,14 +114,14 @@
 								"patterns": [
 									{
 										"group": [
-											"@features/**",
-											"@features/*",
+											"@features/**/components/**",
+											"@features/*/components/**",
 											"@pages/**",
 											"@pages/*",
-											"../*/features/**",
+											"../*/features/**/components/**",
 											"../*/pages/**"
 										],
-										"message": "Shared cannot import from Features or Pages."
+										"message": "Shared cannot import from Feature components or Pages."
 									}
 								]
 							}

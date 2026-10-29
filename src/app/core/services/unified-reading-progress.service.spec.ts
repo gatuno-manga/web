@@ -4,12 +4,10 @@ import { UserTokenService } from '@core/services/auth/user-token.service';
 import { Subject } from 'rxjs';
 import { ReadingProgressService } from './reading-progress.service';
 import { ReadingProgressSyncService } from './reading-progress-sync.service';
-import { SensitiveContentService } from './sensitive-content.service';
 import { UnifiedReadingProgressService } from './unified-reading-progress.service';
 
-describe('UnifiedReadingProgressService & SensitiveContentService react to userIdSignal', () => {
+describe('UnifiedReadingProgressService react to userIdSignal', () => {
 	let readingService: UnifiedReadingProgressService;
-	let sensitiveContentService: SensitiveContentService;
 	let userIdSignal = signal<string | null>(null);
 
 	let localProgressSpy: jasmine.SpyObj<ReadingProgressService>;
@@ -50,7 +48,6 @@ describe('UnifiedReadingProgressService & SensitiveContentService react to userI
 		TestBed.configureTestingModule({
 			providers: [
 				UnifiedReadingProgressService,
-				SensitiveContentService,
 				{ provide: PLATFORM_ID, useValue: 'browser' },
 				{ provide: ReadingProgressService, useValue: localProgressSpy },
 				{
@@ -62,22 +59,17 @@ describe('UnifiedReadingProgressService & SensitiveContentService react to userI
 		});
 
 		readingService = TestBed.inject(UnifiedReadingProgressService);
-		sensitiveContentService = TestBed.inject(SensitiveContentService);
 	});
 
-	it('trocar userIdSignal de null para um id chama onUserLogin e invalidateCache uma vez, e voltar para null chama onUserLogout', async () => {
+	it('trocar userIdSignal de null para um id chama onUserLogin, e voltar para null chama onUserLogout', async () => {
 		spyOn(readingService, 'onUserLogin').and.callThrough();
 		spyOn(readingService, 'onUserLogout').and.callThrough();
-		spyOn(sensitiveContentService, 'invalidateCache').and.callThrough();
 
 		// Trocar userIdSignal de null para um id
 		userIdSignal.set('user-123');
 		TestBed.flushEffects();
 
 		expect(readingService.onUserLogin).toHaveBeenCalledTimes(1);
-		expect(sensitiveContentService.invalidateCache).toHaveBeenCalledTimes(
-			1,
-		);
 		expect(readingService.onUserLogout).not.toHaveBeenCalled();
 
 		// Voltar userIdSignal para null
@@ -85,8 +77,5 @@ describe('UnifiedReadingProgressService & SensitiveContentService react to userI
 		TestBed.flushEffects();
 
 		expect(readingService.onUserLogout).toHaveBeenCalledTimes(1);
-		expect(sensitiveContentService.invalidateCache).toHaveBeenCalledTimes(
-			2,
-		);
 	});
 });

@@ -11,10 +11,10 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { UserTokenService } from '@core/services/auth/user-token.service';
-import { BookService } from '@core/services/book.service';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { DashboardService } from '@core/services/dashboard.service';
 import { MqttService } from '@core/services/realtime/mqtt.service';
+import { BookService } from '@features/books/services/book.service';
 import {
 	DashboardOverview,
 	DashboardProgress,

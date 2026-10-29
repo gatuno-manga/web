@@ -1,10 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
-import { BookService } from '@core/services/book.service';
-import { DownloadService } from '@core/services/download.service';
 import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
 import { NotificationService } from '@core/services/notification/notification.service';
+import { BookService } from '@features/books/services/book.service';
+import { DownloadService } from '@features/books/services/download.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { of, ReplaySubject } from 'rxjs';
 

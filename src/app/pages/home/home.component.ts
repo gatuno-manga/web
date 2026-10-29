@@ -9,13 +9,13 @@ import {
 	signal,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { BookService } from '@core/services/book.service';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { ReadingProgressService } from '@core/services/reading-progress.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { TagsService } from '@core/services/tags.service';
 import { BookGridComponent } from '@features/books/components/book-grid/book-grid.component';
 import { ItemBookComponent } from '@features/books/components/item-book/item-book.component';
+import { BookService } from '@features/books/services/book.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+import { TagsService } from '@features/books/services/tags.service';
 import { BookList } from '@models/book.models';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
