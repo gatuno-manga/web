@@ -10,11 +10,11 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
-import { SearchService } from '@core/services/search.service';
-import { SettingsService } from '@core/services/settings.service';
 import { LocalStorageService } from '@core/services/storage/local-storage.service';
 import { LanguageService } from '@core/services/theme/language.service';
 import { AppTheme, ThemeService } from '@core/services/theme/theme.service';
+import { SearchService } from '@features/user/services/search.service';
+import { SettingsService } from '@features/user/services/settings.service';
 import {
 	BookListSettings,
 	DEFAULT_BOOK_LIST_SETTINGS,

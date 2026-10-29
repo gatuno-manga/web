@@ -34,7 +34,6 @@ import {
 	MqttWatchEvent,
 } from '@core/services/realtime/mqtt.service';
 import { NetworkStatusService } from '@core/services/realtime/network-status.service';
-import { SettingsService } from '@core/services/settings.service';
 import { BookService } from '@features/books/services/book.service';
 import { DownloadService } from '@features/books/services/download.service';
 import { SavedPagesService } from '@features/books/services/saved-pages.service';
@@ -52,6 +51,7 @@ import { ChapterService } from '@features/reading/services/chapter.service';
 import { HighlightService } from '@features/reading/services/highlight.service';
 import { UnifiedReadingProgressService } from '@features/reading/services/unified-reading-progress.service';
 import { VisibilityPrivacyService } from '@features/reading/services/visibility-privacy.service';
+import { SettingsService } from '@features/user/services/settings.service';
 import { Chapter, ContentType, ImageMetadata, Page } from '@models/book.models';
 import { ContextMenuItem } from '@models/context-menu.models';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';

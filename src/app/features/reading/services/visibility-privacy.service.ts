@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, inject, NgZone, PLATFORM_ID, signal } from '@angular/core';
-import { SettingsService } from '@core/services/settings.service';
+import { SettingsService } from '@features/user/services/settings.service';
 
 @Injectable({
 	providedIn: 'root',

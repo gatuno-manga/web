@@ -20,7 +20,7 @@ import {
 	ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { SettingsService } from '@core/services/settings.service';
+import { SettingsService } from '@features/user/services/settings.service';
 import { DocumentFormat } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ContextMenuService } from '@ui/organisms/context-menu/context-menu.service';

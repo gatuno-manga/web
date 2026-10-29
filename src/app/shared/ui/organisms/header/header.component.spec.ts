@@ -5,8 +5,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { UserTokenService } from '@core/services/auth/user-token.service';
 import { ThemeService } from '@core/services/theme/theme.service';
-import { UserService } from '@core/services/user.service';
 import { BookService } from '@features/books/services/book.service';
+import { UserService } from '@features/user/services/user.service';
 import { of } from 'rxjs';
 import { HeaderComponent } from './header.component';
 

@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
-import { PublicUserService } from '@core/services/public-user.service';
+import { PublicUserService } from '@features/user/services/public-user.service';
 import {
 	PublicUserCollection,
 	PublicUserProfile,

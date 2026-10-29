@@ -9,10 +9,10 @@ import {
 	signal,
 } from '@angular/core';
 import { MetaDataService } from '@core/services/browser/meta-data.service';
-import { SearchService } from '@core/services/search.service';
 import { DownloadService } from '@features/books/services/download.service';
 import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
 import { TagsService } from '@features/books/services/tags.service';
+import { SearchService } from '@features/user/services/search.service';
 import { SensitiveContentResponse } from '@models/book.models';
 import { Tag } from '@models/tags.models';
 import { MultiSelectTagsComponent } from '@ui/organisms/multi-select-tags/multi-select-tags.component';

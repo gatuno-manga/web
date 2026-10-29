@@ -37,12 +37,12 @@ import { UserTokenService } from '@core/services/auth/user-token.service';
 import { NotificationSeverity } from '@core/services/notification';
 import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
 import { NotificationService } from '@core/services/notification/notification.service';
-import { UserService } from '@core/services/user.service';
 import { BookService } from '@features/books/services/book.service';
 import { BookRelationshipService } from '@features/books/services/book-relationship.service';
 import { DownloadService } from '@features/books/services/download.service';
 import { SavedPagesService } from '@features/books/services/saved-pages.service';
 import { ChapterService } from '@features/reading/services/chapter.service';
+import { UserService } from '@features/user/services/user.service';
 import {
 	Book,
 	BookBasic,
