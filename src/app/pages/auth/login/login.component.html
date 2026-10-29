@@ -28,7 +28,7 @@
           type="email"
           leftIcon="email"
           autocomplete="username webauthn"
-          [errors]="this.form.get('email')?.errors"
+          [errors]="$safeNavigationMigration(this.form.get('email')?.errors)"
           [touched]="this.form.get('email')?.touched ?? false"
         />
 
@@ -106,7 +106,7 @@
           id="password"
           type="password"
           leftIcon="lock"
-          [errors]="this.form.get('password')?.errors"
+          [errors]="$safeNavigationMigration(this.form.get('password')?.errors)"
           [touched]="this.form.get('password')?.touched ?? false"
         />
 

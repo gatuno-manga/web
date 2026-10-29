@@ -1,0 +1,164 @@
+import { HttpClient } from '@angular/common/http';
+import { effect, Injectable, inject, signal } from '@angular/core';
+import { CookieService } from '@core/services/auth/cookie.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { SensitiveContentResponse } from '@models/book.models';
+import { Observable, of, shareReplay } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+
+@Injectable({
+	providedIn: 'root',
+})
+export class SensitiveContentService {
+	private readonly http = inject(HttpClient);
+	private readonly cookieService = inject(CookieService);
+	private readonly userTokenService = inject(UserTokenService);
+
+	constructor() {
+		if (typeof this.userTokenService?.userIdSignal === 'function') {
+			let previousUserId = this.userTokenService.userIdSignal();
+			effect(() => {
+				const currentUserId = this.userTokenService.userIdSignal();
+				if (currentUserId !== previousUserId) {
+					previousUserId = currentUserId;
+					this.invalidateCache();
+				}
+			});
+		}
+	}
+
+	KEY = 'sensitive-content-allow';
+
+	allowContentSignal = signal<string[]>(this.getInitialContentAllow());
+
+	/** Cached observable — shared across all subscribers to avoid duplicate GETs. */
+	private sensitiveContentCache$: Observable<
+		SensitiveContentResponse[]
+	> | null = null;
+
+	private getInitialContentAllow(): string[] {
+		const content = this.cookieService.get(this.KEY);
+		if (!content) return [];
+		try {
+			return JSON.parse(content) as string[];
+		} catch (error) {
+			console.error('Error parsing content allow:', error);
+			return [];
+		}
+	}
+
+	getContentAllow(): string[] {
+		return this.allowContentSignal();
+	}
+
+	setContentAllow(content: string[]): void {
+		this.cookieService.set(this.KEY, JSON.stringify(content));
+		this.allowContentSignal.set(content);
+	}
+
+	/**
+	 * Returns the list of sensitive-content types.
+	 * The first call triggers a single GET request; subsequent calls (e.g. from the
+	 * user-menu and book-filter rendered on the same page) share the cached response
+	 * via shareReplay(1) — no duplicate network requests are made.
+	 * The cache is invalidated whenever the data is mutated (create/update/delete/merge).
+	 */
+	getSensitiveContent(): Observable<SensitiveContentResponse[]> {
+		if (!this.sensitiveContentCache$) {
+			this.sensitiveContentCache$ = this.http
+				.get<SensitiveContentResponse[]>('sensitive-content')
+				.pipe(
+					catchError(() => {
+						// Não cacheia falhas: libera o cache para que a próxima
+						// chamada tente uma nova requisição em vez de repetir
+						// permanentemente uma lista vazia.
+						this.invalidateCache();
+						return of([]);
+					}),
+					shareReplay(1),
+				);
+		}
+		return this.sensitiveContentCache$;
+	}
+
+	/** Invalidates the in-memory cache so the next call triggers a fresh GET. */
+	invalidateCache(): void {
+		this.sensitiveContentCache$ = null;
+	}
+
+	/**
+	 * Cria uma nova tag de conteúdo sensível.
+	 */
+	createSensitiveContent(
+		name: string,
+		weight?: number,
+	): Observable<SensitiveContentResponse> {
+		return this.http
+			.post<SensitiveContentResponse>('sensitive-content', {
+				name,
+				weight,
+			})
+			.pipe(tap(() => this.invalidateCache()));
+	}
+
+	/**
+	 * Atualiza uma tag de conteúdo sensível existente.
+	 */
+	updateSensitiveContent(
+		id: string,
+		name: string,
+		weight?: number,
+	): Observable<SensitiveContentResponse> {
+		return this.http
+			.put<SensitiveContentResponse>(`sensitive-content/${id}`, {
+				name,
+				weight,
+			})
+			.pipe(tap(() => this.invalidateCache()));
+	}
+
+	/**
+	 * Remove uma tag de conteúdo sensível.
+	 */
+	deleteSensitiveContent(id: string): Observable<void> {
+		return this.http
+			.delete<void>(`sensitive-content/${id}`)
+			.pipe(tap(() => this.invalidateCache()));
+	}
+
+	/**
+	 * Mescla tags de conteúdo sensível.
+	 */
+	mergeSensitiveContent(
+		targetId: string,
+		sourceIds: string[],
+	): Observable<void> {
+		return this.http
+			.patch<void>(`sensitive-content/${targetId}/merge`, sourceIds)
+			.pipe(tap(() => this.invalidateCache()));
+	}
+
+	/**
+	 * Atualiza múltiplas tags de conteúdo sensível em lote (ex: reordenação).
+	 */
+	updateSensitiveContentBatch(
+		items: Partial<SensitiveContentResponse>[],
+	): Observable<void> {
+		return this.http
+			.patch<void>('sensitive-content/batch', { items })
+			.pipe(tap(() => this.invalidateCache()));
+	}
+
+	isAllowed(contents: { name: string }[] | string[]): boolean {
+		const allowed = new Set(this.allowContentSignal());
+		// Default 'safe' content is always allowed
+		allowed.add('safe');
+
+		if (!contents || contents.length === 0) return true;
+
+		return contents.every((c) => {
+			const name = typeof c === 'string' ? c : c.name;
+			return allowed.has(name);
+		});
+	}
+}

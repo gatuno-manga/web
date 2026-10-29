@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DocumentReaderComponent } from './document-reader.component';
 
@@ -9,7 +9,7 @@ describe('DocumentReaderComponent', () => {
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
 			imports: [DocumentReaderComponent],
-			providers: [provideHttpClient()],
+			providers: [provideHttpClient(withXhr())],
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(DocumentReaderComponent);

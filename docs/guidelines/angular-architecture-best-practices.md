@@ -6,9 +6,9 @@ Este documento descreve as regras e padrões arquiteturais que devem ser seguido
 
 O projeto é organizado em camadas baseadas em domínios e responsabilidades:
 
-- **Core (`src/app/core/`):** Contém singletons e configurações globais. Aqui vivem os interceptadores (ex: auth, cache), serviços globais e tokens de injeção.
+- **Core (`src/app/core/`):** Contém singletons e configurações globais de infraestrutura. Aqui vivem os interceptadores (ex: auth, cache), serviços de infraestrutura (organizados em subpastas por responsabilidade) e tokens de injeção. `core` guarda só infraestrutura.
 - **Shared (`src/app/shared/`):** Contém UI genérica seguindo o **Atomic Design** (`atoms`, `molecules`, `organisms`), além de utilitários e validadores reutilizáveis.
-- **Features (`src/app/features/`):** Contém a lógica de negócio e componentes específicos de cada domínio (ex: `authentication`, `books`, `reading`).
+- **Features (`src/app/features/`):** Contém a lógica de negócio e componentes específicos de cada domínio (ex: `authentication`, `books`, `reading`, `user`, `dashboard`). Todo serviço de domínio vive em `features/<domínio>/services/`, e `core` guarda só infraestrutura.
 - **Pages (`src/app/pages/`):** Componentes roteados que compõem as diversas fatias de negócio (features) em uma visualização final.
 
 ## 2. Padrões de Componentes (Angular v21+)

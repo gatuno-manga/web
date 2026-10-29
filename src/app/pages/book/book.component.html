@@ -407,7 +407,7 @@
 				>
 					@if (book()?.blurHash) {
 						<app-blurhash
-							[hash]="book()?.blurHash"
+							[hash]="$safeNavigationMigration(book()?.blurHash)"
 							[width]="32"
 							[height]="32"
 						/>

@@ -1,9 +1,9 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { NotificationService } from '@core/services/notification.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { TagsService } from '@core/services/tags.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+import { TagsService } from '@features/books/services/tags.service';
 import { of } from 'rxjs';
 import { BookFilterComponent } from './book-filter.component';
 

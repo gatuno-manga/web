@@ -1,4 +1,8 @@
-import { Component, DebugElement } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	DebugElement,
+} from '@angular/core';
 import {
 	ComponentFixture,
 	fakeAsync,
@@ -10,6 +14,7 @@ import { TooltipDirective } from './tooltip.directive';
 
 @Component({
 	template: `<button [appTooltip]="'Test Tooltip'">Test</button>`,
+	changeDetection: ChangeDetectionStrategy.Eager,
 	imports: [TooltipDirective],
 })
 class TestComponent {}

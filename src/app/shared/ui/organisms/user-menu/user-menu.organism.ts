@@ -13,11 +13,11 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '@core/services/auth.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { AppTheme, ThemeService } from '@core/services/theme.service';
-import { UserService } from '@core/services/user.service';
-import { UserTokenService } from '@core/services/user-token.service';
+import { AuthService } from '@core/services/auth/auth.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { AppTheme, ThemeService } from '@core/services/theme/theme.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+import { UserService } from '@features/user/services/user.service';
 import { SensitiveContentResponse } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { AsideComponent } from '@ui/organisms/aside/aside.component';
