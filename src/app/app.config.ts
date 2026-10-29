@@ -15,6 +15,7 @@ import {
 	provideClientHydration,
 	withEventReplay,
 	withHttpTransferCacheOptions,
+	withNoIncrementalHydration,
 } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
@@ -43,6 +44,7 @@ export const appConfig: ApplicationConfig = {
 		provideClientHydration(
 			withEventReplay(),
 			withHttpTransferCacheOptions({ includePostRequests: false }),
+			withNoIncrementalHydration(),
 		),
 		provideAnimationsAsync(),
 		provideHttpClient(

@@ -43,7 +43,7 @@
 							formControlName="userName"
 							label="Nome de Usuário"
 							placeholder="Ex: john_doe"
-							[errors]="profileForm.get('userName')?.errors"
+							[errors]="$safeNavigationMigration(profileForm.get('userName')?.errors)"
 							[touched]="profileForm.get('userName')?.touched || false"
 						/>
 					</div>
@@ -55,7 +55,7 @@
 							formControlName="name"
 							label="Nome Completo"
 							placeholder="Ex: John Doe"
-							[errors]="profileForm.get('name')?.errors"
+							[errors]="$safeNavigationMigration(profileForm.get('name')?.errors)"
 							[touched]="profileForm.get('name')?.touched || false"
 						/>
 					</div>

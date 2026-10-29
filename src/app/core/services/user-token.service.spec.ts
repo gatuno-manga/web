@@ -1,4 +1,8 @@
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+	provideHttpClient,
+	withInterceptors,
+	withXhr,
+} from '@angular/common/http';
 import {
 	HttpTestingController,
 	provideHttpClientTesting,
@@ -131,6 +135,7 @@ describe('UserTokenService', () => {
 			providers: [
 				UserTokenService,
 				provideHttpClient(
+					withXhr(),
 					withInterceptors([HttpClientRequestInterceptor]),
 				),
 				provideHttpClientTesting(),

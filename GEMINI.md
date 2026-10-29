@@ -2,7 +2,7 @@
 
 ## Core Architecture & Features
 
-- **Framework:** Angular 21 based web application.
+- **Framework:** Angular 22 based web application.
 - **Real-time Updates:** WebSocket integration via `book-websocket.service.ts` for live status on book processing and updates.
 - **State Synchronization:** Implemented a complex `ReadingProgressSyncService` for cross-device and cross-tab state management.
 - **Offline Capabilities:** 
@@ -44,7 +44,7 @@ This section contains mandatory rules for any AI agent or developer working on t
   - `.placeholder`: For generic skeleton loading gradients.
   - `.skeleton-text`: For text placeholder lines.
 
-### 3. Modern Angular (v21+) Standards
+### 3. Modern Angular (v22+) Standards
 - **Standalone Components:** All components, directives, and pipes must be standalone.
 - **Reactivity:** Prioritize **Signals** for state management. Use `computed()` for derived values.
 - **Signals API:** Use `input()`, `output()`, and `model()` functions instead of the older `@Input()`, `@Output()` decorators.

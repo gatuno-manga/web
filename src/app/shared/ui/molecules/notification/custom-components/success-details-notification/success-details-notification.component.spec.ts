@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SuccessDetailsNotificationComponent } from './success-details-notification.component';
 
@@ -9,7 +9,7 @@ describe('SuccessDetailsNotificationComponent', () => {
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
 			imports: [SuccessDetailsNotificationComponent],
-			providers: [provideHttpClient()],
+			providers: [provideHttpClient(withXhr())],
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(SuccessDetailsNotificationComponent);
