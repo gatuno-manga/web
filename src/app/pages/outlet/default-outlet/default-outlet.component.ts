@@ -9,7 +9,7 @@ import {
 	signal,
 } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
-import { HeaderStateService } from '@core/services/header-state.service';
+import { HeaderStateService } from '@core/services/browser/header-state.service';
 import { HeaderComponent } from '@ui/organisms/header/header.component';
 import { SideNavComponent } from './side-nav/side-nav.component';
 

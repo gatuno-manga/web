@@ -21,7 +21,7 @@
 				<button type="button" class="user-btn" (click)="userMenu.toggle(); $event.stopPropagation()">
 					@if (userProfile()?.profileImageUrl) {
 						<div class="avatar-container">
-							<img [src]="userProfile()?.profileImageUrl" alt="Avatar" class="avatar" />
+							<img [src]="$safeNavigationMigration(userProfile()?.profileImageUrl)" alt="Avatar" class="avatar" />
 						</div>
 					} @else {
 						<app-icons name="user" size="32" />

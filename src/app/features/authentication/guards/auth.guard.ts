@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, CanMatchFn, Router } from '@angular/router';
-import { UserTokenService } from '@core/services/user-token.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { catchError, map, of } from 'rxjs';
 
 export const isLoggedGuard: CanActivateFn = (_route, state) => {

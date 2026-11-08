@@ -2,7 +2,7 @@
 
 ## Core Architecture & Features
 
-- **Framework:** Angular 21 based web application.
+- **Framework:** Angular 22 based web application.
 - **Real-time Updates:** WebSocket integration via `book-websocket.service.ts` for live status on book processing and updates.
 - **State Synchronization:** Implemented a complex `ReadingProgressSyncService` for cross-device and cross-tab state management.
 - **Offline Capabilities:** 
@@ -19,8 +19,8 @@
 
 ## Infrastructure & Performance
 
-- **Environment Management:** Automated environment variable generation via `generate-env.ts`.
-- **Branding:** Custom icon generation script (`generate-icons.sh`) from SVG assets.
+- **Environment Management:** Automated environment variable generation via `scripts/generate-env.ts`.
+- **Branding:** Custom icon generation script (`scripts/generate-icons.sh`) from SVG assets.
 - **Quality & Maintenance:**
   - Robust testing setup with Karma and Jasmine.
   - Modular project structure for better feature encapsulation.
@@ -44,7 +44,7 @@ This section contains mandatory rules for any AI agent or developer working on t
   - `.placeholder`: For generic skeleton loading gradients.
   - `.skeleton-text`: For text placeholder lines.
 
-### 3. Modern Angular (v21+) Standards
+### 3. Modern Angular (v22+) Standards
 - **Standalone Components:** All components, directives, and pipes must be standalone.
 - **Reactivity:** Prioritize **Signals** for state management. Use `computed()` for derived values.
 - **Signals API:** Use `input()`, `output()`, and `model()` functions instead of the older `@Input()`, `@Output()` decorators.

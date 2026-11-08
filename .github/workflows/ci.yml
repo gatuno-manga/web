@@ -33,7 +33,7 @@ jobs:
         if: needs.pre_job.outputs.should_skip != 'true'
         uses: gatuno-manga/workflows/.github/workflows/node-ci.yml@main
         with:
-            node_version: "24.11.1"
+            node_version: "24.22.2"
             setup_chrome: true
             lint_command: "npm run lint && npm run audit"
             test_command: "npm run test:headless"
@@ -76,7 +76,7 @@ jobs:
             - name: Setup Node
               uses: actions/setup-node@v7
               with:
-                  node-version: "24.11.1"
+                  node-version: "24.22.2"
                   cache: "npm"
             - run: npm ci
             - name: Semantic Release

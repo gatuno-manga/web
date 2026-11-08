@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CollectionService } from '@core/services/collection.service';
+import { CollectionService } from '@features/books/services/collection.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { of } from 'rxjs';
 import { AddToCollectionModalComponent } from './add-to-collection-modal.component';

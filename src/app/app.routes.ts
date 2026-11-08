@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { RenderMode } from '@angular/ssr';
 import { networkGuard } from '@core/guards/network.guard';
-import { permissionGuard } from '@core/guards/permission.guard';
+import { permissionGuard } from '@features/authentication/guards/permission.guard';
 
 /**
  * Helpers para configuração de SSR e Cache

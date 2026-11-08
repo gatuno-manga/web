@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
@@ -10,6 +10,6 @@ import { RouterModule } from '@angular/router';
 	// provideRouter()/provideLocationMocks() as needed.
 	imports: [RouterModule.forRoot([])],
 	exports: [RouterModule],
-	providers: [provideHttpClient(), provideHttpClientTesting()],
+	providers: [provideHttpClient(withXhr()), provideHttpClientTesting()],
 })
 export class SharedTestingModule {}

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DownloadService } from '@core/services/download.service';
+import { DownloadService } from '@features/books/services/download.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { of } from 'rxjs';
 

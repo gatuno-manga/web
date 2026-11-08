@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DomSanitizer } from '@angular/platform-browser';
-import { IconRegistryService } from '@core/services/icon-registry.service';
+import { IconRegistryService } from '@core/services/browser/icon-registry.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { of } from 'rxjs';
 

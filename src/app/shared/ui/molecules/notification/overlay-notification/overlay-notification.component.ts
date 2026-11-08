@@ -5,8 +5,8 @@ import {
 	effect,
 	inject,
 } from '@angular/core';
-import { BodyScrollService } from '@core/services/body-scroll.service';
-import { NotificationService } from '@core/services/notification.service';
+import { BodyScrollService } from '@core/services/browser/body-scroll.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 
 @Component({
 	selector: 'app-overlay-notification',

@@ -6,8 +6,8 @@ import {
 	HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthQueueService } from '@core/services/auth-queue.service';
-import { UserTokenService } from '@core/services/user-token.service';
+import { AuthQueueService } from '@core/services/auth/auth-queue.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import {
 	catchError,
 	filter,

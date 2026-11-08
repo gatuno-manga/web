@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { ContextMenuService } from '@core/services/context-menu.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ContextMenuComponent } from './context-menu.component';
+import { ContextMenuService } from './context-menu.service';
 
 describe('ContextMenuComponent', () => {
 	let component: ContextMenuComponent;

@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { signal } from '@angular/core';
 import {
 	ComponentFixture,
@@ -19,7 +19,7 @@ describe('PromptModalComponent', () => {
 
 		await TestBed.configureTestingModule({
 			imports: [PromptModalComponent],
-			providers: [provideHttpClient()],
+			providers: [provideHttpClient(withXhr())],
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(PromptModalComponent);

@@ -3,14 +3,15 @@ import {
 	HttpErrorResponse,
 	provideHttpClient,
 	withInterceptors,
+	withXhr,
 } from '@angular/common/http';
 import {
 	HttpTestingController,
 	provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { AuthQueueService } from '@core/services/auth-queue.service';
-import { UserTokenService } from '@core/services/user-token.service';
+import { AuthQueueService } from '@core/services/auth/auth-queue.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { Subject as RxSubject } from 'rxjs';
 import { httpClientResponseInterceptor } from './http-client-response.interceptor';
 
@@ -34,6 +35,7 @@ describe('httpClientResponseInterceptor', () => {
 		TestBed.configureTestingModule({
 			providers: [
 				provideHttpClient(
+					withXhr(),
 					withInterceptors([httpClientResponseInterceptor]),
 				),
 				provideHttpClientTesting(),

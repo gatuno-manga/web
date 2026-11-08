@@ -179,7 +179,7 @@
 			</a>
 		}
 		<a class="index" (click)="backPage()" aria-label="Voltar para o livro">
-			{{ chapter()?.index | chapterIndex }}/{{
+			{{ $safeNavigationMigration(chapter()?.index) | chapterIndex }}/{{
 				chapter()?.totalChapters || 0
 			}}
 		</a>

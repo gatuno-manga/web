@@ -16,8 +16,8 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
 import { SensitiveContentResponse } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';

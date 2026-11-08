@@ -61,7 +61,7 @@
 													@if (cover.metadata?.blurHash) {
 														<div class="blur-placeholder">
 															<app-blurhash 
-																[hash]="cover.metadata?.blurHash"
+																[hash]="$safeNavigationMigration(cover.metadata?.blurHash)"
 																[width]="cover.metadata?.width || 32"
 																[height]="cover.metadata?.height || 32">
 															</app-blurhash>

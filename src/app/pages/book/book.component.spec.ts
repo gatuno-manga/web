@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MetaDataService } from '@core/services/meta-data.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { BookComponent } from './book.component';
 

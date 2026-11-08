@@ -1,6 +1,6 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { SettingsService } from '@core/services/settings.service';
+import { SettingsService } from '@features/user/services/settings.service';
 
 @Pipe({
 	name: 'chapterIndex',

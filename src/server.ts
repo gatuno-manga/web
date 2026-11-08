@@ -23,7 +23,7 @@ app.use(cookieParser());
  *
  * Example:
  * ```ts
- * app.get('/api/**', (req, res) => {
+ * app.get('/api/{*splat}', (req, res) => {
  *   // Handle API request
  * });
  * ```
@@ -33,7 +33,7 @@ app.use(cookieParser());
  * Serve static files from /browser
  */
 app.get(
-	'**',
+	'/{*splat}',
 	express.static(browserDistFolder, {
 		maxAge: '1y',
 		index: 'index.html',
@@ -43,11 +43,11 @@ app.get(
 /**
  * Handle all other requests by rendering the Angular application.
  */
-app.get('/api/**', (_req, res) => {
+app.get('/api/{*splat}', (_req, res) => {
 	res.status(404).send('API endpoint not handled by frontend server');
 });
 
-app.get('**', (req, res, next) => {
+app.get('/{*splat}', (req, res, next) => {
 	const { protocol, originalUrl, baseUrl, headers } = req;
 	const host = headers.host || 'localhost:4000';
 	const requestUrl = `${protocol}://${host}${originalUrl}`;
