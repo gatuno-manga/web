@@ -8,8 +8,10 @@ import {
 	registerRequest,
 } from '@models/user.models';
 import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
-import { tap } from 'rxjs/operators';
+import { of, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { CsrfService } from './csrf.service';
+import { isCsrfTokenInvalidError } from './refresh-error.util';
 import { UserTokenService } from './user-token.service';
 
 @Injectable({
@@ -60,17 +62,31 @@ export class AuthService {
 	}
 
 	logout() {
-		const csrfToken = this.csrfService.csrfToken;
-		return this.http
-			.get<void>('/auth/logout', {
-				withCredentials: true,
-				headers: csrfToken ? { 'x-csrf-token': csrfToken } : undefined,
-			})
-			.pipe(
-				tap(() => {
-					this.userTokenService.removeTokens();
-				}),
-			);
+		return this.executeLogout(this.csrfService.csrfToken?.trim()).pipe(
+			catchError((err) => {
+				if (isCsrfTokenInvalidError(err)) {
+					const freshCsrf = this.csrfService.csrfToken?.trim();
+					if (freshCsrf) {
+						return this.executeLogout(freshCsrf);
+					}
+				}
+				return throwError(() => err);
+			}),
+			tap(() => {
+				this.userTokenService.removeTokens(false);
+			}),
+			catchError(() => {
+				this.userTokenService.removeTokens(false);
+				return of(undefined);
+			}),
+		);
+	}
+
+	private executeLogout(csrfToken?: string) {
+		return this.http.get<void>('/auth/logout', {
+			withCredentials: true,
+			headers: csrfToken ? { 'x-csrf-token': csrfToken } : undefined,
+		});
 	}
 
 	register(payload: registerRequest) {

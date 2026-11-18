@@ -18,10 +18,22 @@ import {
 } from '@core/services/storage/cross-tab-sync.service';
 import { payloadToken, Role } from '@models/user.models';
 import { jwtDecode } from 'jwt-decode';
-import { Observable, Subscription, throwError, timer } from 'rxjs';
-import { catchError, finalize, shareReplay, tap } from 'rxjs/operators';
+import { Observable, of, Subscription, throwError, timer } from 'rxjs';
+import {
+	catchError,
+	finalize,
+	shareReplay,
+	switchMap,
+	tap,
+} from 'rxjs/operators';
 import { CookieService } from './cookie.service';
 import { CsrfService } from './csrf.service';
+import {
+	isCsrfTokenInvalidError,
+	isDeadSessionRefreshError,
+	isRefreshInProgressError,
+	parseRetryAfterSeconds,
+} from './refresh-error.util';
 
 @Injectable({
 	providedIn: 'root',
@@ -43,7 +55,11 @@ export class UserTokenService {
 	private readonly SESSION_INTENT_KEY = 'gatuno-session-intent';
 	private readonly LOCK_TIMEOUT_MS = 10000;
 	private readonly REFRESH_MARGIN_SEC = 60;
+	private readonly AUTO_REFRESH_BACKOFF_MS = [
+		30_000, 60_000, 120_000, 240_000, 300_000,
+	];
 	private sessionMayExist = false;
+	private autoRefreshFailureCount = 0;
 
 	private refreshObservable: Observable<{
 		accessToken: string;
@@ -133,10 +149,12 @@ export class UserTokenService {
 					}
 
 					if (message.accessToken) {
+						this.autoRefreshFailureCount = 0;
 						this.scheduleAutoRefresh();
 					}
 				} else if (message.type === 'TOKEN_REMOVE') {
 					this.stopAutoRefresh();
+					this.autoRefreshFailureCount = 0;
 					this.sessionMayExist = false;
 					if (isPlatformBrowser(this.platformId)) {
 						localStorage.removeItem(this.SESSION_INTENT_KEY);
@@ -148,6 +166,7 @@ export class UserTokenService {
 	}
 
 	setTokens(accessToken: string, csrfToken?: string) {
+		this.autoRefreshFailureCount = 0;
 		this.cookieService.set(this.ACCESSKEY, accessToken, false);
 		this.sessionMayExist = true;
 		if (isPlatformBrowser(this.platformId)) {
@@ -165,6 +184,7 @@ export class UserTokenService {
 
 	removeTokens(notifyUser = false): void {
 		this.stopAutoRefresh();
+		this.autoRefreshFailureCount = 0;
 		this.cookieService.delete(this.ACCESSKEY, false);
 
 		if (isPlatformBrowser(this.platformId)) {
@@ -231,9 +251,20 @@ export class UserTokenService {
 		return this.sessionMayExist;
 	}
 
-	private scheduleAutoRefresh() {
+	private scheduleAutoRefresh(delayOverrideMs?: number) {
 		if (!isPlatformBrowser(this.platformId) || !this.accessToken) return;
-		this.stopAutoRefresh();
+		this.clearRefreshTimer();
+
+		if (delayOverrideMs !== undefined) {
+			this.ngZone.runOutsideAngular(() => {
+				this.refreshSubscription = timer(delayOverrideMs).subscribe(
+					() => {
+						this.ngZone.run(() => this.executeAutoRefresh(true));
+					},
+				);
+			});
+			return;
+		}
 
 		try {
 			const { exp } = jwtDecode<payloadToken>(this.accessToken);
@@ -250,46 +281,13 @@ export class UserTokenService {
 					this.refreshSubscription = timer(
 						timeToRefresh + jitter,
 					).subscribe(() => {
-						this.ngZone.run(() => {
-							const lock = localStorage.getItem(
-								this.REFRESH_LOCK_KEY,
-							);
-							const now = Date.now();
-
-							if (
-								lock &&
-								now - parseInt(lock, 10) < this.LOCK_TIMEOUT_MS
-							) {
-								return;
-							}
-
-							localStorage.setItem(
-								this.REFRESH_LOCK_KEY,
-								now.toString(),
-							);
-
-							this.refreshTokens()
-								.pipe(
-									finalize(() =>
-										localStorage.removeItem(
-											this.REFRESH_LOCK_KEY,
-										),
-									),
-								)
-								.subscribe({
-									error: () => this.removeTokens(true),
-								});
-						});
+						this.ngZone.run(() => this.executeAutoRefresh(true));
 					});
 				});
 			} else {
 				this.ngZone.runOutsideAngular(() => {
 					this.refreshSubscription = timer(5000).subscribe(() => {
-						this.ngZone.run(() => {
-							this.refreshTokens().subscribe({
-								error: () => this.removeTokens(true),
-							});
-						});
+						this.ngZone.run(() => this.executeAutoRefresh(false));
 					});
 				});
 			}
@@ -298,11 +296,58 @@ export class UserTokenService {
 		}
 	}
 
-	private stopAutoRefresh() {
+	private executeAutoRefresh(useCrossTabLock: boolean): void {
+		if (useCrossTabLock) {
+			const lock = localStorage.getItem(this.REFRESH_LOCK_KEY);
+			const now = Date.now();
+
+			if (lock && now - parseInt(lock, 10) < this.LOCK_TIMEOUT_MS) {
+				return;
+			}
+
+			localStorage.setItem(this.REFRESH_LOCK_KEY, now.toString());
+		}
+
+		this.refreshTokens()
+			.pipe(
+				finalize(() => {
+					if (useCrossTabLock) {
+						localStorage.removeItem(this.REFRESH_LOCK_KEY);
+					}
+				}),
+			)
+			.subscribe({
+				next: () => {
+					this.autoRefreshFailureCount = 0;
+				},
+				error: (err) => this.handleAutoRefreshError(err),
+			});
+	}
+
+	private handleAutoRefreshError(err: unknown): void {
+		if (isDeadSessionRefreshError(err)) {
+			this.removeTokens(true);
+			return;
+		}
+
+		this.autoRefreshFailureCount += 1;
+		const index = Math.min(
+			this.autoRefreshFailureCount - 1,
+			this.AUTO_REFRESH_BACKOFF_MS.length - 1,
+		);
+		this.scheduleAutoRefresh(this.AUTO_REFRESH_BACKOFF_MS[index]);
+	}
+
+	private clearRefreshTimer() {
 		if (this.refreshSubscription) {
 			this.refreshSubscription.unsubscribe();
 			this.refreshSubscription = undefined;
 		}
+	}
+
+	private stopAutoRefresh() {
+		this.autoRefreshFailureCount = 0;
+		this.clearRefreshTimer();
 	}
 
 	refreshTokens(): Observable<{
@@ -325,10 +370,41 @@ export class UserTokenService {
 			);
 		}
 
-		// O fonte HTTP inclui tap e finalize antes do shareReplay.
-		// Assim, refreshObservable só é limpo quando a request HTTP completa
+		const initialAccessToken = this._accessToken();
+
+		// O fonte HTTP inclui tap, retries e finalize antes do shareReplay.
+		// Assim, refreshObservable só é limpo quando o fluxo completa
 		// (não quando um subscriber individual cancela a subscription).
-		const source = this.http
+		const source = this.executeRefreshAttempt(
+			csrfToken,
+			initialAccessToken,
+			0,
+			0,
+		).pipe(
+			finalize(() => {
+				this.refreshObservable = null;
+			}),
+		);
+
+		const obs = source.pipe(
+			shareReplay({ bufferSize: 1, refCount: false }),
+		);
+
+		this.refreshObservable = obs;
+		return obs;
+	}
+
+	private executeRefreshAttempt(
+		csrfToken: string,
+		initialAccessToken: string | null,
+		conflictRetries: number,
+		csrfRetries: number,
+	): Observable<{
+		accessToken: string;
+		refreshToken?: string;
+		csrfToken?: string;
+	}> {
+		return this.http
 			.post<{
 				accessToken: string;
 				refreshToken?: string;
@@ -343,18 +419,62 @@ export class UserTokenService {
 						this.setTokens(body.accessToken, body.csrfToken);
 					}
 				}),
-				catchError((err) => throwError(() => err)),
-				finalize(() => {
-					this.refreshObservable = null;
+				catchError((err) => {
+					if (isRefreshInProgressError(err) && conflictRetries < 1) {
+						const waitSeconds = parseRetryAfterSeconds(
+							err,
+							1,
+							0,
+							5,
+						);
+						return timer(waitSeconds * 1000).pipe(
+							switchMap(() => {
+								const currentToken = this._accessToken();
+								if (
+									currentToken &&
+									currentToken !== initialAccessToken
+								) {
+									return of({
+										accessToken: currentToken,
+										csrfToken: this.csrfToken ?? undefined,
+									});
+								}
+								const latestCsrf =
+									this.csrfToken?.trim() || csrfToken;
+								return this.executeRefreshAttempt(
+									latestCsrf,
+									initialAccessToken,
+									conflictRetries + 1,
+									csrfRetries,
+								);
+							}),
+						);
+					}
+
+					if (isCsrfTokenInvalidError(err)) {
+						if (csrfRetries < 1) {
+							const freshCsrf = this.csrfToken?.trim();
+							if (freshCsrf) {
+								return this.executeRefreshAttempt(
+									freshCsrf,
+									initialAccessToken,
+									conflictRetries,
+									csrfRetries + 1,
+								);
+							}
+						}
+						this.ngZone.run(() => {
+							this.notificationService.show(
+								'Não foi possível validar o token de segurança (CSRF). Tente novamente.',
+								'warning',
+							);
+						});
+						return throwError(() => err);
+					}
+
+					return throwError(() => err);
 				}),
 			);
-
-		const obs = source.pipe(
-			shareReplay({ bufferSize: 1, refCount: false }),
-		);
-
-		this.refreshObservable = obs;
-		return obs;
 	}
 
 	get isAdmin(): boolean {

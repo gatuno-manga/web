@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, CanMatchFn, Router } from '@angular/router';
+import { isDeadSessionRefreshError } from '@core/services/auth/refresh-error.util';
 import { UserTokenService } from '@core/services/auth/user-token.service';
 import { catchError, map, of } from 'rxjs';
 
@@ -14,13 +15,17 @@ export const isLoggedGuard: CanActivateFn = (_route, state) => {
 	if (tokenService.hasValidRefreshToken) {
 		return tokenService.refreshTokens().pipe(
 			map(() => true),
-			catchError(() => {
-				const returnUrl = state.url;
-				return of(
-					router.createUrlTree(['/auth/login'], {
-						queryParams: { returnUrl },
-					}),
-				);
+			catchError((err) => {
+				if (isDeadSessionRefreshError(err)) {
+					tokenService.removeTokens(true);
+					const returnUrl = state.url;
+					return of(
+						router.createUrlTree(['/auth/login'], {
+							queryParams: { returnUrl },
+						}),
+					);
+				}
+				return of(true);
 			}),
 		);
 	}
@@ -53,7 +58,13 @@ export const isLoggedMatchGuard: CanMatchFn = (_route, _segments) => {
 	if (tokenService.hasValidRefreshToken) {
 		return tokenService.refreshTokens().pipe(
 			map(() => true),
-			catchError(() => of(router.createUrlTree(['/auth/login']))),
+			catchError((err) => {
+				if (isDeadSessionRefreshError(err)) {
+					tokenService.removeTokens(true);
+					return of(router.createUrlTree(['/auth/login']));
+				}
+				return of(true);
+			}),
 		);
 	}
 
