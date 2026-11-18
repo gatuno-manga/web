@@ -166,6 +166,8 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private pageObjectUrls: string[] = [];
 	private destroyRef = inject(DestroyRef);
 	private maxReadPageIndex = 0;
+	private hasMarkedCurrentChapterRead = false;
+	private readonly READ_THRESHOLD_PERCENTAGE = 80;
 	private isNavigating = false;
 	private isDragging = false;
 	private lastScrollPosition = 0;
@@ -394,6 +396,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	) {
 		const requestId = ++this.currentLoadRequestId;
 		this.maxReadPageIndex = 0;
+		this.hasMarkedCurrentChapterRead = false;
 		this.readingProgress.set(0);
 		this.chapter.set(null);
 		try {
@@ -659,6 +662,26 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 				pageIndex,
 			);
 		}
+
+		const totalPages = currentChapter.pages?.length || 0;
+		const isLastPage = totalPages > 0 && pageIndex >= totalPages - 1;
+		if (
+			visualProgressPercentage >= this.READ_THRESHOLD_PERCENTAGE ||
+			isLastPage
+		) {
+			this.markCurrentChapterAsRead();
+		}
+	}
+
+	private markCurrentChapterAsRead(): void {
+		if (this.hasMarkedCurrentChapterRead) return;
+
+		const current = this.chapter();
+		if (!current) return;
+		if (!this.userTokenService.hasValidAccessTokenSignal()) return;
+
+		this.hasMarkedCurrentChapterRead = true;
+		void this.readingProgressService.markChapterRead(current.id);
 	}
 
 	onImageProgress(event: ReadingProgressEvent) {
@@ -867,6 +890,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	private async markChapterAsCompleted() {
 		this.readingProgressService.cancelPendingSync();
+		this.markCurrentChapterAsRead();
 
 		const current = this.chapter();
 		if (current?.pages) {

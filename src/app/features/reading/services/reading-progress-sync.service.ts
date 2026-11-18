@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable, inject, OnDestroy, signal } from '@angular/core';
 import { UserTokenService } from '@core/services/auth/user-token.service';
 import { BackgroundSyncRegistrationService } from '@core/services/realtime/background-sync-registration.service';
@@ -20,6 +20,7 @@ import {
 import { IDBPDatabase, openDB } from 'idb';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { BatchReadResult, ChapterService } from './chapter.service';
 import {
 	ReadingProgress,
 	ReadingProgressService,
@@ -46,6 +47,8 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private dbPromise?: Promise<IDBPDatabase<unknown>>;
 
 	private mqttService = inject(MqttService);
+	private chapterService = inject(ChapterService);
+	private isFlushingReadMarks = false;
 
 	// Estado da sincronização usando Signals
 	private readonly _syncStatus = signal<SyncStatus>({
@@ -88,6 +91,10 @@ export class ReadingProgressSyncService implements OnDestroy {
 			this.setupMqttListeners();
 
 			this.initLastSyncAt();
+
+			if (this.userTokenService.hasValidAccessToken) {
+				void this.flushPendingReadMarks();
+			}
 		}
 	}
 
@@ -119,6 +126,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 				if (this.pendingChanges.size > 0) {
 					this.syncPendingChanges();
 				}
+				void this.flushPendingReadMarks();
 			});
 	}
 
@@ -306,6 +314,97 @@ export class ReadingProgressSyncService implements OnDestroy {
 		}
 
 		this.updateSyncStatus({ pendingChanges: this.pendingChanges.size });
+	}
+
+	async markChapterRead(chapterId: string): Promise<void> {
+		if (!this.isBrowser || !this.userTokenService.hasValidAccessToken) {
+			return;
+		}
+
+		const isOffline =
+			typeof this.networkStatusService.isOffline === 'function' &&
+			this.networkStatusService.isOffline();
+
+		if (isOffline) {
+			await this.localProgressService.enqueuePendingReadMark?.(chapterId);
+			return;
+		}
+
+		try {
+			await firstValueFrom(this.chapterService.markAsRead(chapterId));
+		} catch (error) {
+			if (
+				error instanceof HttpErrorResponse &&
+				error.status >= 400 &&
+				error.status < 500
+			) {
+				console.warn(
+					`Descartando markAsRead para ${chapterId} (status ${error.status})`,
+					error,
+				);
+				return;
+			}
+			await this.localProgressService.enqueuePendingReadMark?.(chapterId);
+		}
+	}
+
+	async flushPendingReadMarks(): Promise<void> {
+		if (
+			!this.isBrowser ||
+			!this.userTokenService.hasValidAccessToken ||
+			this.isFlushingReadMarks
+		) {
+			return;
+		}
+
+		const isOffline =
+			typeof this.networkStatusService.isOffline === 'function' &&
+			this.networkStatusService.isOffline();
+		if (
+			isOffline ||
+			typeof this.localProgressService.getPendingReadMarks !== 'function'
+		) {
+			return;
+		}
+
+		this.isFlushingReadMarks = true;
+		try {
+			const pending =
+				await this.localProgressService.getPendingReadMarks();
+			if (pending.length === 0) return;
+
+			const chapterIds = pending.map((item) => item.chapterId);
+			const rawResults = await firstValueFrom(
+				this.chapterService.markManyAsRead(chapterIds),
+			);
+			const results: BatchReadResult[] = Array.isArray(rawResults)
+				? rawResults
+				: ((rawResults as { data?: BatchReadResult[] } | null)?.data ??
+					[]);
+
+			const idsToRemove = results
+				.filter(
+					(item) =>
+						item.success === true ||
+						(typeof item.error === 'string' &&
+							item.error.toLowerCase().includes('not found')),
+				)
+				.map((item) => item.chapterId);
+
+			if (idsToRemove.length > 0) {
+				await this.localProgressService.removePendingReadMarks(
+					idsToRemove,
+				);
+			}
+		} catch (error) {
+			logWebSocketError(
+				this.serviceName,
+				error,
+				'Erro ao sincronizar marcações de leitura pendentes',
+			);
+		} finally {
+			this.isFlushingReadMarks = false;
+		}
 	}
 
 	async uploadProgress(progress: SaveProgressDto[]): Promise<void> {

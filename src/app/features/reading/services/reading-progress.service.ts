@@ -22,6 +22,13 @@ export interface SyncQueueItem {
 	accessToken: string;
 }
 
+export interface PendingReadMark {
+	id: string; // Chave composta: `${userId}_${chapterId}`
+	userId: string;
+	chapterId: string;
+	createdAt: number;
+}
+
 const GUEST_USER_ID = 'guest';
 
 @Injectable({
@@ -31,6 +38,7 @@ export class ReadingProgressService {
 	private dbName = 'gatuno_db';
 	private storeName = 'reading_progress';
 	private syncStoreName = 'sync_queue';
+	private pendingReadMarksStoreName = 'pending_read_marks';
 	private dbPromise: Promise<IDBDatabase> | null = null;
 	private isBrowser: boolean;
 	private currentUserId: string = GUEST_USER_ID;
@@ -94,8 +102,8 @@ export class ReadingProgressService {
 			if (!this.isBrowser) {
 				return reject('Not in browser');
 			}
-			// Incrementar a versão para forçar o upgrade (v3 para sync_queue)
-			const request = indexedDB.open(this.dbName, 3);
+			// Incrementar a versão para forçar o upgrade (v4 para pending_read_marks)
+			const request = indexedDB.open(this.dbName, 4);
 
 			request.onerror = (event) => {
 				console.error('Erro ao abrir IndexedDB:', event);
@@ -125,6 +133,21 @@ export class ReadingProgressService {
 				if (!db.objectStoreNames.contains(this.syncStoreName)) {
 					db.createObjectStore(this.syncStoreName, {
 						keyPath: 'chapterId',
+					});
+				}
+
+				// Store de marcações de capítulo lido pendentes (user-scoped)
+				if (
+					!db.objectStoreNames.contains(
+						this.pendingReadMarksStoreName,
+					)
+				) {
+					const readMarksStore = db.createObjectStore(
+						this.pendingReadMarksStoreName,
+						{ keyPath: 'id' },
+					);
+					readMarksStore.createIndex('userId', 'userId', {
+						unique: false,
 					});
 				}
 			};
@@ -468,6 +491,119 @@ export class ReadingProgressService {
 			});
 		} catch (error) {
 			console.error('Erro ao limpar progressos sincronizados:', error);
+		}
+	}
+
+	/**
+	 * Enfileira uma marcação de capítulo lido pendente para o usuário autenticado.
+	 * Usuários guest nunca enfileiram marcações.
+	 */
+	async enqueuePendingReadMark(
+		chapterId: string,
+		userId?: string,
+	): Promise<void> {
+		if (!this.isBrowser || !this.dbPromise) return;
+
+		const targetUserId = userId || this.currentUserId;
+		if (!targetUserId || targetUserId === GUEST_USER_ID) return;
+
+		try {
+			const db = await this.dbPromise;
+			const transaction = db.transaction(
+				[this.pendingReadMarksStoreName],
+				'readwrite',
+			);
+			const store = transaction.objectStore(
+				this.pendingReadMarksStoreName,
+			);
+			const record: PendingReadMark = {
+				id: this.generateKey(chapterId, targetUserId),
+				userId: targetUserId,
+				chapterId,
+				createdAt: Date.now(),
+			};
+			store.put(record);
+
+			return new Promise((resolve, reject) => {
+				transaction.oncomplete = () => resolve();
+				transaction.onerror = () => reject(transaction.error);
+			});
+		} catch (error) {
+			console.error('Erro ao enfileirar marcação de leitura:', error);
+		}
+	}
+
+	/**
+	 * Retorna todas as marcações de capítulo lido pendentes do usuário autenticado.
+	 */
+	async getPendingReadMarks(userId?: string): Promise<PendingReadMark[]> {
+		if (!this.isBrowser || !this.dbPromise) return [];
+
+		const targetUserId = userId || this.currentUserId;
+		if (!targetUserId || targetUserId === GUEST_USER_ID) return [];
+
+		try {
+			const db = await this.dbPromise;
+			const transaction = db.transaction(
+				[this.pendingReadMarksStoreName],
+				'readonly',
+			);
+			const store = transaction.objectStore(
+				this.pendingReadMarksStoreName,
+			);
+			const index = store.index('userId');
+			const request = index.getAll(IDBKeyRange.only(targetUserId));
+
+			return new Promise((resolve, reject) => {
+				request.onsuccess = () =>
+					resolve((request.result as PendingReadMark[]) || []);
+				request.onerror = () => reject(request.error);
+			});
+		} catch (error) {
+			console.error(
+				'Erro ao obter marcações de leitura pendentes:',
+				error,
+			);
+			return [];
+		}
+	}
+
+	/**
+	 * Remove marcações de capítulo lido pendentes já sincronizadas.
+	 */
+	async removePendingReadMarks(
+		chapterIds: string[],
+		userId?: string,
+	): Promise<void> {
+		if (!this.isBrowser || !this.dbPromise || chapterIds.length === 0)
+			return;
+
+		const targetUserId = userId || this.currentUserId;
+		if (!targetUserId || targetUserId === GUEST_USER_ID) return;
+
+		try {
+			const db = await this.dbPromise;
+			const transaction = db.transaction(
+				[this.pendingReadMarksStoreName],
+				'readwrite',
+			);
+			const store = transaction.objectStore(
+				this.pendingReadMarksStoreName,
+			);
+
+			for (const chapterId of chapterIds) {
+				store.delete(this.generateKey(chapterId, targetUserId));
+			}
+
+			return new Promise((resolve, reject) => {
+				transaction.oncomplete = () => resolve();
+				transaction.onerror = () => reject(transaction.error);
+			});
+		} catch (error) {
+			console.error(
+				'Erro ao remover marcações de leitura pendentes:',
+				error,
+			);
 		}
 	}
 }

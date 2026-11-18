@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Chapter } from '@models/book.models';
 
-interface BatchReadResult {
+export interface BatchReadResult {
 	chapterId: string;
 	success: boolean;
 	result?: object | string | number | boolean | null;

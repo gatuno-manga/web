@@ -34,23 +34,41 @@ describe('ReadingProgressSyncService', () => {
 		},
 	};
 
-	beforeEach(() => {
+	beforeEach(async () => {
 		const userTokenSpy = jasmine.createSpyObj('UserTokenService', [], {
 			accessToken: 'mock-token',
 			hasValidAccessToken: true,
 		});
 		const localProgressSpy = jasmine.createSpyObj(
 			'ReadingProgressService',
-			['saveProgress', 'getProgress', 'enqueueSync', 'getCurrentUserId'],
+			[
+				'saveProgress',
+				'getProgress',
+				'enqueueSync',
+				'getCurrentUserId',
+				'enqueuePendingReadMark',
+				'getPendingReadMarks',
+				'removePendingReadMarks',
+			],
+		);
+		localProgressSpy.enqueuePendingReadMark.and.returnValue(
+			Promise.resolve(),
+		);
+		localProgressSpy.getPendingReadMarks.and.returnValue(
+			Promise.resolve([]),
+		);
+		localProgressSpy.removePendingReadMarks.and.returnValue(
+			Promise.resolve(),
 		);
 		const networkStatusSpy = jasmine.createSpyObj(
 			'NetworkStatusService',
-			[],
+			['isOffline'],
 			{
 				wentOffline$: new Subject<void>(),
 				wentOnline$: new Subject<void>(),
 			},
 		);
+		networkStatusSpy.isOffline.and.returnValue(false);
 		const backgroundSyncSpy = jasmine.createSpyObj(
 			'BackgroundSyncRegistrationService',
 			['register'],
@@ -103,6 +121,8 @@ describe('ReadingProgressSyncService', () => {
 		mqttServiceSpy = TestBed.inject(
 			MqttService,
 		) as jasmine.SpyObj<MqttService>;
+
+		await Promise.resolve();
 	});
 
 	it('should be created', () => {
@@ -188,5 +208,146 @@ describe('ReadingProgressSyncService', () => {
 
 		const result = await getProgressPromise;
 		expect(result).toEqual(mockLocalProgress);
+	});
+
+	describe('chapter read marking and offline flush', () => {
+		it('should POST chapters/:id/read when online and authenticated', fakeAsync(() => {
+			let resolved = false;
+			service.markChapterRead('ch-1').then(() => {
+				resolved = true;
+			});
+
+			const req = httpMock.expectOne('chapters/ch-1/read');
+			expect(req.request.method).toBe('POST');
+			req.flush({});
+			tick();
+
+			expect(resolved).toBeTrue();
+			expect(
+				localProgressServiceSpy.enqueuePendingReadMark,
+			).not.toHaveBeenCalled();
+		}));
+
+		it('should enqueue read mark when offline without making HTTP call', async () => {
+			_networkStatusServiceSpy.isOffline.and.returnValue(true);
+
+			await service.markChapterRead('ch-offline');
+
+			httpMock.expectNone('chapters/ch-offline/read');
+			expect(
+				localProgressServiceSpy.enqueuePendingReadMark,
+			).toHaveBeenCalledWith('ch-offline');
+		});
+
+		it('should enqueue read mark on 5xx or status 0 errors', fakeAsync(() => {
+			service.markChapterRead('ch-500');
+			const req500 = httpMock.expectOne('chapters/ch-500/read');
+			req500.flush('Server Error', {
+				status: 503,
+				statusText: 'Service Unavailable',
+			});
+			tick();
+			expect(
+				localProgressServiceSpy.enqueuePendingReadMark,
+			).toHaveBeenCalledWith('ch-500');
+
+			service.markChapterRead('ch-0');
+			const req0 = httpMock.expectOne('chapters/ch-0/read');
+			req0.error(new ProgressEvent('Network error'));
+			tick();
+			expect(
+				localProgressServiceSpy.enqueuePendingReadMark,
+			).toHaveBeenCalledWith('ch-0');
+		}));
+
+		it('should log and drop 4xx errors without enqueueing', fakeAsync(() => {
+			spyOn(console, 'warn');
+			service.markChapterRead('ch-404');
+			const req = httpMock.expectOne('chapters/ch-404/read');
+			req.flush('Not Found', { status: 404, statusText: 'Not Found' });
+			tick();
+
+			expect(
+				localProgressServiceSpy.enqueuePendingReadMark,
+			).not.toHaveBeenCalled();
+		}));
+
+		it('should flush pending read marks via batch endpoint and remove succeeded or not-found items', fakeAsync(() => {
+			localProgressServiceSpy.getPendingReadMarks.and.returnValue(
+				Promise.resolve([
+					{
+						id: 'u1_ch-ok',
+						userId: 'u1',
+						chapterId: 'ch-ok',
+						createdAt: 1,
+					},
+					{
+						id: 'u1_ch-missing',
+						userId: 'u1',
+						chapterId: 'ch-missing',
+						createdAt: 2,
+					},
+					{
+						id: 'u1_ch-retry',
+						userId: 'u1',
+						chapterId: 'ch-retry',
+						createdAt: 3,
+					},
+				]),
+			);
+
+			service.flushPendingReadMarks();
+			tick();
+
+			const req = httpMock.expectOne('chapters/batch/read');
+			expect(req.request.method).toBe('POST');
+			expect(req.request.body).toEqual([
+				'ch-ok',
+				'ch-missing',
+				'ch-retry',
+			]);
+			req.flush([
+				{ chapterId: 'ch-ok', success: true },
+				{
+					chapterId: 'ch-missing',
+					success: false,
+					error: 'Chapter Not Found',
+				},
+				{
+					chapterId: 'ch-retry',
+					success: false,
+					error: 'Transient failure',
+				},
+			]);
+			tick();
+
+			expect(
+				localProgressServiceSpy.removePendingReadMarks,
+			).toHaveBeenCalledWith(['ch-ok', 'ch-missing']);
+		}));
+
+		it('should flush pending read marks when wentOnline$ emits', fakeAsync(() => {
+			localProgressServiceSpy.getPendingReadMarks.and.returnValue(
+				Promise.resolve([
+					{
+						id: 'u1_ch-reconn',
+						userId: 'u1',
+						chapterId: 'ch-reconn',
+						createdAt: 1,
+					},
+				]),
+			);
+
+			(_networkStatusServiceSpy.wentOnline$ as Subject<void>).next();
+			tick();
+
+			const req = httpMock.expectOne('chapters/batch/read');
+			req.flush([{ chapterId: 'ch-reconn', success: true }]);
+			tick();
+
+			expect(
+				localProgressServiceSpy.removePendingReadMarks,
+			).toHaveBeenCalledWith(['ch-reconn']);
+		}));
 	});
 });
