@@ -77,7 +77,7 @@ export class UnifiedReadingProgressService implements OnDestroy {
 
 		const userId = this.extractUserIdFromToken();
 		this.localService.setCurrentUser(userId);
-		if (userId && this.userTokenService.hasValidAccessToken) {
+		if (userId) {
 			void this.syncService.flushPendingReadMarks();
 		}
 	}
@@ -253,9 +253,7 @@ export class UnifiedReadingProgressService implements OnDestroy {
 	 * Marca um capítulo como lido para usuários autenticados (com fallback offline)
 	 */
 	async markChapterRead(chapterId: string): Promise<void> {
-		if (!this.isBrowser || !this.userTokenService.hasValidAccessToken) {
-			return;
-		}
+		if (!this.isBrowser) return;
 		await this.syncService.markChapterRead(chapterId);
 	}
 

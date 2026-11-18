@@ -49,6 +49,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private mqttService = inject(MqttService);
 	private chapterService = inject(ChapterService);
 	private isFlushingReadMarks = false;
+	private pendingFlushRequested = false;
 
 	// Estado da sincronização usando Signals
 	private readonly _syncStatus = signal<SyncStatus>({
@@ -312,8 +313,32 @@ export class ReadingProgressSyncService implements OnDestroy {
 		this.updateSyncStatus({ pendingChanges: this.pendingChanges.size });
 	}
 
+	private static readonly NON_RETRYABLE_READ_MARK_STATUSES = new Set([
+		400, 403, 404, 422,
+	]);
+
+	private canSyncAuthenticated(): boolean {
+		return (
+			this.isBrowser &&
+			(this.userTokenService.hasValidAccessToken ||
+				this.userTokenService.hasValidRefreshToken)
+		);
+	}
+
+	/**
+	 * BatchReadResult currently exposes only `error?: string` without a status/code field.
+	 * Treat 'not found' as settled so deleted chapters do not remain stuck in IndexedDB.
+	 */
+	private isSettledReadMark(item: BatchReadResult): boolean {
+		return (
+			item.success === true ||
+			(typeof item.error === 'string' &&
+				item.error.toLowerCase().includes('not found'))
+		);
+	}
+
 	async markChapterRead(chapterId: string): Promise<void> {
-		if (!this.isBrowser || !this.userTokenService.hasValidAccessToken) {
+		if (!this.canSyncAuthenticated()) {
 			return;
 		}
 
@@ -327,8 +352,9 @@ export class ReadingProgressSyncService implements OnDestroy {
 		} catch (error) {
 			if (
 				error instanceof HttpErrorResponse &&
-				error.status >= 400 &&
-				error.status < 500
+				ReadingProgressSyncService.NON_RETRYABLE_READ_MARK_STATUSES.has(
+					error.status,
+				)
 			) {
 				console.warn(
 					`Descartando markAsRead para ${chapterId} (status ${error.status})`,
@@ -342,18 +368,24 @@ export class ReadingProgressSyncService implements OnDestroy {
 
 	async flushPendingReadMarks(): Promise<void> {
 		if (
-			!this.isBrowser ||
-			!this.userTokenService.hasValidAccessToken ||
-			this.isFlushingReadMarks ||
+			!this.canSyncAuthenticated() ||
 			this.networkStatusService.isOffline()
 		) {
+			return;
+		}
+		if (this.isFlushingReadMarks) {
+			this.pendingFlushRequested = true;
 			return;
 		}
 
 		this.isFlushingReadMarks = true;
 		try {
+			const tokenUserId =
+				this.userTokenService.userIdSignal() ?? undefined;
 			const pending =
-				await this.localProgressService.getPendingReadMarks();
+				await this.localProgressService.getPendingReadMarks(
+					tokenUserId,
+				);
 			if (pending.length === 0) return;
 
 			const userId = pending[0].userId;
@@ -363,12 +395,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 			);
 
 			const idsToRemove = results
-				.filter(
-					(item) =>
-						item.success === true ||
-						(typeof item.error === 'string' &&
-							item.error.toLowerCase().includes('not found')),
-				)
+				.filter((item) => this.isSettledReadMark(item))
 				.map((item) => item.chapterId);
 
 			if (idsToRemove.length > 0) {
@@ -385,6 +412,10 @@ export class ReadingProgressSyncService implements OnDestroy {
 			);
 		} finally {
 			this.isFlushingReadMarks = false;
+			if (this.pendingFlushRequested) {
+				this.pendingFlushRequested = false;
+				void this.flushPendingReadMarks();
+			}
 		}
 	}
 

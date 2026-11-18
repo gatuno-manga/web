@@ -359,4 +359,26 @@ describe('InfoBookComponent', () => {
 		expect(args[1][7].type).toBe('separator');
 		expect(args[1][8].label).toBe('Apagar');
 	});
+
+	it('should treat Chapterlist.read: null as unread/falsy in context menu', () => {
+		const unreadChapter = {
+			id: 'ch-null',
+			index: 1,
+			title: 'Null Read Chapter',
+			read: null,
+		} as any;
+		component.chapters.set([unreadChapter]);
+
+		component.onChapterContextMenu(
+			new MouseEvent('contextmenu'),
+			unreadChapter,
+		);
+		const items = mockContextMenuService.open.calls.mostRecent().args[1];
+		expect(
+			items.some((i: any) => i.label === 'Marcar como Lido'),
+		).toBeTrue();
+		expect(
+			items.some((i: any) => i.label === 'Marcar como Não Lido'),
+		).toBeFalse();
+	});
 });

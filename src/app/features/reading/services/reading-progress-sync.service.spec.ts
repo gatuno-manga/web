@@ -38,6 +38,8 @@ describe('ReadingProgressSyncService', () => {
 		const userTokenSpy = jasmine.createSpyObj('UserTokenService', [], {
 			accessToken: 'mock-token',
 			hasValidAccessToken: true,
+			hasValidRefreshToken: false,
+			userIdSignal: () => 'u1',
 		});
 		const localProgressSpy = jasmine.createSpyObj(
 			'ReadingProgressService',
@@ -270,6 +272,30 @@ describe('ReadingProgressSyncService', () => {
 			).not.toHaveBeenCalled();
 		}));
 
+		it('should enqueue retryable 4xx errors (401, 429) in markChapterRead', fakeAsync(() => {
+			service.markChapterRead('ch-401');
+			const req401 = httpMock.expectOne('chapters/ch-401/read');
+			req401.flush('Unauthorized', {
+				status: 401,
+				statusText: 'Unauthorized',
+			});
+			tick();
+			expect(
+				localProgressServiceSpy.enqueuePendingReadMark,
+			).toHaveBeenCalledWith('ch-401');
+
+			service.markChapterRead('ch-429');
+			const req429 = httpMock.expectOne('chapters/ch-429/read');
+			req429.flush('Too Many Requests', {
+				status: 429,
+				statusText: 'Too Many Requests',
+			});
+			tick();
+			expect(
+				localProgressServiceSpy.enqueuePendingReadMark,
+			).toHaveBeenCalledWith('ch-429');
+		}));
+
 		it('should flush pending read marks via batch endpoint and remove succeeded or not-found items', fakeAsync(() => {
 			localProgressServiceSpy.getPendingReadMarks.and.returnValue(
 				Promise.resolve([
@@ -346,6 +372,47 @@ describe('ReadingProgressSyncService', () => {
 			expect(
 				localProgressServiceSpy.removePendingReadMarks,
 			).toHaveBeenCalledWith(['ch-reconn'], 'u1');
+		}));
+
+		it('should flush pending read marks on reconnect even when access token expired offline if refresh token exists', fakeAsync(() => {
+			Object.defineProperty(_userTokenServiceSpy, 'hasValidAccessToken', {
+				get: () => false,
+				configurable: true,
+			});
+			Object.defineProperty(
+				_userTokenServiceSpy,
+				'hasValidRefreshToken',
+				{
+					get: () => true,
+					configurable: true,
+				},
+			);
+
+			localProgressServiceSpy.getPendingReadMarks.and.returnValue(
+				Promise.resolve([
+					{
+						id: 'u1_ch-expired',
+						userId: 'u1',
+						chapterId: 'ch-expired',
+						createdAt: 1,
+					},
+				]),
+			);
+
+			(_networkStatusServiceSpy.wentOnline$ as Subject<void>).next();
+			tick();
+
+			expect(
+				localProgressServiceSpy.getPendingReadMarks,
+			).toHaveBeenCalledWith('u1');
+			const req = httpMock.expectOne('chapters/batch/read');
+			expect(req.request.body).toEqual(['ch-expired']);
+			req.flush([{ chapterId: 'ch-expired', success: true }]);
+			tick();
+
+			expect(
+				localProgressServiceSpy.removePendingReadMarks,
+			).toHaveBeenCalledWith(['ch-expired'], 'u1');
 		}));
 	});
 });

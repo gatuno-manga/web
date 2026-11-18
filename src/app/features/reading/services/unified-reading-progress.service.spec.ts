@@ -89,17 +89,7 @@ describe('UnifiedReadingProgressService react to userIdSignal', () => {
 		expect(readingService.onUserLogout).toHaveBeenCalledTimes(1);
 	});
 
-	it('markChapterRead não delega para syncService quando usuário é guest', async () => {
-		await readingService.markChapterRead('ch-guest');
-		expect(syncServiceSpy.markChapterRead).not.toHaveBeenCalled();
-	});
-
-	it('markChapterRead delega para syncService quando usuário está autenticado', async () => {
-		const userToken = TestBed.inject(UserTokenService) as unknown as {
-			hasValidAccessToken: boolean;
-		};
-		userToken.hasValidAccessToken = true;
-
+	it('markChapterRead delega para syncService', async () => {
 		await readingService.markChapterRead('ch-auth');
 		expect(syncServiceSpy.markChapterRead).toHaveBeenCalledWith('ch-auth');
 	});

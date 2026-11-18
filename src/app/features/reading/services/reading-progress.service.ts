@@ -494,13 +494,49 @@ export class ReadingProgressService {
 		}
 	}
 
-	private resolveAuthenticatedUserId(userId?: string): string | null {
+	private resolvePendingReadMarksTarget(
+		userId?: string,
+	): { userId: string; dbPromise: Promise<IDBDatabase> } | null {
 		if (!this.isBrowser || !this.dbPromise) return null;
 
 		const targetUserId = userId || this.currentUserId;
 		if (!targetUserId || targetUserId === GUEST_USER_ID) return null;
 
-		return targetUserId;
+		return { userId: targetUserId, dbPromise: this.dbPromise };
+	}
+
+	private awaitWriteTransaction(tx: IDBTransaction): Promise<void> {
+		return new Promise<void>((resolve, reject) => {
+			tx.oncomplete = () => resolve();
+			tx.onerror = () => reject(tx.error);
+			tx.onabort = () => reject(tx.error);
+		});
+	}
+
+	private async runPendingReadMarksTransaction<T>(
+		mode: IDBTransactionMode,
+		userId: string | undefined,
+		fallback: T,
+		errorContext: string,
+		operation: (store: IDBObjectStore, targetUserId: string) => Promise<T>,
+	): Promise<T> {
+		const target = this.resolvePendingReadMarksTarget(userId);
+		if (!target) return fallback;
+
+		try {
+			const db = await target.dbPromise;
+			const transaction = db.transaction(
+				[this.pendingReadMarksStoreName],
+				mode,
+			);
+			const store = transaction.objectStore(
+				this.pendingReadMarksStoreName,
+			);
+			return await operation(store, target.userId);
+		} catch (error) {
+			console.error(`${errorContext}:`, error);
+			return fallback;
+		}
 	}
 
 	/**
@@ -511,67 +547,45 @@ export class ReadingProgressService {
 		chapterId: string,
 		userId?: string,
 	): Promise<void> {
-		const targetUserId = this.resolveAuthenticatedUserId(userId);
-		if (!targetUserId || !this.dbPromise) return;
+		await this.runPendingReadMarksTransaction<void>(
+			'readwrite',
+			userId,
+			undefined,
+			'Erro ao enfileirar marcação de leitura',
+			(store, targetUserId) => {
+				store.put({
+					id: this.generateKey(chapterId, targetUserId),
+					userId: targetUserId,
+					chapterId,
+					createdAt: Date.now(),
+				} satisfies PendingReadMark);
 
-		try {
-			const db = await this.dbPromise;
-			const transaction = db.transaction(
-				[this.pendingReadMarksStoreName],
-				'readwrite',
-			);
-			const store = transaction.objectStore(
-				this.pendingReadMarksStoreName,
-			);
-			const record: PendingReadMark = {
-				id: this.generateKey(chapterId, targetUserId),
-				userId: targetUserId,
-				chapterId,
-				createdAt: Date.now(),
-			};
-			store.put(record);
-
-			return new Promise((resolve, reject) => {
-				transaction.oncomplete = () => resolve();
-				transaction.onerror = () => reject(transaction.error);
-				transaction.onabort = () => reject(transaction.error);
-			});
-		} catch (error) {
-			console.error('Erro ao enfileirar marcação de leitura:', error);
-		}
+				return this.awaitWriteTransaction(store.transaction);
+			},
+		);
 	}
 
 	/**
 	 * Retorna todas as marcações de capítulo lido pendentes do usuário autenticado.
 	 */
 	async getPendingReadMarks(userId?: string): Promise<PendingReadMark[]> {
-		const targetUserId = this.resolveAuthenticatedUserId(userId);
-		if (!targetUserId || !this.dbPromise) return [];
+		return this.runPendingReadMarksTransaction<PendingReadMark[]>(
+			'readonly',
+			userId,
+			[],
+			'Erro ao obter marcações de leitura pendentes',
+			(store, targetUserId) => {
+				const request = store
+					.index('userId')
+					.getAll(IDBKeyRange.only(targetUserId));
 
-		try {
-			const db = await this.dbPromise;
-			const transaction = db.transaction(
-				[this.pendingReadMarksStoreName],
-				'readonly',
-			);
-			const store = transaction.objectStore(
-				this.pendingReadMarksStoreName,
-			);
-			const index = store.index('userId');
-			const request = index.getAll(IDBKeyRange.only(targetUserId));
-
-			return new Promise((resolve, reject) => {
-				request.onsuccess = () =>
-					resolve((request.result as PendingReadMark[]) || []);
-				request.onerror = () => reject(request.error);
-			});
-		} catch (error) {
-			console.error(
-				'Erro ao obter marcações de leitura pendentes:',
-				error,
-			);
-			return [];
-		}
+				return new Promise<PendingReadMark[]>((resolve, reject) => {
+					request.onsuccess = () =>
+						resolve((request.result as PendingReadMark[]) || []);
+					request.onerror = () => reject(request.error);
+				});
+			},
+		);
 	}
 
 	/**
@@ -583,33 +597,18 @@ export class ReadingProgressService {
 	): Promise<void> {
 		if (chapterIds.length === 0) return;
 
-		const targetUserId = this.resolveAuthenticatedUserId(userId);
-		if (!targetUserId || !this.dbPromise) return;
+		await this.runPendingReadMarksTransaction<void>(
+			'readwrite',
+			userId,
+			undefined,
+			'Erro ao remover marcações de leitura pendentes',
+			(store, targetUserId) => {
+				for (const chapterId of chapterIds) {
+					store.delete(this.generateKey(chapterId, targetUserId));
+				}
 
-		try {
-			const db = await this.dbPromise;
-			const transaction = db.transaction(
-				[this.pendingReadMarksStoreName],
-				'readwrite',
-			);
-			const store = transaction.objectStore(
-				this.pendingReadMarksStoreName,
-			);
-
-			for (const chapterId of chapterIds) {
-				store.delete(this.generateKey(chapterId, targetUserId));
-			}
-
-			return new Promise((resolve, reject) => {
-				transaction.oncomplete = () => resolve();
-				transaction.onerror = () => reject(transaction.error);
-				transaction.onabort = () => reject(transaction.error);
-			});
-		} catch (error) {
-			console.error(
-				'Erro ao remover marcações de leitura pendentes:',
-				error,
-			);
-		}
+				return this.awaitWriteTransaction(store.transaction);
+			},
+		);
 	}
 }

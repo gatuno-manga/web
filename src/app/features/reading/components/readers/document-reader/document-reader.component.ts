@@ -109,7 +109,7 @@ export class DocumentReaderComponent
 	}
 
 	private calculateGradualProgress() {
-		if (!this.isBrowser) return;
+		if (!this.isBrowser || this.isLoading()) return;
 
 		const container = this.elRef.nativeElement;
 		const rect = container.getBoundingClientRect();
@@ -155,10 +155,9 @@ export class DocumentReaderComponent
 				onError: (error: unknown) => this.onPdfError(error),
 			};
 
-			// Re-emit progress for new document
+			// Reset page index for new document
 			if (!srcChange.firstChange) {
 				this.currentPage.set(1);
-				this.emitProgress();
 			}
 		}
 	}
@@ -193,8 +192,6 @@ export class DocumentReaderComponent
 				onError: (error: unknown) => this.onPdfError(error),
 			};
 		}
-
-		this.emitProgress();
 
 		// Load PDF component dynamically only in browser
 		if (this.isBrowser && this.isPdfFormat) {
@@ -356,6 +353,7 @@ export class DocumentReaderComponent
 
 		// Start updating visible pages
 		setTimeout(() => this.updateVisiblePages(), 200);
+		this.emitProgress();
 	}
 
 	onPdfError(error: unknown) {
@@ -383,6 +381,7 @@ export class DocumentReaderComponent
 	}
 
 	private emitProgress() {
+		if (this.isLoading()) return;
 		this.pageChange.emit({
 			pageIndex: this.currentPage() - 1,
 			totalPages: this.totalPages(),
