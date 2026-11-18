@@ -8,10 +8,10 @@ import {
 	registerRequest,
 } from '@models/user.models';
 import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { CsrfService } from './csrf.service';
-import { isCsrfTokenInvalidError } from './refresh-error.util';
+import { retryOnInvalidCsrf } from './refresh-error.util';
 import { UserTokenService } from './user-token.service';
 
 @Injectable({
@@ -62,22 +62,12 @@ export class AuthService {
 	}
 
 	logout() {
-		return this.executeLogout(this.csrfService.csrfToken?.trim()).pipe(
-			catchError((err) => {
-				if (isCsrfTokenInvalidError(err)) {
-					const freshCsrf = this.csrfService.csrfToken?.trim();
-					if (freshCsrf) {
-						return this.executeLogout(freshCsrf);
-					}
-				}
-				return throwError(() => err);
-			}),
+		return retryOnInvalidCsrf(() =>
+			this.executeLogout(this.csrfService.csrfToken?.trim() || undefined),
+		).pipe(
+			catchError(() => of(undefined)),
 			tap(() => {
 				this.userTokenService.removeTokens(false);
-			}),
-			catchError(() => {
-				this.userTokenService.removeTokens(false);
-				return of(undefined);
 			}),
 		);
 	}

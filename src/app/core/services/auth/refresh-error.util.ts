@@ -1,4 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+export const SESSION_EXPIRED_MESSAGE =
+	'Sua sessão expirou por inatividade. Por favor, faça login novamente.';
 
 export const REFRESH_ERROR_CODES = {
 	REFRESH_TOKEN_MISSING: 'REFRESH_TOKEN_MISSING',
@@ -45,25 +50,34 @@ export function isCsrfTokenInvalidError(error: unknown): boolean {
 	);
 }
 
+export function retryOnInvalidCsrf<T>(
+	requestFn: () => Observable<T>,
+	canRetry: () => boolean = () => true,
+): Observable<T> {
+	return requestFn().pipe(
+		catchError((err) => {
+			if (isCsrfTokenInvalidError(err) && canRetry()) {
+				return requestFn();
+			}
+			return throwError(() => err);
+		}),
+	);
+}
+
 /**
- * Parses integer Retry-After seconds, falling back to defaultSeconds on missing/NaN/negative
- * and clamping to [minSeconds, maxSeconds] (default [0, 5]).
+ * Parses integer Retry-After seconds, falling back to 1 on missing/NaN/negative
+ * and clamping to [0, 5].
  */
-export function parseRetryAfterSeconds(
-	error: HttpErrorResponse,
-	defaultSeconds = 1,
-	minSeconds = 0,
-	maxSeconds = 5,
-): number {
+export function parseRetryAfterSeconds(error: HttpErrorResponse): number {
 	const raw = error.headers?.get('Retry-After');
 	if (!raw?.trim()) {
-		return defaultSeconds;
+		return 1;
 	}
 
 	const parsed = Number.parseInt(raw.trim(), 10);
 	if (Number.isNaN(parsed) || parsed < 0) {
-		return defaultSeconds;
+		return 1;
 	}
 
-	return Math.min(maxSeconds, Math.max(minSeconds, parsed));
+	return Math.min(5, Math.max(0, parsed));
 }

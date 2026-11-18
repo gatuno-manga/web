@@ -9,11 +9,13 @@ import {
 } from '@angular/router';
 import { REFRESH_ERROR_CODES } from '@core/services/auth/refresh-error.util';
 import { UserTokenService } from '@core/services/auth/user-token.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { firstValueFrom, isObservable, of, throwError } from 'rxjs';
 import { isLoggedGuard, isLoggedMatchGuard } from './auth.guard';
 
 describe('AuthGuards', () => {
 	let tokenServiceSpy: jasmine.SpyObj<UserTokenService>;
+	let notificationServiceSpy: jasmine.SpyObj<NotificationService>;
 	let router: Router;
 	let hasValidAccessToken = false;
 	let hasValidRefreshToken = false;
@@ -24,6 +26,9 @@ describe('AuthGuards', () => {
 		tokenServiceSpy = jasmine.createSpyObj('UserTokenService', [
 			'refreshTokens',
 			'removeTokens',
+		]);
+		notificationServiceSpy = jasmine.createSpyObj('NotificationService', [
+			'show',
 		]);
 		Object.defineProperty(tokenServiceSpy, 'hasValidAccessToken', {
 			get: () => hasValidAccessToken,
@@ -38,6 +43,10 @@ describe('AuthGuards', () => {
 			providers: [
 				provideRouter([]),
 				{ provide: UserTokenService, useValue: tokenServiceSpy },
+				{
+					provide: NotificationService,
+					useValue: notificationServiceSpy,
+				},
 			],
 		});
 
@@ -79,10 +88,14 @@ describe('AuthGuards', () => {
 			? await firstValueFrom(resultOrObs)
 			: resultOrObs;
 
-		expect(tokenServiceSpy.removeTokens).toHaveBeenCalledWith(true);
+		expect(tokenServiceSpy.removeTokens).toHaveBeenCalledWith(false);
+		expect(notificationServiceSpy.show).toHaveBeenCalledWith(
+			jasmine.any(String),
+			'warning',
+		);
 		expect(result instanceof UrlTree).toBeTrue();
 		expect(router.serializeUrl(result as UrlTree)).toBe(
-			'/auth/login?returnUrl=%2Flibrary',
+			'/auth/login?sessionExpired=true&returnUrl=%2Flibrary',
 		);
 	});
 
@@ -134,8 +147,15 @@ describe('AuthGuards', () => {
 		const res401 = isObservable(obs401)
 			? await firstValueFrom(obs401)
 			: obs401;
-		expect(tokenServiceSpy.removeTokens).toHaveBeenCalledWith(true);
+		expect(tokenServiceSpy.removeTokens).toHaveBeenCalledWith(false);
+		expect(notificationServiceSpy.show).toHaveBeenCalledWith(
+			jasmine.any(String),
+			'warning',
+		);
 		expect(res401 instanceof UrlTree).toBeTrue();
+		expect(router.serializeUrl(res401 as UrlTree)).toBe(
+			'/auth/login?sessionExpired=true',
+		);
 
 		tokenServiceSpy.removeTokens.calls.reset();
 		tokenServiceSpy.refreshTokens.and.returnValue(

@@ -907,6 +907,46 @@ describe('UserTokenService', () => {
 			expect(routerSpy.navigate).not.toHaveBeenCalled();
 		}));
 
+		it('409 REFRESH_IN_PROGRESS deve abortar retry se outra aba enviar TOKEN_REMOVE durante Retry-After', fakeAsync(() => {
+			const initialToken = createValidToken();
+			service.setTokens(initialToken);
+			let capturedStatus: number | undefined;
+
+			service.refreshTokens().subscribe({
+				error: (err) => {
+					capturedStatus = err.status;
+				},
+			});
+			tick();
+
+			const req1 = httpMock.expectOne((r) =>
+				r.url.endsWith('/auth/refresh'),
+			);
+			req1.flush(
+				{ code: REFRESH_ERROR_CODES.REFRESH_IN_PROGRESS },
+				{
+					status: 409,
+					statusText: 'Conflict',
+					headers: { 'Retry-After': '1' },
+				},
+			);
+
+			// Outra aba encerra a sessão durante o timer de Retry-After
+			crossTabMessages$.next({
+				type: 'TOKEN_REMOVE',
+				timestamp: Date.now(),
+			});
+			tick(1000);
+			discardPeriodicTasks();
+
+			expect(
+				httpMock.match((r) => r.url.endsWith('/auth/refresh')).length,
+			).toBe(0);
+			expect(capturedStatus).toBe(409);
+			expect(service.hasValidRefreshToken).toBeFalse();
+			expect(service.accessToken).toBeNull();
+		}));
+
 		it('403 CSRF_TOKEN_INVALID deve reler csrfToken e tentar novamente 1 vez', fakeAsync(() => {
 			let currentCsrf = 'stale-csrf';
 			Object.defineProperty(csrfServiceSpy, 'csrfToken', {
@@ -1023,7 +1063,7 @@ describe('UserTokenService', () => {
 			discardPeriodicTasks();
 		}));
 
-		it('auto-refresh deve manter sessão e reagendar com backoff exponencial (30s, 60s, 120s) em erros 0 e 500', fakeAsync(() => {
+		it('auto-refresh deve manter sessão e reagendar com backoff exponencial completo (30s, 60s, 120s, 240s, 300s cap) em erros 0 e 500', fakeAsync(() => {
 			const soonToken = createExpiringSoonToken();
 			service.setTokens(soonToken);
 
@@ -1040,33 +1080,129 @@ describe('UserTokenService', () => {
 			expect(service.accessToken).toBe(soonToken);
 			expect(routerSpy.navigate).not.toHaveBeenCalled();
 
-			// Backoff 1: 30s
-			tick(29999);
-			expect(
-				httpMock.match((r) => r.url.endsWith('/auth/refresh')).length,
-			).toBe(0);
-			tick(1);
-			const req2 = httpMock.expectOne((r) =>
-				r.url.endsWith('/auth/refresh'),
-			);
-			req2.error(new ProgressEvent('error')); // status 0
+			const expectedDelays = [
+				30_000, 60_000, 120_000, 240_000, 300_000, 300_000,
+			];
+			for (let i = 0; i < expectedDelays.length; i++) {
+				const delay = expectedDelays[i];
+				tick(delay - 1);
+				expect(
+					httpMock.match((r) => r.url.endsWith('/auth/refresh'))
+						.length,
+				)
+					.withContext(
+						`should not fire before ${delay}ms (step ${i + 1})`,
+					)
+					.toBe(0);
+				tick(1);
+				const req = httpMock.expectOne((r) =>
+					r.url.endsWith('/auth/refresh'),
+				);
+				if (i < expectedDelays.length - 1) {
+					if (i % 2 === 0) {
+						req.error(new ProgressEvent('error')); // status 0
+					} else {
+						req.flush('Server Error', {
+							status: 500,
+							statusText: 'Server Error',
+						});
+					}
+					expect(service.accessToken).toBe(soonToken);
+					expect(routerSpy.navigate).not.toHaveBeenCalled();
+				} else {
+					req.flush({
+						accessToken: createValidToken(),
+						csrfToken: 'ok',
+					});
+				}
+			}
 
-			expect(service.accessToken).toBe(soonToken);
-			expect(routerSpy.navigate).not.toHaveBeenCalled();
-
-			// Backoff 2: 60s
-			tick(59999);
-			expect(
-				httpMock.match((r) => r.url.endsWith('/auth/refresh')).length,
-			).toBe(0);
-			tick(1);
-			const req3 = httpMock.expectOne((r) =>
-				r.url.endsWith('/auth/refresh'),
-			);
-			req3.flush({ accessToken: createValidToken(), csrfToken: 'ok' });
 			tick();
 			discardPeriodicTasks();
 
+			expect(routerSpy.navigate).not.toHaveBeenCalled();
+		}));
+
+		it('auto-refresh deve aplicar backoff após 403/409 esgotados e não repetir toast de CSRF em cada ciclo', fakeAsync(() => {
+			const soonToken = createExpiringSoonToken();
+			service.setTokens(soonToken);
+
+			// Disparo inicial em 5s -> 403 CSRF_TOKEN_INVALID (1 retry imediato = 2 requests)
+			tick(5000);
+			for (let attempt = 0; attempt < 2; attempt++) {
+				const req = httpMock.expectOne((r) =>
+					r.url.endsWith('/auth/refresh'),
+				);
+				req.flush(
+					{ code: REFRESH_ERROR_CODES.CSRF_TOKEN_INVALID },
+					{ status: 403, statusText: 'Forbidden' },
+				);
+			}
+			tick();
+
+			expect(notificationSpy.show).toHaveBeenCalledTimes(1);
+			expect(service.accessToken).toBe(soonToken);
+
+			// Backoff 1: 30s -> 403 novamente (não deve repetir toast)
+			tick(29_999);
+			expect(
+				httpMock.match((r) => r.url.endsWith('/auth/refresh')).length,
+			).toBe(0);
+			tick(1);
+			for (let attempt = 0; attempt < 2; attempt++) {
+				const req = httpMock.expectOne((r) =>
+					r.url.endsWith('/auth/refresh'),
+				);
+				req.flush(
+					{ code: REFRESH_ERROR_CODES.CSRF_TOKEN_INVALID },
+					{ status: 403, statusText: 'Forbidden' },
+				);
+			}
+			tick();
+
+			expect(notificationSpy.show).toHaveBeenCalledTimes(1);
+
+			// Backoff 2: 60s -> 409 REFRESH_IN_PROGRESS esgotado (1 retry após 1s)
+			tick(59_999);
+			expect(
+				httpMock.match((r) => r.url.endsWith('/auth/refresh')).length,
+			).toBe(0);
+			tick(1);
+			const req409a = httpMock.expectOne((r) =>
+				r.url.endsWith('/auth/refresh'),
+			);
+			req409a.flush(
+				{ code: REFRESH_ERROR_CODES.REFRESH_IN_PROGRESS },
+				{
+					status: 409,
+					statusText: 'Conflict',
+					headers: { 'Retry-After': '1' },
+				},
+			);
+			tick(1000);
+			const req409b = httpMock.expectOne((r) =>
+				r.url.endsWith('/auth/refresh'),
+			);
+			req409b.flush(
+				{ code: REFRESH_ERROR_CODES.REFRESH_IN_PROGRESS },
+				{ status: 409, statusText: 'Conflict' },
+			);
+			tick();
+
+			// Backoff 3: 120s -> sucesso reseta o streak
+			tick(119_999);
+			expect(
+				httpMock.match((r) => r.url.endsWith('/auth/refresh')).length,
+			).toBe(0);
+			tick(1);
+			const reqOk = httpMock.expectOne((r) =>
+				r.url.endsWith('/auth/refresh'),
+			);
+			reqOk.flush({ accessToken: createValidToken(), csrfToken: 'ok' });
+			tick();
+			discardPeriodicTasks();
+
+			expect(notificationSpy.show).toHaveBeenCalledTimes(1);
 			expect(routerSpy.navigate).not.toHaveBeenCalled();
 		}));
 	});
