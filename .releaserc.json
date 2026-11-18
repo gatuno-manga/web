@@ -2,7 +2,7 @@
 	"branches": [
 		"main",
 		{
-			"name": "developer",
+			"name": "develop",
 			"prerelease": "beta"
 		}
 	],

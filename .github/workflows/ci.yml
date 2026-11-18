@@ -4,11 +4,11 @@ on:
     push:
         branches:
             - main
-            - developer
+            - develop
     pull_request:
         branches:
             - main
-            - developer
+            - develop
     workflow_dispatch:
 
 concurrency:
@@ -45,7 +45,7 @@ jobs:
             !cancelled() &&
             (needs.ci.result == 'success' || needs.ci.result == 'skipped') &&
             github.event_name == 'push' &&
-            (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/developer')
+            (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
         uses: gatuno-manga/workflows/.github/workflows/registry.yml@main
         with:
             image_name: gatuno-web
@@ -63,7 +63,7 @@ jobs:
         needs: build-and-publish
         if: |
             github.event_name == 'push' &&
-            (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/developer')
+            (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
         runs-on: ubuntu-latest
         permissions:
             contents: write
