@@ -91,10 +91,6 @@ export class ReadingProgressSyncService implements OnDestroy {
 			this.setupMqttListeners();
 
 			this.initLastSyncAt();
-
-			if (this.userTokenService.hasValidAccessToken) {
-				void this.flushPendingReadMarks();
-			}
 		}
 	}
 
@@ -321,12 +317,8 @@ export class ReadingProgressSyncService implements OnDestroy {
 			return;
 		}
 
-		const isOffline =
-			typeof this.networkStatusService.isOffline === 'function' &&
-			this.networkStatusService.isOffline();
-
-		if (isOffline) {
-			await this.localProgressService.enqueuePendingReadMark?.(chapterId);
+		if (this.networkStatusService.isOffline()) {
+			await this.localProgressService.enqueuePendingReadMark(chapterId);
 			return;
 		}
 
@@ -344,7 +336,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 				);
 				return;
 			}
-			await this.localProgressService.enqueuePendingReadMark?.(chapterId);
+			await this.localProgressService.enqueuePendingReadMark(chapterId);
 		}
 	}
 
@@ -352,17 +344,8 @@ export class ReadingProgressSyncService implements OnDestroy {
 		if (
 			!this.isBrowser ||
 			!this.userTokenService.hasValidAccessToken ||
-			this.isFlushingReadMarks
-		) {
-			return;
-		}
-
-		const isOffline =
-			typeof this.networkStatusService.isOffline === 'function' &&
-			this.networkStatusService.isOffline();
-		if (
-			isOffline ||
-			typeof this.localProgressService.getPendingReadMarks !== 'function'
+			this.isFlushingReadMarks ||
+			this.networkStatusService.isOffline()
 		) {
 			return;
 		}
@@ -373,14 +356,11 @@ export class ReadingProgressSyncService implements OnDestroy {
 				await this.localProgressService.getPendingReadMarks();
 			if (pending.length === 0) return;
 
+			const userId = pending[0].userId;
 			const chapterIds = pending.map((item) => item.chapterId);
-			const rawResults = await firstValueFrom(
+			const results: BatchReadResult[] = await firstValueFrom(
 				this.chapterService.markManyAsRead(chapterIds),
 			);
-			const results: BatchReadResult[] = Array.isArray(rawResults)
-				? rawResults
-				: ((rawResults as { data?: BatchReadResult[] } | null)?.data ??
-					[]);
 
 			const idsToRemove = results
 				.filter(
@@ -394,6 +374,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 			if (idsToRemove.length > 0) {
 				await this.localProgressService.removePendingReadMarks(
 					idsToRemove,
+					userId,
 				);
 			}
 		} catch (error) {

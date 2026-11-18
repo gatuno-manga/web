@@ -116,4 +116,39 @@ describe('UnifiedReadingProgressService react to userIdSignal', () => {
 
 		expect(syncServiceSpy.flushPendingReadMarks).toHaveBeenCalledTimes(1);
 	});
+
+	it('inicialização com token válido define usuário antes de chamar flushPendingReadMarks', () => {
+		const callOrder: string[] = [];
+		localProgressSpy.setCurrentUser.and.callFake((id) => {
+			callOrder.push(`setCurrentUser:${id}`);
+		});
+		syncServiceSpy.flushPendingReadMarks.and.callFake(() => {
+			callOrder.push('flushPendingReadMarks');
+			return Promise.resolve();
+		});
+
+		const userToken = TestBed.inject(UserTokenService) as unknown as {
+			accessToken: string | null;
+			hasValidAccessToken: boolean;
+		};
+		const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+		const payload = btoa(JSON.stringify({ sub: 'user-startup' }));
+		userToken.accessToken = `${header}.${payload}.sig`;
+		userToken.hasValidAccessToken = true;
+
+		// Instancia novamente para exercitar initializeUser() no construtor
+		TestBed.runInInjectionContext(() => {
+			new UnifiedReadingProgressService(
+				'browser' as unknown as object,
+				localProgressSpy,
+				syncServiceSpy,
+				userToken as unknown as UserTokenService,
+			);
+		});
+
+		expect(callOrder).toEqual([
+			'setCurrentUser:user-startup',
+			'flushPendingReadMarks',
+		]);
+	});
 });

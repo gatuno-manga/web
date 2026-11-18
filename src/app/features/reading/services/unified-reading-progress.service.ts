@@ -77,6 +77,9 @@ export class UnifiedReadingProgressService implements OnDestroy {
 
 		const userId = this.extractUserIdFromToken();
 		this.localService.setCurrentUser(userId);
+		if (userId && this.userTokenService.hasValidAccessToken) {
+			void this.syncService.flushPendingReadMarks();
+		}
 	}
 
 	/**
@@ -342,7 +345,7 @@ export class UnifiedReadingProgressService implements OnDestroy {
 		this.localService.setCurrentUser(userId);
 		await this.localService.migrateGuestProgressToUser(userId);
 		await this.syncLocalHistoryToServer();
-		await this.syncService.flushPendingReadMarks?.();
+		await this.syncService.flushPendingReadMarks();
 		this.connect();
 		await this.syncAll();
 	}

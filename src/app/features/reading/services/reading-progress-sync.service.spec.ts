@@ -34,7 +34,7 @@ describe('ReadingProgressSyncService', () => {
 		},
 	};
 
-	beforeEach(async () => {
+	beforeEach(() => {
 		const userTokenSpy = jasmine.createSpyObj('UserTokenService', [], {
 			accessToken: 'mock-token',
 			hasValidAccessToken: true,
@@ -121,8 +121,6 @@ describe('ReadingProgressSyncService', () => {
 		mqttServiceSpy = TestBed.inject(
 			MqttService,
 		) as jasmine.SpyObj<MqttService>;
-
-		await Promise.resolve();
 	});
 
 	it('should be created', () => {
@@ -323,7 +321,7 @@ describe('ReadingProgressSyncService', () => {
 
 			expect(
 				localProgressServiceSpy.removePendingReadMarks,
-			).toHaveBeenCalledWith(['ch-ok', 'ch-missing']);
+			).toHaveBeenCalledWith(['ch-ok', 'ch-missing'], 'u1');
 		}));
 
 		it('should flush pending read marks when wentOnline$ emits', fakeAsync(() => {
@@ -347,7 +345,7 @@ describe('ReadingProgressSyncService', () => {
 
 			expect(
 				localProgressServiceSpy.removePendingReadMarks,
-			).toHaveBeenCalledWith(['ch-reconn']);
+			).toHaveBeenCalledWith(['ch-reconn'], 'u1');
 		}));
 	});
 });

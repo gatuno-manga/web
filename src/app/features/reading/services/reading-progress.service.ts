@@ -494,6 +494,15 @@ export class ReadingProgressService {
 		}
 	}
 
+	private resolveAuthenticatedUserId(userId?: string): string | null {
+		if (!this.isBrowser || !this.dbPromise) return null;
+
+		const targetUserId = userId || this.currentUserId;
+		if (!targetUserId || targetUserId === GUEST_USER_ID) return null;
+
+		return targetUserId;
+	}
+
 	/**
 	 * Enfileira uma marcação de capítulo lido pendente para o usuário autenticado.
 	 * Usuários guest nunca enfileiram marcações.
@@ -502,10 +511,8 @@ export class ReadingProgressService {
 		chapterId: string,
 		userId?: string,
 	): Promise<void> {
-		if (!this.isBrowser || !this.dbPromise) return;
-
-		const targetUserId = userId || this.currentUserId;
-		if (!targetUserId || targetUserId === GUEST_USER_ID) return;
+		const targetUserId = this.resolveAuthenticatedUserId(userId);
+		if (!targetUserId || !this.dbPromise) return;
 
 		try {
 			const db = await this.dbPromise;
@@ -527,6 +534,7 @@ export class ReadingProgressService {
 			return new Promise((resolve, reject) => {
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => reject(transaction.error);
+				transaction.onabort = () => reject(transaction.error);
 			});
 		} catch (error) {
 			console.error('Erro ao enfileirar marcação de leitura:', error);
@@ -537,10 +545,8 @@ export class ReadingProgressService {
 	 * Retorna todas as marcações de capítulo lido pendentes do usuário autenticado.
 	 */
 	async getPendingReadMarks(userId?: string): Promise<PendingReadMark[]> {
-		if (!this.isBrowser || !this.dbPromise) return [];
-
-		const targetUserId = userId || this.currentUserId;
-		if (!targetUserId || targetUserId === GUEST_USER_ID) return [];
+		const targetUserId = this.resolveAuthenticatedUserId(userId);
+		if (!targetUserId || !this.dbPromise) return [];
 
 		try {
 			const db = await this.dbPromise;
@@ -575,11 +581,10 @@ export class ReadingProgressService {
 		chapterIds: string[],
 		userId?: string,
 	): Promise<void> {
-		if (!this.isBrowser || !this.dbPromise || chapterIds.length === 0)
-			return;
+		if (chapterIds.length === 0) return;
 
-		const targetUserId = userId || this.currentUserId;
-		if (!targetUserId || targetUserId === GUEST_USER_ID) return;
+		const targetUserId = this.resolveAuthenticatedUserId(userId);
+		if (!targetUserId || !this.dbPromise) return;
 
 		try {
 			const db = await this.dbPromise;
@@ -598,6 +603,7 @@ export class ReadingProgressService {
 			return new Promise((resolve, reject) => {
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => reject(transaction.error);
+				transaction.onabort = () => reject(transaction.error);
 			});
 		} catch (error) {
 			console.error(
