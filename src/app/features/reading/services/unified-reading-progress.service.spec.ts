@@ -30,7 +30,14 @@ describe('UnifiedReadingProgressService react to userIdSignal', () => {
 
 		syncServiceSpy = jasmine.createSpyObj(
 			'ReadingProgressSyncService',
-			['connect', 'disconnect', 'syncAll', 'uploadProgress'],
+			[
+				'connect',
+				'disconnect',
+				'syncAll',
+				'uploadProgress',
+				'markChapterRead',
+				'flushPendingReadMarks',
+			],
 			{
 				progressSynced$: new Subject(),
 				progressDeleted$: new Subject(),
@@ -39,10 +46,13 @@ describe('UnifiedReadingProgressService react to userIdSignal', () => {
 		);
 		syncServiceSpy.syncAll.and.returnValue(Promise.resolve());
 		syncServiceSpy.uploadProgress.and.returnValue(Promise.resolve());
+		syncServiceSpy.markChapterRead.and.returnValue(Promise.resolve());
+		syncServiceSpy.flushPendingReadMarks.and.returnValue(Promise.resolve());
 
 		const userTokenSpy = {
 			userIdSignal: userIdSignal.asReadonly(),
 			hasValidAccessTokenSignal: signal(false).asReadonly(),
+			hasValidAccessToken: false,
 		};
 
 		TestBed.configureTestingModule({
@@ -77,5 +87,58 @@ describe('UnifiedReadingProgressService react to userIdSignal', () => {
 		TestBed.flushEffects();
 
 		expect(readingService.onUserLogout).toHaveBeenCalledTimes(1);
+	});
+
+	it('markChapterRead delega para syncService', async () => {
+		await readingService.markChapterRead('ch-auth');
+		expect(syncServiceSpy.markChapterRead).toHaveBeenCalledWith('ch-auth');
+	});
+
+	it('onUserLogin dispara flushPendingReadMarks no syncService', async () => {
+		const userToken = TestBed.inject(UserTokenService) as unknown as {
+			accessToken: string | null;
+		};
+		const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+		const payload = btoa(JSON.stringify({ sub: 'user-123' }));
+		userToken.accessToken = `${header}.${payload}.sig`;
+
+		await readingService.onUserLogin();
+
+		expect(syncServiceSpy.flushPendingReadMarks).toHaveBeenCalledTimes(1);
+	});
+
+	it('inicialização com token válido define usuário antes de chamar flushPendingReadMarks', () => {
+		const callOrder: string[] = [];
+		localProgressSpy.setCurrentUser.and.callFake((id) => {
+			callOrder.push(`setCurrentUser:${id}`);
+		});
+		syncServiceSpy.flushPendingReadMarks.and.callFake(() => {
+			callOrder.push('flushPendingReadMarks');
+			return Promise.resolve();
+		});
+
+		const userToken = TestBed.inject(UserTokenService) as unknown as {
+			accessToken: string | null;
+			hasValidAccessToken: boolean;
+		};
+		const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+		const payload = btoa(JSON.stringify({ sub: 'user-startup' }));
+		userToken.accessToken = `${header}.${payload}.sig`;
+		userToken.hasValidAccessToken = true;
+
+		// Instancia novamente para exercitar initializeUser() no construtor
+		TestBed.runInInjectionContext(() => {
+			new UnifiedReadingProgressService(
+				'browser' as unknown as object,
+				localProgressSpy,
+				syncServiceSpy,
+				userToken as unknown as UserTokenService,
+			);
+		});
+
+		expect(callOrder).toEqual([
+			'setCurrentUser:user-startup',
+			'flushPendingReadMarks',
+		]);
 	});
 });

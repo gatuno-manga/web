@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable, inject, OnDestroy, signal } from '@angular/core';
 import { UserTokenService } from '@core/services/auth/user-token.service';
 import { BackgroundSyncRegistrationService } from '@core/services/realtime/background-sync-registration.service';
@@ -20,6 +20,7 @@ import {
 import { IDBPDatabase, openDB } from 'idb';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { BatchReadResult, ChapterService } from './chapter.service';
 import {
 	ReadingProgress,
 	ReadingProgressService,
@@ -46,6 +47,9 @@ export class ReadingProgressSyncService implements OnDestroy {
 	private dbPromise?: Promise<IDBPDatabase<unknown>>;
 
 	private mqttService = inject(MqttService);
+	private chapterService = inject(ChapterService);
+	private isFlushingReadMarks = false;
+	private pendingFlushRequested = false;
 
 	// Estado da sincronização usando Signals
 	private readonly _syncStatus = signal<SyncStatus>({
@@ -119,6 +123,7 @@ export class ReadingProgressSyncService implements OnDestroy {
 				if (this.pendingChanges.size > 0) {
 					this.syncPendingChanges();
 				}
+				void this.flushPendingReadMarks();
 			});
 	}
 
@@ -306,6 +311,112 @@ export class ReadingProgressSyncService implements OnDestroy {
 		}
 
 		this.updateSyncStatus({ pendingChanges: this.pendingChanges.size });
+	}
+
+	private static readonly NON_RETRYABLE_READ_MARK_STATUSES = new Set([
+		400, 403, 404, 422,
+	]);
+
+	private canSyncAuthenticated(): boolean {
+		return (
+			this.isBrowser &&
+			(this.userTokenService.hasValidAccessToken ||
+				this.userTokenService.hasValidRefreshToken)
+		);
+	}
+
+	/**
+	 * BatchReadResult currently exposes only `error?: string` without a status/code field.
+	 * Treat 'not found' as settled so deleted chapters do not remain stuck in IndexedDB.
+	 */
+	private isSettledReadMark(item: BatchReadResult): boolean {
+		return (
+			item.success === true ||
+			(typeof item.error === 'string' &&
+				item.error.toLowerCase().includes('not found'))
+		);
+	}
+
+	async markChapterRead(chapterId: string): Promise<void> {
+		if (!this.canSyncAuthenticated()) {
+			return;
+		}
+
+		if (this.networkStatusService.isOffline()) {
+			await this.localProgressService.enqueuePendingReadMark(chapterId);
+			return;
+		}
+
+		try {
+			await firstValueFrom(this.chapterService.markAsRead(chapterId));
+		} catch (error) {
+			if (
+				error instanceof HttpErrorResponse &&
+				ReadingProgressSyncService.NON_RETRYABLE_READ_MARK_STATUSES.has(
+					error.status,
+				)
+			) {
+				console.warn(
+					`Descartando markAsRead para ${chapterId} (status ${error.status})`,
+					error,
+				);
+				return;
+			}
+			await this.localProgressService.enqueuePendingReadMark(chapterId);
+		}
+	}
+
+	async flushPendingReadMarks(): Promise<void> {
+		if (
+			!this.canSyncAuthenticated() ||
+			this.networkStatusService.isOffline()
+		) {
+			return;
+		}
+		if (this.isFlushingReadMarks) {
+			this.pendingFlushRequested = true;
+			return;
+		}
+
+		this.isFlushingReadMarks = true;
+		try {
+			const tokenUserId =
+				this.userTokenService.userIdSignal() ?? undefined;
+			const pending =
+				await this.localProgressService.getPendingReadMarks(
+					tokenUserId,
+				);
+			if (pending.length === 0) return;
+
+			const userId = pending[0].userId;
+			const chapterIds = pending.map((item) => item.chapterId);
+			const results: BatchReadResult[] = await firstValueFrom(
+				this.chapterService.markManyAsRead(chapterIds),
+			);
+
+			const idsToRemove = results
+				.filter((item) => this.isSettledReadMark(item))
+				.map((item) => item.chapterId);
+
+			if (idsToRemove.length > 0) {
+				await this.localProgressService.removePendingReadMarks(
+					idsToRemove,
+					userId,
+				);
+			}
+		} catch (error) {
+			logWebSocketError(
+				this.serviceName,
+				error,
+				'Erro ao sincronizar marcações de leitura pendentes',
+			);
+		} finally {
+			this.isFlushingReadMarks = false;
+			if (this.pendingFlushRequested) {
+				this.pendingFlushRequested = false;
+				void this.flushPendingReadMarks();
+			}
+		}
 	}
 
 	async uploadProgress(progress: SaveProgressDto[]): Promise<void> {

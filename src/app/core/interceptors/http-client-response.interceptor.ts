@@ -7,6 +7,7 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthQueueService } from '@core/services/auth/auth-queue.service';
+import { isDeadSessionRefreshError } from '@core/services/auth/refresh-error.util';
 import { UserTokenService } from '@core/services/auth/user-token.service';
 import {
 	catchError,
@@ -61,12 +62,9 @@ const handle401Error = (
 					err,
 				);
 
-				// Só remove tokens se for um erro de autenticação (401 ou 403)
-				// Erros de rede (0) ou servidor (500) não devem deslogar o usuário
-				if (
-					err instanceof HttpErrorResponse &&
-					(err.status === 401 || err.status === 403)
-				) {
+				// Só remove tokens se o refresh retornar 401 (sessão morta no servidor).
+				// 403 CSRF_TOKEN_INVALID, 409 REFRESH_IN_PROGRESS, rede (0) ou 5xx mantêm a sessão.
+				if (isDeadSessionRefreshError(err)) {
 					console.warn(
 						'[GATUNO_INTERCEPTOR] Sessão expirada no servidor. Removendo tokens.',
 					);

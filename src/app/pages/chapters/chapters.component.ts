@@ -166,6 +166,8 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private pageObjectUrls: string[] = [];
 	private destroyRef = inject(DestroyRef);
 	private maxReadPageIndex = 0;
+	private hasMarkedCurrentChapterRead = false;
+	private readonly READ_THRESHOLD_PERCENTAGE = 80;
 	private isNavigating = false;
 	private isDragging = false;
 	private lastScrollPosition = 0;
@@ -394,6 +396,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	) {
 		const requestId = ++this.currentLoadRequestId;
 		this.maxReadPageIndex = 0;
+		this.hasMarkedCurrentChapterRead = false;
 		this.readingProgress.set(0);
 		this.chapter.set(null);
 		try {
@@ -641,6 +644,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private updateProgressState(
 		pageIndex: number,
 		visualProgressPercentage: number,
+		isLastPage = false,
 	) {
 		if (this.isNavigating || this.isDragging) return;
 
@@ -659,14 +663,41 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 				pageIndex,
 			);
 		}
+
+		if (
+			visualProgressPercentage >= this.READ_THRESHOLD_PERCENTAGE ||
+			isLastPage
+		) {
+			void this.markCurrentChapterAsRead();
+		}
 	}
 
-	onImageProgress(event: ReadingProgressEvent) {
+	private async markCurrentChapterAsRead(): Promise<void> {
+		if (this.hasMarkedCurrentChapterRead) return;
+
+		const current = this.chapter();
+		if (!current) return;
+
+		this.hasMarkedCurrentChapterRead = true;
+		await this.readingProgressService.markChapterRead(current.id);
+	}
+
+	private handlePagedProgress(event: {
+		pageIndex: number;
+		totalPages: number;
+		scrollPercentage?: number;
+	}): void {
+		if (event.totalPages <= 0) return;
 		const percent =
 			event.scrollPercentage !== undefined
 				? event.scrollPercentage
 				: ((event.pageIndex + 1) / event.totalPages) * 100;
-		this.updateProgressState(event.pageIndex, percent);
+		const isLastPage = event.pageIndex >= event.totalPages - 1;
+		this.updateProgressState(event.pageIndex, percent, isLastPage);
+	}
+
+	onImageProgress(event: ReadingProgressEvent) {
+		this.handlePagedProgress(event);
 	}
 
 	onTextProgress(event: TextProgressEvent) {
@@ -674,11 +705,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	onDocumentProgress(event: DocumentProgressEvent) {
-		const percent =
-			event.scrollPercentage !== undefined
-				? event.scrollPercentage
-				: ((event.pageIndex + 1) / event.totalPages) * 100;
-		this.updateProgressState(event.pageIndex, percent);
+		this.handlePagedProgress(event);
 	}
 
 	unblur() {
@@ -859,14 +886,15 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 				);
 				return;
 			}
+			await this.markChapterAsCompleted();
 		}
 
-		await this.markChapterAsCompleted();
 		this.navigateToChapter(targetChapterId);
 	}
 
 	private async markChapterAsCompleted() {
 		this.readingProgressService.cancelPendingSync();
+		await this.markCurrentChapterAsRead();
 
 		const current = this.chapter();
 		if (current?.pages) {

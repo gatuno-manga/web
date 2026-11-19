@@ -11,12 +11,16 @@ import {
 } from '@models/user.models';
 import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { AuthService } from './auth.service';
+import { CsrfService } from './csrf.service';
+import { REFRESH_ERROR_CODES } from './refresh-error.util';
 import { UserTokenService } from './user-token.service';
 
 describe('AuthService', () => {
 	let service: AuthService;
 	let httpMock: HttpTestingController;
 	let userTokenServiceSpy: jasmine.SpyObj<UserTokenService>;
+	let csrfServiceSpy: jasmine.SpyObj<CsrfService>;
+	let currentCsrfToken: string | null;
 
 	const mockAssertion: AuthenticationResponseJSON = {
 		id: 'cred',
@@ -32,6 +36,7 @@ describe('AuthService', () => {
 	};
 
 	beforeEach(() => {
+		currentCsrfToken = 'mock-csrf';
 		const userTokenSpy = jasmine.createSpyObj(
 			'UserTokenService',
 			['setTokens', 'removeTokens'],
@@ -39,12 +44,18 @@ describe('AuthService', () => {
 				csrfToken: 'mock-csrf',
 			},
 		);
+		csrfServiceSpy = jasmine.createSpyObj('CsrfService', ['setToken']);
+		Object.defineProperty(csrfServiceSpy, 'csrfToken', {
+			get: () => currentCsrfToken,
+			configurable: true,
+		});
 
 		TestBed.configureTestingModule({
 			imports: [HttpClientTestingModule],
 			providers: [
 				AuthService,
 				{ provide: UserTokenService, useValue: userTokenSpy },
+				{ provide: CsrfService, useValue: csrfServiceSpy },
 			],
 		});
 
@@ -118,12 +129,88 @@ describe('AuthService', () => {
 	describe('logout', () => {
 		it('should call logout endpoint and remove tokens', () => {
 			service.logout().subscribe(() => {
-				expect(userTokenServiceSpy.removeTokens).toHaveBeenCalled();
+				expect(userTokenServiceSpy.removeTokens).toHaveBeenCalledWith(
+					false,
+				);
 			});
 
 			const req = httpMock.expectOne('/auth/logout');
 			expect(req.request.method).toBe('GET');
+			expect(req.request.headers.get('x-csrf-token')).toBe('mock-csrf');
 			req.flush({});
+		});
+
+		it('should re-read CSRF token and retry once on 403 CSRF_TOKEN_INVALID', () => {
+			let completed = false;
+			service.logout().subscribe({
+				complete: () => {
+					completed = true;
+				},
+			});
+
+			const req1 = httpMock.expectOne('/auth/logout');
+			expect(req1.request.headers.get('x-csrf-token')).toBe('mock-csrf');
+			currentCsrfToken = 'fresh-csrf';
+			req1.flush(
+				{ code: REFRESH_ERROR_CODES.CSRF_TOKEN_INVALID },
+				{ status: 403, statusText: 'Forbidden' },
+			);
+
+			const req2 = httpMock.expectOne('/auth/logout');
+			expect(req2.request.headers.get('x-csrf-token')).toBe('fresh-csrf');
+			req2.flush({});
+
+			expect(completed).toBeTrue();
+			expect(userTokenServiceSpy.removeTokens).toHaveBeenCalledWith(
+				false,
+			);
+		});
+
+		it('should still clear local tokens and complete cleanly when logout fails after retry or on network/5xx error', () => {
+			let completed = false;
+			service.logout().subscribe({
+				error: () => fail('logout should not error'),
+				complete: () => {
+					completed = true;
+				},
+			});
+
+			const req1 = httpMock.expectOne('/auth/logout');
+			req1.flush(
+				{ code: REFRESH_ERROR_CODES.CSRF_TOKEN_INVALID },
+				{ status: 403, statusText: 'Forbidden' },
+			);
+
+			const req2 = httpMock.expectOne('/auth/logout');
+			req2.flush(
+				{ code: REFRESH_ERROR_CODES.CSRF_TOKEN_INVALID },
+				{ status: 403, statusText: 'Forbidden' },
+			);
+
+			expect(completed).toBeTrue();
+			expect(userTokenServiceSpy.removeTokens).toHaveBeenCalledWith(
+				false,
+			);
+
+			userTokenServiceSpy.removeTokens.calls.reset();
+			let networkCompleted = false;
+			service.logout().subscribe({
+				error: () => fail('logout should not error on 500'),
+				complete: () => {
+					networkCompleted = true;
+				},
+			});
+
+			const req3 = httpMock.expectOne('/auth/logout');
+			req3.flush('Server Error', {
+				status: 500,
+				statusText: 'Server Error',
+			});
+
+			expect(networkCompleted).toBeTrue();
+			expect(userTokenServiceSpy.removeTokens).toHaveBeenCalledWith(
+				false,
+			);
 		});
 	});
 

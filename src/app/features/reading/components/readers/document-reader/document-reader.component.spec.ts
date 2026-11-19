@@ -41,14 +41,17 @@ describe('DocumentReaderComponent', () => {
 		expect(unsupported).toBeTruthy();
 	});
 
-	it('should emit page change on init', () => {
+	it('should not emit page change on init before pdf loads, and should emit onPdfLoaded', () => {
 		const spy = spyOn(component.pageChange, 'emit');
 		fixture.componentRef.setInput('src', 'http://example.com/test.pdf');
 		component.ngOnInit();
 
+		expect(spy).not.toHaveBeenCalled();
+
+		component.onPdfLoaded({ numPages: 10 } as any);
 		expect(spy).toHaveBeenCalledWith({
 			pageIndex: 0,
-			totalPages: 1,
+			totalPages: 10,
 		});
 	});
 
