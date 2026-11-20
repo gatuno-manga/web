@@ -1,10 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
-import { BookService } from '@core/services/book.service';
-import { DownloadService } from '@core/services/download.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { NotificationService } from '@core/services/notification.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
+import { BookService } from '@features/books/services/book.service';
+import { DownloadService } from '@features/books/services/download.service';
+import { ChapterService } from '@features/reading/services/chapter.service';
+import { ReadingProgressService } from '@features/reading/services/reading-progress.service';
+import { UnifiedReadingProgressService } from '@features/reading/services/unified-reading-progress.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { of, ReplaySubject } from 'rxjs';
 
@@ -263,5 +267,278 @@ describe('ChaptersComponent', () => {
 
 		expect(getBookSpy).toHaveBeenCalledWith('test-book-id');
 		expect(newComponent.bookBlurHash()).toBe('test-hash');
+	});
+
+	describe('explicit chapter read marking', () => {
+		const mockChapter = {
+			id: 'ch-1',
+			bookId: 'book-1',
+			bookTitle: 'Test Book',
+			title: 'Chapter 1',
+			originalUrl: '',
+			index: 1,
+			totalChapters: 10,
+			contentType: 'image' as const,
+			pages: Array.from({ length: 10 }, (_, i) => ({
+				index: String(i),
+				path: `/p/${i}.jpg`,
+			})),
+		};
+
+		it('should not mark chapter read on raw open or below 80% progress', async () => {
+			const userTokenService = TestBed.inject(UserTokenService);
+			const readingProgressService = TestBed.inject(
+				UnifiedReadingProgressService,
+			);
+			spyOn(
+				userTokenService,
+				'hasValidAccessTokenSignal',
+			).and.returnValue(true);
+			const markSpy = spyOn(
+				readingProgressService,
+				'markChapterRead',
+			).and.resolveTo();
+			spyOn<any>(component, 'resolveChapterData').and.resolveTo(
+				mockChapter,
+			);
+			spyOn<any>(component, 'restoreReadingProgress').and.resolveTo();
+
+			await component.loadChapter('ch-1');
+			expect(markSpy).not.toHaveBeenCalled();
+
+			component.onImageProgress({
+				pageIndex: 4,
+				totalPages: 10,
+				scrollPercentage: 50,
+			});
+			expect(markSpy).not.toHaveBeenCalled();
+		});
+
+		it('should mark chapter read once when reaching >= 80% progress for signed-in users', async () => {
+			const userTokenService = TestBed.inject(UserTokenService);
+			const readingProgressService = TestBed.inject(
+				UnifiedReadingProgressService,
+			);
+			spyOn(
+				userTokenService,
+				'hasValidAccessTokenSignal',
+			).and.returnValue(true);
+			const markSpy = spyOn(
+				readingProgressService,
+				'markChapterRead',
+			).and.resolveTo();
+			spyOn<any>(component, 'resolveChapterData').and.resolveTo(
+				mockChapter,
+			);
+			spyOn<any>(component, 'restoreReadingProgress').and.resolveTo();
+
+			await component.loadChapter('ch-1');
+
+			component.onImageProgress({
+				pageIndex: 7,
+				totalPages: 10,
+				scrollPercentage: 80,
+			});
+			component.onImageProgress({
+				pageIndex: 8,
+				totalPages: 10,
+				scrollPercentage: 90,
+			});
+
+			expect(markSpy).toHaveBeenCalledTimes(1);
+			expect(markSpy).toHaveBeenCalledWith('ch-1');
+		});
+
+		it('should mark chapter read on markChapterAsCompleted even for text chapters below 80%', async () => {
+			const userTokenService = TestBed.inject(UserTokenService);
+			const readingProgressService = TestBed.inject(
+				UnifiedReadingProgressService,
+			);
+			spyOn(
+				userTokenService,
+				'hasValidAccessTokenSignal',
+			).and.returnValue(true);
+			const markSpy = spyOn(
+				readingProgressService,
+				'markChapterRead',
+			).and.resolveTo();
+			spyOn(
+				readingProgressService,
+				'saveProgressImmediate',
+			).and.resolveTo();
+			spyOn<any>(component, 'resolveChapterData').and.resolveTo({
+				...mockChapter,
+				id: 'ch-text',
+				contentType: 'text',
+				pages: [],
+			});
+			spyOn<any>(component, 'restoreReadingProgress').and.resolveTo();
+
+			await component.loadChapter('ch-text');
+			await (component as any).markChapterAsCompleted();
+
+			expect(markSpy).toHaveBeenCalledTimes(1);
+			expect(markSpy).toHaveBeenCalledWith('ch-text');
+		});
+
+		it('should not mark chapter read for guest / anonymous users', async () => {
+			const userTokenService = TestBed.inject(UserTokenService);
+			const chapterService = TestBed.inject(ChapterService);
+			const localProgressService = TestBed.inject(ReadingProgressService);
+			spyOnProperty(
+				userTokenService,
+				'hasValidAccessToken',
+				'get',
+			).and.returnValue(false);
+			spyOnProperty(
+				userTokenService,
+				'hasValidRefreshToken',
+				'get',
+			).and.returnValue(false);
+			const httpSpy = spyOn(chapterService, 'markAsRead');
+			const enqueueSpy = spyOn(
+				localProgressService,
+				'enqueuePendingReadMark',
+			);
+			spyOn<any>(component, 'resolveChapterData').and.resolveTo(
+				mockChapter,
+			);
+			spyOn<any>(component, 'restoreReadingProgress').and.resolveTo();
+
+			await component.loadChapter('ch-1');
+			component.onImageProgress({
+				pageIndex: 9,
+				totalPages: 10,
+				scrollPercentage: 100,
+			});
+			await (component as any).markChapterAsCompleted();
+
+			expect(httpSpy).not.toHaveBeenCalled();
+			expect(enqueueSpy).not.toHaveBeenCalled();
+		});
+
+		it('should NOT mark document chapter read on raw open before PDF loads, and SHOULD mark read at >= 80% after load', async () => {
+			const readingProgressService = TestBed.inject(
+				UnifiedReadingProgressService,
+			);
+			const markSpy = spyOn(
+				readingProgressService,
+				'markChapterRead',
+			).and.resolveTo();
+			spyOn<any>(component, 'resolveChapterData').and.resolveTo({
+				...mockChapter,
+				id: 'ch-doc',
+				contentType: 'document',
+				pages: [],
+				documentPath: 'https://example.com/doc.pdf',
+			});
+			spyOn<any>(component, 'restoreReadingProgress').and.resolveTo();
+
+			await component.loadChapter('ch-doc');
+			expect(markSpy).not.toHaveBeenCalled();
+
+			component.onDocumentProgress({
+				pageIndex: 7,
+				totalPages: 10,
+			});
+			expect(markSpy).toHaveBeenCalledTimes(1);
+			expect(markSpy).toHaveBeenCalledWith('ch-doc');
+		});
+
+		it('should NOT mark chapter read when totalPages is 0', async () => {
+			const readingProgressService = TestBed.inject(
+				UnifiedReadingProgressService,
+			);
+			const markSpy = spyOn(
+				readingProgressService,
+				'markChapterRead',
+			).and.resolveTo();
+			spyOn<any>(component, 'resolveChapterData').and.resolveTo(
+				mockChapter,
+			);
+			spyOn<any>(component, 'restoreReadingProgress').and.resolveTo();
+
+			await component.loadChapter('ch-1');
+
+			component.onImageProgress({ pageIndex: 0, totalPages: 0 });
+			component.onDocumentProgress({
+				pageIndex: 0,
+				totalPages: 0,
+			});
+
+			expect(markSpy).not.toHaveBeenCalled();
+		});
+
+		it('should only mark chapter read on chapter transition when direction is next, not previous', async () => {
+			const userTokenService = TestBed.inject(UserTokenService);
+			const readingProgressService = TestBed.inject(
+				UnifiedReadingProgressService,
+			);
+			const downloadService = TestBed.inject(DownloadService);
+			spyOn(
+				userTokenService,
+				'hasValidAccessTokenSignal',
+			).and.returnValue(true);
+			const markSpy = spyOn(
+				readingProgressService,
+				'markChapterRead',
+			).and.resolveTo();
+			spyOn(
+				readingProgressService,
+				'saveProgressImmediate',
+			).and.resolveTo();
+			spyOn(downloadService, 'isChapterDownloaded').and.resolveTo(true);
+			spyOn<any>(component, 'navigateToChapter');
+			spyOn<any>(component, 'resolveChapterData').and.resolveTo({
+				...mockChapter,
+				previous: 'ch-0',
+				next: 'ch-2',
+			});
+			spyOn<any>(component, 'restoreReadingProgress').and.resolveTo();
+
+			await component.loadChapter('ch-1');
+
+			await component.previousPage();
+			expect(markSpy).not.toHaveBeenCalled();
+
+			await component.nextPage();
+			expect(markSpy).toHaveBeenCalledTimes(1);
+			expect(markSpy).toHaveBeenCalledWith('ch-1');
+		});
+
+		it('should mark offline-downloaded chapter read when reaching >= 80%', async () => {
+			const userTokenService = TestBed.inject(UserTokenService);
+			const readingProgressService = TestBed.inject(
+				UnifiedReadingProgressService,
+			);
+			const downloadService = TestBed.inject(DownloadService);
+			spyOn(
+				userTokenService,
+				'hasValidAccessTokenSignal',
+			).and.returnValue(true);
+			const markSpy = spyOn(
+				readingProgressService,
+				'markChapterRead',
+			).and.resolveTo();
+			spyOn(downloadService, 'isChapterDownloaded').and.resolveTo(true);
+			spyOn(downloadService, 'getChapter').and.resolveTo({
+				id: 'ch-offline',
+				bookId: 'book-1',
+				index: 1,
+				title: 'Offline Chapter',
+				contentType: 'image',
+				pages: new Array(10)
+					.fill(null)
+					.map(() => new Blob(['img'], { type: 'image/png' })),
+			} as any);
+			spyOn(downloadService, 'getBook').and.resolveTo(undefined);
+			spyOn<any>(component, 'restoreReadingProgress').and.resolveTo();
+
+			await component.loadChapter('ch-offline');
+			component.onImageProgress({ pageIndex: 8, totalPages: 10 });
+
+			expect(markSpy).toHaveBeenCalledTimes(1);
+			expect(markSpy).toHaveBeenCalledWith('ch-offline');
+		});
 	});
 });

@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { ThemeService } from '@core/services/theme.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
+import { ThemeService } from '@core/services/theme/theme.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+import { UnifiedReadingProgressService } from '@features/reading/services/unified-reading-progress.service';
 import { OverlayNotificationComponent } from '@ui/molecules/notification/overlay-notification/overlay-notification.component';
 import { ContextMenuComponent } from '@ui/organisms/context-menu/context-menu.component';
 import { ThemeSetupModalComponent } from '@ui/organisms/theme-setup-modal/theme-setup-modal.component';
@@ -22,6 +23,7 @@ import { ThemeSetupModalComponent } from '@ui/organisms/theme-setup-modal/theme-
 export class AppComponent {
 	public themeService = inject(ThemeService);
 	public sensitiveContentService = inject(SensitiveContentService);
+	public readingProgressService = inject(UnifiedReadingProgressService);
 	public metadata = inject(MetaDataService);
 
 	ngOnInit() {

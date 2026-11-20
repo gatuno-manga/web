@@ -39,7 +39,7 @@
 
 .form-subtitle {
 	font-size: 0.875rem;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
 	line-height: 1.5;
 }
@@ -90,7 +90,7 @@
 .auth-link {
 	text-align: center;
 	font-size: 0.8rem;
-	color: var(--white-muted);
+	color: var(--app-text-color-muted);
 	font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
 	margin-top: 0.25rem;
 

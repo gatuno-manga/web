@@ -7,7 +7,7 @@ import {
 	OnInit,
 	signal,
 } from '@angular/core';
-import { BookInteractionService } from '@core/services/book-interaction.service';
+import { BookInteractionService } from '@features/books/services/book-interaction.service';
 import { BookReview } from '@models/book-interaction.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 

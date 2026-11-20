@@ -9,9 +9,9 @@ import {
 	PLATFORM_ID,
 	ViewChild,
 } from '@angular/core';
-import { BodyScrollService } from '@core/services/body-scroll.service';
-import { ContextMenuService } from '@core/services/context-menu.service';
+import { BodyScrollService } from '@core/services/browser/body-scroll.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
+import { ContextMenuService } from './context-menu.service';
 
 @Component({
 	selector: 'app-context-menu',

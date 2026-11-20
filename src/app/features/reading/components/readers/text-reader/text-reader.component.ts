@@ -19,8 +19,8 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { HighlightService } from '@core/services/highlight.service';
-import { SettingsService } from '@core/services/settings.service';
+import { HighlightService } from '@features/reading/services/highlight.service';
+import { SettingsService } from '@features/user/services/settings.service';
 import { ContentFormat } from '@models/book.models';
 import { MarkdownComponent } from 'ngx-markdown';
 import { fromEvent } from 'rxjs';

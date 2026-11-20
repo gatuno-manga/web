@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { NetworkStatusService } from '@core/services/network-status.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NetworkStatusService } from '@core/services/realtime/network-status.service';
 
 export const networkGuard: CanActivateFn = (_route, _state) => {
 	const networkStatus = inject(NetworkStatusService);

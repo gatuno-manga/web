@@ -3,14 +3,16 @@ import {
 	HttpErrorResponse,
 	provideHttpClient,
 	withInterceptors,
+	withXhr,
 } from '@angular/common/http';
 import {
 	HttpTestingController,
 	provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { AuthQueueService } from '@core/services/auth-queue.service';
-import { UserTokenService } from '@core/services/user-token.service';
+import { AuthQueueService } from '@core/services/auth/auth-queue.service';
+import { REFRESH_ERROR_CODES } from '@core/services/auth/refresh-error.util';
+import { UserTokenService } from '@core/services/auth/user-token.service';
 import { Subject as RxSubject } from 'rxjs';
 import { httpClientResponseInterceptor } from './http-client-response.interceptor';
 
@@ -34,6 +36,7 @@ describe('httpClientResponseInterceptor', () => {
 		TestBed.configureTestingModule({
 			providers: [
 				provideHttpClient(
+					withXhr(),
 					withInterceptors([httpClientResponseInterceptor]),
 				),
 				provideHttpClientTesting(),
@@ -133,49 +136,93 @@ describe('httpClientResponseInterceptor', () => {
 		retry2.flush({ ok: 2 });
 	});
 
-	it('deve limpar tokens e deslogar se o refresh falhar com 401/403', () => {
-		tokenServiceSpy.refreshTokens.and.returnValue(
-			refreshSubject.asObservable(),
-		);
+	it('deve limpar tokens e deslogar se o refresh falhar com 401 para qualquer código de sessão morta', () => {
+		const deadCodes = [
+			REFRESH_ERROR_CODES.REFRESH_TOKEN_MISSING,
+			REFRESH_ERROR_CODES.REFRESH_TOKEN_INVALID,
+			REFRESH_ERROR_CODES.REFRESH_SESSION_NOT_FOUND,
+			REFRESH_ERROR_CODES.REFRESH_TOKEN_REUSED,
+			REFRESH_ERROR_CODES.REFRESH_USER_NOT_FOUND,
+		];
 
-		httpClient.get('/protected').subscribe({
-			error: (err) => {
-				expect(err.status).toBe(401);
-			},
-		});
+		for (const code of deadCodes) {
+			tokenServiceSpy.removeTokens.calls.reset();
+			authQueue.reset();
+			const subject = new RxSubject<{ accessToken: string }>();
+			tokenServiceSpy.refreshTokens.and.returnValue(
+				subject.asObservable(),
+			);
 
-		const req = httpMock.expectOne('/protected');
-		req.flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
+			httpClient.get('/protected').subscribe({
+				error: (err) => {
+					expect(err.status).toBe(401);
+				},
+			});
 
-		refreshSubject.error(
-			new HttpErrorResponse({
+			const req = httpMock.expectOne('/protected');
+			req.flush('Unauthorized', {
 				status: 401,
-				statusText: 'Expired Refresh',
-			}),
-		);
+				statusText: 'Unauthorized',
+			});
 
-		expect(tokenServiceSpy.removeTokens).toHaveBeenCalledWith(true);
+			subject.error(
+				new HttpErrorResponse({
+					status: 401,
+					statusText: 'Unauthorized',
+					error: { code },
+				}),
+			);
+
+			expect(tokenServiceSpy.removeTokens)
+				.withContext(`401 with ${code} should sign out`)
+				.toHaveBeenCalledWith(true);
+		}
 	});
 
-	it('NÃO deve deslogar se o refresh falhar com erro de rede ou 500', () => {
-		tokenServiceSpy.refreshTokens.and.returnValue(
-			refreshSubject.asObservable(),
-		);
-
-		httpClient.get('/protected').subscribe({
-			error: (err) => {
-				expect(err.status).toBe(500);
-			},
-		});
-
-		const req = httpMock.expectOne('/protected');
-		req.flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
-
-		refreshSubject.error(
+	it('NÃO deve deslogar se o refresh falhar com 403 CSRF_TOKEN_INVALID, 409 REFRESH_IN_PROGRESS, erro 0 ou 500', () => {
+		const nonFatalErrors = [
+			new HttpErrorResponse({
+				status: 403,
+				statusText: 'Forbidden',
+				error: { code: REFRESH_ERROR_CODES.CSRF_TOKEN_INVALID },
+			}),
+			new HttpErrorResponse({
+				status: 409,
+				statusText: 'Conflict',
+				error: { code: REFRESH_ERROR_CODES.REFRESH_IN_PROGRESS },
+			}),
+			new HttpErrorResponse({ status: 0, statusText: 'Unknown Error' }),
 			new HttpErrorResponse({ status: 500, statusText: 'Server Error' }),
-		);
+		];
 
-		expect(tokenServiceSpy.removeTokens).not.toHaveBeenCalled();
+		for (const refreshError of nonFatalErrors) {
+			tokenServiceSpy.removeTokens.calls.reset();
+			authQueue.reset();
+			const subject = new RxSubject<{ accessToken: string }>();
+			tokenServiceSpy.refreshTokens.and.returnValue(
+				subject.asObservable(),
+			);
+
+			httpClient.get('/protected').subscribe({
+				error: (err) => {
+					expect(err.status).toBe(refreshError.status);
+				},
+			});
+
+			const req = httpMock.expectOne('/protected');
+			req.flush('Unauthorized', {
+				status: 401,
+				statusText: 'Unauthorized',
+			});
+
+			subject.error(refreshError);
+
+			expect(tokenServiceSpy.removeTokens)
+				.withContext(
+					`status ${refreshError.status} should NOT sign out`,
+				)
+				.not.toHaveBeenCalled();
+		}
 	});
 
 	it('deve ignorar erro 401 em URLs de autenticação (evitar loop)', () => {

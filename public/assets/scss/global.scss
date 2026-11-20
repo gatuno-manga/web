@@ -10,13 +10,16 @@
 	list-style: none;
 	text-decoration: none;
 	color: inherit;
-	position: relative;
 	font-family: 'Inknut Antiqua', serif;
 }
 
 :root {
 	@include color-definitions.light-definitions();
 	@include color.colors();
+
+	// Firefox (WebKit usa as regras ::-webkit-scrollbar abaixo)
+	scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-color);
+	scrollbar-width: thin;
 
 	::-webkit-scrollbar {
 		width: 7px;
@@ -58,7 +61,7 @@ body {
 	-webkit-tap-highlight-color: transparent;
 }
 
-@media (max-width: 768px) {
+@include mixins.mobile {
 	html {
 		font-size: 12px;
 	}

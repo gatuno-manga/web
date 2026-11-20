@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer } from '@angular/platform-browser';
-import { IconRegistryService } from '@core/services/icon-registry.service';
+import { IconRegistryService } from '@core/services/browser/icon-registry.service';
 import { of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 

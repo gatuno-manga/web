@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 .cover-edit-modal-content {
 	width: 100%;
 	display: flex;
@@ -112,7 +113,7 @@
 	border-top: 1px solid var(--app-text-color);
 }
 
-@media (max-width: 768px) {
+@include mobile {
 	.cover-edit-modal-content {
 		max-width: 100%;
 	}

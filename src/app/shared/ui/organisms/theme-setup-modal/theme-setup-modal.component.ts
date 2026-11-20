@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { AppTheme, ThemeService } from '@core/services/theme.service';
+import { AppTheme, ThemeService } from '@core/services/theme/theme.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 
 @Component({

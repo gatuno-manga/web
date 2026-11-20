@@ -1,10 +1,10 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { BookService } from '@core/services/book.service';
-import { NetworkStatusService } from '@core/services/network-status.service';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
-import { TagsService } from '@core/services/tags.service';
+import { NetworkStatusService } from '@core/services/realtime/network-status.service';
+import { BookService } from '@features/books/services/book.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
+import { TagsService } from '@features/books/services/tags.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { of } from 'rxjs';
 import { BooksComponent } from './books.component';

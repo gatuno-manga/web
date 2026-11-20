@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { BookInteractionService } from '@core/services/book-interaction.service';
+import { BookInteractionService } from '@features/books/services/book-interaction.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { of } from 'rxjs';
 import { BookReviewFormComponent } from './book-review-form.component';

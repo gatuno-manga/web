@@ -149,7 +149,7 @@ export interface Chapterlist {
 	originalUrl: string;
 	scrapingStatus?: ScrapingStatus | null;
 	index: number;
-	read?: boolean;
+	read?: boolean | null;
 	contentType?: ContentType;
 	languageCode?: string;
 }

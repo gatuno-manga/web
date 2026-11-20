@@ -1,8 +1,8 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject, PLATFORM_ID } from '@angular/core';
-import { CookieService } from '@core/services/cookie.service';
-import { CsrfService } from '@core/services/csrf.service';
+import { CookieService } from '@core/services/auth/cookie.service';
+import { CsrfService } from '@core/services/auth/csrf.service';
 import { environment } from '@environments/environment';
 import { buildApiUrl } from '@shared/utils/api-url.utils';
 

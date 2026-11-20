@@ -9,17 +9,17 @@ import {
 } from '@angular/core';
 import { BookList, ImageMetadata } from '@core/models/book.models';
 import { ContextMenuItem } from '@core/models/context-menu.models';
-import { BookService } from '@core/services/book.service';
-import { CollectionService } from '@core/services/collection.service';
-import { ContextMenuService } from '@core/services/context-menu.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { NotificationSeverity } from '@core/services/notification/notification-strategy.interface';
-import { NotificationService } from '@core/services/notification.service';
-import { BookGridComponent } from '@shared/ui/organisms/book-grid/book-grid.component';
+import { BookGridComponent } from '@features/books/components/book-grid/book-grid.component';
+import { BookService } from '@features/books/services/book.service';
+import { CollectionService } from '@features/books/services/collection.service';
 import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
 import { CollectionEditModalComponent } from '@ui/molecules/notification/custom-components/collection-edit-modal/collection-edit-modal.component';
+import { ContextMenuService } from '@ui/organisms/context-menu/context-menu.service';
 import { finalize } from 'rxjs';
 
 export interface LibraryCollection {

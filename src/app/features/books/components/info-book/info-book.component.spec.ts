@@ -9,16 +9,16 @@ import { InfoBookComponent } from './info-book.component';
 
 registerLocaleData(localePt, 'pt-BR');
 
-import { BookService } from '@core/services/book.service';
-import { ChapterService } from '@core/services/chapter.service';
-import { ContextMenuService } from '@core/services/context-menu.service';
-import { DownloadService } from '@core/services/download.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { NotificationService } from '@core/services/notification.service';
-import { SavedPagesService } from '@core/services/saved-pages.service';
-import { UserService } from '@core/services/user.service';
-import { UserTokenService } from '@core/services/user-token.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
+import { BookService } from '@features/books/services/book.service';
+import { DownloadService } from '@features/books/services/download.service';
+import { SavedPagesService } from '@features/books/services/saved-pages.service';
+import { ChapterService } from '@features/reading/services/chapter.service';
+import { UserService } from '@features/user/services/user.service';
 import { ScrapingStatus } from '@models/book.models';
+import { ContextMenuService } from '@ui/organisms/context-menu/context-menu.service';
 
 describe('InfoBookComponent', () => {
 	let component: InfoBookComponent;
@@ -358,5 +358,27 @@ describe('InfoBookComponent', () => {
 		expect(args[1][6].label).toBe('Corrigir Capa');
 		expect(args[1][7].type).toBe('separator');
 		expect(args[1][8].label).toBe('Apagar');
+	});
+
+	it('should treat Chapterlist.read: null as unread/falsy in context menu', () => {
+		const unreadChapter = {
+			id: 'ch-null',
+			index: 1,
+			title: 'Null Read Chapter',
+			read: null,
+		} as any;
+		component.chapters.set([unreadChapter]);
+
+		component.onChapterContextMenu(
+			new MouseEvent('contextmenu'),
+			unreadChapter,
+		);
+		const items = mockContextMenuService.open.calls.mostRecent().args[1];
+		expect(
+			items.some((i: any) => i.label === 'Marcar como Lido'),
+		).toBeTrue();
+		expect(
+			items.some((i: any) => i.label === 'Marcar como Não Lido'),
+		).toBeFalse();
 	});
 });

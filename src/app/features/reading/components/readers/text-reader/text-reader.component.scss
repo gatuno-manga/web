@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 :host {
 	display: block;
 	width: 100%;
@@ -113,7 +114,7 @@
 	}
 }
 
-@media (max-width: 768px) {
+@include mobile {
 	.text-reader-container {
 		padding: 2rem 1.5rem;
 	}

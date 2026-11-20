@@ -18,7 +18,7 @@ import {
 	ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { SettingsService } from '@core/services/settings.service';
+import { SettingsService } from '@features/user/services/settings.service';
 import { ImageMetadata, Page } from '@models/book.models';
 import { ImageFallbackDirective } from '@ui/directives/image-fallback.directive';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';

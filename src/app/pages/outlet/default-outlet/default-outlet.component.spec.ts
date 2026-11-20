@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HeaderStateService } from '@core/services/header-state.service';
+import { HeaderStateService } from '@core/services/browser/header-state.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { DefaultOutletComponent } from './default-outlet.component';
 

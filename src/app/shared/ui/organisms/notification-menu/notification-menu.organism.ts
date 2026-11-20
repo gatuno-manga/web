@@ -10,7 +10,7 @@ import {
 	signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
 import { IconButtonComponent } from '@ui/atoms/icon-button/icon-button.component';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { AsideComponent } from '@ui/organisms/aside/aside.component';

@@ -10,7 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { BookService } from '@core/services/book.service';
+import { BookService } from '@features/books/services/book.service';
 import { BookList } from '@models/book.models';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import {

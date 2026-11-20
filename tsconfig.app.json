@@ -8,5 +8,13 @@
 	},
 	"files": ["src/main.ts", "src/main.server.ts", "src/server.ts"],
 	"include": ["src/**/*.d.ts", "src/**/*.ts"],
-	"exclude": ["src/**/*.spec.ts", "src/test.ts", "src/testing/**"]
+	"exclude": ["src/**/*.spec.ts", "src/test.ts", "src/testing/**"],
+	"angularCompilerOptions": {
+		"extendedDiagnostics": {
+			"checks": {
+				"nullishCoalescingNotNullable": "suppress",
+				"optionalChainNotNullable": "suppress"
+			}
+		}
+	}
 }

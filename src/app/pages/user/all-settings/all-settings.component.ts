@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { UserTokenService } from '@core/services/user-token.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
 import { AppearanceComponent } from '../appearance/appearance.component';
 import { FilterComponent } from '../filter/filter.component';
 import { NotificationsSettingsComponent } from '../notifications/notifications.component';

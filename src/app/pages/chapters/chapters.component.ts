@@ -22,25 +22,23 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { BookService } from '@core/services/book.service';
-import { ChapterService } from '@core/services/chapter.service';
-import { ContextMenuService } from '@core/services/context-menu.service';
-import { DownloadService } from '@core/services/download.service';
-import { HeaderStateService } from '@core/services/header-state.service';
-import { HighlightService } from '@core/services/highlight.service';
-import { MetaDataService } from '@core/services/meta-data.service';
-import { ModalNotificationService } from '@core/services/modal-notification.service';
-import { MqttService, MqttWatchEvent } from '@core/services/mqtt.service';
-import { NetworkStatusService } from '@core/services/network-status.service';
+import { UserTokenService } from '@core/services/auth/user-token.service';
+import { HeaderStateService } from '@core/services/browser/header-state.service';
+import { MetaDataService } from '@core/services/browser/meta-data.service';
+import { WakeLockService } from '@core/services/browser/wake-lock.service';
 import { NotificationSeverity } from '@core/services/notification';
-import { NotificationService } from '@core/services/notification.service';
-import { SavedPagesService } from '@core/services/saved-pages.service';
-import { SettingsService } from '@core/services/settings.service';
-import { UnifiedReadingProgressService } from '@core/services/unified-reading-progress.service';
-import { UserTokenService } from '@core/services/user-token.service';
-import { VisibilityPrivacyService } from '@core/services/visibility-privacy.service';
-import { WakeLockService } from '@core/services/wake-lock.service';
+import { ModalNotificationService } from '@core/services/notification/modal-notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
+import {
+	MqttService,
+	MqttWatchEvent,
+} from '@core/services/realtime/mqtt.service';
+import { NetworkStatusService } from '@core/services/realtime/network-status.service';
+import { BookService } from '@features/books/services/book.service';
+import { DownloadService } from '@features/books/services/download.service';
+import { SavedPagesService } from '@features/books/services/saved-pages.service';
 import { ChapterCommentsComponent } from '@features/reading/components/chapter-comments/chapter-comments.component';
+import { ReaderSettingsNotificationComponent } from '@features/reading/components/reader-settings-notification/reader-settings-notification.component';
 import {
 	DocumentProgressEvent,
 	DocumentReaderComponent,
@@ -49,15 +47,20 @@ import {
 	TextProgressEvent,
 	TextReaderComponent,
 } from '@features/reading/components/readers';
+import { ChapterService } from '@features/reading/services/chapter.service';
+import { HighlightService } from '@features/reading/services/highlight.service';
+import { UnifiedReadingProgressService } from '@features/reading/services/unified-reading-progress.service';
+import { VisibilityPrivacyService } from '@features/reading/services/visibility-privacy.service';
+import { SettingsService } from '@features/user/services/settings.service';
 import { Chapter, ContentType, ImageMetadata, Page } from '@models/book.models';
 import { ContextMenuItem } from '@models/context-menu.models';
 import { ChapterIndexPipe } from '@shared/utils/pipes/chapter-index.pipe';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 import { BlurhashComponent } from '@ui/molecules/blurhash/blurhash.component';
-import { ReaderSettingsNotificationComponent } from '@ui/molecules/notification/custom-components';
 import { PromptModalComponent } from '@ui/molecules/notification/custom-components/prompt-modal/prompt-modal.component';
 import { AsideComponent } from '@ui/organisms/aside/aside.component';
+import { ContextMenuService } from '@ui/organisms/context-menu/context-menu.service';
 import { fromEvent, lastValueFrom } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 
@@ -163,6 +166,8 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private pageObjectUrls: string[] = [];
 	private destroyRef = inject(DestroyRef);
 	private maxReadPageIndex = 0;
+	private hasMarkedCurrentChapterRead = false;
+	private readonly READ_THRESHOLD_PERCENTAGE = 80;
 	private isNavigating = false;
 	private isDragging = false;
 	private lastScrollPosition = 0;
@@ -391,6 +396,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	) {
 		const requestId = ++this.currentLoadRequestId;
 		this.maxReadPageIndex = 0;
+		this.hasMarkedCurrentChapterRead = false;
 		this.readingProgress.set(0);
 		this.chapter.set(null);
 		try {
@@ -638,6 +644,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	private updateProgressState(
 		pageIndex: number,
 		visualProgressPercentage: number,
+		isLastPage = false,
 	) {
 		if (this.isNavigating || this.isDragging) return;
 
@@ -656,14 +663,41 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 				pageIndex,
 			);
 		}
+
+		if (
+			visualProgressPercentage >= this.READ_THRESHOLD_PERCENTAGE ||
+			isLastPage
+		) {
+			void this.markCurrentChapterAsRead();
+		}
 	}
 
-	onImageProgress(event: ReadingProgressEvent) {
+	private async markCurrentChapterAsRead(): Promise<void> {
+		if (this.hasMarkedCurrentChapterRead) return;
+
+		const current = this.chapter();
+		if (!current) return;
+
+		this.hasMarkedCurrentChapterRead = true;
+		await this.readingProgressService.markChapterRead(current.id);
+	}
+
+	private handlePagedProgress(event: {
+		pageIndex: number;
+		totalPages: number;
+		scrollPercentage?: number;
+	}): void {
+		if (event.totalPages <= 0) return;
 		const percent =
 			event.scrollPercentage !== undefined
 				? event.scrollPercentage
 				: ((event.pageIndex + 1) / event.totalPages) * 100;
-		this.updateProgressState(event.pageIndex, percent);
+		const isLastPage = event.pageIndex >= event.totalPages - 1;
+		this.updateProgressState(event.pageIndex, percent, isLastPage);
+	}
+
+	onImageProgress(event: ReadingProgressEvent) {
+		this.handlePagedProgress(event);
 	}
 
 	onTextProgress(event: TextProgressEvent) {
@@ -671,11 +705,7 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	onDocumentProgress(event: DocumentProgressEvent) {
-		const percent =
-			event.scrollPercentage !== undefined
-				? event.scrollPercentage
-				: ((event.pageIndex + 1) / event.totalPages) * 100;
-		this.updateProgressState(event.pageIndex, percent);
+		this.handlePagedProgress(event);
 	}
 
 	unblur() {
@@ -856,14 +886,15 @@ export class ChaptersComponent implements OnInit, OnDestroy, AfterViewInit {
 				);
 				return;
 			}
+			await this.markChapterAsCompleted();
 		}
 
-		await this.markChapterAsCompleted();
 		this.navigateToChapter(targetChapterId);
 	}
 
 	private async markChapterAsCompleted() {
 		this.readingProgressService.cancelPendingSync();
+		await this.markCurrentChapterAsRead();
 
 		const current = this.chapter();
 		if (current?.pages) {

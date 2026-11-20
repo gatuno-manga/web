@@ -12,8 +12,8 @@ import {
 	ReactiveFormsModule,
 	Validators,
 } from '@angular/forms';
-import { BookInteractionService } from '@core/services/book-interaction.service';
-import { NotificationService } from '@core/services/notification.service';
+import { NotificationService } from '@core/services/notification/notification.service';
+import { BookInteractionService } from '@features/books/services/book-interaction.service';
 import { IconsComponent } from '@ui/atoms/icons/icons.component';
 import { ButtonComponent } from '@ui/atoms/inputs/button/button.component';
 

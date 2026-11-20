@@ -418,7 +418,7 @@ app-aside {
 	}
 }
 
-@media (max-width: 768px) {
+@include mobile {
 	.page-container {
 		.page-number {
 			bottom: 8px;

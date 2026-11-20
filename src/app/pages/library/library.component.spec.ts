@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BookInteractionService } from '@core/services/book-interaction.service';
-import { CollectionService } from '@core/services/collection.service';
+import { BookInteractionService } from '@features/books/services/book-interaction.service';
+import { CollectionService } from '@features/books/services/collection.service';
 import { of } from 'rxjs';
 import { LibraryComponent } from './library.component';
 

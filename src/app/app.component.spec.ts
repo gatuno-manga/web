@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { SensitiveContentService } from '@core/services/sensitive-content.service';
+import { SensitiveContentService } from '@features/books/services/sensitive-content.service';
 import { SharedTestingModule } from '@testing/shared-testing.module';
 import { AppComponent } from './app.component';
 

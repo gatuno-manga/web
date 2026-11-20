@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DocumentReaderComponent } from './document-reader.component';
 
@@ -9,7 +9,7 @@ describe('DocumentReaderComponent', () => {
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
 			imports: [DocumentReaderComponent],
-			providers: [provideHttpClient()],
+			providers: [provideHttpClient(withXhr())],
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(DocumentReaderComponent);
@@ -41,14 +41,17 @@ describe('DocumentReaderComponent', () => {
 		expect(unsupported).toBeTruthy();
 	});
 
-	it('should emit page change on init', () => {
+	it('should not emit page change on init before pdf loads, and should emit onPdfLoaded', () => {
 		const spy = spyOn(component.pageChange, 'emit');
 		fixture.componentRef.setInput('src', 'http://example.com/test.pdf');
 		component.ngOnInit();
 
+		expect(spy).not.toHaveBeenCalled();
+
+		component.onPdfLoaded({ numPages: 10 } as any);
 		expect(spy).toHaveBeenCalledWith({
 			pageIndex: 0,
-			totalPages: 1,
+			totalPages: 10,
 		});
 	});
 

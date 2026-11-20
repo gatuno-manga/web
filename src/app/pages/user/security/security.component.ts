@@ -9,8 +9,8 @@ import {
 	OnInit,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AccountSecurityService } from '@core/services/account-security.service';
-import { SearchService } from '@core/services/search.service';
+import { AccountSecurityService } from '@features/user/services/account-security.service';
+import { SearchService } from '@features/user/services/search.service';
 import {
 	ActiveSession,
 	AuditLogItem,
