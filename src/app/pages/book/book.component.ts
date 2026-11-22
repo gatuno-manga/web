@@ -352,11 +352,15 @@ export class BookComponent implements OnInit, OnDestroy {
 	setMetaData() {
 		const b = this.book();
 		if (!b) return;
+		const configuredBase = (
+			this.env?.publicURL ??
+			environment.publicURL ??
+			''
+		).trim();
 		const base =
-			this.env?.publicURL ||
-			environment.publicURL ||
+			configuredBase ||
 			(isPlatformBrowser(this.platformId) ? window.location.origin : '');
-		const normalizedBase = base ? base.replace(/\/$/, '') : '';
+		const normalizedBase = base.trim().replace(/\/+$/, '');
 		const url = normalizedBase
 			? `${normalizedBase}/books/${b.id}`
 			: `/books/${b.id}`;
