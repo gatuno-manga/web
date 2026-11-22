@@ -4,7 +4,7 @@ import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine, isMainModule } from '@angular/ssr/node';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import { parseAllowedHosts } from './allowed-hosts';
+import { parseAllowedHosts, validateRequestHost } from './allowed-hosts';
 import bootstrap from './main.server';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
@@ -48,7 +48,11 @@ app.get('/api/{*splat}', (_req, res) => {
 
 app.get('/{*splat}', (req, res, next) => {
 	const { protocol, originalUrl, baseUrl, headers } = req;
-	const host = headers.host || 'localhost:4000';
+	const host = validateRequestHost(headers.host);
+	if (!host) {
+		res.status(400).send('Invalid Host header');
+		return;
+	}
 	const requestUrl = `${protocol}://${host}${originalUrl}`;
 
 	commonEngine
