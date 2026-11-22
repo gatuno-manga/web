@@ -397,18 +397,29 @@ describe('MqttService', () => {
 			firstMock.emit('connect');
 			const staleReq = _httpMock.expectOne('/interactions/mqtt-topics');
 
-			// Disconnect before the in-flight HTTP response arrives, then start a new connection
+			// Disconnect before the in-flight HTTP response arrives, then reconnect
 			service.disconnect();
 			service.connect();
+			secondMock.emit('connect');
 
 			staleReq.flush({
-				data: { topics: ['user/123/notifications'] },
+				data: { topics: ['user/stale/notifications'] },
 			});
 
-			expect((service as any).subscribedTopics.size).toBe(0);
-			expect((service as any).dynamicTopics.size).toBe(0);
+			expect(secondMock.client.subscribe).not.toHaveBeenCalledWith(
+				'user/stale/notifications',
+				jasmine.any(Object),
+				jasmine.any(Function),
+			);
+			expect(
+				(service as any).subscribedTopics.has(
+					'user/stale/notifications',
+				),
+			).toBeFalse();
+			expect(
+				(service as any).dynamicTopics.has('user/stale/notifications'),
+			).toBeFalse();
 
-			secondMock.emit('connect');
 			_httpMock.expectOne('/interactions/mqtt-topics').flush({
 				data: { topics: ['user/123/notifications'] },
 			});
