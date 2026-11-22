@@ -4,7 +4,6 @@
 	"entry": ["src/main.ts", "src/main.server.ts", "src/server.ts"],
 	"ignore": ["**/*.spec.ts", "src/test.ts"],
 	"ignoreDependencies": [
-		"@angular-devkit/build-angular",
 		"karma",
 		"jasmine-core",
 		"karma-jasmine",
