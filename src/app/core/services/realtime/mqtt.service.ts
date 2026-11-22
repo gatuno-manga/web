@@ -323,8 +323,9 @@ export class MqttService implements OnDestroy {
 
 	private setupClientListeners(): void {
 		if (!this.client) return;
+		const client = this.client;
 
-		this.client.on('connect', () => {
+		client.on('connect', () => {
 			logConnectionEvent(
 				this.serviceName,
 				'connected',
@@ -357,7 +358,7 @@ export class MqttService implements OnDestroy {
 								topics,
 							);
 							if (
-								this.client &&
+								this.client === client &&
 								this._connected() &&
 								topics &&
 								Array.isArray(topics)
@@ -579,14 +580,14 @@ export class MqttService implements OnDestroy {
 		if (this.client) {
 			this.client.end(true);
 			this.client = null;
-			this.transitionTo(
-				WebSocketConnectionState.DISCONNECTED,
-				'Desconexão manual',
-			);
-			this._connected.set(false);
-			this.subscribedTopics.clear();
-			this.dynamicTopics.clear();
 		}
+		this.transitionTo(
+			WebSocketConnectionState.DISCONNECTED,
+			'Desconexão manual',
+		);
+		this._connected.set(false);
+		this.subscribedTopics.clear();
+		this.dynamicTopics.clear();
 	}
 
 	isConnected(): boolean {

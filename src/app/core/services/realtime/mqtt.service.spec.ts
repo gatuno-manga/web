@@ -385,6 +385,119 @@ describe('MqttService', () => {
 			).toBe(1);
 		});
 
+		it('should ignore stale /interactions/mqtt-topics response if disconnected before it settles', () => {
+			const firstMock = createMockMqttClient();
+			const secondMock = createMockMqttClient();
+			spyOn<any>(service, 'createMqttClient').and.returnValues(
+				firstMock.client,
+				secondMock.client,
+			);
+
+			service.connect();
+			firstMock.emit('connect');
+			const staleReq = _httpMock.expectOne('/interactions/mqtt-topics');
+
+			// Disconnect before the in-flight HTTP response arrives, then start a new connection
+			service.disconnect();
+			service.connect();
+
+			staleReq.flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			expect((service as any).subscribedTopics.size).toBe(0);
+			expect((service as any).dynamicTopics.size).toBe(0);
+
+			secondMock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			expect(secondMock.client.subscribe).toHaveBeenCalledWith(
+				'user/123/notifications',
+				{ qos: 1 },
+				jasmine.any(Function),
+			);
+			expect(
+				(service as any).subscribedTopics.get('user/123/notifications'),
+			).toBe(1);
+		});
+
+		it('should clear dynamicTopics and subscribedTopics when disconnect is called while OFFLINE_PAUSED', () => {
+			const firstMock = createMockMqttClient();
+			const secondMock = createMockMqttClient();
+			spyOn<any>(service, 'createMqttClient').and.returnValues(
+				firstMock.client,
+				secondMock.client,
+			);
+
+			service.connect();
+			firstMock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			offline$.next();
+			expect(service.connectionState()).toBe(
+				WebSocketConnectionState.OFFLINE_PAUSED,
+			);
+
+			service.disconnect();
+			expect(service.connectionState()).toBe(
+				WebSocketConnectionState.DISCONNECTED,
+			);
+			expect((service as any).subscribedTopics.size).toBe(0);
+			expect((service as any).dynamicTopics.size).toBe(0);
+
+			service.connect();
+			secondMock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			expect(secondMock.client.subscribe).toHaveBeenCalledWith(
+				'user/123/notifications',
+				{ qos: 1 },
+				jasmine.any(Function),
+			);
+			expect(
+				(service as any).subscribedTopics.get('user/123/notifications'),
+			).toBe(1);
+		});
+
+		it('should allow subsequent reconnect to subscribe if /interactions/mqtt-topics fails with HTTP error', () => {
+			const mock = createMockMqttClient();
+			spyOn<any>(service, 'createMqttClient').and.returnValue(
+				mock.client,
+			);
+
+			service.connect();
+			mock.emit('connect');
+			_httpMock
+				.expectOne('/interactions/mqtt-topics')
+				.flush('Server Error', {
+					status: 500,
+					statusText: 'Internal Server Error',
+				});
+
+			expect((service as any).dynamicTopics.size).toBe(0);
+			expect((service as any).subscribedTopics.size).toBe(0);
+
+			mock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			expect(mock.client.subscribe).toHaveBeenCalledWith(
+				'user/123/notifications',
+				{ qos: 1 },
+				jasmine.any(Function),
+			);
+			expect(
+				(service as any).subscribedTopics.get('user/123/notifications'),
+			).toBe(1);
+		});
+
 		it('should unsubscribe both chapterTopic and bookTopic on watchChapter teardown when no other watcher is active', () => {
 			const mock = createMockMqttClient();
 			spyOn<any>(service, 'createMqttClient').and.returnValue(
