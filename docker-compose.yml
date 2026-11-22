@@ -6,6 +6,7 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV:-development}
       - API_URL=${API_URL:-http://localhost:3000}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
     networks:
       - gatuno-net
     deploy:

@@ -4,6 +4,7 @@ import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine, isMainModule } from '@angular/ssr/node';
 import cookieParser from 'cookie-parser';
 import express from 'express';
+import { parseAllowedHosts, validateRequestHost } from './allowed-hosts';
 import bootstrap from './main.server';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
@@ -11,9 +12,7 @@ const browserDistFolder = resolve(serverDistFolder, '../browser');
 const indexHtml = join(serverDistFolder, 'index.server.html');
 
 const app = express();
-const allowedHosts = process.env['ALLOWED_HOSTS']
-	? process.env['ALLOWED_HOSTS'].split(',')
-	: ['localhost', '127.0.0.1'];
+const allowedHosts = parseAllowedHosts(process.env['ALLOWED_HOSTS']);
 const commonEngine = new CommonEngine({ allowedHosts });
 app.use(cookieParser());
 
@@ -49,7 +48,11 @@ app.get('/api/{*splat}', (_req, res) => {
 
 app.get('/{*splat}', (req, res, next) => {
 	const { protocol, originalUrl, baseUrl, headers } = req;
-	const host = headers.host || 'localhost:4000';
+	const host = validateRequestHost(headers.host);
+	if (!host) {
+		res.status(400).send('Invalid Host header');
+		return;
+	}
 	const requestUrl = `${protocol}://${host}${originalUrl}`;
 
 	commonEngine
