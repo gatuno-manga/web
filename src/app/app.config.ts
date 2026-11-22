@@ -17,7 +17,6 @@ import {
 	withHttpTransferCacheOptions,
 	withNoIncrementalHydration,
 } from '@angular/platform-browser';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
 	PreloadAllModules,
 	provideRouter,
@@ -46,7 +45,6 @@ export const appConfig: ApplicationConfig = {
 			withHttpTransferCacheOptions({ includePostRequests: false }),
 			withNoIncrementalHydration(),
 		),
-		provideAnimationsAsync(),
 		provideHttpClient(
 			withFetch(),
 			withInterceptors([
