@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile.prod
       args:
+        - PUBLIC_URL=${PUBLIC_URL:-}
         - API_URL=https://${API_HOST:-localhost:3000}
         - API_URL_SERVER=http://api:3000
     ports:
