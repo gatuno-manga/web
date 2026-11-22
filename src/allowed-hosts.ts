@@ -1,11 +1,23 @@
-const ALLOWED_HOST_PATTERN = /^(\*\.)?[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$/;
+const ALLOWED_HOST_PATTERN =
+	/^(\*\.[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+|[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)$/;
+
+function hasControlChar(value: string): boolean {
+	for (let i = 0; i < value.length; i++) {
+		const code = value.charCodeAt(i);
+		if (code < 0x20 || code === 0x7f) {
+			return true;
+		}
+	}
+	return false;
+}
 
 /**
  * Parses a comma-separated list of allowed hosts for Angular SSR `CommonEngine`.
  *
  * Trims whitespace around entries, drops empty values, and rejects wildcards
- * (`*`, `*.`), schemes, userinfo, paths, ports, or malformed hostnames. Throws
- * if unset or empty after filtering so misconfigured deploys fail fast.
+ * (`*`, `*.`, `*.tld`), schemes, userinfo, paths, ports, or malformed
+ * hostnames. Throws if unset or empty after filtering so misconfigured deploys
+ * fail fast.
  */
 export function parseAllowedHosts(raw: string | undefined): string[] {
 	const hosts = (raw ?? '')
@@ -34,7 +46,8 @@ export function parseAllowedHosts(raw: string | undefined): string[] {
  * Validates an incoming HTTP `Host` header before interpolating it into an SSR URL.
  *
  * Returns the validated host string, or `null` when missing or containing
- * userinfo, paths, queries, fragments, whitespace, or invalid URL syntax.
+ * userinfo, paths, queries, fragments, whitespace, control characters, bare
+ * delimiters, or invalid URL syntax.
  */
 export function validateRequestHost(
 	hostHeader: string | string[] | undefined,
@@ -43,23 +56,18 @@ export function validateRequestHost(
 		return null;
 	}
 
-	if (/\s/.test(hostHeader)) {
+	if (
+		/\s/.test(hostHeader) ||
+		/[/?#@\\]/.test(hostHeader) ||
+		hostHeader.endsWith(':') ||
+		hasControlChar(hostHeader)
+	) {
 		return null;
 	}
 
 	try {
 		const parsed = new URL(`http://${hostHeader}`);
-		if (
-			parsed.hostname === '' ||
-			parsed.username !== '' ||
-			parsed.password !== '' ||
-			parsed.pathname !== '/' ||
-			parsed.search !== '' ||
-			parsed.hash !== ''
-		) {
-			return null;
-		}
-		return hostHeader;
+		return parsed.hostname === '' ? null : hostHeader;
 	} catch {
 		return null;
 	}
