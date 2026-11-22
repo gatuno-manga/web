@@ -3,6 +3,7 @@ import { parseAllowedHosts, validateRequestHost } from './allowed-hosts';
 describe('parseAllowedHosts', () => {
 	it('parses a single host', () => {
 		expect(parseAllowedHosts('example.com')).toEqual(['example.com']);
+		expect(parseAllowedHosts('localhost')).toEqual(['localhost']);
 	});
 
 	it('parses multiple comma-separated hosts', () => {
@@ -93,9 +94,15 @@ describe('validateRequestHost', () => {
 		expect(validateRequestHost('example.com:')).toBeNull();
 	});
 
-	it('rejects malformed URL syntax and invalid ports', () => {
+	it('rejects malformed URL syntax, invalid ports, and non-LDH/Unicode/encoded chars', () => {
 		expect(validateRequestHost('example.com:abc')).toBeNull();
 		expect(validateRequestHost('example.com:99999')).toBeNull();
 		expect(validateRequestHost('[')).toBeNull();
+		expect(
+			validateRequestHost('"onmouseover="alert(1).example.com'),
+		).toBeNull();
+		expect(validateRequestHost('example%2ecom')).toBeNull();
+		expect(validateRequestHost('.example.com')).toBeNull();
+		expect(validateRequestHost('example\uff0ecom')).toBeNull();
 	});
 });

@@ -1,15 +1,8 @@
 const ALLOWED_HOST_PATTERN =
 	/^(\*\.[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+|[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)$/;
 
-function hasControlChar(value: string): boolean {
-	for (let i = 0; i < value.length; i++) {
-		const code = value.charCodeAt(i);
-		if (code < 0x20 || code === 0x7f) {
-			return true;
-		}
-	}
-	return false;
-}
+const REQUEST_HOST_PATTERN =
+	/^([a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*|\[[0-9a-fA-F:.]+\])(:[0-9]{1,5})?$/;
 
 /**
  * Parses a comma-separated list of allowed hosts for Angular SSR `CommonEngine`.
@@ -45,22 +38,15 @@ export function parseAllowedHosts(raw: string | undefined): string[] {
 /**
  * Validates an incoming HTTP `Host` header before interpolating it into an SSR URL.
  *
- * Returns the validated host string, or `null` when missing or containing
- * userinfo, paths, queries, fragments, whitespace, control characters, bare
- * delimiters, or invalid URL syntax.
+ * Enforces a strict hostname/IPv6 + optional port allowlist before URL parsing,
+ * returning the validated host string or `null` when missing or malformed.
  */
 export function validateRequestHost(
 	hostHeader: string | string[] | undefined,
 ): string | null {
-	if (typeof hostHeader !== 'string' || hostHeader.length === 0) {
-		return null;
-	}
-
 	if (
-		/\s/.test(hostHeader) ||
-		/[/?#@\\]/.test(hostHeader) ||
-		hostHeader.endsWith(':') ||
-		hasControlChar(hostHeader)
+		typeof hostHeader !== 'string' ||
+		!REQUEST_HOST_PATTERN.test(hostHeader)
 	) {
 		return null;
 	}
