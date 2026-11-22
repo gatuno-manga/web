@@ -88,6 +88,7 @@ export class MqttService implements OnDestroy {
 	public readonly connectionState = this._connectionState.asReadonly();
 
 	private subscribedTopics = new Map<string, number>();
+	private dynamicTopics = new Set<string>();
 	private networkSubscription: Subscription | null = null;
 	private readonly serviceName = 'MqttService';
 	private readonly isBrowser: boolean;
@@ -322,8 +323,9 @@ export class MqttService implements OnDestroy {
 
 	private setupClientListeners(): void {
 		if (!this.client) return;
+		const client = this.client;
 
-		this.client.on('connect', () => {
+		client.on('connect', () => {
 			logConnectionEvent(
 				this.serviceName,
 				'connected',
@@ -355,9 +357,17 @@ export class MqttService implements OnDestroy {
 								'[MQTT_DEBUG] Tópicos retornados pela API:',
 								topics,
 							);
-							if (topics && Array.isArray(topics)) {
+							if (
+								this.client === client &&
+								this._connected() &&
+								topics &&
+								Array.isArray(topics)
+							) {
 								topics.forEach((topic) => {
-									this.subscribeTopic(topic);
+									if (!this.dynamicTopics.has(topic)) {
+										this.dynamicTopics.add(topic);
+										this.subscribeTopic(topic);
+									}
 								});
 							}
 						},
@@ -570,13 +580,14 @@ export class MqttService implements OnDestroy {
 		if (this.client) {
 			this.client.end(true);
 			this.client = null;
-			this.transitionTo(
-				WebSocketConnectionState.DISCONNECTED,
-				'Desconexão manual',
-			);
-			this._connected.set(false);
-			this.subscribedTopics.clear();
 		}
+		this.transitionTo(
+			WebSocketConnectionState.DISCONNECTED,
+			'Desconexão manual',
+		);
+		this._connected.set(false);
+		this.subscribedTopics.clear();
+		this.dynamicTopics.clear();
 	}
 
 	isConnected(): boolean {
@@ -765,8 +776,7 @@ export class MqttService implements OnDestroy {
 					sub.unsubscribe();
 				});
 				this.unsubscribeTopic(chapterTopic);
-				// Não damos unsubscribe do bookTopic porque ele pode estar sendo usado por watchBook simultaneamente,
-				// idealmente haveria um ref count por tópico.
+				this.unsubscribeTopic(bookTopic);
 			};
 		});
 	}

@@ -235,4 +235,376 @@ describe('MqttService', () => {
 			expect(service.connected()).toBeFalse();
 		});
 	});
+
+	describe('Dynamic Topics & Reconnect Ref-Counting', () => {
+		function createMockMqttClient(): {
+			client: jasmine.SpyObj<MqttClient>;
+			emit: (event: string, ...args: unknown[]) => void;
+		} {
+			const handlers = new Map<
+				string,
+				Array<(...args: unknown[]) => void>
+			>();
+			const client = jasmine.createSpyObj<MqttClient>('MqttClient', [
+				'on',
+				'end',
+				'subscribe',
+				'unsubscribe',
+				'publish',
+			]);
+			client.on.and.callFake(((
+				event: string,
+				cb: (...args: unknown[]) => void,
+			) => {
+				const list = handlers.get(event) ?? [];
+				list.push(cb);
+				handlers.set(event, list);
+				return client;
+			}) as MqttClient['on']);
+			client.subscribe.and.returnValue(client);
+			client.unsubscribe.and.returnValue(client);
+
+			return {
+				client,
+				emit: (event: string, ...args: unknown[]) => {
+					for (const cb of handlers.get(event) ?? []) {
+						cb(...args);
+					}
+				},
+			};
+		}
+
+		it('should not inflate subscribedTopics ref-counts when connect fires multiple times', () => {
+			const mock = createMockMqttClient();
+			spyOn<any>(service, 'createMqttClient').and.returnValue(
+				mock.client,
+			);
+
+			service.connect();
+			mock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications', 'books/global'] },
+			});
+
+			expect(mock.client.subscribe.calls.count()).toBe(2);
+			expect(
+				(service as any).subscribedTopics.get('user/123/notifications'),
+			).toBe(1);
+			expect((service as any).subscribedTopics.get('books/global')).toBe(
+				1,
+			);
+
+			// Broker reconnect emits 'connect' again on the same client
+			mock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: {
+					topics: [
+						'user/123/notifications',
+						'books/global',
+						'books/new-global',
+					],
+				},
+			});
+
+			// resubscribeAll() subscribes the 2 existing topics + 1 newly added dynamic topic = 3 new calls (5 total)
+			expect(mock.client.subscribe.calls.count()).toBe(5);
+			expect(
+				(service as any).subscribedTopics.get('user/123/notifications'),
+			).toBe(1);
+			expect((service as any).subscribedTopics.get('books/global')).toBe(
+				1,
+			);
+			expect(
+				(service as any).subscribedTopics.get('books/new-global'),
+			).toBe(1);
+		});
+
+		it('should preserve dynamicTopics without inflating ref-counts across offline/online reconnect', () => {
+			const firstMock = createMockMqttClient();
+			const secondMock = createMockMqttClient();
+			const createSpy = spyOn<any>(
+				service,
+				'createMqttClient',
+			).and.returnValues(firstMock.client, secondMock.client);
+
+			service.connect();
+			firstMock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			offline$.next();
+			expect(service.connectionState()).toBe(
+				WebSocketConnectionState.OFFLINE_PAUSED,
+			);
+
+			online$.next();
+			expect(createSpy).toHaveBeenCalledTimes(2);
+			secondMock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			// Only resubscribeAll() should subscribe on the new client, not a duplicate subscribeTopic()
+			expect(secondMock.client.subscribe.calls.count()).toBe(1);
+			expect(
+				(service as any).subscribedTopics.get('user/123/notifications'),
+			).toBe(1);
+		});
+
+		it('should clear dynamicTopics on manual disconnect so a fresh connect re-subscribes', () => {
+			const firstMock = createMockMqttClient();
+			const secondMock = createMockMqttClient();
+			spyOn<any>(service, 'createMqttClient').and.returnValues(
+				firstMock.client,
+				secondMock.client,
+			);
+
+			service.connect();
+			firstMock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			service.disconnect();
+			expect((service as any).subscribedTopics.size).toBe(0);
+
+			service.connect();
+			secondMock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			expect(secondMock.client.subscribe).toHaveBeenCalledWith(
+				'user/123/notifications',
+				{ qos: 1 },
+				jasmine.any(Function),
+			);
+			expect(
+				(service as any).subscribedTopics.get('user/123/notifications'),
+			).toBe(1);
+		});
+
+		it('should ignore stale /interactions/mqtt-topics response if disconnected before it settles', () => {
+			const firstMock = createMockMqttClient();
+			const secondMock = createMockMqttClient();
+			spyOn<any>(service, 'createMqttClient').and.returnValues(
+				firstMock.client,
+				secondMock.client,
+			);
+
+			service.connect();
+			firstMock.emit('connect');
+			const staleReq = _httpMock.expectOne('/interactions/mqtt-topics');
+
+			// Disconnect before the in-flight HTTP response arrives, then reconnect
+			service.disconnect();
+			service.connect();
+			secondMock.emit('connect');
+
+			staleReq.flush({
+				data: { topics: ['user/stale/notifications'] },
+			});
+
+			expect(secondMock.client.subscribe).not.toHaveBeenCalledWith(
+				'user/stale/notifications',
+				jasmine.any(Object),
+				jasmine.any(Function),
+			);
+			expect(
+				(service as any).subscribedTopics.has(
+					'user/stale/notifications',
+				),
+			).toBeFalse();
+			expect(
+				(service as any).dynamicTopics.has('user/stale/notifications'),
+			).toBeFalse();
+
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			expect(secondMock.client.subscribe).toHaveBeenCalledWith(
+				'user/123/notifications',
+				{ qos: 1 },
+				jasmine.any(Function),
+			);
+			expect(
+				(service as any).subscribedTopics.get('user/123/notifications'),
+			).toBe(1);
+		});
+
+		it('should clear dynamicTopics and subscribedTopics when disconnect is called while OFFLINE_PAUSED', () => {
+			const firstMock = createMockMqttClient();
+			const secondMock = createMockMqttClient();
+			spyOn<any>(service, 'createMqttClient').and.returnValues(
+				firstMock.client,
+				secondMock.client,
+			);
+
+			service.connect();
+			firstMock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			offline$.next();
+			expect(service.connectionState()).toBe(
+				WebSocketConnectionState.OFFLINE_PAUSED,
+			);
+
+			service.disconnect();
+			expect(service.connectionState()).toBe(
+				WebSocketConnectionState.DISCONNECTED,
+			);
+			expect((service as any).subscribedTopics.size).toBe(0);
+			expect((service as any).dynamicTopics.size).toBe(0);
+
+			service.connect();
+			secondMock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			expect(secondMock.client.subscribe).toHaveBeenCalledWith(
+				'user/123/notifications',
+				{ qos: 1 },
+				jasmine.any(Function),
+			);
+			expect(
+				(service as any).subscribedTopics.get('user/123/notifications'),
+			).toBe(1);
+		});
+
+		it('should allow subsequent reconnect to subscribe if /interactions/mqtt-topics fails with HTTP error', () => {
+			const mock = createMockMqttClient();
+			spyOn<any>(service, 'createMqttClient').and.returnValue(
+				mock.client,
+			);
+
+			service.connect();
+			mock.emit('connect');
+			_httpMock
+				.expectOne('/interactions/mqtt-topics')
+				.flush('Server Error', {
+					status: 500,
+					statusText: 'Internal Server Error',
+				});
+
+			expect((service as any).dynamicTopics.size).toBe(0);
+			expect((service as any).subscribedTopics.size).toBe(0);
+
+			mock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: ['user/123/notifications'] },
+			});
+
+			expect(mock.client.subscribe).toHaveBeenCalledWith(
+				'user/123/notifications',
+				{ qos: 1 },
+				jasmine.any(Function),
+			);
+			expect(
+				(service as any).subscribedTopics.get('user/123/notifications'),
+			).toBe(1);
+		});
+
+		it('should unsubscribe both chapterTopic and bookTopic on watchChapter teardown when no other watcher is active', () => {
+			const mock = createMockMqttClient();
+			spyOn<any>(service, 'createMqttClient').and.returnValue(
+				mock.client,
+			);
+
+			service.connect();
+			mock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: [] },
+			});
+
+			const sub = service.watchChapter('ch-1', 'book-1').subscribe();
+			expect(mock.client.subscribe).toHaveBeenCalledWith(
+				'books/events/chapter/ch-1',
+				{ qos: 1 },
+				jasmine.any(Function),
+			);
+			expect(mock.client.subscribe).toHaveBeenCalledWith(
+				'books/events/book/book-1',
+				{ qos: 1 },
+				jasmine.any(Function),
+			);
+
+			sub.unsubscribe();
+
+			expect(mock.client.unsubscribe).toHaveBeenCalledWith(
+				'books/events/chapter/ch-1',
+			);
+			expect(mock.client.unsubscribe).toHaveBeenCalledWith(
+				'books/events/book/book-1',
+			);
+			expect(
+				(service as any).subscribedTopics.has(
+					'books/events/chapter/ch-1',
+				),
+			).toBeFalse();
+			expect(
+				(service as any).subscribedTopics.has(
+					'books/events/book/book-1',
+				),
+			).toBeFalse();
+		});
+
+		it('should keep bookTopic subscribed while concurrent watchBook is active and unsubscribe when both tear down', () => {
+			const mock = createMockMqttClient();
+			spyOn<any>(service, 'createMqttClient').and.returnValue(
+				mock.client,
+			);
+
+			service.connect();
+			mock.emit('connect');
+			_httpMock.expectOne('/interactions/mqtt-topics').flush({
+				data: { topics: [] },
+			});
+
+			const bookSub = service.watchBook('book-1').subscribe();
+			const chapterSub = service
+				.watchChapter('ch-1', 'book-1')
+				.subscribe();
+
+			expect(
+				(service as any).subscribedTopics.get(
+					'books/events/book/book-1',
+				),
+			).toBe(2);
+			expect(
+				(service as any).subscribedTopics.get(
+					'books/events/chapter/ch-1',
+				),
+			).toBe(1);
+
+			chapterSub.unsubscribe();
+
+			expect(mock.client.unsubscribe).toHaveBeenCalledWith(
+				'books/events/chapter/ch-1',
+			);
+			expect(mock.client.unsubscribe).not.toHaveBeenCalledWith(
+				'books/events/book/book-1',
+			);
+			expect(
+				(service as any).subscribedTopics.get(
+					'books/events/book/book-1',
+				),
+			).toBe(1);
+
+			bookSub.unsubscribe();
+
+			expect(mock.client.unsubscribe).toHaveBeenCalledWith(
+				'books/events/book/book-1',
+			);
+			expect(
+				(service as any).subscribedTopics.has(
+					'books/events/book/book-1',
+				),
+			).toBeFalse();
+		});
+	});
 });
